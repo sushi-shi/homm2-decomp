@@ -102,3 +102,11 @@ headers. Every starting member needs a current home with the same value; new,
 removed or changed members need a new decision. Moving members changes C1
 symbol numbering in the unit, so do source moves as a reviewed batch and check
 the edited functions with `homm2 match`.
+
+## Starting ledger
+
+At initialization every domain was `pending`: 848 rows (834 enum
+blocks and 14 macro or const groups) over 8,253 keys (8,127 enum members,
+78 macros, 48 consts) evaluated in 161 unit views. The census holds 763
+distinct values; 371 are held by two or more keys and 361 by two or more
+domains.

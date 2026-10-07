@@ -181,8 +181,8 @@ guides are skills under `.agents/skills/` (`.claude/skills` links there);
 | MAX regression (`verify check`) | `status` (observation only) | merge: `verify check` fails on a live loss |
 | `link-diff` per image | `link_diff.py` ceiling (ninja default) | merge: per-image ceiling, `verify link-diff [--update]` |
 | `strict-view` | `strict_allocations` | keep (same role: strict data identity) |
-| `constants` | `constants_audit` | merge verb |
-| `enum-reuse` | `audit enums` | keep as audit (no review ledger here yet) |
+| `constants` | `constants_audit` | merge: verb, and HoMM1's open floor and kept rows over the clang-tidy census ([ported checks](#ported-checks)) |
+| `enum-reuse` | `audit enums` | merge: `verify enum-reuse` with the review ledger replaces `audit enums` (now its alias) ([ported checks](#ported-checks)) |
 | `localization` | `build.localization` (byte-preserving check in build) | merge verb |
 | clean exports | `clean --verify` | keep |
 | play runner | `run-rebuilt-game.py` | merge verb |
@@ -217,8 +217,71 @@ its review ledger was restored as `config/reviews/constants.tsv` (every file
 `pending` on this branch, the two imported codecs `third-party`), and the 53
 null pointers spelled `0` became `NULL`.
 
+`constants` also holds the open numeric constants to the `#floor` in
+`config/constants.tsv` ([constants-audit.md](constants-audit.md)).
+`enum-reuse` runs outside the tier, as HoMM1 runs it: it fails while its
+review ledger has `pending` rows ([enum-reuse.md](enum-reuse.md)).
+
 `od-frames`, `relocs`, `data-relocs` and `data-topology` are reports, not
 gates.
+
+## Ported checks
+
+HoMM1's two whole-program constant checks were ported from
+`homm1-decomp`, branch `decomp-buka-2003` at `4ab5281d` (`enum_reuse.py` and
+`constants.py` last changed in `3a5094a0`, `constant_context.py` in
+`7c6b699b`), into this repository's existing modules.
+
+`homm2 verify enum-reuse` (`verify/enum_reuse.py`, replacing
+`audit/enums.py`; `homm2 audit enums` is its alias):
+
+- retained: the lexical inventory joined with libclang evaluation of every unit
+  and the fatal coverage check between them; the use contexts
+  (`verify/constant_context.py`, copied); the `--value`, `--duplicates`,
+  `--json`, `--no-report`, `--init-ledger` and `--extend-ledger` modes; the
+  `enum_reuse`, `enum_value_collisions`, `enum_domain_pairs` and
+  `enum_role_pairs` reports; the ledger schema, its `retain`/`canonical`/
+  `reuse`/`pending` decisions, retired members and the value-preserving
+  provenance check; standalone status (not in the tier, as in HoMM1).
+- adapted: `H2_ENUM_*` blocks (`BEGIN`, `CLASS_BEGIN`, `CLASS_BEGIN_T`,
+  `CLASS_BEGIN_SPLIT`) in place of `H1_ENUM_*`; `src/{BASE,SOURCE,EDITOR}` and
+  `include/`; the units of both images from `config/units.toml`, each shared
+  unit read once per image with `homm2.manifest.clang_image_defines`
+  (HoMM1 reads a shared unit once, as the game), in the retail-analysis view
+  `audit enums` used, with its reviewed parse diagnostics and the
+  localization overlay; byte offsets (the sources are not ASCII-only);
+  `#if H2_STRICT_ENUMS` blocks are strict-view only, not coverage holes.
+- extended: the census keys every object-like `#define` with an integer value
+  (evaluated by appended enumerator probes) and every `const` integer, not only
+  enum members, with the images that compile each key; the value map
+  `build/gen/constant_values.{tsv,json}` and `--by-value` print every value
+  with every key; the ledger has one row per file for its macro and const
+  groups.
+- deferred: the collision report's literal side reads function-body literals
+  from its own walk, not from a libclang constants census (this repository's
+  `constants` is clang-tidy based, without HoMM1's per-literal review groups,
+  so `literal_groups` is dropped).
+
+`homm2 verify constants` (`verify/constants.py`, extended in place):
+
+- retained: the clang-tidy magic-number and null-pointer census, the
+  per-file `pending`/`reviewed`/`third-party` checklist and the generated
+  `build/constants/` reports.
+- adopted from HoMM1: the committed `#floor` of open findings, which
+  `--update-floor` only lowers and `--gate` holds; kept rows in
+  `config/constants.tsv` (fnmatch globs over file, owner, spelling, group and
+  detail, then a reason; a row that keeps nothing is stale and fails the
+  gate); `--list [FILTER]`; `build/constants/open.tsv`.
+- adapted: open means a `code`, `local-table` or `declaration` magic number
+  outside `third-party` files; group is that category and detail the source
+  line, and owner is the enclosing function from the lexical pass (HoMM1's
+  libclang review groups and AST details have no counterpart here); the open
+  count is split by game, shared and editor units; a `reviewed` file with open
+  findings is a gate failure instead of an exception; shared units with
+  `#ifdef HOMM2_EDITOR` code are read a second time as the editor.
+- inapplicable: HoMM1's proven `NULL`/`TRUE`/`FALSE`/enum replacements,
+  `--fix` and the strict-view proof pass (the null-pointer check is the
+  clang-tidy one; VC6 has `bool`).
 
 ## Tests
 

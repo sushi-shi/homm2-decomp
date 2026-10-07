@@ -46,3 +46,5 @@ for `EDT2PL.exe`). Addresses are image RVAs.
   casts`).
 - `constants.tsv`: the per-file numeric-literal checklist (`pending`,
   `reviewed`, `third-party`) of `homm2 verify constants`.
+- `enum-reuse.tsv`: the enum and constant reuse review ledger
+  (`homm2 verify enum-reuse`, [docs/enum-reuse.md](../docs/enum-reuse.md)).
