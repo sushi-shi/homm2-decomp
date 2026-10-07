@@ -10814,6 +10814,99 @@ void editManager::ScreenToCell(i32& x, i32& y) {
         y = gZoomViewCells[m_zoomLevel] - 1;
 }
 
+VA(0x00403a3d, 0x27)
+void editManager::DrawMap(void) {
+    DrawView(m_viewX, m_viewY);
+}
+
+VA(0x00403a64, 0x38b)
+void editManager::DrawView(i32 viewX, i32 viewY) {
+    i32 col;
+    i32 outline;
+    i32 tileSize;
+    i32 row;
+    i32 cells;
+    i32 oldZoom;
+
+    oldZoom = m_zoomLevel;
+    if (gGeneratingMap)
+        m_zoomLevel = EDIT_ZOOM_NORMAL;
+    cells = gZoomViewCells[m_zoomLevel];
+    for (row = 0; row < cells; row++)
+        for (col = 0; col < cells; col++)
+            DrawCell(viewX + col, viewY + row, col, row, EDIT_DRAW_GROUND);
+    for (row = 0; row < cells; row++) {
+        for (col = 0; col < cells; col++)
+            DrawCell(viewX + col, viewY + row, col, row, EDIT_DRAW_OBJECTS);
+        if (row > 0) {
+            for (col = 0; col < cells; col++)
+                DrawCell(viewX + col, viewY + row - 1, col, row - 1, EDIT_DRAW_OVERHANGING);
+        }
+    }
+    for (col = 0; col < cells; col++)
+        DrawCell(viewX + col, viewY + cells - 1, col, cells - 1, EDIT_DRAW_OVERHANGING);
+    gLastAnimationTick = KBTickCount();
+    if (!gConfig.editorScreenAnimation) {
+        m_animationCounter++;
+        m_animationFrame++;
+        m_animationFrame %= EDIT_ANIMATION_FRAMES;
+    }
+    tileSize = gZoomTileSize[m_zoomLevel];
+    outline = m_zoomLevel ? 1 : 2;
+    if (gSelectionX >= 0) {
+        gSelectionColor = EDIT_SELECTION_COLOR;
+        FillBitmapAreaClip(
+            gpWindowManager->m_screen,
+            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
+            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
+            outline,
+            gSelectionHeight * tileSize - 1,
+            gSelectionColor,
+            EDIT_VIEW_LEFT,
+            EDIT_VIEW_TOP,
+            EDIT_VIEW_PIXELS,
+            EDIT_VIEW_PIXELS
+        );
+        FillBitmapAreaClip(
+            gpWindowManager->m_screen,
+            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
+            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
+            gSelectionWidth * tileSize - 1,
+            outline,
+            gSelectionColor,
+            EDIT_VIEW_LEFT,
+            EDIT_VIEW_TOP,
+            EDIT_VIEW_PIXELS,
+            EDIT_VIEW_PIXELS
+        );
+        FillBitmapAreaClip(
+            gpWindowManager->m_screen,
+            (gSelectionX - viewX + gSelectionWidth) * tileSize + EDIT_VIEW_LEFT - outline,
+            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
+            outline,
+            gSelectionHeight * tileSize - 1,
+            gSelectionColor,
+            EDIT_VIEW_LEFT,
+            EDIT_VIEW_TOP,
+            EDIT_VIEW_PIXELS,
+            EDIT_VIEW_PIXELS
+        );
+        FillBitmapAreaClip(
+            gpWindowManager->m_screen,
+            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
+            (gSelectionY - viewY + gSelectionHeight) * tileSize + EDIT_VIEW_TOP - outline,
+            gSelectionWidth * tileSize - 1,
+            outline,
+            gSelectionColor,
+            EDIT_VIEW_LEFT,
+            EDIT_VIEW_TOP,
+            EDIT_VIEW_PIXELS,
+            EDIT_VIEW_PIXELS
+        );
+    }
+    m_zoomLevel = oldZoom;
+}
+
 #if H2_RETAIL_COMPILER
 #define radarLeft viewX4
 #define unusedA spare3
@@ -11284,98 +11377,6 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
     }
 }
 
-VA(0x00403a3d, 0x27)
-void editManager::DrawMap(void) {
-    DrawView(m_viewX, m_viewY);
-}
-
-VA(0x00403a64, 0x38b)
-void editManager::DrawView(i32 viewX, i32 viewY) {
-    i32 col;
-    i32 outline;
-    i32 tileSize;
-    i32 row;
-    i32 cells;
-    i32 oldZoom;
-
-    oldZoom = m_zoomLevel;
-    if (gGeneratingMap)
-        m_zoomLevel = EDIT_ZOOM_NORMAL;
-    cells = gZoomViewCells[m_zoomLevel];
-    for (row = 0; row < cells; row++)
-        for (col = 0; col < cells; col++)
-            DrawCell(viewX + col, viewY + row, col, row, EDIT_DRAW_GROUND);
-    for (row = 0; row < cells; row++) {
-        for (col = 0; col < cells; col++)
-            DrawCell(viewX + col, viewY + row, col, row, EDIT_DRAW_OBJECTS);
-        if (row > 0) {
-            for (col = 0; col < cells; col++)
-                DrawCell(viewX + col, viewY + row - 1, col, row - 1, EDIT_DRAW_OVERHANGING);
-        }
-    }
-    for (col = 0; col < cells; col++)
-        DrawCell(viewX + col, viewY + cells - 1, col, cells - 1, EDIT_DRAW_OVERHANGING);
-    gLastAnimationTick = KBTickCount();
-    if (!gConfig.editorScreenAnimation) {
-        m_animationCounter++;
-        m_animationFrame++;
-        m_animationFrame %= EDIT_ANIMATION_FRAMES;
-    }
-    tileSize = gZoomTileSize[m_zoomLevel];
-    outline = m_zoomLevel ? 1 : 2;
-    if (gSelectionX >= 0) {
-        gSelectionColor = EDIT_SELECTION_COLOR;
-        FillBitmapAreaClip(
-            gpWindowManager->m_screen,
-            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
-            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
-            outline,
-            gSelectionHeight * tileSize - 1,
-            gSelectionColor,
-            EDIT_VIEW_LEFT,
-            EDIT_VIEW_TOP,
-            EDIT_VIEW_PIXELS,
-            EDIT_VIEW_PIXELS
-        );
-        FillBitmapAreaClip(
-            gpWindowManager->m_screen,
-            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
-            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
-            gSelectionWidth * tileSize - 1,
-            outline,
-            gSelectionColor,
-            EDIT_VIEW_LEFT,
-            EDIT_VIEW_TOP,
-            EDIT_VIEW_PIXELS,
-            EDIT_VIEW_PIXELS
-        );
-        FillBitmapAreaClip(
-            gpWindowManager->m_screen,
-            (gSelectionX - viewX + gSelectionWidth) * tileSize + EDIT_VIEW_LEFT - outline,
-            (gSelectionY - viewY) * tileSize + EDIT_VIEW_TOP,
-            outline,
-            gSelectionHeight * tileSize - 1,
-            gSelectionColor,
-            EDIT_VIEW_LEFT,
-            EDIT_VIEW_TOP,
-            EDIT_VIEW_PIXELS,
-            EDIT_VIEW_PIXELS
-        );
-        FillBitmapAreaClip(
-            gpWindowManager->m_screen,
-            (gSelectionX - viewX) * tileSize + EDIT_VIEW_LEFT,
-            (gSelectionY - viewY + gSelectionHeight) * tileSize + EDIT_VIEW_TOP - outline,
-            gSelectionWidth * tileSize - 1,
-            outline,
-            gSelectionColor,
-            EDIT_VIEW_LEFT,
-            EDIT_VIEW_TOP,
-            EDIT_VIEW_PIXELS,
-            EDIT_VIEW_PIXELS
-        );
-    }
-    m_zoomLevel = oldZoom;
-}
 VA(0x004050fa, 0xc4)
 void editManager::ToggleZoom(void) {
     if (m_zoomLevel == EDIT_ZOOM_NORMAL) {
@@ -14446,9 +14447,9 @@ void editManager::RandomizeTownNames(void) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE)) {
                 townExtra = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
                 for (choice = 0; choice < EDITOR_TOWN_NAME_COUNT; choice++) {
-                    if (!strcmp(townExtra->name, gTownNames[choice]) || !_strnicmp(townExtra->name, "dusk", 4)
-                        || !_strnicmp(townExtra->name, "necr", 4)) {
-                        if (!_strnicmp(townExtra->name, "dusk", 4) || !_strnicmp(townExtra->name, "necr", 4))
+                    if (!strcmp(townExtra->name, gTownNames[choice]) || !strnicmp(townExtra->name, "dusk", 4)
+                        || !strnicmp(townExtra->name, "necr", 4)) {
+                        if (!strnicmp(townExtra->name, "dusk", 4) || !strnicmp(townExtra->name, "necr", 4))
                             namesTaken[choice] = true;
                         if (namesTaken[choice]) {
                             while (namesTaken[choice])

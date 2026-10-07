@@ -594,6 +594,7 @@ flags = "base_nogf"
 unit = "EDITOR/CLEARMGR"
 source = "src/EDITOR/CLEARMGR.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/EDITOR"
@@ -611,6 +612,7 @@ flags = "base_nogf"
 unit = "EDITOR/terrain"
 source = "src/EDITOR/terrain.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/OVERLAY"
@@ -652,26 +654,31 @@ flags = "base_nogf"
 unit = "EDITOR/setup"
 source = "src/EDITOR/setup.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/x_spedit"
 source = "src/EDITOR/x_spedit.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/ridledit"
 source = "src/EDITOR/ridledit.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/rumredit"
 source = "src/EDITOR/rumredit.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/signedit"
 source = "src/EDITOR/signedit.cpp"
 images = ["editor"]
+flags = "base_nogf"
 
 [[unit]]
 unit = "EDITOR/specedit"
@@ -683,3 +690,4 @@ flags = "base_nogf"
 unit = "EDITOR/line"
 source = "src/EDITOR/line.cpp"
 images = ["editor"]
+flags = "base_nogf"
