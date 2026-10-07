@@ -31,7 +31,6 @@
 H2_ENUM_BEGIN(NewGameConstant)
     GAME_DIALOG_OK                        = DIALOG_BUTTON_2,
     GAME_DIALOG_CANCEL                    = DIALOG_BUTTON_1,
-    GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
     GAME_KEY_BUFFER_SIZE                  = 0x69,
     GAME_MAP_PACKET_SIZE                  = 0x74,
@@ -41,7 +40,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SETUP_BUFFER_SIZE                = 240,
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
-    GAME_REMOTE_CHANNEL                   = 0x7f,
     GAME_REMOTE_CHAT                      = 0x0b,
     GAME_REMOTE_SETUP                     = 0x33,
     GAME_REMOTE_MAP_HEADER                = 0x34,
@@ -50,7 +48,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
-    GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
     GAME_COMPUTER_COLOR_UNLOCKED_FRAME    = 3,
@@ -125,7 +122,6 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
     BROKENA_MAX_HUMAN_PLAYERS = 3,
     SCENARIO_WINDOW_X         = 90,
     SCENARIO_WINDOW_Y         = 4,
-    NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
 H2_ENUM_END(NewGameDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
@@ -425,7 +421,7 @@ i32 game::NewGame(void) {
 
     SetupNetPlayerNames();
     glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = 0;
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
         strcpy(
@@ -544,7 +540,7 @@ i32 game::NewGame(void) {
             memcpy(mapInfo, &gpGame->m_mapHeader, GAME_MAP_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 mapInfo,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_MAP_PACKET_SIZE,
                 GAME_REMOTE_MAP_HEADER,
                 1
@@ -554,7 +550,7 @@ i32 game::NewGame(void) {
             memcpy(netPlayerPacket, gsNetPlayerInfo, GAME_PLAYER_INFO_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 netPlayerPacket,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_PLAYER_INFO_PACKET_SIZE,
                 GAME_REMOTE_PLAYER_INFO,
                 1
@@ -594,7 +590,7 @@ i32 game::NewGame(void) {
     }
 
 cleanup:
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         H2_FREE(cTextReceivedBuffer[textBufferIndex]);
     }
     H2_FREE(cNGKPCore);
@@ -846,7 +842,7 @@ VA(0x00476e3b, 0x50f)
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
-            for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
+            for (playerIndex = 0; playerIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++playerIndex) {
                 sprintf(gText, cTextReceivedBuffer[playerIndex]);
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
@@ -1038,14 +1034,14 @@ VA(0x0047734a, 0xdd1)
                             unusedSender = 0;
                         }
                         gText[GAME_CHAT_TEXT_LIMIT] = 0;
-                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
                              ++currentPlayerLocal) {
                             strcpy(
                                 cTextReceivedBuffer[currentPlayerLocal],
                                 cTextReceivedBuffer[currentPlayerLocal + 1]
                             );
                         }
-                        strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], gText);
+                        strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], gText);
                         break;
                 }
             }
@@ -1058,14 +1054,14 @@ VA(0x0047734a, 0xdd1)
         if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
             redraw = true;
-            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
                  ++currentPlayerLocal) {
                 strcpy(
                     cTextReceivedBuffer[currentPlayerLocal],
                     cTextReceivedBuffer[currentPlayerLocal + 1]
                 );
             }
-            strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
+            strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], cNGKPCore);
             strcpy(
                 cNGKPCore,
                 ""
@@ -1076,9 +1072,9 @@ VA(0x0047734a, 0xdd1)
             );
             NGKPcursorIndex = 0;
             sendResult = TransmitRemoteData(
-                cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1],
-                GAME_REMOTE_CHANNEL,
-                strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
+                cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1],
+                REMOTE_BROADCAST_PLAYER,
+                strlen(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1]) + 1,
                 GAME_REMOTE_CHAT,
                 1
             );
@@ -1135,7 +1131,7 @@ VA(0x0047734a, 0xdd1)
                     if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
-                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
+                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NORMAL_DIALOG_QUICK_VIEW);
                 }
             } else {
                 switch (message.payload.widget.command) {
@@ -1145,7 +1141,7 @@ VA(0x0047734a, 0xdd1)
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
                                         GAME_REMOTE_START,
                                         1
@@ -1161,7 +1157,7 @@ VA(0x0047734a, 0xdd1)
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
                                         GAME_REMOTE_CANCEL,
                                         1
@@ -1413,7 +1409,7 @@ VA(0x0047734a, 0xdd1)
                                         );
                                         sendResult = TransmitRemoteData(
                                             mapPacketLocal,
-                                            GAME_REMOTE_CHANNEL,
+                                            REMOTE_BROADCAST_PLAYER,
                                             GAME_MAP_PACKET_SIZE,
                                             GAME_REMOTE_MAP_HEADER,
                                             1
@@ -1442,7 +1438,7 @@ VA(0x0047734a, 0xdd1)
         memcpy(mapNamePacket + MAP_HEADER_NAME_SIZE, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
         sendResult = TransmitRemoteData(
             mapNamePacket,
-            GAME_REMOTE_CHANNEL,
+            REMOTE_BROADCAST_PLAYER,
             GAME_SETUP_PACKET_SIZE,
             GAME_REMOTE_SETUP,
             1
@@ -2193,5 +2189,5 @@ DATA(0x00530968) char* cNGKPDisplay;
 DATA(0x00530950) b32 gbNewGameShadowHidden;
 DATA(0x00530960) char* cNGKPCore;
 DATA(0x0053094c) i32 NGKPcursorIndex;
-DATA(0x00530954) char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
+DATA(0x00530954) char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 DATA(0x00530964) class icon* NGKPBkg;

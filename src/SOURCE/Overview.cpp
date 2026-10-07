@@ -265,8 +265,6 @@ H2_ENUM_END(OverviewDwellingIndex)
 
 H2_ENUM_BEGIN(OverviewDialogConstant)
     OVERVIEW_RETURN_ID_NONE = -1,
-    OVERVIEW_VIEW_ARMY_X    = 119,
-    OVERVIEW_VIEW_ARMY_Y    = 20
 H2_ENUM_END(OverviewDialogConstant)
 
 }
@@ -1405,8 +1403,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
                 item = widgetId - HERO_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     curHero->m_army.m_creatureTypes[item],
                     curHero->m_army.m_creatureCounts[item],
                     NULL,
@@ -1490,8 +1488,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
                 item = widgetId - TOWN_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     selectedTown->m_army.m_creatureTypes[item],
                     selectedTown->m_army.m_creatureCounts[item],
                     selectedTown,

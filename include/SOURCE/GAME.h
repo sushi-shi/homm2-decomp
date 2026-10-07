@@ -34,6 +34,7 @@ H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_UNUSED_FILE_MARKER      = 9999,
     GAME_PLAYER_COUNT            = PLAYER_COLOR_COUNT,
     GAME_HERO_COUNT              = 54,
+    GAME_HEROES_PER_FACTION      = GAME_HERO_COUNT / IDX(FACTION_COUNT),
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,
     GAME_BOAT_COUNT              = 48,
@@ -41,8 +42,10 @@ H2_ENUM_BEGIN(GameSerializationConstant)
 H2_ENUM_END(GameSerializationConstant)
 
 H2_ENUM_BEGIN(GameCalendarConstant)
-    CALENDAR_DAYS_PER_WEEK  = 7,
-    CALENDAR_DAYS_PER_MONTH = 28
+    CALENDAR_FIRST           = 1,
+    CALENDAR_DAYS_PER_WEEK   = 7,
+    CALENDAR_WEEKS_PER_MONTH = 4,
+    CALENDAR_DAYS_PER_MONTH  = 28
 H2_ENUM_END(GameCalendarConstant)
 
 H2_ENUM_BEGIN(GameSetupSharedConstant)
@@ -131,8 +134,7 @@ H2_ENUM_END(GameRandomHeroConstant)
 
 H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
-    WAIT_AMBIENT_MUSIC       = 21,
-    WAIT_DIALOG_TYPE         = 9
+    WAIT_AMBIENT_MUSIC       = 21
 H2_ENUM_END(GameWaitConstant)
 
 i32 GetNumObelisks(i32 player);

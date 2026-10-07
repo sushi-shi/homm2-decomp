@@ -66,7 +66,6 @@ H2_ENUM_END(FileRequesterScrollGeometry)
 
 H2_ENUM_BEGIN(FileRequesterFileSelectionConstant)
     FILE_REQUESTER_EXTENSION_PLAYER_DIGIT      = 3,
-    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
     FILE_REQUESTER_SELECTION_NONE              = -1,
 H2_ENUM_END(FileRequesterFileSelectionConstant)
 

@@ -21,7 +21,6 @@
 #endif
 
 H2_ENUM_BEGIN(WingraphPaletteConstant)
-    PALETTE_VALUE_SHIFT = 2,
     SYSTEM_PALETTE_REGION_COUNT = 2
 H2_ENUM_END(WingraphPaletteConstant)
 

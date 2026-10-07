@@ -10,6 +10,8 @@
 H2_ENUM_BEGIN(GlobalTimerConstant)
     GLOBAL_TIMER_COUNT               = 10,
     GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
+    HIGH_SCORE_TIMER_SLOT            = 0,
+    COMBAT_EFFECT_TIMER_SLOT         = 1,
     GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
     GLOBAL_MUSIC_FADE_TIMER_SLOT     = 4,
     GLOBAL_POLL_SOUND_TIMER_SLOT     = 5,
@@ -67,6 +69,8 @@ H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_SWITCHING_MAP            = 11,
     CAMPAIGN_SWITCHING_SCENARIO       = 4,
     CAMPAIGN_NO_SCENARIO              = -1,
+    CAMPAIGN_CHOICE_NO_VALUE          = -1,
+    CAMPAIGN_CHOICE_NO_AMOUNT         = -1,
     CAMPAIGN_ROLAND_FINAL_SCENARIO    = 9,
     CAMPAIGN_ARCHIBALD_FINAL_SCENARIO = 10,
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
@@ -114,18 +118,6 @@ struct SPlayerExit {
     b8 continueGame;
 };
 SIZE(SPlayerExit, 7);
-
-H2_ENUM_BEGIN(EventWindowConstant)
-    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
-    EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
-    EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
-    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
-    EVENT_WINDOW_LUCK                   = 10,
-    EVENT_WINDOW_BAD_LUCK               = 11,
-    EVENT_WINDOW_MORALE                 = 12,
-    EVENT_WINDOW_BAD_MORALE             = 13,
-    EVENT_WINDOW_EXPERIENCE             = 14
-H2_ENUM_END(EventWindowConstant)
 
 H2_ENUM_BEGIN(KbBuildingConstant)
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
@@ -193,7 +185,13 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
     NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
     NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
+    NORMAL_DIALOG_DEFAULT_X                = 159,
 H2_ENUM_END(NormalDialogConstant)
+
+H2_ENUM_BEGIN(EventWindowConstant)
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
+    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID + 1
+H2_ENUM_END(EventWindowConstant)
 
 H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
     END_GAME_FORCE_NONE    = 0,
@@ -294,14 +292,11 @@ H2_ENUM_CLASS_END(DialogWaitType)
 
 H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
-    OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
-    OLD_MAIN_DEFAULT_NAME_STRIDE              = 4,
     OLD_MAIN_MAIN_MUSIC                       = 42,
     OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
     OLD_MAIN_FADE_SPEED                       = 8,
     OLD_MAIN_LONG_FADE_SPEED                  = 0x80,
-    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL         = 9,
     OLD_MAIN_INTRO_PUBLISHER_VIDEO            = 0x49,
     OLD_MAIN_INTRO_PRIMARY_VIDEO              = 0x42,
     OLD_MAIN_INTRO_FALLBACK_VIDEO             = 1,
@@ -321,11 +316,8 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 6000,
     OLD_MAIN_NET_BUFFER_SIZE                  = 256,
     OLD_MAIN_NETWORK_PACKET                   = 0x20,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
-    OLD_MAIN_DIALOG_WAIT                      = 6,
+    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1,
+    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = CAMPAIGN_ROLAND_FINAL_SCENARIO + 1,
 H2_ENUM_END(OldMainConstant)
 
 #pragma pack(push, 1)
@@ -361,20 +353,14 @@ struct KbRemotePacket {
 SIZE(KbRemotePacket, REMOTE_MESSAGE_SIZE);
 
 H2_ENUM_BEGIN(AppMenuConstant)
-    APP_MENU_CONFIRM_OK          = DIALOG_BUTTON_5,
-    APP_MENU_CHECKED             = 8,
-    APP_MENU_UNCHECKED           = 0,
-    APP_MENU_CONFIRM_DIALOG      = 2,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
     APP_MENU_SPELL_COUNT         = 10,
-    APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
     APP_MENU_GOLD_BONUS          = 1000,
     APP_MENU_MOVEMENT_BONUS      = 299999,
     APP_MENU_CHEAT_SPELL_POINTS  = 999,
     APP_MENU_CHEAT_ARMY_QUANTITY = 5,
-    APP_MENU_CLOSE_MESSAGE       = 0x10,
     APP_MENU_ARMY_FIRST          = 41000,
     APP_MENU_ARMY_LAST           = 41066,
     APP_MENU_SECONDARY_FIRST     = 42000,
@@ -383,8 +369,6 @@ H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_BUILDING_LAST       = 43101,
     APP_MENU_COMBAT_FIRST        = 44000,
     APP_MENU_COMBAT_LAST         = 44200,
-    APP_MENU_COMBAT_HEX_COUNT    = 117,
-    APP_MENU_FORMATION_HEX_COUNT = 15
 H2_ENUM_END(AppMenuConstant)
 
 H2_ENUM_BEGIN(NetBoxConstant)
@@ -586,6 +570,11 @@ extern i32 giBottomViewOverrideEndTime;
 extern H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
 extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
+// giDebugLevel thresholds: each role is enabled from its level up.
+H2_ENUM_BEGIN(DebugLevel)
+    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
+    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9
+H2_ENUM_END(DebugLevel)
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern H2_ENUM_STORAGE(TerrainType, u8) giGroundToTerrain[];

@@ -164,7 +164,6 @@ namespace {
         RECRUIT_PORTRAIT_CONTROL = 2,
         RECRUIT_BUTTON_TEXT_CONTROL = 8,
         RECRUIT_BUTTON_ICON_CONTROL = 9,
-        HEROES_PER_FACTION = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
         TAVERN_WINDOW_X = 162,
         TAVERN_WINDOW_Y = 10,
         TAVERN_WINDOW_TEXT_ID = 22,
@@ -1697,8 +1696,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                                      ? gpGame->GetHero(m_town->m_occupyingHeroId)
                                                      : NULL;
                                     gpGame->ViewArmy(
-                                        TOWN_ARMY_VIEW_X,
-                                        TOWN_ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_selectedStrip->m_army
                                             ->m_creatureTypes[m_selectedArmySlot],
                                         m_selectedStrip->m_army
@@ -1826,8 +1825,8 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
                              ? gpGame->GetHero(m_town->m_occupyingHeroId)
                              : NULL;
             gpGame->ViewArmy(
-                TOWN_ARMY_VIEW_X,
-                TOWN_ARMY_VIEW_Y,
+                VIEW_ARMY_STANDARD_X,
+                VIEW_ARMY_STANDARD_Y,
                 m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot],
                 m_selectedStrip->m_army->m_creatureCounts[m_selectedArmySlot],
                 m_town,
@@ -2918,7 +2917,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             m_town->GiveSpells(NULL);
 
         newHeroClass = static_cast<FactionType>(
-            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
+            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / GAME_HEROES_PER_FACTION
         );
         newHeroClass = (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
         gpCurPlayer->m_availableHeroIds[m_recruitState] =

@@ -9,6 +9,7 @@
 
 H2_ENUM_BEGIN(WingraphConstant)
     WINGRAPH_COLOR_DEPTH           = 8,
+    PALETTE_VALUE_SHIFT            = 2,
     WINGRAPH_PALETTE_VERSION       = 0x300,
     WINGRAPH_SYSTEM_PALETTE_SIZE   = 10,
     WINGRAPH_SCROLL_MARGIN         = 16,

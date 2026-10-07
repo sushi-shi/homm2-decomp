@@ -66,8 +66,6 @@ H2_ENUM_BEGIN(CombatSystemOptionWidget)
 H2_ENUM_END(CombatSystemOptionWidget)
 
 H2_ENUM_BEGIN(CombatSystemOptionConstant)
-    SYSTEM_OPTION_CYCLE_COUNT             = 3,
-    SYSTEM_OPTION_HELP_DIALOG             = 4,
     SYSTEM_OPTION_SPEED_STATE_OFFSET      = 0,
     SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET  = 3,
     SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET = 6,
@@ -117,10 +115,6 @@ H2_ENUM_BEGIN(CombatObstacleConstant)
     ELEVATION_OBSTACLE_WEIGHT_DIVISOR = 2
 H2_ENUM_END(CombatObstacleConstant)
 
-H2_ENUM_BEGIN(CombatMissileConstant)
-    MISSILE_DIAMETER_MULTIPLIER = 2
-H2_ENUM_END(CombatMissileConstant)
-
 H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
     BACKGROUND_WATER       = 0,
     BACKGROUND_GRASS_TREES = 2,
@@ -141,27 +135,6 @@ H2_ENUM_CLASS_BEGIN_T(NearbyFeature, i8)
     NEARBY_MOUNTAIN = 0,
     NEARBY_TREE     = 1
 H2_ENUM_CLASS_END_T(NearbyFeature, i8)
-
-H2_ENUM_BEGIN(CombatCastleInteriorRange)
-    CASTLE_INTERIOR_ROW_0_FIRST = 0,
-    CASTLE_INTERIOR_ROW_0_LAST  = 8,
-    CASTLE_INTERIOR_ROW_1_FIRST = 13,
-    CASTLE_INTERIOR_ROW_1_LAST  = 21,
-    CASTLE_INTERIOR_ROW_2_FIRST = 26,
-    CASTLE_INTERIOR_ROW_2_LAST  = 33,
-    CASTLE_INTERIOR_ROW_3_FIRST = 39,
-    CASTLE_INTERIOR_ROW_3_LAST  = 46,
-    CASTLE_INTERIOR_ROW_4_FIRST = 52,
-    CASTLE_INTERIOR_ROW_4_LAST  = 58,
-    CASTLE_INTERIOR_ROW_5_FIRST = 65,
-    CASTLE_INTERIOR_ROW_5_LAST  = 72,
-    CASTLE_INTERIOR_ROW_6_FIRST = 78,
-    CASTLE_INTERIOR_ROW_6_LAST  = 85,
-    CASTLE_INTERIOR_ROW_7_FIRST = 91,
-    CASTLE_INTERIOR_ROW_7_LAST  = 99,
-    CASTLE_INTERIOR_ROW_8_FIRST = 104,
-    CASTLE_INTERIOR_ROW_8_LAST  = 112
-H2_ENUM_END(CombatCastleInteriorRange)
 
 H2_ENUM_CLASS_BEGIN(CombatCatapultDamage)
     CATAPULT_DAMAGE_NONE   = 0,
@@ -408,7 +381,7 @@ void combatManager::InitNonVisualVars(void) {
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
-    m_currentSpeed = COMBAT_INITIAL_COMMAND;
+    m_currentSpeed = COMBAT_INITIAL_SPEED;
     gbRetreatWin = false;
     gbCombatSurrender = false;
     m_sideSurrendered[IDX(COMBAT_ATTACKER_SIDE)] = false;
@@ -521,7 +494,7 @@ i32 combatManager::Open(i32 openFlags) {
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = true;
-    DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     glTimers[0] = KBTickCount();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
@@ -1050,7 +1023,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
             return COMBAT_GRID_LEFT_HERO_HEX;
         if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= LOGICAL_SCREEN_MAX_X
             && y >= COMBAT_GRID_RIGHT_UPPER_Y_MIN && y <= COMBAT_GRID_RIGHT_UPPER_Y_MAX)
-            return COMBAT_GRID_RIGHT_UPPER_HEX;
+            return COMBAT_GRID_RIGHT_HERO_HEX;
         if (x >= COMBAT_GRID_RIGHT_SPECIAL_X_MIN && x <= LOGICAL_SCREEN_MAX_X
             && y >= COMBAT_GRID_RIGHT_LOWER_Y_MIN && y <= COMBAT_GRID_RIGHT_LOWER_Y_MAX
             && m_inCastleCombat)
@@ -1436,11 +1409,11 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         i32 startDirection =
             SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN, COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         i32 adjacentHex;
-        for (frame = 0; frame < COMBAT_CATAPULT_DIRECTION_COUNT; frame++) {
+        for (frame = 0; frame < COMBAT_DIRECTION_ADJACENT_COUNT; frame++) {
             adjacentHex = GetAdjacentCellIndexNoArmy(
                 IDX(targetHex),
                 static_cast<CombatHexDirection>(
-                    (startDirection + frame) % COMBAT_CATAPULT_DIRECTION_COUNT
+                    (startDirection + frame) % COMBAT_DIRECTION_ADJACENT_COUNT
                 )
             );
             if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == COMBAT_SIDE_NONE) {
@@ -1465,7 +1438,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     giMaxExtentY = COMBAT_CATAPULT_INITIAL_MAX_Y;
     m_catapultFrame[IDX(side)] = 0;
     while (m_catapultFrame[IDX(side)] < COMBAT_CATAPULT_LOAD_FRAME_COUNT) {
-        DrawFrame(1, 0, 1, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
+        DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
         m_catapultFrame[IDX(side)]++;
     }
 
@@ -1567,9 +1540,9 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         if (frame >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT
             && (gateIndex != -1 || missShot != 0))
             continue;
-        glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
+        glTimers[COMBAT_EFFECT_TIMER_SLOT] = static_cast<i32l>(
             KBTickCount()
-            + IDX(COMBAT_CATAPULT_ANIMATION_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
+            + IDX(COMBAT_FRAME_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
         if (gateIndex != -1 && frame >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot) {
@@ -1603,7 +1576,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             );
         }
         UPDATE_INCLUSIVE_REGION(giMinExtentX, giMinExtentY, giMaxExtentX, giMaxExtentY);
-        DelayTil(&glTimers[COMBAT_CATAPULT_TIMER_SLOT]);
+        DelayTil(&glTimers[COMBAT_EFFECT_TIMER_SLOT]);
 
         if (((frame == COMBAT_CATAPULT_WALL_IMPACT_FRAME && gateIndex == -1)
              || (frame == COMBAT_CATAPULT_GATE_IMPACT_FRAME && gateIndex != -1))
@@ -1643,7 +1616,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
 
     gpResourceManager->Dispose(cloud);
     m_catapultFrame[IDX(side)] = 0;
-    DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
+    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     gpResourceManager->Dispose(boulder);
     WaitEndSample(&impactSound);
     WaitEndSample(&catapultSound);
@@ -1768,7 +1741,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     i32 sourceY = towerOrigins[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].y;
     i32 targetX = target->MidX();
     i32 targetY = target->MidY();
-    float missileAngles[COMBAT_KEEP_MISSILE_ANGLE_COUNT] =
+    float missileAngles[COMBAT_MISSILE_DIRECTION_COUNT] =
         {90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};
     ShootMissile(
         sourceX,
@@ -1786,10 +1759,10 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)])
         attackBonus += m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->Stats(HERO_PRIMARY_ATTACK);
     attackBonus -= target->m_monster.defense;
-    if (attackBonus > COMBAT_KEEP_ATTACK_STAT_LIMIT)
-        attackBonus = COMBAT_KEEP_ATTACK_STAT_LIMIT;
-    if (attackBonus < -COMBAT_KEEP_ATTACK_STAT_LIMIT)
-        attackBonus = -COMBAT_KEEP_ATTACK_STAT_LIMIT;
+    if (attackBonus > ARMY_DAMAGE_STAT_LIMIT)
+        attackBonus = ARMY_DAMAGE_STAT_LIMIT;
+    if (attackBonus < -ARMY_DAMAGE_STAT_LIMIT)
+        attackBonus = -ARMY_DAMAGE_STAT_LIMIT;
     if (tower != COMBAT_TOWER_GARRISON)
         shotCount /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
@@ -1797,7 +1770,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     for (armyIndex = 0; armyIndex < shotCount; armyIndex++)
         damage += SRandom(COMBAT_KEEP_RANDOM_DAMAGE_MIN, COMBAT_KEEP_RANDOM_DAMAGE_MAX);
     damage = static_cast<i32l>(
-        damage * gfBattleStat[attackBonus + COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET]
+        damage * gfBattleStat[attackBonus + ARMY_DAMAGE_STAT_LIMIT]
     );
     if (damage <= 0)
         damage = COMBAT_KEEP_MIN_DAMAGE;
@@ -1911,7 +1884,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     i32 elevation;
     i32 elevCells;
     i32 cellIndex;
-    u8 typeUsed[COMBAT_OBSTACLE_TYPE_COUNT];
+    u8 typeUsed[KB_COMBAT_OBSTACLE_COUNT];
     b32 blocked;
     i32 placedCells;
     i32 obstacleHex;
@@ -1919,7 +1892,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     m_elevationOverlayIndex = 0;
     if (m_inCastleCombat) {
         m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
-        for (cellIndex = 0; cellIndex < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex++) {
+        for (cellIndex = 0; cellIndex < COMBAT_WALL_SECTION_COUNT; cellIndex++) {
             m_wallStates[cellIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
@@ -2026,7 +1999,7 @@ void combatManager::MakeCreaturesVanish(void) {
                 m_limitCreatureCount[iSide][armyIndex] = 1;
         }
     }
-    DrawFrame(0, 1, 0, 1, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    DrawFrame(0, 1, 0, 1, COMBAT_FRAME_DELAY, 1, 1);
     i32 x = giMinExtentX;
     i32 y = giMinExtentY;
     i32 width = giMaxExtentX - giMinExtentX + 1;
@@ -2046,7 +2019,7 @@ void combatManager::MakeCreaturesVanish(void) {
         }
     }
     gpWindowManager->SaveFizzleSource(x, y, width, height);
-    gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         x,
         y,
@@ -2070,7 +2043,7 @@ void combatManager::LowerDoor(void) {
          bridgeFrame >= COMBAT_DRAWBRIDGE_LOWERED;
          bridgeFrame--) {
         m_drawbridgeState = bridgeFrame;
-        DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+        DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
     WaitEndSample(&drawbridgeSample);
 }
@@ -2083,11 +2056,11 @@ void combatManager::RaiseDoor(void) {
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST;
-    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
-    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
-    DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
     WaitEndSample(&drawbridgeSample);
 }
 
@@ -2104,16 +2077,16 @@ void combatManager::TestRaiseDoor(void) {
 
 VA(0x0042aa31, 0x8e)
 i32 combatManager::InCastle(i32 hex) {
-    return ((hex < CASTLE_INTERIOR_ROW_0_FIRST || hex > CASTLE_INTERIOR_ROW_0_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_1_FIRST || hex > CASTLE_INTERIOR_ROW_1_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_2_FIRST || hex > CASTLE_INTERIOR_ROW_2_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_3_FIRST || hex > CASTLE_INTERIOR_ROW_3_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_4_FIRST || hex > CASTLE_INTERIOR_ROW_4_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_5_FIRST || hex > CASTLE_INTERIOR_ROW_5_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_6_FIRST || hex > CASTLE_INTERIOR_ROW_6_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_7_FIRST || hex > CASTLE_INTERIOR_ROW_7_LAST)
-            && (hex < CASTLE_INTERIOR_ROW_8_FIRST
-                || hex > CASTLE_INTERIOR_ROW_8_LAST))
+    return ((hex < COMBAT_CASTLE_EXTERIOR_ROW_0_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_0_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_1_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_1_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_2_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_2_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_3_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_3_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_4_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_4_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_5_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_5_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_6_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_6_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_7_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_7_LAST)
+            && (hex < COMBAT_CASTLE_EXTERIOR_ROW_8_FIRST
+                || hex > COMBAT_CASTLE_EXTERIOR_ROW_8_LAST))
                ? 1
                : 0;
 }
@@ -2177,7 +2150,7 @@ i32 combatManager::ShotIsThroughWall(
         traceRow += rowStride;
         traceSquare =
             static_cast<i32>(traceRow) * COMBAT_GRID_ROW_LENGTH + static_cast<i32>(traceColumn);
-        for (structIndex = 0; structIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
+        for (structIndex = 0; structIndex < COMBAT_WALL_SECTION_COUNT;
              structIndex++) {
             if (traceSquare == IDX(iWallToHexCell[structIndex])
                 && m_wallStates[structIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
@@ -2282,8 +2255,8 @@ void combatManager::ShootMissile(
     missileHalfHeight = COMBAT_MISSILE_HALF_HEIGHT;
     missileBackground = new bitmap(
         BITMAP_TYPE_MEMORY,
-        missileHalfWidth * MISSILE_DIAMETER_MULTIPLIER,
-        missileHalfHeight * MISSILE_DIAMETER_MULTIPLIER
+        missileHalfWidth * COMBAT_MISSILE_DIAMETER_MULTIPLIER,
+        missileHalfHeight * COMBAT_MISSILE_DIAMETER_MULTIPLIER
     );
     missileBackground->GrabBitmapCareful(
         gpWindowManager->m_screen,
@@ -2362,8 +2335,8 @@ void combatManager::ShootMissile(
     gpWindowManager->UpdateScreenRegion(
         oldX - missileHalfWidth,
         oldY - missileHalfHeight,
-        missileHalfWidth * MISSILE_DIAMETER_MULTIPLIER,
-        missileHalfHeight * MISSILE_DIAMETER_MULTIPLIER
+        missileHalfWidth * COMBAT_MISSILE_DIAMETER_MULTIPLIER,
+        missileHalfHeight * COMBAT_MISSILE_DIAMETER_MULTIPLIER
     );
     delete missileBackground;
 }
@@ -2386,7 +2359,7 @@ void combatManager::CombatSystemOptions(void) {
     if (bCPrefsChanged)
         WritePrefs();
     m_backgroundDrawn = false;
-    DrawFrame(1, 0, 0, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
+    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
 }
 
 VA(0x0042b346, 0x1e1)
@@ -2476,7 +2449,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(gCSPanelHelp[helpIndex], SYSTEM_OPTION_HELP_DIALOG);
+                    NormalDialog(gCSPanelHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
                 }
             }
         } else {
@@ -2492,13 +2465,13 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case SYSTEM_OPTION_SPEED_BUTTON:
                             gConfig.combatSpeed =
-                                (gConfig.combatSpeed + 1) % SYSTEM_OPTION_CYCLE_COUNT;
+                                (gConfig.combatSpeed + 1) % KB_COMBAT_SPEED_COUNT;
                             bRedraw = true;
                             bCPrefsChanged = true;
                             break;
                         case SYSTEM_OPTION_ARMY_INFO_BUTTON:
                             gConfig.combatArmyInfoLevel = (gConfig.combatArmyInfoLevel + 1)
-                                                          % SYSTEM_OPTION_CYCLE_COUNT;
+                                                          % COMBAT_ARMY_INFO_LEVEL_COUNT;
                             bRedraw = true;
                             bCPrefsChanged = true;
                             break;

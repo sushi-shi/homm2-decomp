@@ -64,13 +64,7 @@
 #include <SOURCE/REMOTE_TYPES.h>
 #include <SOURCE/combatTypes.h>
 
-H2_ENUM_BEGIN(CampaignChoiceValue)
-    CHOICE_VALUE_NONE = -1
-H2_ENUM_END(CampaignChoiceValue)
-
 H2_ENUM_BEGIN(CampaignChoiceAmount)
-    CHOICE_NO_AMOUNT = -1,
-    CHOICE_BASIC_SKILL = 1,
     CHOICE_RESOURCE_BONUS = 20,
     CHOICE_GOLD_BONUS = 2000
 H2_ENUM_END(CampaignChoiceAmount)
@@ -157,7 +151,6 @@ H2_ENUM_END(MoraleLuckInfoConstant)
 H2_ENUM_BEGIN(NetBoxLocalConstant)
     BOX_WINDOW_Y = 0x19b,
     BOX_HEIGHT = 0x44,
-    BOX_WIDTH = 0x27f,
     BOX_INPUT_Y = 0x1d1,
     BOX_INPUT_HEIGHT = 0xc,
     BOX_TEXT_LENGTH = 150,
@@ -195,7 +188,6 @@ H2_ENUM_BEGIN(PollSoundConstant)
     DEFAULT_COLOR_CYCLE_INTERVAL = 200,
     NON_PALETTED_COLOR_CYCLE_DELAY = 300,
     SOUND_POLL_INTERVAL = 30,
-    PALETTED_VIDEO_MODE_COLOR_DEPTH = 8
 H2_ENUM_END(PollSoundConstant)
 
 H2_ENUM_BEGIN(CongratsConstant)
@@ -207,10 +199,8 @@ H2_ENUM_END(CongratsConstant)
 
 H2_ENUM_BEGIN(CommandLineConstant)
     LINE_TCP_TEXT_LENGTH = 20,
-    LINE_HELP_LINE_COUNT = 14,
     LINE_HUMAN_PLAYER_SLOTS = 4,
     LINE_TCP_MIN_PLAYERS = 2,
-    LINE_TCP_MAX_PLAYERS = 6,
     LINE_FRAME_STEP = 6,
     LINE_TCP_TYPE_DEFAULT = 0,
     LINE_TCP_TYPE_L = 1,
@@ -220,27 +210,18 @@ H2_ENUM_BEGIN(CommandLineConstant)
 H2_ENUM_END(CommandLineConstant)
 
 H2_ENUM_BEGIN(InitMenuConstant)
-    MENU_HOTSPOT_COUNT = 5,
-    MENU_FIRST_COMMAND = 0x65,
-    MENU_NEW_GAME = 0x65,
-    MENU_LOAD_GAME = 0x66,
-    MENU_HIGH_SCORES = 0x67,
-    MENU_CREDITS = 0x68,
-    MENU_EXIT = 0x69,
+    MENU_FIRST_COMMAND = OLD_MAIN_NEW_GAME,
     MENU_LAST_ACTION = 0x6b,
     MENU_MOVIE = 0x6b,
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_DISABLE_MASK = 0x200,
-    MENU_HELP_DIALOG = 4,
     MENU_MOVIE_SMACKER = 0x26,
     MENU_MAIN_MUSIC = 0x2a,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
     MENU_IDLE_FRAME = 1,
     MENU_ACTIVE_FRAME = 2,
-    MENU_WIDGET_FRAME_BASE = 44,
     MENU_REDRAW_LEFT = 0,
     MENU_REDRAW_TOP = 105,
     MENU_REDRAW_WIDTH = 565,
@@ -299,7 +280,7 @@ extern "C" void PollSound(void) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
         bDoColorCycle = true;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
-            && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
+            && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += NON_PALETTED_COLOR_CYCLE_DELAY;
             if (gbHeroMoving)
                 bDoColorCycle = false;
@@ -772,11 +753,11 @@ i32 oldmain(void) {
                         continue;
                     for (gamePlayer = 0; gamePlayer < GAME_PLAYER_COUNT; gamePlayer++) {
                         if (strlen(&gpGame->m_defaultPlayerNames
-                                        [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE])
+                                        [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE])
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
                             && !strcmp(
                                 &gpGame->m_defaultPlayerNames
-                                     [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                     [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE],
                                 gsNetPlayerInfo[netPlayer].uniqueSystemID
                             )
                             && !gpGame->m_playerDead[gamePlayer]
@@ -798,7 +779,7 @@ i32 oldmain(void) {
                         gbGamePosToNetPos[netPlayer] = static_cast<i8>(gamePlayer);
                         strcpy(
                             &gpGame->m_defaultPlayerNames
-                                 [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                 [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE],
                             gsNetPlayerInfo[netPlayer].uniqueSystemID
                         );
                         gamePlayer++;
@@ -854,7 +835,7 @@ i32 oldmain(void) {
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
                     localization::Tr("network.data.waiting_to_receive"),
-                    OLD_MAIN_DIALOG_WAIT
+                    NORMAL_DIALOG_WAIT_LAST
                 );
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
@@ -967,12 +948,12 @@ i32 oldmain(void) {
                     campaignResult = gpGame->HandleCampaignWin();
                     if ((gpGame->m_campaignScenario + 1 == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER
                          && gpGame->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
-                                                               [OLD_MAIN_ARCHIBALD_FINAL_SCENARIO])
+                                                               [CAMPAIGN_ARCHIBALD_FINAL_SCENARIO])
                         || (gpGame->m_campaignScenario + 1 == OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER
                             && gpGame->m_campaignType == CAMPAIGN_ROLAND
                             && gpGame
                                    ->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
-                                                                [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
+                                                                [CAMPAIGN_ROLAND_FINAL_SCENARIO])) {
                         gbShowHighScore = true;
                         ShowCongrats(HIGH_SCORE_CAMPAIGN);
                         AddScoreToHighScore(
@@ -1193,7 +1174,7 @@ i32 InterpretCommandLine(void) {
                                 if (i + 3 < size)
                                     count = gcCommandLine[i + 3] - '0';
                                 if (count >= LINE_TCP_MIN_PLAYERS
-                                    && count <= LINE_TCP_MAX_PLAYERS) {
+                                    && count <= GAME_PLAYER_COUNT) {
                                     giTCPNumPlayers = count;
                                 }
                                 break;
@@ -1237,7 +1218,7 @@ i32 InterpretCommandLine(void) {
 
     if (helpRequested) {
         sprintf(gText, "");
-        for (i = 0; i < LINE_HELP_LINE_COUNT; i++)
+        for (i = 0; i < KB_COMMAND_LINE_HELP_COUNT; i++)
             strcat(gText, gcCommandLineHelp[i]);
         ShutDown(gText);
     }
@@ -1289,52 +1270,52 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
     i32 hoverIndex;
 
     PollSound();
-    if (message.payload.widget.parameter & MENU_DISABLE_MASK) {
+    if (message.payload.widget.parameter & IDX(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
         if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
             || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
             helpIndex = -1;
             switch (message.payload.widget.id) {
-                case MENU_NEW_GAME:
+                case OLD_MAIN_NEW_GAME:
                     helpIndex = MENU_HELP_NEW_GAME;
                     break;
-                case MENU_LOAD_GAME:
+                case OLD_MAIN_LOAD_GAME:
                     helpIndex = MENU_HELP_LOAD_GAME;
                     break;
-                case MENU_HIGH_SCORES:
+                case OLD_MAIN_HIGH_SCORES:
                     helpIndex = MENU_HELP_HIGH_SCORES;
                     break;
-                case MENU_CREDITS:
+                case OLD_MAIN_CREDITS:
                     helpIndex = MENU_HELP_CREDITS;
                     break;
-                case MENU_EXIT:
+                case OLD_MAIN_EXIT:
                     helpIndex = MENU_HELP_EXIT;
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
+                NormalDialog(gInitMenuHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
             }
         }
     } else {
         if (message.type == MESSAGE_KEY_DOWN) {
             switch (message.payload.keyboard.keyCode) {
                 case IDX(INPUT_SCAN_N):
-                    gpWindowManager->m_dialogResult = MENU_NEW_GAME;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_NEW_GAME;
                     handled = true;
                     break;
                 case IDX(INPUT_SCAN_L):
-                    gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_LOAD_GAME;
                     handled = true;
                     break;
                 case IDX(INPUT_SCAN_C):
-                    gpWindowManager->m_dialogResult = MENU_CREDITS;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_CREDITS;
                     handled = true;
                     break;
                 case IDX(INPUT_SCAN_H):
-                    gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_HIGH_SCORES;
                     handled = true;
                     break;
                 case IDX(INPUT_SCAN_Q):
-                    gpWindowManager->m_dialogResult = MENU_EXIT;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_EXIT;
                     handled = true;
                     break;
             }
@@ -1402,7 +1383,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
         } else if (message.type == MESSAGE_MOUSE_MOVE) {
             hoverIndex = -1;
-            for (index = 0; index < MENU_HOTSPOT_COUNT; index++) {
+            for (index = 0; index < KB_INIT_MENU_HOTSPOT_COUNT; index++) {
                 if (message.payload.mouse.screenX >= IMHotSpots[index][IDX(INIT_MENU_HOTSPOT_X)]
                     && message.payload.mouse.screenY >= IMHotSpots[index][IDX(INIT_MENU_HOTSPOT_Y)]
                     && message.payload.mouse.screenX
@@ -1869,9 +1850,9 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
-                if (message.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                if (message.payload.widget.parameter & IDX(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                     switch (message.payload.widget.id) {
-                        case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
+                        case NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID:
                             resType = giResType1;
                             resExtra = giResExtra1;
                             break;
@@ -1881,25 +1862,25 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
                             break;
                     }
                     switch (resType) {
-                        case EVENT_WINDOW_LUCK:
+                        case NORMAL_DIALOG_LUCK_BONUS:
                             NormalDialog(cLuckInfo[IDX(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_BAD_LUCK:
+                        case NORMAL_DIALOG_LUCK_PENALTY:
                             NormalDialog(cLuckInfo[IDX(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_MORALE:
+                        case NORMAL_DIALOG_MORALE_BONUS:
                             NormalDialog(
                                 cMoraleInfo[IDX(MORALE_INFO_GOOD)],
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
-                        case EVENT_WINDOW_BAD_MORALE:
+                        case NORMAL_DIALOG_MORALE_PENALTY:
                             NormalDialog(
                                 cMoraleInfo[IDX(MORALE_INFO_BAD)],
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
-                        case EVENT_WINDOW_EXPERIENCE:
+                        case NORMAL_DIALOG_EXPERIENCE:
                             NormalDialog(
                                 localization::Tr("help.experience"),
                                 NORMAL_DIALOG_QUICK_VIEW
@@ -3385,7 +3366,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             updateMessage.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
             netWindow->BroadcastMessage(updateMessage);
             netWindow->DrawWindow();
-            gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, LOGICAL_SCREEN_MAX_X, BOX_HEIGHT);
         }
 
         if (updateInput) {
@@ -3400,7 +3381,7 @@ void PopNetBox(H2_CONST char* text, i32 netPlayer) {
             updateMessage.payload.widget.data.text = inputText;
             netWindow->BroadcastMessage(updateMessage);
             netWindow->DrawWindow();
-            gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, LOGICAL_SCREEN_MAX_X, BOX_INPUT_HEIGHT);
         }
 
         if (messageTime != 0 && messageTime + BOX_MESSAGE_TIMEOUT < KBTickCount())
@@ -3913,8 +3894,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
-                if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
+                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES)
                     break;
             }
             giMenuCommand = command;
@@ -3924,7 +3905,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             SaveGame();
             break;
         case APP_MENU_EXIT:
-            PostMessageA(hwndApp, APP_MENU_CLOSE_MESSAGE, 0, 0);
+            PostMessageA(hwndApp, WM_CLOSE, 0, 0);
             break;
 
         case APP_MENU_MUSIC_FIRST:
@@ -4068,7 +4049,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gpGame->m_cheated = 1;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
-            for (loopIndex = 0; loopIndex < APP_MENU_RESOURCE_COUNT; loopIndex++)
+            for (loopIndex = 0; loopIndex < IDX(RES_COUNT); loopIndex++)
                 gpCurPlayer->m_resources[loopIndex] += loopIndex == IDX(RES_GOLD)
                     ? APP_MENU_GOLD_BONUS
                     : APP_MENU_RESOURCE_BONUS;
@@ -4114,11 +4095,11 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
                 gpCombatManager->m_elevationOverlayIndex = command - APP_MENU_COMBAT_FIRST;
                 gpCombatManager->m_backgroundDrawn = false;
-                for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
+                for (loopIndex = 0; loopIndex < COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
                     gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;
                 }
-                for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
+                for (loopIndex = 0; loopIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT; loopIndex++) {
                     formationHexIndex =
                         sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
                     if (formationHexIndex != -1)
@@ -4151,7 +4132,7 @@ void UpdateSystemOptionsMenu(void) {
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+        CheckMenuItem(hmnuApp, menuCommand, MF_UNCHECKED);
     switch (gConfig.musicVolume) {
         case CONFIG_VOLUME_MIN:
             checkedCommand = APP_MENU_MUSIC_FIRST + 1;
@@ -4187,10 +4168,10 @@ void UpdateSystemOptionsMenu(void) {
             checkedCommand = APP_MENU_MUSIC_FIRST;
             break;
     }
-    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+    CheckMenuItem(hmnuApp, checkedCommand, MF_CHECKED);
 
     for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+        CheckMenuItem(hmnuApp, menuCommand, MF_UNCHECKED);
     switch (gConfig.soundVolume) {
         case CONFIG_VOLUME_MIN:
             checkedCommand = APP_MENU_SOUND_FIRST + 1;
@@ -4226,19 +4207,19 @@ void UpdateSystemOptionsMenu(void) {
             checkedCommand = APP_MENU_SOUND_FIRST;
             break;
     }
-    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+    CheckMenuItem(hmnuApp, checkedCommand, MF_CHECKED);
 
     for (menuCommand = APP_MENU_SPEED_FIRST; menuCommand <= APP_MENU_SPEED_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+        CheckMenuItem(hmnuApp, menuCommand, MF_UNCHECKED);
     CheckMenuItem(
         hmnuApp,
         APP_MENU_TOGGLE_ROUTE,
-        gConfig.showRoute ? APP_MENU_CHECKED : APP_MENU_UNCHECKED
+        gConfig.showRoute ? MF_CHECKED : MF_UNCHECKED
     );
     CheckMenuItem(
         hmnuApp,
         APP_MENU_TOGGLE_BLACKOUT,
-        1 - gConfig.blackoutComputer ? APP_MENU_CHECKED : APP_MENU_UNCHECKED
+        1 - gConfig.blackoutComputer ? MF_CHECKED : MF_UNCHECKED
     );
 }
 
@@ -5112,7 +5093,6 @@ H2_ENUM_BEGIN(NormalDialogLayoutConstant)
     NORMAL_DIALOG_BUTTON_AREA_HEIGHT = 39,
     NORMAL_DIALOG_RESOURCE_VERTICAL_GAP = 14,
     NORMAL_DIALOG_ROW_CALCULATION_OFFSET = 25,
-    NORMAL_DIALOG_DEFAULT_X = 159,
     NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET = 17,
     NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X = 104,
     NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET = 87,
@@ -8507,77 +8487,77 @@ DATA(0x004fd634) u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 9
 DATA(0x004fd641) SCampaignChoice
     campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
         {{{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_THUNDER_MACE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_ARMORED_GAUNTLETS)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MIRROR_IMAGE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_SUMMON_EARTH_ELEMENTAL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_RESURRECT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_THUNDER_MACE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_ARMORED_GAUNTLETS)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MIRROR_IMAGE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_SUMMON_EARTH_ELEMENTAL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_RESURRECT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
          {{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_CRYSTAL)}, CHOICE_RESOURCE_BONUS},
           {CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GEMS)}, CHOICE_RESOURCE_BONUS},
           {CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_MERCURY)}, CHOICE_RESOURCE_BONUS}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}}},
         {{{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MAGE_RING)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MINOR_SCROLL)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MAGE_RING)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_MINOR_SCROLL)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
          {{CAMPAIGN_CHOICE_RESOURCE, {IDX(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MASS_CURSE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DEFENDER_HELM)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {IDX(HERO_SKILL_LOGISTICS)}, CHOICE_BASIC_SKILL},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_POWER_AXE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_WHITE_PEARL)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}}}
+          {CAMPAIGN_CHOICE_SPELL, {IDX(SPELL_MASS_CURSE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DEFENDER_HELM)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {IDX(HERO_SKILL_LOGISTICS)}, IDX(HERO_SKILL_LEVEL_BASIC)},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_POWER_AXE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_WHITE_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_BLACK_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DRAGON_SWORD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_DIVINE_BREASTPLATE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_TAX_LIEN)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_HIDEOUS_MASK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {IDX(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}}}
 };
 DATA(0x00526688) char* congratsText = NULL;
 DATA(0x004fd7ac) H2_CONST char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {

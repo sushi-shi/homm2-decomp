@@ -32,7 +32,7 @@ DATA(0x0051b638) H2_CONST char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT
        Отменить и вернуться в главное меню. */
     localization::Tr("table.xSetupStandardGameHelp.2")
 };
-DATA(0x0051b644) H2_CONST char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+DATA(0x0051b644) H2_CONST char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT] = {
      localization::Tr("table.xCampaignAwards.0"),
      localization::Tr("table.xCampaignAwards.1"),
      localization::Tr("table.xCampaignAwards.2"),
@@ -46,7 +46,7 @@ DATA(0x0051b644) H2_CONST char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWAR
      localization::Tr("table.xCampaignAwards.10")
 };
 DATA(0x0051b670) H2_CONST char*
-    xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
+    xScenarioName[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
         { localization::Tr("table.xScenarioName.0.0"),
           localization::Tr("table.xScenarioName.0.1"),
           localization::Tr("table.xScenarioName.0.2"),
@@ -81,7 +81,7 @@ DATA(0x0051b670) H2_CONST char*
          ""}
 };
 DATA(0x0051b6f0) H2_CONST char*
-    xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
+    xScenarioDescription[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] =
         {
             {
                  localization::Tr("table.xScenarioDescription.0.0"),
@@ -124,13 +124,13 @@ DATA(0x0051b6f0) H2_CONST char*
                 ""
             }
         };
-DATA(0x0051b770) H2_CONST char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+DATA(0x0051b770) H2_CONST char* xShortCampaignNames[IDX(EXPANSION_CAMPAIGN_COUNT)] = {
      localization::Tr("table.xShortCampaignNames.0"),
      localization::Tr("table.xShortCampaignNames.1"),
      localization::Tr("table.xShortCampaignNames.2"),
      localization::Tr("table.xShortCampaignNames.3")
 };
-DATA(0x0051b780) H2_CONST char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+DATA(0x0051b780) H2_CONST char* xHSCampaignNames[IDX(EXPANSION_CAMPAIGN_COUNT)] = {
     /* Цена верности  */ localization::Tr("table.xHSCampaignNames.0"),
      localization::Tr("table.xHSCampaignNames.1"),
      localization::Tr("table.xHSCampaignNames.2"),
@@ -176,7 +176,7 @@ DATA(0x0051b7e8) H2_CONST char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUN
      localization::Tr("table.xUncleIvanName.4"),
      localization::Tr("table.xUncleIvanName.5")
 };
-DATA(0x0051b800) H2_CONST char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+DATA(0x0051b800) H2_CONST char* xShortSSLevelNames[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
      localization::Tr("table.xShortSSLevelNames.0"),
      localization::Tr("table.xShortSSLevelNames.1"),
      localization::Tr("table.xShortSSLevelNames.2")

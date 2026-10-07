@@ -23,7 +23,6 @@
 #include <BASE/display.h>
 
 H2_ENUM_BEGIN(SmackManagerConstant)
-    PALETTE_VALUE_SHIFT            = 2,
     AUDIO_OPEN_FLAGS               = 0xfe000,
     NORMAL_FADE                    = 0x80,
     SHORT_FADE                     = 8,

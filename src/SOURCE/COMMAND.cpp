@@ -122,7 +122,6 @@ namespace {
     H2_ENUM_CLASS_END(CombatActionDataIndex)
 
     H2_ENUM_BEGIN(CombatDirectionConstant)
-        DIRECTION_SECTOR_COUNT = 24,
         DIRECTION_SECTOR_ORIGIN = 0,
         DIRECTION_SECTOR_QUARTER = 6,
         DIRECTION_SECTOR_HALF = 12,
@@ -146,24 +145,16 @@ namespace {
     H2_ENUM_BEGIN(CombatCommandConstant)
         POINTER_VIEW = 5,
         POINTER_ATTACK_OFFSET = 7,
-        INVALID_ARMY_INDEX = -1,
-        INVALID_HEX = -1,
         PLAYER_NONE = -1,
         SMALL_VIEW_POSITION_NONE = -1,
-        IGNORED_HEX = -2,
-        CASTLE_GATE_HEX = 59
+        IGNORED_HEX = -2
     H2_ENUM_END(CombatCommandConstant)
-
-    H2_ENUM_BEGIN(CombatRoundConstant)
-        ROUND_INITIAL_SPEED = 15
-    H2_ENUM_END(CombatRoundConstant)
 
     H2_ENUM_BEGIN(CombatCommandGeometry)
         CONTROL_RIGHT_MIN_X = 590,
         CONTROL_LEFT_MAX_X = 50,
         CONTROL_SYSTEM_OPTIONS_MIN_Y = 460,
-        ARMY_VIEW_LEVEL_COUNT = 3,
-        COMMAND_FRAME_DELAY = 75
+        COMMAND_FIZZLE_DELAY = 75
     H2_ENUM_END(CombatCommandGeometry)
 
     H2_ENUM_BEGIN(CombatCasualtyConstant)
@@ -244,12 +235,6 @@ namespace {
     H2_ENUM_END(CombatCasualtyPanelConstant)
 
     H2_ENUM_BEGIN(CombatCycleConstant)
-        HERO_ANIMATION_STAND = 0,
-        HERO_ANIMATION_LOSS_REACTION = 1,
-        HERO_ANIMATION_OPPONENT_LOSS_REACTION = 2,
-        HERO_ANIMATION_IDLE_FIRST = 9,
-        HERO_ANIMATION_IDLE_SECOND = 10,
-        HERO_ANIMATION_IDLE_LAST = 11,
         HERO_IDLE_DELAY = 4500,
         STAND_DELAY_RANDOM_THRESHOLD = 51,
         STAND_DELAY_RANDOM_MIN = 50,
@@ -398,7 +383,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
 
-    if (!(hexIndex == INVALID_HEX || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
+    if (!(hexIndex == ARMY_HEX_INVALID || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
           || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
           || (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex))
           || (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
@@ -465,7 +450,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                             m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHEAST)];
                 }
             } else {
-                directionHexes[direction] = INVALID_HEX;
+                directionHexes[direction] = ARMY_HEX_INVALID;
             }
         } else {
             directionHexes[direction] =
@@ -473,20 +458,20 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         }
 
         if (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0
-            && directionHexes[direction] != INVALID_HEX) {
+            && directionHexes[direction] != ARMY_HEX_INVALID) {
             if (currentArmy->m_facing == ARMY_FACING_RIGHT) {
                 if (direction == IDX(COMBAT_DIRECTION_NORTHWEST)
                     || direction == IDX(COMBAT_DIRECTION_WEST)
                     || direction == IDX(COMBAT_DIRECTION_SOUTHWEST)) {
                     if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH
                         == COMBAT_GRID_FIRST_COLUMN)
-                        directionHexes[direction] = INVALID_HEX;
+                        directionHexes[direction] = ARMY_HEX_INVALID;
                     else
                         directionHexes[direction]--;
                 }
                 if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH
                     == COMBAT_GRID_REVERSE_FIRST_COLUMN)
-                    rearHexes[direction] = INVALID_HEX;
+                    rearHexes[direction] = ARMY_HEX_INVALID;
                 else
                     rearHexes[direction] = directionHexes[direction] + 1;
             } else {
@@ -495,13 +480,13 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     || direction == IDX(COMBAT_DIRECTION_SOUTHEAST)) {
                     if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH
                         == COMBAT_GRID_REVERSE_FIRST_COLUMN)
-                        directionHexes[direction] = INVALID_HEX;
+                        directionHexes[direction] = ARMY_HEX_INVALID;
                     else
                         directionHexes[direction]++;
                 }
                 if (directionHexes[direction] % COMBAT_GRID_ROW_LENGTH
                     == COMBAT_GRID_FIRST_COLUMN)
-                    rearHexes[direction] = INVALID_HEX;
+                    rearHexes[direction] = ARMY_HEX_INVALID;
                 else
                     rearHexes[direction] = directionHexes[direction] - 1;
             }
@@ -608,13 +593,13 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         }
     }
 
-    i32 unresolved = DIRECTION_SECTOR_COUNT;
+    i32 unresolved = COMBAT_DIRECTION_MAP_COUNT;
     while (unresolved > 0) {
-        for (direction = 0; direction < DIRECTION_SECTOR_COUNT; direction++) {
+        for (direction = 0; direction < COMBAT_DIRECTION_MAP_COUNT; direction++) {
             if (m_directionMap[direction] == -1) {
-                next = (direction + 1) % DIRECTION_SECTOR_COUNT;
+                next = (direction + 1) % COMBAT_DIRECTION_MAP_COUNT;
                 previous =
-                    (direction + DIRECTION_SECTOR_COUNT - 1) % DIRECTION_SECTOR_COUNT;
+                    (direction + COMBAT_DIRECTION_MAP_COUNT - 1) % COMBAT_DIRECTION_MAP_COUNT;
                 if (m_directionMap[next] >= 0
                     && m_directionMap[next] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
                     m_directionMap[direction] =
@@ -627,10 +612,10 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             }
         }
         unresolved = 0;
-        for (direction = 0; direction < DIRECTION_SECTOR_COUNT; direction++) {
+        for (direction = 0; direction < COMBAT_DIRECTION_MAP_COUNT; direction++) {
             if (m_directionMap[direction] >= DIRECTION_PENDING_OFFSET) {
                 m_directionMap[direction] -= DIRECTION_PENDING_OFFSET;
-            } else if (m_directionMap[direction] == INVALID_HEX) {
+            } else if (m_directionMap[direction] == IDX(COMBAT_DIRECTION_INVALID)) {
                 unresolved++;
             }
         }
@@ -927,15 +912,15 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0)
                 selectedHex = GetGridIndex(mouseX, mouseY);
             else
-                selectedHex = INVALID_HEX;
+                selectedHex = ARMY_HEX_INVALID;
 
             UpdateMouseGrid(selectedHex, 0);
             if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0) {
-                if (selectedHex != m_selectedHex || selectedHex == INVALID_HEX) {
+                if (selectedHex != m_selectedHex || selectedHex == ARMY_HEX_INVALID) {
                     m_selectedHex = selectedHex;
                     m_previousCommand = COMBAT_INVALID_COMMAND;
                     m_currentCommand = GetCommand(m_selectedHex);
-                    m_mouseDirection = INVALID_HEX;
+                    m_mouseDirection = IDX(COMBAT_DIRECTION_INVALID);
                     if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                         SetCombatDirections(selectedHex);
                         CheckSetMouseDirection(mouseX, mouseY, selectedHex);
@@ -960,7 +945,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     CombatMessage(cCombatHelp[IDX(HELP_OTHER_CONTROL)], 1, 0, 0);
                 }
                 gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-                m_selectedHex = INVALID_HEX;
+                m_selectedHex = ARMY_HEX_INVALID;
                 m_previousCommand = COMBAT_INVALID_COMMAND;
             }
             return MESSAGE_DISPATCH_CONSUME;
@@ -980,7 +965,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 case IDX(INPUT_SCAN_F5):
                     SetCombatViewArmySmallLevel(
-                        (gConfig.combatArmyInfoLevel + 1) % ARMY_VIEW_LEVEL_COUNT
+                        (gConfig.combatArmyInfoLevel + 1) % COMBAT_ARMY_INFO_LEVEL_COUNT
                     );
                     break;
                 case IDX(INPUT_SCAN_F6):
@@ -1006,7 +991,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 case IDX(INPUT_SCAN_F9):
                     giSpellEffectShowType = NextSpellEffectDisplayType(giSpellEffectShowType);
-                    DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+                    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
                     break;
                 case IDX(INPUT_SCAN_F11):
                     if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)) {
@@ -1127,7 +1112,7 @@ void combatManager::ResetRound(void) {
 
     if (gpCombatManager->m_removedArmyPresent != 0)
         gpCombatManager->MakeCreaturesVanish();
-    m_currentSpeed = ROUND_INITIAL_SPEED;
+    m_currentSpeed = COMBAT_INITIAL_SPEED;
 }
 #if H2_RETAIL_COMPILER
 #undef unusedResetRoundWord
@@ -1200,7 +1185,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 targetIndex;
     army* ourArmy;
 
-    if (hexIndex == INVALID_HEX) {
+    if (hexIndex == ARMY_HEX_INVALID) {
         command = COMBAT_MESSAGE_COMMAND_DEFAULT;
         goto smallView;
     }
@@ -1327,7 +1312,7 @@ VA(0x0042d964, 0x1eb)
 i32 combatManager::RightClick(i32 hexIndex) {
     i32 H2_UNUSED(column) = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 H2_UNUSED(row) = hexIndex / COMBAT_GRID_ROW_LENGTH;
-    if (hexIndex == INVALID_HEX)
+    if (hexIndex == ARMY_HEX_INVALID)
         return 0;
 
     switch (hexIndex) {
@@ -2476,7 +2461,7 @@ void combatManager::CheckChangeSelector(void) {
         giNewMonsterCycleFrame = SELECTOR_INITIAL_FRAME;
         m_limitCreatureHex = currentArmy->m_hex;
         m_limitCreature = true;
-        DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+        DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
     SetupSmallView();
 }
@@ -2519,7 +2504,7 @@ void combatManager::CheckGetAIMove(void) {
 
 VA(0x00430ab0, 0x14f)
 void combatManager::GetControl(void) {
-    m_selectedHex = INVALID_HEX;
+    m_selectedHex = ARMY_HEX_INVALID;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     if (gpCombatManager->m_active == 1)
@@ -2556,7 +2541,7 @@ void combatManager::ResetMouse(void) {
         return;
     if (gbThisNetHasControl != 0 && m_playerId[IDX(m_currentSide)] >= 0
         && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0) {
-        m_selectedHex = INVALID_HEX;
+        m_selectedHex = ARMY_HEX_INVALID;
         ClearCombatMessages(0);
         gpMouseManager->MouseCoords(mouseX, mouseY);
         message.type = MESSAGE_MOUSE_MOVE;
@@ -2610,7 +2595,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     if (UpdateGrid(0, 0) != 0)
         redraw = true;
     if (redraw != 0)
-        DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+        DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
 
     if (gbThisNetHasControl != 0 && gbRemoteOn != 0 && m_playerId[IDX(COMBAT_ATTACKER_SIDE)] >= 0
         && m_playerId[IDX(COMBAT_DEFENDER_SIDE)] >= 0
@@ -2748,7 +2733,7 @@ void combatManager::ResetCyclingCreatures(void) {
     if (rotateCount == 0)
         return;
 
-    gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(0, 1, 1, 1, COMBAT_FRAME_DELAY, 1, 1);
     for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
             currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
@@ -2763,7 +2748,7 @@ void combatManager::ResetCyclingCreatures(void) {
     }
     m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
     m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
-    gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(1, 1, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
 }
 
 #if H2_RETAIL_COMPILER
@@ -2922,7 +2907,7 @@ void combatManager::CycleCombatScreen(void) {
         && m_drawHeroOverlay[IDX(COMBAT_ATTACKER_SIDE)] == 0
         && m_drawHeroOverlay[IDX(COMBAT_DEFENDER_SIDE)] == 0)
         goto setCycleTimer;
-    gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(0, 1, 1, 1, COMBAT_FRAME_DELAY, 1, 1);
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
             currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
@@ -2993,7 +2978,7 @@ void combatManager::CycleCombatScreen(void) {
             }
         }
     }
-    DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    DrawFrame(1, 1, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
 setCycleTimer:
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = COMBAT_DEADLINE(COMBAT_CYCLE_TIMER_FACTOR);
 }
@@ -3010,7 +2995,7 @@ setCycleTimer:
 VA(0x00431f2a, 0x30)
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {
     gConfig.combatArmyInfoLevel = level;
-    DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     WritePrefs();
 }
 
@@ -3020,13 +3005,13 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
         && gConfig.combatShadeLevel == shadeLevel)
         return;
 
-    UpdateMouseGrid(INVALID_HEX, 0);
+    UpdateMouseGrid(ARMY_HEX_INVALID, 0);
     gConfig.showCombatGrid = showGrid;
     gConfig.showCombatMouseHex = showMouseHex;
     gConfig.combatShadeLevel = shadeLevel;
     m_backgroundDrawn = false;
     SetupGridForArmy(&m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]);
-    DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     ResetMouse();
     WritePrefs();
 }
@@ -3043,7 +3028,7 @@ void combatManager::AddArmy(
     H2_ENUM_PARAM(MonsterFlags, i32) flags,
     i32 animate
 ) {
-    i32 armyIndex = INVALID_ARMY_INDEX;
+    i32 armyIndex = COMBAT_ARMY_INDEX_NONE;
     b32 reusedArmy = false;
     i32 index;
     army* newStack;
@@ -3062,11 +3047,11 @@ void combatManager::AddArmy(
         }
     }
 
-    if (armyIndex == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+    if (armyIndex == COMBAT_ARMY_INDEX_NONE || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
     newStack = &m_armies[IDX(side)][armyIndex];
-    newStack->Init(monsterType, quantity, side, armyIndex, hex, INVALID_HEX);
+    newStack->Init(monsterType, quantity, side, armyIndex, hex, ARMY_HEX_INVALID);
     newStack->LoadResources();
     newStack->m_monster.attributes |= flags;
     if (reusedArmy == 0)
@@ -3077,7 +3062,7 @@ void combatManager::AddArmy(
 
     ResetLimitCreature();
     ++m_limitCreatureCount[IDX(side)][armyIndex];
-    gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(0, 1, 0, 1, COMBAT_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,
         giMinExtentY,
@@ -3085,13 +3070,13 @@ void combatManager::AddArmy(
         giMaxExtentY - giMinExtentY + 1
     );
     UpdateGrid(0, 1);
-    DrawFrame(0, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    DrawFrame(0, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,
         giMinExtentY,
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1,
-        COMMAND_FRAME_DELAY,
+        COMMAND_FIZZLE_DELAY,
         NULL,
         NULL
     );

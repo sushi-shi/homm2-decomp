@@ -68,8 +68,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     RIGHT_PRIMARY_SKILL_FIRST = 0x48,
     LEFT_ARMY_COUNT_FIRST     = 0x74,
     RIGHT_ARMY_COUNT_FIRST    = 0x79,
-    ARMY_VIEW_X               = 0x77,
-    ARMY_VIEW_Y               = 0x14,
     SPLIT_WINDOW_X            = 0xb1,
     SPLIT_WINDOW_Y            = 0x14,
     SPLIT_TEXT_CONTROL        = 1,
@@ -567,8 +565,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_LEFT_ARMY_FIRST],
@@ -638,8 +636,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_RIGHT_ARMY_FIRST],
@@ -738,8 +736,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 VA(0x004a33b6, 0x98)
 void swapManager::ViewMon(void) {
     gpGame->ViewArmy(
-        ARMY_VIEW_X,
-        ARMY_VIEW_Y,
+        VIEW_ARMY_STANDARD_X,
+        VIEW_ARMY_STANDARD_Y,
         m_heroes[IDX(m_selectedSide)]->m_army.m_creatureTypes[m_targetSlot],
         m_heroes[IDX(m_selectedSide)]->m_army.m_creatureCounts[m_targetSlot],
         NULL,

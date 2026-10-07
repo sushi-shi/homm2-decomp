@@ -22,7 +22,7 @@ VA(0x00465110, 0x59)
 highScoreManager::highScoreManager(void) {
     i32 entry;
 
-    for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++)
+    for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
         m_animationFrames[entry] = Random(0, HIGH_SCORE_ANIMATION_FRAME_COUNT - 1);
     m_showCampaignScores = false;
 }
@@ -70,7 +70,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
 
     if (glTimers[HIGH_SCORE_TIMER_SLOT] < KBTickCount()) {
         glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
-        for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++) {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
             m_animationFrames[entry] =
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
             windowMessage.type = MESSAGE_WIDGET;
@@ -171,7 +171,7 @@ void highScoreManager::Update(void) {
     hsMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_window->BroadcastMessage(hsMessage);
 
-    for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
+    for (rank = 0; rank < HIGH_SCORE_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
         else

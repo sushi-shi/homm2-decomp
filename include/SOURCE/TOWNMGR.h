@@ -79,8 +79,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_STATUS_REGION_Y                     = 0x1d0,
     TOWN_STATUS_REGION_WIDTH                 = 0x24e,
     TOWN_STATUS_REGION_HEIGHT                = 0xf,
-    TOWN_ARMY_VIEW_X                         = 0x77,
-    TOWN_ARMY_VIEW_Y                         = 0x14,
     TOWN_SPELL_BOOK_COST                     = 500,
     TOWN_BOAT_GOLD_COST                      = 1000,
     TOWN_BOAT_WOOD_COST                      = 10,

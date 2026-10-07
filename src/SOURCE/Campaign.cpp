@@ -21,10 +21,6 @@
 #include <BASE/dialog.h>
 #include <SOURCE/GAME.h>
 // This screen activates replay/accept/cancel actions on the release notification.
-H2_ENUM_BEGIN(CampaignNotification)
-    CAMPAIGN_MESSAGE_ACTIVATE = IDX(WIDGET_NOTIFY_DESELECT)
-H2_ENUM_END(CampaignNotification)
-
 H2_ENUM_BEGIN(CampaignScenarioArmyCount)
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
     BARBARIAN_OGRE_COUNT       = 18,
@@ -118,8 +114,6 @@ H2_ENUM_CLASS_BEGIN(CampaignTrackType)
 H2_ENUM_CLASS_END(CampaignTrackType)
 
 H2_ENUM_BEGIN(CampaignTrackConstant)
-    TRACK_X                          = 0,
-    TRACK_Y                          = 1,
     TRACK_ICON_FILL_COLOR            = 1,
     TRACK_SELECTED_FRAME_ONE_STEP    = 3,
     TRACK_SELECTED_FRAME_TWO_STEPS   = 6,
@@ -431,16 +425,16 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             continue;
         if (iCampaignTrackType == SWITCH_TO_ARCHIBALD_OPEN && mapIndex == MAP_TWELVE)
             continue;
-        if (trackXY[IDX(iCurViewSide)][mapIndex][TRACK_X] != -1) {
+        if (trackXY[IDX(iCurViewSide)][mapIndex][IDX(COORDINATE_AXIS_X)] != -1) {
             trackMapIndex = mapIndex;
             if (trackMapIndex > CAMPAIGN_REGULAR_MAP_COUNT)
                 trackMapIndex = CAMPAIGN_REGULAR_MAP_COUNT;
             trackWidget = new iconWidget(
                 trackXY[IDX(mapIndex < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
-                                                               : m_campaignType)][mapIndex][TRACK_X]
+                                                               : m_campaignType)][mapIndex][IDX(COORDINATE_AXIS_X)]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
                 trackXY[IDX(mapIndex < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
-                                                               : m_campaignType)][mapIndex][TRACK_Y]
+                                                               : m_campaignType)][mapIndex][IDX(COORDINATE_AXIS_Y)]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
                 CAMPAIGN_TRACK_ICON_SIZE,
                 CAMPAIGN_TRACK_ICON_SIZE,
@@ -475,7 +469,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
             localization::Tr("campaign.confirm.restart_scenario"),
-            CAMPAIGN_RESTART_CONFIRM
+            NORMAL_DIALOG_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitCampaignMap();
@@ -757,7 +751,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                 }
                 break;
 
-            case BaseWidgetCommand(CAMPAIGN_MESSAGE_ACTIVATE):
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_DIALOG_REPLAY:
                         gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
@@ -1097,7 +1091,7 @@ void game::InitCampaignMap(void) {
 #endif
 
 DATA(0x004f0828) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
-                                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
+                                  [IDX(COORDINATE_AXIS_COUNT)] = {
     {{39, 336},
      {113, 336},
      {150, 294},

@@ -441,8 +441,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_WHIRLPOOL                  = 39,
     MAP_OBJECT_WINDMILL                   = 40,
     MAP_OBJECT_ARTIFACT                   = 41,
-    MAP_OBJECT_MERMAID                    = 42,
-    MAP_OBJECT_HERO_INTERACTION           = IDX(MAP_OBJECT_MERMAID),
+    MAP_OBJECT_HERO_INTERACTION           = 42,
     MAP_OBJECT_BOAT                       = 43,
     MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT   = 44,
     MAP_OBJECT_RANDOM_ARTIFACT            = 45,
@@ -523,7 +522,8 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_TRAVELER_TENT              = 120,
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
-    MAP_OBJECT_JAIL                       = 123
+    MAP_OBJECT_JAIL                       = 123,
+    MAP_OBJECT_COUNT                      = 124
 H2_ENUM_CLASS_END_SPLIT(MapObjectType, i16)
 
 // An artifact's or a resource's map sprite is a shadow frame and an item frame
