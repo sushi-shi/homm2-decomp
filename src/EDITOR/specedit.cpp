@@ -104,7 +104,7 @@ DATA(0x004a583c) i32 gLandPercent;
 DATA(0x004a5840) heroWindow* gSpecWindow;
 
 VA(0x00426640, 0x528)
-b32 EditMapSpecifications(i32 randomMap) {
+b32 EditMapSpecifications(b32 randomMap) {
     char buffer[SPEC_EXCERPT_SIZE];
     tag_message message;
     i32 y;

@@ -272,6 +272,9 @@ MessageDispatchResult CellWindowHandler(tag_message& message) {
                             value = atoi(message.payload.widget.data.text);
                             if (value < 0)
                                 break;
+                            // Rows 6, 8 and 9 store the fields HoMM1's cell
+                            // editor kept there (flags, trigger type and
+                            // metadata), not the ones EditCell fills them from.
                             switch (message.payload.widget.id) {
                                 case CELL_WINDOW_FIRST_FIELD + CELL_FIELD_TERRAIN_IMAGE:
                                     gEditCell->m_terrainImageIndex = value & CELL_WINDOW_BYTE_MASK;
