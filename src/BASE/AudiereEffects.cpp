@@ -6,6 +6,10 @@
 #include <SOURCE/NOOPT.h>
 
 
+typedef enum AudiereEffectsConstant {
+    AUDIERE_SAMPLE_WAIT_POLL_MILLISECONDS = 10
+} AudiereEffectsConstant;
+
 static AudiereEffectsState gAudiereEffects = {};
 
 void PurgeFinishedAudiereSamples(void) {
@@ -66,10 +70,10 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
     gAudiereEffects.sampleRate = (sampleResource->m_playbackData.sampleRate);
     gAudiereEffects.frameCount = sampleResource->m_playbackData.size;
     if (sampleResource->m_playbackData.stereo != 0) {
-        gAudiereEffects.channelCount = 2;
+        gAudiereEffects.channelCount = AUDIERE_CHANNELS_STEREO;
         gAudiereEffects.frameCount >>= 1;
     } else {
-        gAudiereEffects.channelCount = 1;
+        gAudiereEffects.channelCount = AUDIERE_CHANNELS_MONO;
     }
     if (sampleResource->m_playbackData.sampleFormat != FORMAT_8_BIT) {
         gAudiereEffects.sampleFormat = audiere::SF_S16;
@@ -137,7 +141,7 @@ void WaitForAudiereSample(class sample* sampleResource) {
     AudiereSampleNode* node = FindAudiereSample(sampleResource);
     if (node != NULL) {
         while (node->stream->isPlaying())
-            DelayMilli(10);
+            DelayMilli(AUDIERE_SAMPLE_WAIT_POLL_MILLISECONDS);
         PurgeFinishedAudiereSamples();
     }
 }

@@ -19,11 +19,6 @@ i32 WaitForDirectConnect(void);
 char ReadPacket(void);
 void WriteModemPacket(const char* buffer, i32 length);
 
-typedef enum ModemSetupMode {
-    MODEM_MODE_DIAL = 3,
-    MODEM_MODE_WAIT = 4,
-} ModemSetupMode;
-
 typedef enum ModemConnectionStage {
     MODEM_CONNECTION_INIT_STAGE      = 0,
     MODEM_CONNECTION_HANDSHAKE_STAGE = 1,

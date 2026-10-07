@@ -12,7 +12,8 @@ typedef enum AudiereMusicConstant {
     AUDIERE_FADE_VOLUME_LIMIT        = 121,
     AUDIERE_FADE_START_LEVEL         = 10,
     AUDIERE_FADE_STEP_COUNT          = 11,
-    AUDIERE_FADE_DELAY               = 480
+    AUDIERE_FADE_DELAY               = 480,
+    AUDIERE_MUSIC_FILENAME_CAPACITY  = 0x160
 } AudiereMusicConstant;
 
 static float gAudiereMusicVolume = 1.0f;
@@ -105,7 +106,7 @@ void PlayAudiereMusic(
     i32& fadeSteps,
     i32 track
 ) {
-    char filename[0x160];
+    char filename[AUDIERE_MUSIC_FILENAME_CAPACITY];
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     if (track == MIDI_NO_TRACK) {

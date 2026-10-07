@@ -31,9 +31,7 @@ typedef enum CellWindowConstant {
     CELL_WINDOW_ACTION_TOGGLE   = 0x48,
     CELL_WINDOW_BYTE_MASK       = 0xff,
 
-    CELL_WINDOW_MAX_TILESET     = 15,
-
-    CELL_WINDOW_DEBUG_LEVEL     = 1
+    CELL_WINDOW_MAX_TILESET     = 15
 } CellWindowConstant;
 
 typedef enum CellWindowField {
@@ -79,7 +77,7 @@ typedef enum NewMapWindowConstant {
 
     NEW_MAP_PLAYERS_BASE           = 1498,
     NEW_MAP_MIN_PLAYERS            = 2,
-    NEW_MAP_MAX_PLAYERS            = 6,
+    NEW_MAP_DEFAULT_PLAYERS        = 4,
     NEW_MAP_TRACK_X                = 154,
     NEW_MAP_TRACK_WIDTH            = 250,
     NEW_MAP_TRACK_HEIGHT           = 16,
@@ -99,6 +97,8 @@ typedef enum NewMapWindowConstant {
     NEW_MAP_KNOB_RIGHT             = 383,
     NEW_MAP_KNOB_TRAVEL            = 227,
     NEW_MAP_KNOB_GRAB              = 8,
+
+
     NEW_MAP_PERCENT                = 100,
 
     NEW_MAP_MINIMUM_LAND           = 20,

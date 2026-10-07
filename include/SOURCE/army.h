@@ -25,6 +25,10 @@ typedef enum ArmyHexConstant {
     ARMY_HEX_INVALID      = -1
 } ArmyHexConstant;
 
+typedef enum ArmyDisplayConstant {
+    ARMY_QUANTITY_OVERRIDE_NONE = -1
+} ArmyDisplayConstant;
+
 #pragma pack(push, 1)
 class army {
 public:

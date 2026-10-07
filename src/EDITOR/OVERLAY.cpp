@@ -129,6 +129,10 @@ typedef enum OverlayPickerLayout {
 
 
     OVERLAY_PICKER_KNOB_PARKED  = 0xd7,
+
+
+    OVERLAY_PICKER_KNOB_TRAVEL  = 393,
+    OVERLAY_PICKER_KNOB_SCALE_SPAN = 402,
     OVERLAY_PICKER_ZOOM         = 1,
     OVERLAY_PICKER_DRAG_ORIGIN  = 0x27,
 
@@ -696,7 +700,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
             shadow =
                 (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS + OVERLAY_TOWN_SHADOWS;
         else
-            shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
+            shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % OVERLAY_TOWN_KINDS + OVERLAY_RANDOM_TOWN_SHADOWS;
         ground =
             (CELL_TERRAIN(gMap.CellAt(x + OVERLAY_TOWN_ENTRANCE_X, y + OVERLAY_TOWN_ENTRANCE_Y)))
             + OVERLAY_TOWN_GROUNDS;
@@ -835,11 +839,11 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         if (type->id >= OVERLAY_RANDOM_TOWN_FIRST
                             && type->id <= OVERLAY_RANDOM_TOWN_LAST) {
                             newTown->faction = OVERLAY_RANDOM_TOWN_FACTION;
-                            newTown->isCastle = 1 - (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2;
+                            newTown->isCastle = 1 - (type->id - OVERLAY_RANDOM_TOWN_FIRST) % OVERLAY_TOWN_KINDS;
                         } else {
                             newTown->faction =
-                                (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS / 2;
-                            newTown->isCastle = 1 - (type->id - OVERLAY_TOWN_FIRST) % 2;
+                                (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS / OVERLAY_TOWN_KINDS;
+                            newTown->isCastle = 1 - (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_KINDS;
                         }
                         gEditManager->m_extraSizes[gEditManager->m_extraCount] = sizeof(TownExtra);
                         gEditManager->m_extraCount++;
@@ -934,7 +938,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                         gEditManager->m_extraCount++;
                     }
                     if (dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)
-                        && dest->m_objectIndex / 2 == (ARTIFACT_SPELL_SCROLL))
+                        && dest->m_objectIndex / EVENTS_ARTIFACT_SPRITE_FRAMES == (ARTIFACT_SPELL_SCROLL))
                         dest->m_objectMetadata = 0;
                     if (dest->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_OBJECT)
                         && OverlayGridHas(type->entranceRows, col, row)) {
@@ -1000,13 +1004,13 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
         }
     if (type->category == OVERLAY_CATEGORY_TOWN) {
         PlaceOverlay(
-            &gOverlayTypes[OVERLAY_TOWN_FLAGS + type->color * 2],
+            &gOverlayTypes[OVERLAY_TOWN_FLAGS + type->color * OVERLAY_TOWN_FLAG_PARTS],
             x + OVERLAY_LEFT_FLAG_X,
             y + OVERLAY_FLAG_Y,
             false
         );
         PlaceOverlay(
-            &gOverlayTypes[OVERLAY_TOWN_FLAGS + 1 + type->color * 2],
+            &gOverlayTypes[OVERLAY_TOWN_FLAGS + 1 + type->color * OVERLAY_TOWN_FLAG_PARTS],
             x + OVERLAY_RIGHT_FLAG_X,
             y + OVERLAY_FLAG_Y,
             false
@@ -1070,7 +1074,7 @@ void overlayManager::DrawOverlay(
         if (type->id >= OVERLAY_TOWN_FIRST && type->id <= OVERLAY_TOWN_LAST)
             shadow = (type->id - OVERLAY_TOWN_FIRST) % OVERLAY_TOWN_VARIANTS + OVERLAY_TOWN_SHADOWS;
         else
-            shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % 2 + OVERLAY_RANDOM_TOWN_SHADOWS;
+            shadow = (type->id - OVERLAY_RANDOM_TOWN_FIRST) % OVERLAY_TOWN_KINDS + OVERLAY_RANDOM_TOWN_SHADOWS;
         ground = OVERLAY_TOWN_GRASS_GROUND;
         if (cellX != EDIT_NO_CELL) {
             if (cellX < OVERLAY_TOWN_GROUND_COLUMN)
@@ -1189,7 +1193,7 @@ void overlayManager::DrawOverlay(
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
-                        type->color * 2,
+                        type->color * OVERLAY_TOWN_FLAG_PARTS,
                         static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
@@ -1204,7 +1208,7 @@ void overlayManager::DrawOverlay(
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,
                         y + (gridY - fromY) * tileSize,
-                        type->color * 2 + 1,
+                        type->color * OVERLAY_TOWN_FLAG_PARTS + 1,
                         static_cast<IconDrawClipMode>(clip),
                         EDIT_VIEW_LEFT,
                         EDIT_VIEW_TOP,
@@ -1331,8 +1335,9 @@ void overlayManager::DrawPicker(b32 update) {
     }
     if (gPickerRows > OVERLAY_PICKER_ROWS)
         m_pickerKnob->m_y = gPickerFirst / OVERLAY_PICKER_COLUMNS
-                                * (393.0 / (gPickerRows - (OVERLAY_PICKER_ROWS - 1) - 1.0))
-                            + 19.0;
+                                * (static_cast<double>(OVERLAY_PICKER_KNOB_TRAVEL)
+                                   / (gPickerRows - (OVERLAY_PICKER_ROWS - 1) - 1.0))
+                            + static_cast<double>(OVERLAY_PICKER_KNOB_Y);
     else
         m_pickerKnob->m_y = OVERLAY_PICKER_KNOB_PARKED;
     m_picker->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
@@ -1549,7 +1554,7 @@ void overlayManager::DragPickerKnob(b32 trackClick, i32 mouseX, i32 mouseY) {
 
     if (gPickerRows <= OVERLAY_PICKER_ROWS)
         return;
-    rowHeight = 402.0 / (gPickerRows - (OVERLAY_PICKER_ROWS - 1));
+    rowHeight = static_cast<double>(OVERLAY_PICKER_KNOB_SCALE_SPAN) / (gPickerRows - (OVERLAY_PICKER_ROWS - 1));
     if (mouseX == EDIT_NO_CELL)
         gpMouseManager->MouseCoords(mouseX, mouseY);
     gpInputManager->Flush();

@@ -19,7 +19,6 @@
 
 typedef enum SoundConstant {
     SAMPLE_VOLUME_MAX            = 0x40,
-    MIDI_VOLUME_MAX              = 0x7f,
     CD_VOLUME_SCALE_DIVISOR      = 0x280,
     CD_MUSIC_TRACK_FIRST         = 8,
     CD_MUSIC_TRACK_LAST          = 15,
@@ -148,8 +147,8 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     }
     if (convertedVolume < 0)
         convertedVolume = 0;
-    if (MIDI_VOLUME_MAX < convertedVolume)
-        convertedVolume = MIDI_VOLUME_MAX;
+    if (SOUND_VOLUME_FULL < convertedVolume)
+        convertedVolume = SOUND_VOLUME_FULL;
     return convertedVolume;
 }
 
@@ -178,37 +177,37 @@ i32 soundManager::Open(i32) {
     memset(bSaveMusicPosition, 0, MIDI_TRACK_COUNT);
     memset(bMusicIsLooping, 0, MIDI_TRACK_COUNT);
 
-    bSaveMusicPosition[16] = 1;
-    bSaveMusicPosition[18] = 1;
-    bSaveMusicPosition[14] = 1;
-    bSaveMusicPosition[15] = 1;
-    bSaveMusicPosition[11] = 1;
-    bSaveMusicPosition[13] = 1;
-    bSaveMusicPosition[17] = 1;
-    bSaveMusicPosition[12] = 1;
-    bSaveMusicPosition[28] = 1;
-    bSaveMusicPosition[42] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_WATER] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_GRASS] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_SNOW] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_SWAMP] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_LAVA] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_DESERT] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_DIRT] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_WASTELAND] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_AI_TURN] = 1;
+    bSaveMusicPosition[MUSIC_TRACK_MAIN_MENU] = 1;
 
-    bMusicIsLooping[16] = 1;
-    bMusicIsLooping[18] = 1;
-    bMusicIsLooping[14] = 1;
-    bMusicIsLooping[15] = 1;
-    bMusicIsLooping[11] = 1;
-    bMusicIsLooping[13] = 1;
-    bMusicIsLooping[17] = 1;
-    bMusicIsLooping[12] = 1;
-    bMusicIsLooping[8] = 1;
-    bMusicIsLooping[9] = 1;
-    bMusicIsLooping[5] = 1;
-    bMusicIsLooping[6] = 1;
-    bMusicIsLooping[10] = 1;
-    bMusicIsLooping[7] = 1;
-    bMusicIsLooping[42] = 1;
-    bMusicIsLooping[28] = 1;
-    bMusicIsLooping[43] = 1;
+    bMusicIsLooping[MUSIC_TRACK_WATER] = 1;
+    bMusicIsLooping[MUSIC_TRACK_GRASS] = 1;
+    bMusicIsLooping[MUSIC_TRACK_SNOW] = 1;
+    bMusicIsLooping[MUSIC_TRACK_SWAMP] = 1;
+    bMusicIsLooping[MUSIC_TRACK_LAVA] = 1;
+    bMusicIsLooping[MUSIC_TRACK_DESERT] = 1;
+    bMusicIsLooping[MUSIC_TRACK_DIRT] = 1;
+    bMusicIsLooping[MUSIC_TRACK_WASTELAND] = 1;
+    bMusicIsLooping[MUSIC_TRACK_KNIGHT_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_BARBARIAN_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_SORCERESS_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_WARLOCK_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_WIZARD_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_NECROMANCER_TOWN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_MAIN_MENU] = 1;
+    bMusicIsLooping[MUSIC_TRACK_AI_TURN] = 1;
+    bMusicIsLooping[MUSIC_TRACK_HIGH_SCORE] = 1;
     bMusicIsLooping[22] = 1;
     bMusicIsLooping[24] = 1;
-    for (musicTrack = 2; musicTrack <= 4; musicTrack++)
+    for (musicTrack = MUSIC_TRACK_BATTLE_FIRST; musicTrack <= MUSIC_TRACK_BATTLE_LAST; musicTrack++)
         bMusicIsLooping[musicTrack] = 1;
 
     asyncState = GetAsyncKeyState(VK_F6);
@@ -428,9 +427,9 @@ void soundManager::PollSound(void) {
 
         if (IsAudiereBackend(this)) {
             volume = (FADE_TOTAL_STEPS - (gConfig.musicVolume)) * volume
-                   * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
-            if (volume > MIDI_VOLUME_MAX)
-                volume = MIDI_VOLUME_MAX;
+                   * SOUND_VOLUME_FULL / CD_VOLUME_SCALE_DIVISOR;
+            if (volume > SOUND_VOLUME_FULL)
+                volume = SOUND_VOLUME_FULL;
             if (volume < 0)
                 volume = 0;
             SetAudiereMusicVolume(volume, true);

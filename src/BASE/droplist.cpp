@@ -2,6 +2,7 @@
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/dropListWidget.h>
+#include <BASE/listBoxWidget.h>
 #include <BASE/bitmap.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
@@ -32,23 +33,8 @@ enum {
     FRAME_SCROLL_THUMB        = 13
 };
 typedef i32 DropListFrame;
-typedef enum DropListStorageConstant {
-    RESOURCE_NAME_CAPACITY = 16
-} DropListStorageConstant;
-
 typedef enum DropListLayoutConstant {
-    MIN_VISIBLE_ITEM_COUNT      = 3,
-    TEXT_LEFT_INSET             = 5,
-    TEXT_HORIZONTAL_INSET_COUNT = 2,
-    FIRST_ROW_TEXT_TOP_INSET    = 4,
-    ROW_TEXT_TOP_INSET          = 2,
-    LIST_EDGE_ROW_COUNT         = 2,
-    SCROLL_TRACK_EDGE_ROW_COUNT = 2,
-    SCROLL_THUMB_X_INSET        = 5,
-    SCROLL_THUMB_Y_INSET        = 3,
-    SCROLL_THUMB_TRAVEL_PADDING = 7,
-    SCROLL_THUMB_CENTER_DIVISOR = 2,
-    SCROLL_DRAG_Y_ADJUSTMENT    = 4
+    MIN_VISIBLE_ITEM_COUNT = 3
 } DropListLayoutConstant;
 
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
@@ -70,7 +56,7 @@ dropListWidget::~dropListWidget() {
 
 void dropListWidget::Read(void) {
     IconEntry* entry;
-    char name[RESOURCE_NAME_CAPACITY];
+    char name[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
 
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(name);
@@ -274,9 +260,9 @@ void dropListWidget::DrawDropStuff(void) {
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, ICON_DRAW_NORMAL);
     m_font->DrawBoundedString(
         m_items[m_topIndex],
-        m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
-        y + FIRST_ROW_TEXT_TOP_INSET,
-        m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+        m_owner->m_posX + m_listX + LIST_BOX_TEXT_LEFT_INSET,
+        y + LIST_BOX_FIRST_ROW_TEXT_TOP_INSET,
+        m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
         m_font->m_height + 1,
         m_topIndex == m_selectedIndex ? m_selColor : m_normalColor,
         m_alignment
@@ -288,9 +274,9 @@ void dropListWidget::DrawDropStuff(void) {
         m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, ICON_DRAW_NORMAL);
         m_font->DrawBoundedString(
             *(m_items + m_topIndex + i),
-            m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
-            y + ROW_TEXT_TOP_INSET,
-            m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+            m_owner->m_posX + m_listX + LIST_BOX_TEXT_LEFT_INSET,
+            y + LIST_BOX_ROW_TEXT_TOP_INSET,
+            m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
             m_font->m_height + 1,
             m_topIndex + i == m_selectedIndex ? m_selColor : m_normalColor,
             m_alignment
@@ -301,9 +287,9 @@ void dropListWidget::DrawDropStuff(void) {
     if (m_topIndex + i < m_itemCount)
         m_font->DrawBoundedString(
             *(m_items + m_topIndex + i),
-            m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
-            y + ROW_TEXT_TOP_INSET,
-            m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+            m_owner->m_posX + m_listX + LIST_BOX_TEXT_LEFT_INSET,
+            y + LIST_BOX_ROW_TEXT_TOP_INSET,
+            m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
             m_font->m_height + 1,
             m_topIndex + i == m_selectedIndex ? m_selColor : m_normalColor,
             m_alignment
@@ -321,8 +307,8 @@ void dropListWidget::DrawDropStuff(void) {
             m_scrollTrackFirstFrame,
             ICON_DRAW_NORMAL
         );
-        for (i = SCROLL_TRACK_EDGE_ROW_COUNT;
-             i < m_visibleItemCount - SCROLL_TRACK_EDGE_ROW_COUNT;
+        for (i = LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT;
+             i < m_visibleItemCount - LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT;
              i++)
             m_icon->DrawToBuffer(
                 m_owner->m_posX + m_scrollTrackX,
@@ -342,10 +328,10 @@ void dropListWidget::DrawDropStuff(void) {
             m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame,
             ICON_DRAW_NORMAL
         );
-        m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
+        m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + LIST_BOX_SCROLL_THUMB_X_INSET;
         m_scrollThumbY = m_owner->m_posY + m_scrollTrackY
                          + m_scrollThumbTravel * m_topIndex / m_scrollRange
-                         + SCROLL_THUMB_Y_INSET;
+                         + LIST_BOX_SCROLL_THUMB_Y_INSET;
         m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     }
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_height + m_savedBackgroundHeight);
@@ -406,7 +392,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_listY = m_iconY + m_closedContentHeight;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
     m_listWidth = entry->w;
-    m_listHeight = (m_visibleItemCount - LIST_EDGE_ROW_COUNT) * m_middleRowHeight
+    m_listHeight = (m_visibleItemCount - LIST_BOX_EDGE_ROW_COUNT) * m_middleRowHeight
                    + m_firstRowHeight + m_lastRowHeight;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollUpFrame;
     m_scrollUpWidth = entry->w;
@@ -428,7 +414,7 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_scrollTrackWidth = m_scrollDownWidth;
         m_scrollTrackHeight = m_scrollDownY - m_scrollTrackY;
         m_scrollThumbTravel =
-            m_scrollTrackHeight - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
+            m_scrollTrackHeight - m_scrollThumbHeight - LIST_BOX_SCROLL_THUMB_TRAVEL_PADDING;
     }
     m_icon->DrawToBuffer(
         m_owner->m_posX + m_dropButtonX,
@@ -482,8 +468,8 @@ void dropListWidget::ProcessSelectDialog(void) {
                     } else {
                         if (y >= m_scrollThumbY && y < m_scrollThumbY + m_scrollThumbHeight)
                             m_scrollThumbDragging = 1;
-                        m_topIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
-                                      - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                        m_topIndex = (y - m_scrollTrackY - LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT
+                                      - m_scrollThumbHeight / LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR)
                                      * (m_scrollRange + 1) / m_scrollThumbTravel;
                         if (m_topIndex < 0)
                             m_topIndex = 0;
@@ -538,8 +524,8 @@ void dropListWidget::ProcessSelectDialog(void) {
                         DrawDropStuff();
                     }
                 } else if (m_scrollThumbDragging) {
-                    itemIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
-                                 - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                    itemIndex = (y - m_scrollTrackY - LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT
+                                 - m_scrollThumbHeight / LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR)
                                 * (m_scrollRange + 1) / m_scrollThumbTravel;
                     if (itemIndex < 0)
                         itemIndex = 0;

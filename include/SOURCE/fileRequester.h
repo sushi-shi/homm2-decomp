@@ -60,13 +60,15 @@ typedef enum FileRequesterStorageConstant {
 } FileRequesterStorageConstant;
 
 typedef enum FileRequesterScrollGeometry {
+    FILE_REQUESTER_SCROLL_KNOB_FRAME       = 4,
+    FILE_REQUESTER_SCROLL_KNOB_WIDTH       = 8,
+    FILE_REQUESTER_SCROLL_KNOB_HEIGHT      = 17,
     FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT = 9,
     FILE_REQUESTER_GUTTER_SCALE            = 100,
 } FileRequesterScrollGeometry;
 
 typedef enum FileRequesterFileSelectionConstant {
     FILE_REQUESTER_EXTENSION_PLAYER_DIGIT      = 3,
-    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
     FILE_REQUESTER_SELECTION_NONE              = -1,
 } FileRequesterFileSelectionConstant;
 

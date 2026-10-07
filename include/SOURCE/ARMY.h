@@ -59,7 +59,6 @@ typedef enum ArmyCombatConstant {
     ARMY_PRIMARY_SAMPLE_COUNT            = (ARMY_SAMPLE_KILL) + 1,
     ARMY_QUANTITY_TEXT_SIZE              = 12,
     ARMY_SPELL_EFFECT_ANIMATION_DURATION = 275,
-    ARMY_COMBAT_FRAME_DELAY              = 75,
     ARMY_MAGE_BOLT_DELAY                 = 115,
     ARMY_POW_EFFECT_DELAY                = 120,
     ARMY_ARCHMAGE_DISPEL_CHANCE          = 20,
@@ -95,8 +94,6 @@ enum {
 typedef i32 ArmySpellCancelType;
 typedef enum ArmyAttackConstant {
     ARMY_COMBAT_TEXT_SIZE              = 800,
-    ARMY_MOAT_CELL_COUNT               = 9,
-    ARMY_MOAT_GATE_INDEX               = 4,
     ARMY_LUCK_ROLL_MAX                 = 24,
     ARMY_ATTACK_EFFECT_CHANCE          = 20,
     ARMY_ROYAL_MUMMY_EFFECT_CHANCE     = 30,

@@ -36,7 +36,7 @@ source-pol-2.0     classic-pol-2.0   source-gold-2.1-buka    classic-gold-2.1-bu
 ## Reading, not building
 
 This view is for reading. Its strings are UTF-8, while the retail program
-stores them as Windows-1251, and it carries no locale build. To build, use
+stores them as Windows-1251, and it carries no build files. To build, use
 `source-gold-2.1-buka`, which keeps the text in an English and Russian catalog
 and compiles either language.
 

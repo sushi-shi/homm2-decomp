@@ -265,7 +265,7 @@ i32 army::FlyTo(i32 destination) {
         }
     }
     if (m_facingChanged) {
-        gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
 
     endX = gpCombatManager->m_hexCells[destination].m_x;
@@ -303,7 +303,7 @@ i32 army::FlyTo(i32 destination) {
         frameCount = 0;
         frameStart = 0;
         midCount = 0;
-        gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(0, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
         gpWindowManager->m_screen->CopyTo(
             gpCombatManager->m_backgroundBuffer,
             0,
@@ -463,7 +463,7 @@ i32 army::FlyTo(i32 destination) {
         }
         m_facingChanged = false;
     }
-    gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     gpCombatManager->TestRaiseDoor();
     return 1;
 }

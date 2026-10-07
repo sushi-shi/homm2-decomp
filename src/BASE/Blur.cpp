@@ -19,7 +19,7 @@ typedef enum BlurConstant {
     RED_INDEX_SHIFT           = 10,
     GREEN_INDEX_SHIFT         = 5,
     SOUND_POLL_MASK           = 0x3f,
-    FIZZLE_DELAY              = 150
+    BLUR_HOLD_MILLISECONDS    = 350
 } BlurConstant;
 
 
@@ -118,12 +118,12 @@ void DoBlur(
     }
 
     gpWindowManager
-        ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, oldPalette, newPalette);
-    DelayMilli(static_cast<i32l>(350.0f * gfCombatSpeedMod[gConfig.combatSpeed]));
+        ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DEFAULT_DELAY, oldPalette, newPalette);
+    DelayMilli(static_cast<i32l>(static_cast<float>(BLUR_HOLD_MILLISECONDS) * gfCombatSpeedMod[gConfig.combatSpeed]));
     gpWindowManager->SaveFizzleSource(0, 0, LOGICAL_SCREEN_WIDTH, height);
     memcpy(screen->m_pixels, savedBitmap->m_pixels, height * LOGICAL_SCREEN_WIDTH);
     gpWindowManager
-        ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
+        ->FizzleForward(0, 0, LOGICAL_SCREEN_WIDTH, height, FIZZLE_DEFAULT_DELAY, newPalette, oldPalette);
     H2_FREE(lookupTable);
     delete savedBitmap;
     gpMouseManager->ShowColorPointer();

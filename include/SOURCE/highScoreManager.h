@@ -4,6 +4,7 @@
 #include <BASE/dialog.h>
 #include <Ints.h>
 #include <BASE/baseManager.h>
+#include <SOURCE/KBDeclarations.h>
 
 struct tag_message;
 class heroWindow;
@@ -25,7 +26,6 @@ typedef enum HighScoreControlId {
 } HighScoreControlId;
 
 typedef enum HighScoreManagerConstant {
-    HIGH_SCORE_DISPLAY_ENTRY_COUNT = 10,
     HIGH_SCORE_FILENAME_LENGTH     = 352,
     HIGH_SCORE_MANAGER_OPEN_OK     = 0,
 } HighScoreManagerConstant;
@@ -33,8 +33,6 @@ typedef enum HighScoreManagerConstant {
 typedef enum HighScoreAnimationConstant {
     HIGH_SCORE_ANIMATION_FRAME_COUNT       = 18,
     HIGH_SCORE_ANIMATION_DELAY             = 120,
-    HIGH_SCORE_TIMER_SLOT                  = 0,
-    HIGH_SCORE_FADE_STEPS                  = 8,
     HIGH_SCORE_MONSTER_FRAME_STRIDE        = 9,
     HIGH_SCORE_MONSTER_ACTIVE_FRAME_OFFSET = 1,
     HIGH_SCORE_STANDARD_TITLE_FRAME        = 6,
@@ -55,8 +53,8 @@ typedef enum HighScoreLayoutConstant {
 #pragma pack(push, 1)
 class highScoreManager H2_FINAL : public baseManager {
 public:
-    i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
-    i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
+    i16 m_animationFrames[HIGH_SCORE_ENTRY_COUNT];
+    i16 m_monsterTypes[HIGH_SCORE_ENTRY_COUNT];
     bchar m_showCampaignScores;
     heroWindow* m_window;
     highScoreManager(void);

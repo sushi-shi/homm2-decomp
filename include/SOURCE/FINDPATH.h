@@ -4,6 +4,12 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
+
+typedef enum MapDirectionSet {
+    MAP_DIRECTIONS_NORTHWARD = 0x83,
+    MAP_DIRECTIONS_SOUTHWARD = 0x38
+} MapDirectionSet;
+
 i32 CalcTerrainCost(
     TerrainType terrain,
     i32 diagonal,

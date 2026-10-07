@@ -21,7 +21,7 @@
 highScoreManager::highScoreManager(void) {
     i32 entry;
 
-    for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++)
+    for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
         m_animationFrames[entry] = Random(0, HIGH_SCORE_ANIMATION_FRAME_COUNT - 1);
     m_showCampaignScores = false;
 }
@@ -30,7 +30,7 @@ i32 highScoreManager::Open(i32 id) {
     m_showCampaignScores = giHighScoreType == HIGH_SCORE_CAMPAIGN
                            || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN;
 
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     sprintf(gText, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
     m_window = new heroWindow(0, 0, "hiscore.bin");
@@ -43,13 +43,13 @@ i32 highScoreManager::Open(i32 id) {
     m_active = true;
     strcpy(m_name, "highScoreManager");
     KBChangeMenu(hmnuDflt);
-    gpWindowManager->FadeScreen(FADE_IN, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
     glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
 void highScoreManager::Close(void) {
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     m_active = false;
@@ -66,7 +66,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
 
     if (glTimers[HIGH_SCORE_TIMER_SLOT] < KBTickCount()) {
         glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
-        for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++) {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
             m_animationFrames[entry] =
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
             windowMessage.type = MESSAGE_WIDGET;
@@ -166,7 +166,7 @@ void highScoreManager::Update(void) {
     hsMessage.payload.widget.data.value = (WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_window->BroadcastMessage(hsMessage);
 
-    for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
+    for (rank = 0; rank < HIGH_SCORE_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
         else

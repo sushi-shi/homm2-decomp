@@ -20,15 +20,7 @@
 typedef enum ArenaConstant {
     CHOICE_COUNT          = 3,
     WINDOW_RESOURCE       = 5,
-    WINDOW_WIDTH          = 306,
-    WINDOW_BASE_HEIGHT    = 180,
-    WINDOW_ROW_HEIGHT     = 45,
-    WINDOW_X              = 159,
-    WINDOW_MAX_Y          = 28,
     WINDOW_CENTER_DIVISOR = 2,
-    WINDOW_NAME_SIZE      = 16,
-    TEXT_WIDTH            = 244,
-    TEXT_LINE_HEIGHT      = 16,
     TEXT_LINE_SHIFT       = 4,
     ICON_FIRST_X          = 84,
     TEXT_FIRST_X          = 79,
@@ -53,19 +45,19 @@ i32 DoArenaDialog(void) {
     i32 unusedValue4 [[maybe_unused]];
     i32 windowLines = WINDOW_RESOURCE;
     i16 widgetMode [[maybe_unused]] = 1;
-    i32 windowWidth [[maybe_unused]] = WINDOW_WIDTH;
-    i32 windowHeight = windowLines * WINDOW_ROW_HEIGHT + WINDOW_BASE_HEIGHT;
-    i32 windowX = WINDOW_X;
+    i32 windowWidth [[maybe_unused]] = NORMAL_DIALOG_WINDOW_WIDTH;
+    i32 windowHeight = windowLines * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
+    i32 windowX = NORMAL_DIALOG_DEFAULT_X;
     i32 windowY = (LOGICAL_SCREEN_HEIGHT - windowHeight) / WINDOW_CENTER_DIVISOR;
-    char windowName[WINDOW_NAME_SIZE];
+    char windowName[NORMAL_DIALOG_FILENAME_LENGTH];
     i32 lineCount;
     i32 textHeight [[maybe_unused]];
     tag_message message;
     i32 widgetIndex;
     textWidget* statWidgets[CHOICE_COUNT];
 
-    if (windowY > WINDOW_MAX_Y)
-        windowY = WINDOW_MAX_Y;
+    if (windowY > NORMAL_DIALOG_MAX_TOP)
+        windowY = NORMAL_DIALOG_MAX_TOP;
     choice = 0;
     sprintf(windowName, "evntwin%d.bin", windowLines);
     arenaWinPtr = new heroWindow(windowX, windowY, windowName);
@@ -78,7 +70,7 @@ i32 DoArenaDialog(void) {
 
         "Вы вошли на арену и сразились со сворой свирепых львов. Впечатленный вашим мастерством тренер гладиаторов согласился научить вас одному навыку на ваш выбор."
     );
-    lineCount = bigFont->LineLength(gText, TEXT_WIDTH);
+    lineCount = bigFont->LineLength(gText, NORMAL_DIALOG_TEXT_LINE_WIDTH);
     textHeight = lineCount << TEXT_LINE_SHIFT;
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, BROADCAST_TEXT_ID);
     message.payload.widget.data.text = gText;
@@ -171,7 +163,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 extra = NORMAL_DIALOG_NO_VALUE;
                 unusedDialogResourceType = NORMAL_DIALOG_NO_RESOURCE;
-                if (message_1.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                if (message_1.payload.widget.parameter & (MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                     switch (message_1.payload.widget.id) {
                         case WIDGET_FIRST_ID:
                         case WIDGET_FIRST_ID + 1:

@@ -10,7 +10,7 @@ struct tag_message;
 
 typedef enum CastleBuildingConstant {
     CASTLE_SLOT_COUNT     = 18,
-    CASTLE_UPGRADE_OFFSET = 5
+    CASTLE_UPGRADE_OFFSET = (BUILDING_SLOT_UPGRADE_FIRST) - (BUILDING_SLOT_DWELLING_SECOND)
 } CastleBuildingConstant;
 
 MessageDispatchResult CastleHandler(struct tag_message& message);

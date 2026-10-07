@@ -12,6 +12,11 @@ typedef enum LogicalScreenConstant {
 } LogicalScreenConstant;
 
 
+typedef enum ScreenFillColor {
+    SCREEN_FILL_COLOR = 0x24
+} ScreenFillColor;
+
+
 typedef enum PaletteFormatConstant {
     PALETTE_COLOR_COUNT = 256,
     PALETTE_LEVEL_COUNT = 64,

@@ -16,16 +16,7 @@
 #include <BASE/icon.h>
 #include <string.h>
 
-typedef enum TextEntryKeyConstant {
-    ACCEPT_KEY             = 10,
-    DELETE_KEY             = 0x7f,
-    EXTENDED_KEY_SHIFT     = 8,
-    EXTENDED_KEY_HIGH_MASK = 0xff00,
-    ASCII_KEY_MASK         = 0xff
-} TextEntryKeyConstant;
-
 typedef enum TextEntryConstant {
-    RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,
     HORIZONTAL_INSET_SIDE_COUNT = 2,
     SERIALIZED_HORIZONTAL_INSET = 7,
@@ -37,10 +28,6 @@ typedef enum TextEntryConstant {
     EDIT_ALLOCATION_PADDING     = 6,
     PRESERVE_TEXT_FLAG          = 1
 } TextEntryConstant;
-
-typedef enum InputManagerExtendedKey {
-    EXTENDED_KEY_BASE = 0x100
-} InputManagerExtendedKey;
 
 
 textEntryWidget::textEntryWidget(void) : textWidget() {
@@ -100,7 +87,7 @@ textEntryWidget::textEntryWidget(
 }
 
 void textEntryWidget::Read(TextEntryReadMode type) {
-    char resourceName[RESOURCE_NAME_CAPACITY];
+    char resourceName[RESOURCE_MANAGER_READ13_BYTES];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     m_maxLength = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING));
@@ -262,10 +249,10 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                 break;
                             default:
                                 gpInputManager->AsciiConvert(event);
-                                if (event.payload.keyboard.keyCode == ACCEPT_KEY) {
+                                if (event.payload.keyboard.keyCode == INPUT_KEY_CODE_ENTER) {
                                     gbTextEntryEscaped = false;
                                     done++;
-                                } else if (event.payload.keyboard.keyCode == DELETE_KEY) {
+                                } else if (event.payload.keyboard.keyCode == INPUT_KEY_CODE_DELETE) {
                                     if (m_cursorPosition > 0) {
                                         strcpy(swap, edit + m_cursorPosition);
                                         strcpy(edit + m_cursorPosition - 1, swap);
@@ -277,10 +264,10 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                            && event.payload.keyboard.keyCode != 0) {
                                     strcpy(copy, edit);
                                     char typed = 0;
-                                    if (event.payload.keyboard.keyCode >= EXTENDED_KEY_BASE) {
+                                    if (event.payload.keyboard.keyCode >= INPUT_KEY_CODE_FIRST_SCAN) {
                                         i32 key = (event.payload.keyboard.keyCode
-                                                   & EXTENDED_KEY_HIGH_MASK)
-                                                  >> EXTENDED_KEY_SHIFT;
+                                                   & INPUT_KEY_CODE_SCAN_MASK)
+                                                  >> INPUT_KEY_CODE_SCAN_SHIFT;
                                         switch (key) {
                                             case INPUT_SCAN_NUMPAD_0:
                                                 typed = '0';
@@ -314,7 +301,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                                 break;
                                         }
                                     } else {
-                                        typed = event.payload.keyboard.keyCode & ASCII_KEY_MASK;
+                                        typed = event.payload.keyboard.keyCode & INPUT_KEY_CODE_CHARACTER_MASK;
                                         if (typed == '{' || typed == '}')
                                             typed = 0;
                                     }

@@ -21,6 +21,18 @@ enum {
     FADE_OUT = 1
 };
 typedef i32 WindowFadeMode;
+typedef enum WindowFadeSpeed {
+    FADE_SPEED_INSTANT  = 0x80,
+    FADE_SPEED_STANDARD = 8,
+    FADE_SPEED_FINE     = 6,
+    FADE_SPEED_FAST     = 4
+} WindowFadeSpeed;
+
+
+typedef enum WindowFizzleDelay {
+    FIZZLE_DEFAULT_DELAY = 150
+} WindowFizzleDelay;
+
 #pragma pack(push, 1)
 class heroWindowManager H2_FINAL : public baseManager {
 public:

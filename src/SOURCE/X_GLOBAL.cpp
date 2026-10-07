@@ -26,7 +26,7 @@ const char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
 
     "{Отменить}\n\nОтменить и вернуться в главное меню."
 };
-const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+const char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT] = {
      "Союз эльфов",
      "Доспех",
      "Древесина",
@@ -40,7 +40,7 @@ const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
      "Сфера антимагии"
 };
 const char*
-    xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
+    xScenarioName[(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
         { "Мятеж",
           "Земля Хаоса",
           "Полет стрелы",
@@ -75,7 +75,7 @@ const char*
          ""}
 };
 const char*
-    xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
+    xScenarioDescription[(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] =
         {
             {
                  "Усмирите непокорных местных баронов и тем самым создайте плацдарм, с которого Империя начнет экспансию в этом регионе.",
@@ -118,13 +118,13 @@ const char*
                 ""
             }
         };
-const char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+const char* xShortCampaignNames[(EXPANSION_CAMPAIGN_COUNT)] = {
      "ЦВ",
      "НАС",
      "ЧАР",
      "ДОМ"
 };
-const char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+const char* xHSCampaignNames[(EXPANSION_CAMPAIGN_COUNT)] = {
       "Цена верности ",
      "Наследники",
      "Остров чародеев",
@@ -170,7 +170,7 @@ const char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
      "Иван V",
      "Иван VI"
 };
-const char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+const char* xShortSSLevelNames[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
      "1 ступ.",
      "2 ступ.",
      "3 ступ."

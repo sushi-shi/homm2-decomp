@@ -6,6 +6,7 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
+#include <SOURCE/GAME.h>
 
 typedef enum EditorStatusBar {
 
@@ -70,8 +71,7 @@ typedef enum EditorTableCount {
     EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74,
 
     EDITOR_TIME_EVENT_CAPACITY = 50,
-    EDITOR_RUMOUR_CAPACITY = 30,
-    EDITOR_PLAYER_COLOR_COUNT = 6
+    EDITOR_RUMOUR_CAPACITY = 30
 } EditorTableCount;
 
 typedef enum RandomMapDensity {
@@ -165,7 +165,7 @@ extern i32 gStatusTextClearTime;
 extern u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 
-extern const char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
+extern const char* gColorAbbreviations[PLAYER_COLOR_COUNT];
 
 class heroWindow;
 struct tag_message;

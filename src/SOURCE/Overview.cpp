@@ -21,6 +21,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Overview.h>
+#include <SOURCE/fileRequester.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
@@ -44,7 +45,6 @@ typedef enum OverviewStorageConstant {
 
 typedef enum OverviewPresentationConstant {
     OVERVIEW_ICON_FILL_COLOR          = 1,
-    OVERVIEW_FADE_STEPS               = 8,
     OVERVIEW_WINDOW_TEXT_ID           = 9,
     OVERVIEW_POINTER_FRAME            = 0
 } OverviewPresentationConstant;
@@ -116,16 +116,12 @@ typedef enum OverviewScrollConstant {
     SCROLL_KNOB_STATIC_Y      = 169,
     SCROLL_MIN_Y              = 18,
     SCROLL_RANGE              = 304,
-    SCROLL_KNOB_OFFSET        = 9,
     SCROLL_LAST_PIXEL_ADJUST  = 1,
     SCROLL_SCALE              = 100,
     SCROLL_TRACK_PIXEL_COUNT  = 321,
     SCROLL_SCALED_TRACK_RANGE = SCROLL_TRACK_PIXEL_COUNT * SCROLL_SCALE,
     SCROLL_KNOB_X             = 629,
     SCROLL_KNOB_Y             = 18,
-    SCROLL_KNOB_WIDTH         = 8,
-    SCROLL_KNOB_HEIGHT        = 17,
-    SCROLL_KNOB_FRAME         = 4,
     SCROLL_UPDATE_X           = 627,
     SCROLL_UPDATE_Y           = 17,
     SCROLL_UPDATE_WIDTH       = 11,
@@ -265,8 +261,6 @@ typedef enum OverviewDwellingIndex {
 
 typedef enum OverviewDialogConstant {
     OVERVIEW_RETURN_ID_NONE = -1,
-    OVERVIEW_VIEW_ARMY_X    = 119,
-    OVERVIEW_VIEW_ARMY_Y    = 20
 } OverviewDialogConstant;
 
 }
@@ -1025,7 +1019,7 @@ void game::Overview(void) {
     giOverviewReturnActionExtra = OVERVIEW_RETURN_ID_NONE;
     message.type = MESSAGE_WIDGET;
     gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     for (mine = 0; mine < OVERVIEW_TITLE_COUNT; mine++) {
         textWidgetTitle[mine] = NULL;
     }
@@ -1057,10 +1051,10 @@ void game::Overview(void) {
     OVScrollKnob = new iconWidget(
         SCROLL_KNOB_X,
         SCROLL_KNOB_Y,
-        SCROLL_KNOB_WIDTH,
-        SCROLL_KNOB_HEIGHT,
+        FILE_REQUESTER_SCROLL_KNOB_WIDTH,
+        FILE_REQUESTER_SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
-        SCROLL_KNOB_FRAME,
+        FILE_REQUESTER_SCROLL_KNOB_FRAME,
         ICON_DRAW_NORMAL,
         SCROLL_KNOB_WIDGET,
         WIDGET_KIND_ICON_DIRECT,
@@ -1107,7 +1101,7 @@ void game::Overview(void) {
     overWin->BroadcastMessage(message);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     delete overWin;
     overWin = NULL;
     H2_FREE(textWidgetDynamic);
@@ -1152,7 +1146,7 @@ void game::DoKnob(void) {
                 }
                 gpMouseManager->Main(widgetMessage);
                 OVScrollKnob->m_y =
-                    widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                    widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                 topNow = ((OVScrollKnob->m_y - topValue) / itemPixels);
                 if (topNow != topBefore) {
                     if (topNow > giOverviewItems[(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
@@ -1163,7 +1157,7 @@ void game::DoKnob(void) {
                     }
                     giOverviewTop[(giOverviewType)] = topNow;
                     OVScrollKnob->m_y =
-                        widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                        widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                     SetupDynamicStuff(1, 0, 0);
                     topBefore = topNow;
                 } else {
@@ -1238,7 +1232,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         scrollDivisor = SCROLL_SCALED_TRACK_RANGE / scrollSpan;
                         y = message.payload.mouse.screenY;
                         y -= SCROLL_MIN_Y;
-                        y -= SCROLL_KNOB_OFFSET;
+                        y -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                         topIndex = y * SCROLL_SCALE / scrollDivisor;
                         giOverviewTop[(giOverviewType)] = topIndex;
                         if (giOverviewTop[(giOverviewType)] + (OVERVIEW_VISIBLE_ROWS - 1)
@@ -1369,8 +1363,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
                 item = widgetId - HERO_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     curHero->m_army.m_creatureTypes[item],
                     curHero->m_army.m_creatureCounts[item],
                     NULL,
@@ -1437,8 +1431,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
             if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
                 item = widgetId - TOWN_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     selectedTown->m_army.m_creatureTypes[item],
                     selectedTown->m_army.m_creatureCounts[item],
                     selectedTown,

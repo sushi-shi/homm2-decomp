@@ -11,6 +11,43 @@ typedef enum FontGlyphConstant {
     FONT_GLYPH_FALLBACK = 0x5f
 } FontGlyphConstant;
 
+
+typedef enum Cp1251Code {
+    CP1251_ASCII_LAST       = 0x7f,
+    CP1251_ASCII_COUNT      = 0x80,
+    CP1251_CAPITAL_IO       = 0xa8,
+    CP1251_SMALL_IO         = 0xb8,
+    CP1251_CAPITAL_A        = 0xc0,
+    CP1251_CAPITAL_IE       = 0xc5,
+    CP1251_CAPITAL_I        = 0xc8,
+    CP1251_CAPITAL_O        = 0xce,
+    CP1251_CAPITAL_U        = 0xd3,
+    CP1251_CAPITAL_YERU     = 0xdb,
+    CP1251_CAPITAL_E        = 0xdd,
+    CP1251_CAPITAL_YU       = 0xde,
+    CP1251_CAPITAL_YA       = 0xdf,
+    CP1251_SMALL_A          = 0xe0,
+    CP1251_SMALL_IE         = 0xe5,
+    CP1251_SMALL_I          = 0xe8,
+    CP1251_SMALL_O          = 0xee,
+    CP1251_SMALL_U          = 0xf3,
+    CP1251_SMALL_YERU       = 0xfb,
+    CP1251_SMALL_E          = 0xfd,
+    CP1251_SMALL_YU         = 0xfe,
+    CP1251_SMALL_YA         = 0xff
+} Cp1251Code;
+
+
+typedef enum FontCharacterCode {
+    FONT_CODE_UNPRINTABLE     = 0x7f,
+    FONT_CODE_CAPITAL_A       = 0x80,
+    FONT_CODE_CAPITAL_IO      = 0xa0,
+    FONT_CODE_SMALL_A         = 0xa1,
+    FONT_CODE_SMALL_IO        = 0xc1,
+    FONT_CODE_CAPITAL_SHIFT   = CP1251_CAPITAL_A - FONT_CODE_CAPITAL_A,
+    FONT_CODE_SMALL_SHIFT     = CP1251_SMALL_A - FONT_CODE_SMALL_A
+} FontCharacterCode;
+
 enum {
     FONT_DRAW_DARK_GRAY    = 0,
     FONT_DRAW_DEFAULT      = 1,

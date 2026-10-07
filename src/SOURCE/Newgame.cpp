@@ -19,6 +19,7 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SETUP.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
@@ -31,7 +32,6 @@
 typedef enum NewGameConstant {
     GAME_DIALOG_OK                        = DIALOG_BUTTON_2,
     GAME_DIALOG_CANCEL                    = DIALOG_BUTTON_1,
-    GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
     GAME_KEY_BUFFER_SIZE                  = 0x69,
     GAME_MAP_PACKET_SIZE                  = 0x74,
@@ -41,8 +41,6 @@ typedef enum NewGameConstant {
     GAME_SETUP_BUFFER_SIZE                = 240,
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
-    GAME_REMOTE_CHANNEL                   = 0x7f,
-    GAME_REMOTE_CHAT                      = 0x0b,
     GAME_REMOTE_SETUP                     = 0x33,
     GAME_REMOTE_MAP_HEADER                = 0x34,
     GAME_REMOTE_START                     = 0x35,
@@ -50,7 +48,6 @@ typedef enum NewGameConstant {
     GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
-    GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
     GAME_COMPUTER_COLOR_UNLOCKED_FRAME    = 3,
@@ -101,12 +98,6 @@ typedef enum NewGamePlayerSetupType {
     GAME_PLAYER_FLEXIBLE = 1
 } NewGamePlayerSetupType;
 
-enum {
-    GAME_KEY_ENTER          = 10,
-    GAME_KEY_BACKSPACE      = 0x7f,
-    GAME_KEY_FIRST_EXTENDED = 0x100,
-};
-typedef i32 NewGameKeyCode;
 typedef enum NewGameStorageConstant {
     FILE_MASK_CAPACITY      = 16,
     SAVED_MAP_NAME_CAPACITY = 16,
@@ -116,8 +107,6 @@ typedef enum NewGameStorageConstant {
 typedef enum NewGameDialogConstant {
     MAP_REQUESTER_X           = 212,
     MAP_REQUESTER_Y           = 9,
-    MAP_CHOICE_WINDOW_X       = 405,
-    MAP_CHOICE_WINDOW_Y       = 8,
     NEW_GAME_WINDOW_X         = 190,
     NEW_GAME_NETWORK_WINDOW_Y = 4,
     NEW_GAME_SINGLE_WINDOW_Y  = 33,
@@ -125,13 +114,12 @@ typedef enum NewGameDialogConstant {
     BROKENA_MAX_HUMAN_PLAYERS = 3,
     SCENARIO_WINDOW_X         = 90,
     SCENARIO_WINDOW_Y         = 4,
-    NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
 } NewGameDialogConstant;
 
 enum {
-    MAP_CHOICE_CANCEL    = DIALOG_BUTTON_1,
-    MAP_CHOICE_STANDARD  = 1,
-    MAP_CHOICE_EXPANSION = 2,
+    MAP_CHOICE_CANCEL    = DIALOG_CANCEL,
+    MAP_CHOICE_STANDARD  = CHOICE_ONE,
+    MAP_CHOICE_EXPANSION = CHOICE_TWO,
 };
 typedef i32 NewGameMapChoice;
 enum {
@@ -209,12 +197,6 @@ typedef enum NewGamePlayerLayout {
     SCENARIO_PLAYER_RACE_NAME_Y       = PLAYER_RACE_NAME_Y - SCENARIO_PLAYER_Y_OFFSET,
     SCENARIO_PLAYER_RACE_CYCLE_Y      = PLAYER_RACE_CYCLE_Y - SCENARIO_PLAYER_Y_OFFSET
 } NewGamePlayerLayout;
-
-typedef enum NewGameKeyEncoding {
-    KEY_SCAN_CODE_SHIFT = 8,
-    KEY_SCAN_CODE_MASK  = 0xff00,
-    KEY_ASCII_MASK      = 0xff
-} NewGameKeyEncoding;
 
 
 void game::GetMap(void) {
@@ -401,7 +383,7 @@ i32 game::NewGame(void) {
     m_newGameWindow = NULL;
 
     if ((!gbRemoteOn || giThisNetPos == 0) && (!gbRemoteOn || !xNetHasOldPlayers)) {
-        choiceWindow = new heroWindow(MAP_CHOICE_WINDOW_X, MAP_CHOICE_WINDOW_Y, "x_mapmnu.bin");
+        choiceWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (choiceWindow == NULL)
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
@@ -420,7 +402,7 @@ i32 game::NewGame(void) {
 
     SetupNetPlayerNames();
     glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = 0;
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
         strcpy(
@@ -539,7 +521,7 @@ i32 game::NewGame(void) {
             memcpy(mapInfo, &gpGame->m_mapHeader, GAME_MAP_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 mapInfo,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_MAP_PACKET_SIZE,
                 GAME_REMOTE_MAP_HEADER,
                 1
@@ -549,7 +531,7 @@ i32 game::NewGame(void) {
             memcpy(netPlayerPacket, gsNetPlayerInfo, GAME_PLAYER_INFO_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 netPlayerPacket,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_PLAYER_INFO_PACKET_SIZE,
                 GAME_REMOTE_PLAYER_INFO,
                 1
@@ -589,7 +571,7 @@ i32 game::NewGame(void) {
     }
 
 cleanup:
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         H2_FREE(cTextReceivedBuffer[textBufferIndex]);
     }
     H2_FREE(cNGKPCore);
@@ -835,7 +817,7 @@ cleanup:
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
-            for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
+            for (playerIndex = 0; playerIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++playerIndex) {
                 sprintf(gText, cTextReceivedBuffer[playerIndex]);
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
@@ -1009,7 +991,7 @@ cleanup:
                         gpGame->ProcessNewMap(&mapHeader);
                         break;
 
-                    case GAME_REMOTE_CHAT:
+                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
                         redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
@@ -1023,14 +1005,14 @@ cleanup:
                             unusedSender = 0;
                         }
                         gText[GAME_CHAT_TEXT_LIMIT] = 0;
-                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
                              ++currentPlayerLocal) {
                             strcpy(
                                 cTextReceivedBuffer[currentPlayerLocal],
                                 cTextReceivedBuffer[currentPlayerLocal + 1]
                             );
                         }
-                        strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], gText);
+                        strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], gText);
                         break;
                 }
             }
@@ -1043,14 +1025,14 @@ cleanup:
         if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
             redraw = true;
-            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
                  ++currentPlayerLocal) {
                 strcpy(
                     cTextReceivedBuffer[currentPlayerLocal],
                     cTextReceivedBuffer[currentPlayerLocal + 1]
                 );
             }
-            strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
+            strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], cNGKPCore);
             strcpy(
                 cNGKPCore,
                 ""
@@ -1061,10 +1043,10 @@ cleanup:
             );
             NGKPcursorIndex = 0;
             sendResult = TransmitRemoteData(
-                cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1],
-                GAME_REMOTE_CHANNEL,
-                strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
-                GAME_REMOTE_CHAT,
+                cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1],
+                REMOTE_BROADCAST_PLAYER,
+                strlen(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1]) + 1,
+                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!sendResult)
@@ -1120,7 +1102,7 @@ cleanup:
                     if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
-                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
+                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NORMAL_DIALOG_QUICK_VIEW);
                 }
             } else {
                 switch (message.payload.widget.command) {
@@ -1130,7 +1112,7 @@ cleanup:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
                                         GAME_REMOTE_START,
                                         1
@@ -1146,7 +1128,7 @@ cleanup:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
                                         GAME_REMOTE_CANCEL,
                                         1
@@ -1398,7 +1380,7 @@ cleanup:
                                         );
                                         sendResult = TransmitRemoteData(
                                             mapPacketLocal,
-                                            GAME_REMOTE_CHANNEL,
+                                            REMOTE_BROADCAST_PLAYER,
                                             GAME_MAP_PACKET_SIZE,
                                             GAME_REMOTE_MAP_HEADER,
                                             1
@@ -1427,7 +1409,7 @@ cleanup:
         memcpy(mapNamePacket + MAP_HEADER_NAME_SIZE, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
         sendResult = TransmitRemoteData(
             mapNamePacket,
-            GAME_REMOTE_CHANNEL,
+            REMOTE_BROADCAST_PLAYER,
             GAME_SETUP_PACKET_SIZE,
             GAME_REMOTE_SETUP,
             1
@@ -1476,10 +1458,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == (GAME_KEY_ENTER))
+            if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_ENTER)
                 return 1;
 
-            if (message.payload.keyboard.keyCode == (GAME_KEY_BACKSPACE)) {
+            if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_DELETE) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1492,9 +1474,9 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 && message.payload.keyboard.keyCode != 0) {
                 strcpy(buffer, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= (GAME_KEY_FIRST_EXTENDED)) {
-                    scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
-                        >> KEY_SCAN_CODE_SHIFT;
+                if (message.payload.keyboard.keyCode >= INPUT_KEY_CODE_FIRST_SCAN) {
+                    scanCode = (message.payload.keyboard.keyCode & INPUT_KEY_CODE_SCAN_MASK)
+                        >> INPUT_KEY_CODE_SCAN_SHIFT;
                     switch (static_cast<InputManagerScanCode>(scanCode)) {
                         case (INPUT_SCAN_NUMPAD_0):
                             keyChar = '0';
@@ -1529,7 +1511,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     }
                 } else {
                     keyChar =
-                        message.payload.keyboard.keyCode & KEY_ASCII_MASK;
+                        message.payload.keyboard.keyCode & INPUT_KEY_CODE_CHARACTER_MASK;
 
                     if (keyChar == '{' || keyChar == '}')
                         keyChar = 0;
@@ -1628,7 +1610,7 @@ void game::ShowScenInfo(void) {
     widget* iconControl;
     heroWindow* window;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     window = new heroWindow(SCENARIO_WINDOW_X, SCENARIO_WINDOW_Y, "sceninfo.bin");
     if (window == NULL)
         MemError();
@@ -2143,5 +2125,5 @@ char* cNGKPDisplay;
 b32 gbNewGameShadowHidden;
 char* cNGKPCore;
 i32 NGKPcursorIndex;
-char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
+char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 class icon* NGKPBkg;

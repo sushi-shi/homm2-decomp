@@ -37,9 +37,7 @@ typedef enum DataEntryLayout {
     TEXT_FIELD_HORIZONTAL_INSET = 10,
     TEXT_FIELD_VERTICAL_INSET   = 3,
     INPUT_BOX_X                 = 213,
-    REDRAW_OFFSET               = 10,
-    DRAW_MODE                   = 1,
-    WIDGET_Z_ORDER              = -1
+    REDRAW_OFFSET               = 10
 } DataEntryLayout;
 
 typedef enum DataEntryWidgetId {
@@ -49,10 +47,6 @@ typedef enum DataEntryWidgetId {
 } DataEntryWidgetId;
 
 typedef enum MiscLogPrivateConstant {
-    MEMORY_LEAK_DEBUG_LEVEL   = 1,
-    FILE_DEBUG_LEVEL          = 2,
-    DEBUGGER_OUTPUT_LEVEL     = 4,
-    FORCED_DEBUG_LEVEL        = 9,
     FORMAT_BUFFER_SIZE        = 200,
     TEXT_BUFFER_SIZE          = 500,
     MEMORY_ENTRY_CAPACITY     = 2000,
@@ -95,6 +89,7 @@ typedef enum PCXConstant {
     PALETTE_TYPE_COLOR    = 1,
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
+    RLE_RUN_RECORD_BYTES  = 2,
     VGA_PALETTE_MARKER    = 0x0c,
     COMPONENT_SCALE_SHIFT = 2
 } PCXConstant;
@@ -121,11 +116,6 @@ typedef enum MiscWindowConstant {
     WINDOW_POSITION_MARGIN = 200
 } MiscWindowConstant;
 
-typedef enum MiscBlitConstant {
-    BLIT_SCROLL_OFFSET = 0x10,
-    BLIT_SCROLL_EXTENT = 0x1c0,
-} MiscBlitConstant;
-
 typedef enum SeededRandomConstant {
     INITIAL_SEED               = 0x08156a03,
     RANDOM_TERM_MULTIPLIER     = 13,
@@ -151,6 +141,7 @@ typedef enum FileIdHashConstant {
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
@@ -1543,10 +1534,10 @@ void BlitBitmapToScreen(
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        sourceX = giScrollX + BLIT_SCROLL_OFFSET;
-        width = BLIT_SCROLL_EXTENT;
-        sourceY = giScrollY + BLIT_SCROLL_OFFSET;
-        height = BLIT_SCROLL_EXTENT;
+        sourceX = giScrollX + ADVENTURE_VIEW_BORDER;
+        width = ADVENTURE_VIEW_SIZE;
+        sourceY = giScrollY + ADVENTURE_VIEW_BORDER;
+        height = ADVENTURE_VIEW_SIZE;
     }
     gBlitRight = destinationX + width - 1;
     gBlitBottom = destinationY + height - 1;
@@ -1819,7 +1810,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
             if (runLength > 1 || (color & RLE_RUN_MARKER) == RLE_RUN_MARKER) {
                 *(encodedRow + encodedLength) = static_cast<u8>(runLength | RLE_RUN_MARKER);
                 *(encodedRow + encodedLength + 1) = color;
-                encodedLength += 2;
+                encodedLength += RLE_RUN_RECORD_BYTES;
                 sourceIndex += runLength;
             } else {
                 *(encodedRow + encodedLength) = color;
@@ -1933,7 +1924,7 @@ void GetDataEntry(
     nFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;
@@ -2012,7 +2003,7 @@ void GetDataEntry(
         MemError();
     inBoxX = INPUT_BOX_X;
     inBoxY = entryY + INPUT_BOX_Y_OFFSET;
-    DataEntryWin->AddWidget(pText, WIDGET_Z_ORDER);
+    DataEntryWin->AddWidget(pText, WINDOW_Z_ORDER_TOP);
 
     if (useImmediateHandler != 0) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
@@ -2071,7 +2062,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_TEXT_WIDGET);
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
-                        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
+                        DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, REDRAW_OFFSET, REDRAW_OFFSET);
                         if (gbTextEntryEscaped != 0)
                             break;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;

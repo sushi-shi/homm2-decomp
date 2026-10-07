@@ -70,13 +70,18 @@ typedef enum ExpansionCampaignConstant {
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT      = 8,
     EXPANSION_CAMPAIGN_AWARD_COUNT        = 11,
     EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE   = 4,
-    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE  = 13,
     EXPANSION_CAMPAIGN_ICON_FRAME_BASE    = 15,
-    EXPANSION_CAMPAIGN_MUSIC              = 24,
     EXPANSION_CAMPAIGN_MAIN_PLAYER        = 0,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X = 5,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y = 0
 } ExpansionCampaignConstant;
+
+extern const char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT];
+extern const char* xScenarioName[(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+extern const char* xScenarioDescription[(EXPANSION_CAMPAIGN_COUNT)]
+                                         [EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+extern const char* xShortCampaignNames[(EXPANSION_CAMPAIGN_COUNT)];
+extern const char* xHSCampaignNames[(EXPANSION_CAMPAIGN_COUNT)];
 
 #pragma pack(push, 1)
 class ExpCampaign {

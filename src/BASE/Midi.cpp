@@ -23,8 +23,7 @@ typedef enum MidiSequenceStatus {
 typedef enum MidiVolumeConstant {
     VOLUME_HIGH_RANGE = 6,
     VOLUME_FADE_SPLIT = 10,
-    VOLUME_LOW_RANGE  = 11,
-    MAX_VOLUME        = 127
+    VOLUME_LOW_RANGE  = 11
 } MidiVolumeConstant;
 
 typedef enum MidiConstant {
@@ -139,7 +138,7 @@ bool MIDIIsPlaying(void) {
 void MIDISetVolume(i32& fadeSteps) {
     if (!GetMusicFlagA())
         return;
-    i32 volume = MAX_VOLUME;
+    i32 volume = SOUND_VOLUME_FULL;
     if (fadeSteps > 0) {
         if (fadeSteps <= VOLUME_FADE_SPLIT)
             volume = (volume * (VOLUME_LOW_RANGE - fadeSteps)) / VOLUME_LOW_RANGE;

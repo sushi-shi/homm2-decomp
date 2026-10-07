@@ -10,6 +10,8 @@
 typedef enum GlobalTimerConstant {
     GLOBAL_TIMER_COUNT               = 10,
     GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
+    HIGH_SCORE_TIMER_SLOT            = 0,
+    COMBAT_EFFECT_TIMER_SLOT         = 1,
     GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
     GLOBAL_MUSIC_FADE_TIMER_SLOT     = 4,
     GLOBAL_POLL_SOUND_TIMER_SLOT     = 5,
@@ -63,6 +65,8 @@ typedef enum CampaignConstant {
     CAMPAIGN_SWITCHING_MAP            = 11,
     CAMPAIGN_SWITCHING_SCENARIO       = 4,
     CAMPAIGN_NO_SCENARIO              = -1,
+    CAMPAIGN_CHOICE_NO_VALUE          = -1,
+    CAMPAIGN_CHOICE_NO_AMOUNT         = -1,
     CAMPAIGN_ROLAND_FINAL_SCENARIO    = 9,
     CAMPAIGN_ARCHIBALD_FINAL_SCENARIO = 10,
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
@@ -108,18 +112,6 @@ struct SPlayerExit {
     b8 hostReported;
     b8 continueGame;
 };
-
-typedef enum EventWindowConstant {
-    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
-    EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
-    EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
-    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
-    EVENT_WINDOW_LUCK                   = 10,
-    EVENT_WINDOW_BAD_LUCK               = 11,
-    EVENT_WINDOW_MORALE                 = 12,
-    EVENT_WINDOW_BAD_MORALE             = 13,
-    EVENT_WINDOW_EXPERIENCE             = 14
-} EventWindowConstant;
 
 typedef enum KbBuildingConstant {
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
@@ -187,7 +179,13 @@ typedef enum NormalDialogConstant {
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
     NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
     NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
+    NORMAL_DIALOG_DEFAULT_X                = 159,
 } NormalDialogConstant;
+
+typedef enum EventWindowConstant {
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
+    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID + 1
+} EventWindowConstant;
 
 enum {
     END_GAME_FORCE_NONE    = 0,
@@ -287,23 +285,7 @@ enum {
 typedef i32 DialogWaitType;
 typedef enum OldMainConstant {
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
-    OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
-    OLD_MAIN_DEFAULT_NAME_STRIDE              = 4,
-    OLD_MAIN_MAIN_MUSIC                       = 42,
-    OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
-    OLD_MAIN_FADE_SPEED                       = 8,
-    OLD_MAIN_LONG_FADE_SPEED                  = 0x80,
-    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL         = 9,
-    OLD_MAIN_INTRO_PUBLISHER_VIDEO            = 0x49,
-    OLD_MAIN_INTRO_PRIMARY_VIDEO              = 0x42,
-    OLD_MAIN_INTRO_FALLBACK_VIDEO             = 1,
-    OLD_MAIN_INTRO_SECONDARY_VIDEO            = 0x41,
-    OLD_MAIN_CREDITS_FIRST_VIDEO              = 0x48,
-    OLD_MAIN_CREDITS_SECOND_VIDEO             = 0x24,
-    OLD_MAIN_CREDITS_THIRD_VIDEO              = 0x4a,
-    OLD_MAIN_STANDARD_VICTORY_VIDEO           = 3,
-    OLD_MAIN_EXPANSION_VICTORY_VIDEO          = 0x40,
     OLD_MAIN_NEW_GAME                         = 0x65,
     OLD_MAIN_LOAD_GAME                        = 0x66,
     OLD_MAIN_HIGH_SCORES                      = 0x67,
@@ -314,11 +296,8 @@ typedef enum OldMainConstant {
     OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 6000,
     OLD_MAIN_NET_BUFFER_SIZE                  = 256,
     OLD_MAIN_NETWORK_PACKET                   = 0x20,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
-    OLD_MAIN_DIALOG_WAIT                      = 6,
+    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1,
+    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = CAMPAIGN_ROLAND_FINAL_SCENARIO + 1,
 } OldMainConstant;
 
 #pragma pack(push, 1)
@@ -351,20 +330,14 @@ struct KbRemotePacket {
 #pragma pack(pop)
 
 typedef enum AppMenuConstant {
-    APP_MENU_CONFIRM_OK          = DIALOG_BUTTON_5,
-    APP_MENU_CHECKED             = 8,
-    APP_MENU_UNCHECKED           = 0,
-    APP_MENU_CONFIRM_DIALOG      = 2,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
     APP_MENU_SPELL_COUNT         = 10,
-    APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
     APP_MENU_GOLD_BONUS          = 1000,
     APP_MENU_MOVEMENT_BONUS      = 299999,
     APP_MENU_CHEAT_SPELL_POINTS  = 999,
     APP_MENU_CHEAT_ARMY_QUANTITY = 5,
-    APP_MENU_CLOSE_MESSAGE       = 0x10,
     APP_MENU_ARMY_FIRST          = 41000,
     APP_MENU_ARMY_LAST           = 41066,
     APP_MENU_SECONDARY_FIRST     = 42000,
@@ -373,8 +346,6 @@ typedef enum AppMenuConstant {
     APP_MENU_BUILDING_LAST       = 43101,
     APP_MENU_COMBAT_FIRST        = 44000,
     APP_MENU_COMBAT_LAST         = 44200,
-    APP_MENU_COMBAT_HEX_COUNT    = 117,
-    APP_MENU_FORMATION_HEX_COUNT = 15
 } AppMenuConstant;
 
 typedef enum NetBoxConstant {
@@ -575,6 +546,21 @@ extern i32 giBottomViewOverrideEndTime;
 extern i32 giBottomViewResource;
 extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
+
+typedef enum DebugLevel {
+    MEMORY_LEAK_DEBUG_LEVEL                    = 1,
+    CELL_WINDOW_DEBUG_LEVEL                    = 1,
+    FILE_DEBUG_LEVEL                           = 2,
+    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
+    AI_PURCHASE_DEBUG_LEVEL                    = 3,
+    DEBUGGER_OUTPUT_LEVEL                      = 4,
+    COMBAT_AUTO_RESOLVE_DEBUG_LEVEL            = 4,
+    AI_PURCHASE_VALUE_DEBUG_LEVEL              = 5,
+    POSITION_DEBUG_LEVEL                       = 5,
+    FORCED_DEBUG_LEVEL                         = 9,
+    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9,
+    AI_BATTLE_DEBUG_LEVEL                      = 9
+} DebugLevel;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern u8 giGroundToTerrain[];
