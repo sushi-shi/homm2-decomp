@@ -263,7 +263,6 @@ H2_ENUM_BEGIN(RemoteSaveConstant)
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
-    REMOTE_RECEIVE_TIMEOUT           = 90000,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
     REMOTE_SAVE_INIT_RESPONSE        = 2,
     REMOTE_SAVE_DATA_COMMAND         = 3,
@@ -7145,7 +7144,7 @@ i32 game::ReceiveSaveGame(
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
-        if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
+        if (lastPacketTime + REMOTE_WAIT_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 localization::Tr("network.receive.retry"),
                 NORMAL_DIALOG_CONFIRM

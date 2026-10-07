@@ -36,7 +36,9 @@ H2_ENUM_BEGIN(RemoteTransportTimingConstant)
     REMOTE_HOST_TIMEOUT                  = 60000,
     REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT = 30000,
     REMOTE_GUEST_TIMEOUT                 = 60000,
-    REMOTE_CHAIN_TIMEOUT                 = 90000,
+    // How long a peer may stay silent before the player is asked
+    // whether to keep waiting.
+    REMOTE_WAIT_TIMEOUT                  = 90000,
     REMOTE_INITIAL_HEARTBEAT             = 1999999999,
 H2_ENUM_END(RemoteTransportTimingConstant)
 

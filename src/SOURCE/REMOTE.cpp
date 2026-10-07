@@ -837,7 +837,7 @@ i32 TransmitAndWait(
     clock = KBTickCount();
     complete = false;
     while (complete == 0) {
-        if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
+        if (clock + REMOTE_WAIT_TIMEOUT < KBTickCount()) {
             NormalDialog(
 
                 localization::Tr("network.send.retry"),

@@ -8155,7 +8155,7 @@ void advManager::ReceiveHeroTownData(
     while (!gotFirstHeroFirst || !gotFirstHeroSecond || !gotSecondHeroFirst
            || !gotSecondHeroSecond) {
         PollSound();
-        if (lastPacketTime + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
+        if (lastPacketTime + REMOTE_WAIT_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 localization::Tr("event.inline.2b436715930a57ee"),
                 NORMAL_DIALOG_CONFIRM
