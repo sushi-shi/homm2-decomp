@@ -43,7 +43,7 @@ manifests. LINK writes the final executable directly.
 - `homm2 link` produces `build/link/generic/HMM2PL.exe` without resources or
   access to the retail executable.
 - `homm2 link --rsrc` produces `build/link/rsrc/HMM2PL.exe`, adding resources
-  compiled from `res/HMM2PL.rc` and the retail-extracted program icon. The
+  compiled from `src/SOURCE/HMM2PL.rc` and the retail-extracted program icon. The
   resource compiler's output is checked against retail.
 - `homm2 link --historical` adds the observed PDB path and four-link clock
   history, producing `build/link/historical/HMM2PL.exe` directly through LINK.

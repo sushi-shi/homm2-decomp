@@ -40,6 +40,8 @@ class LinkProfile:
     link_times: tuple[str, ...]
     # Header reserve/commit options; an empty tuple keeps LINK's defaults.
     memory: tuple[str, ...]
+    # The image's resource script, kept with its sources.
+    resources: str
 
     @property
     def stem(self) -> str:
@@ -57,14 +59,16 @@ PROFILES = {
         exe="HMM2PL.exe",
         pdb_windows_path=r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\game\HMM2PL.pdb",
         link_times=("2003-02-26 14:51:33",) + ("2003-04-04 08:19:23",) * 3,
-        memory=("/STACK:66112,4096", "/HEAP:1048576,4096")),
+        memory=("/STACK:66112,4096", "/HEAP:1048576,4096"),
+        resources="src/SOURCE/HMM2PL.rc"),
     # EDT2PL.exe: a fresh PDB (age 1) whose NB10 signature equals the image
     # stamp 2003-04-04 08:21:00; LINK's default stack and heap (0x100000/0x1000).
     "editor": LinkProfile(
         exe="EDT2PL.exe",
         pdb_windows_path=r"e:\Users\igorl\VSS\HMM\HMM2\temp\release\editor\EDT2PL.pdb",
         link_times=("2003-04-04 08:21:00",),
-        memory=()),
+        memory=(),
+        resources="src/EDITOR/EDT2PL.rc"),
 }
 
 PROFILE = PROFILES[image_key()]

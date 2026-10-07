@@ -4,7 +4,7 @@
 Language: Cpp
 BasedOnStyle: LLVM
 # c++03 is clang-format's OLDEST standard; any pre-C++11 value keeps `> >` (not
-# `>>`), which the pre-C++98 MSVC 5.0 parser needs. Not a claim that we're c++03.
+# `>>`), which the VC6 parser needs. Not a claim that we're c++03.
 Standard: c++03
 
 # --- indentation -----------------------------------------------------------
@@ -28,7 +28,7 @@ BreakBeforeBraces: Attach
 # Bzip.cpp and voids the whitespace-only matching-neutrality contract above.
 InsertBraces: false
 Cpp11BracedListStyle: true
-InsertTrailingCommas: Wrapped
+InsertTrailingCommas: None
 
 # nothing collapses onto one line (rustfmt expands bodies)
 AllowShortFunctionsOnASingleLine: Empty
