@@ -21,6 +21,19 @@ H2_ENUM_CLASS_BEGIN(WindowFadeMode)
     FADE_OUT = 1
 H2_ENUM_CLASS_END(WindowFadeMode)
 
+// FadeScreen's step through the PALETTE_LEVEL_COUNT palette levels per frame:
+// the usual fade, and the finer one the editor fades its start-up and
+// quitting screens with.
+H2_ENUM_BEGIN(WindowFadeSpeed)
+    FADE_SPEED_STANDARD = 8,
+    FADE_SPEED_FINE     = 6
+H2_ENUM_END(WindowFadeSpeed)
+
+// FizzleForward's palette blend time when its caller passes -1.
+H2_ENUM_BEGIN(WindowFizzleDelay)
+    FIZZLE_DEFAULT_DELAY = 150
+H2_ENUM_END(WindowFizzleDelay)
+
 #pragma pack(push, 1)
 class heroWindowManager H2_FINAL : public baseManager {
 public:

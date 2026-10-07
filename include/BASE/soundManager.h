@@ -10,6 +10,37 @@ H2_ENUM_BEGIN(MidiTrackConstant)
     MIDI_TRACK_COUNT = 60
 H2_ENUM_END(MidiTrackConstant)
 
+// The music track numbers (CD audio tracks, MIDI and OGG files) the game plays
+// through PlayAmbientMusic/SwitchAmbientMusic: the battle themes, the town
+// themes in townTheme (KB.cpp, by faction), the terrain themes in
+// giTerrainToMusicTrack, the AI turn and the main menu and high score themes.
+H2_ENUM_BEGIN(MusicTrack)
+    MUSIC_TRACK_BATTLE_FIRST     = 2,
+    MUSIC_TRACK_BATTLE_LAST      = 4,
+    MUSIC_TRACK_SORCERESS_TOWN   = 5,
+    MUSIC_TRACK_WARLOCK_TOWN     = 6,
+    MUSIC_TRACK_NECROMANCER_TOWN = 7,
+    MUSIC_TRACK_KNIGHT_TOWN      = 8,
+    MUSIC_TRACK_BARBARIAN_TOWN   = 9,
+    MUSIC_TRACK_WIZARD_TOWN      = 10,
+    MUSIC_TRACK_LAVA             = 11,
+    MUSIC_TRACK_WASTELAND        = 12,
+    MUSIC_TRACK_DESERT           = 13,
+    MUSIC_TRACK_SNOW             = 14,
+    MUSIC_TRACK_SWAMP            = 15,
+    MUSIC_TRACK_WATER            = 16,
+    MUSIC_TRACK_DIRT             = 17,
+    MUSIC_TRACK_GRASS            = 18,
+    MUSIC_TRACK_AI_TURN          = 28,
+    MUSIC_TRACK_MAIN_MENU        = 42,
+    MUSIC_TRACK_HIGH_SCORE       = 43
+H2_ENUM_END(MusicTrack)
+
+// The full Miles sample and XMIDI volume (both scales are 0..127).
+H2_ENUM_BEGIN(SoundVolumeScale)
+    SOUND_VOLUME_FULL = 127
+H2_ENUM_END(SoundVolumeScale)
+
 H2_ENUM_BEGIN(SoundStorageConstant)
     SOUND_CHANNEL_TYPE_COUNT = 4
 H2_ENUM_END(SoundStorageConstant)

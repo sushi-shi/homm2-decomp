@@ -12,6 +12,11 @@ H2_ENUM_BEGIN(LogicalScreenConstant)
     LOGICAL_SCREEN_MAX_Y   = LOGICAL_SCREEN_HEIGHT - 1,
 H2_ENUM_END(LogicalScreenConstant)
 
+// The palette index the logical screen is cleared to.
+H2_ENUM_BEGIN(ScreenFillColor)
+    SCREEN_FILL_COLOR = 0x24
+H2_ENUM_END(ScreenFillColor)
+
 // Native RGB palette values use six bits per channel. Windows palette version
 // 0x300 is a separate API field, not a palette byte count.
 H2_ENUM_BEGIN(PaletteFormatConstant)

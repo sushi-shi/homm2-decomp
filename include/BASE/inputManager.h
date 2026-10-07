@@ -114,6 +114,19 @@ H2_ENUM_BEGIN(InputManagerCapacity)
     INPUT_SCAN_CODE_CAPACITY  = 128
 H2_ENUM_END(InputManagerCapacity)
 
+// A keyboard message's keyCode once AsciiConvert has run: the character, or
+// for a key without one its scan code in the high byte (MakeScanCodeTable).
+// Enter gives '\n', Escape 0x1b and Backspace the delete character.
+H2_ENUM_BEGIN(InputKeyCodeEncoding)
+    INPUT_KEY_CODE_CHARACTER_MASK = 0xff,
+    INPUT_KEY_CODE_SCAN_SHIFT     = 8,
+    INPUT_KEY_CODE_SCAN_MASK      = 0xff00,
+    INPUT_KEY_CODE_FIRST_SCAN     = 0x100,
+    INPUT_KEY_CODE_ENTER          = '\n',
+    INPUT_KEY_CODE_ESCAPE         = 0x1b,
+    INPUT_KEY_CODE_DELETE         = 0x7f
+H2_ENUM_END(InputKeyCodeEncoding)
+
 #pragma pack(push, 1)
 class inputManager H2_FINAL : public baseManager {
 public:

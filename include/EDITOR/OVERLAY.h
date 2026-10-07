@@ -161,6 +161,7 @@ H2_ENUM_BEGIN(OverlayCatalogueEntry)
     OVERLAY_RESOURCE_MARKERS  = 128,
     // A town flag's left and right part, two per player colour.
     OVERLAY_TOWN_FLAGS        = 134,
+    OVERLAY_TOWN_FLAG_PARTS   = 2,
     // The random monsters: any, then by strength.
     OVERLAY_RANDOM_MONSTER             = 214,
     OVERLAY_RANDOM_MONSTER_WEAK        = 215,
@@ -218,6 +219,8 @@ H2_ENUM_BEGIN(OverlayCatalogueEntry)
     OVERLAY_TOWN_LAST         = 918,
     OVERLAY_TOWN_SHADOWS      = 919,
     OVERLAY_TOWN_VARIANTS     = 12,
+    // Each faction's castle then its town: a variant's kind is its parity.
+    OVERLAY_TOWN_KINDS        = 2,
     // The ground under a town, one per terrain; grass when the terrain
     // left of a dragged town's entrance is water.
     OVERLAY_TOWN_GROUNDS      = 930,

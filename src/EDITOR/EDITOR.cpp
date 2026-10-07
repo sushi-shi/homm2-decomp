@@ -16,6 +16,7 @@
 #include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
+#include <EDITOR/EVENTMGR.h>
 #include <EDITOR/lineManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>
@@ -46,17 +47,6 @@
 #include <string.h>
 
 H2_ENUM_BEGIN(EditorStartupConstant)
-    // The setup dialog (stpemain.bin) and its results: a new map, a map to
-    // load, and the two ways out.
-    EDITOR_SETUP_WINDOW_X       = 0x195,
-    EDITOR_SETUP_WINDOW_Y       = 8,
-    EDITOR_SETUP_NEW_MAP        = 1,
-    EDITOR_SETUP_LOAD_MAP       = 2,
-    EDITOR_SETUP_QUIT           = 0x69,
-    EDITOR_FADE_STEPS           = 6,
-    EDITOR_SLOW_FADE_STEPS      = 8,
-    // The screen is cleared to this palette index while the map view opens.
-    EDITOR_BACKGROUND_COLOR     = 0x24,
     // DelayTicks counts in 15-millisecond ticks.
     EDITOR_DELAY_TICK_MILLISECONDS = 15,
     EDITOR_DELAY_TIMER_SLOT     = 1,
@@ -842,7 +832,7 @@ DATA(0x0048000c) i32 gClearFlags = EDITOR_CLEAR_FLAGS_DEFAULT;
 // The drag selection the map view outlines (EDIT_NO_CELL when there is none).
 DATA(0x00480010) i32 gSelectionX = EDIT_NO_CELL;
 // The random map generator's settings (EVENTMGR's dialog, RANDOM).
-DATA(0x00480014) i32 gRandomMapPlayers = 4;
+DATA(0x00480014) i32 gRandomMapPlayers = NEW_MAP_DEFAULT_PLAYERS;
 DATA(0x00480018) double gTerrainPercent[RANDOM_MAP_TERRAIN_COUNT] = {30.0, 30.0, 20.0, 0.0, 0.0, 0.0, 20.0, 0.0};
 DATA(0x00480058) double gDensityPercent[RANDOM_MAP_DENSITY_COUNT] = {50.0, 50.0, 50.0, 50.0, 50.0};
 DATA(0x00480080) b32 gScatterTerrain = true;
@@ -2377,7 +2367,7 @@ DATA(0x004817f8) H2_CONST char* gColors[IDX(FACTION_COUNT)] = {
     localization::Tr("table.gColors.4"),
     localization::Tr("table.gColors.5")
 };
-DATA(0x00481810) H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT] = {
+DATA(0x00481810) H2_CONST char* gColorAbbreviations[PLAYER_COLOR_COUNT] = {
     localization::Tr("color.abbreviated.blue"),
     localization::Tr("color.abbreviated.green"),
     localization::Tr("color.abbreviated.red"),
@@ -3604,7 +3594,7 @@ i32 oldmain(void) {
     gPalette = gpResourceManager->GetPalette("kb.pal");
     gpResourceManager->GetBackdrop("editor.icn", gpWindowManager->m_screen, true);
     gpWindowManager->UpdateScreen();
-    gpWindowManager->FadeScreen(FADE_IN, EDITOR_FADE_STEPS, gPalette);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_FINE, gPalette);
     gpMouseManager->SetPointer("editor.mse", EDIT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[IDX(giCurExe)].colorMouseCursor);
     gpMouseManager->ShowColorPointer();
@@ -3613,7 +3603,7 @@ i32 oldmain(void) {
     keepRunning = true;
     while (keepRunning) {
         gbInSetupDialog = true;
-        window = new heroWindow(EDITOR_SETUP_WINDOW_X, EDITOR_SETUP_WINDOW_Y, "stpemain.bin");
+        window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpemain.bin");
         if (!window)
             MemError();
         gpWindowManager->DoDialog(window, SetupMainHandler, 0);
@@ -3621,32 +3611,32 @@ i32 oldmain(void) {
         result = gpWindowManager->m_dialogResult;
         gbInSetupDialog = false;
         switch (result) {
-            case EDITOR_SETUP_LOAD_MAP:
+            case SETUP_CHOICE_TWO: // load a map
                 if (PickMap(FILE_REQUESTER_MAP))
                     keepRunning = false;
                 sprintf(loadName, gMapFileName);
                 break;
-            case EDITOR_SETUP_NEW_MAP:
+            case SETUP_CHOICE_ONE: // a new map
                 if (SetupNewMap())
                     keepRunning = false;
                 break;
-            case EDITOR_SETUP_QUIT:
+            case SETUP_CHOICE_QUIT:
             case DIALOG_BUTTON_1:
-                gpWindowManager->FadeScreen(FADE_OUT, EDITOR_FADE_STEPS, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_FINE, gPalette);
                 ShutDown(NULL);
                 break;
         }
     }
     gpMouseManager->HideColorPointer();
-    gpWindowManager->FadeScreen(FADE_OUT, EDITOR_SLOW_FADE_STEPS, gPalette);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
     memset(
         gpWindowManager->m_screen->m_pixels,
-        EDITOR_BACKGROUND_COLOR,
+        SCREEN_FILL_COLOR,
         LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
     );
     if (gpExec->AddManager(gEditManager, BASE_MANAGER_PRIORITY_UNASSIGNED))
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (result == EDITOR_SETUP_LOAD_MAP) {
+    if (result == SETUP_CHOICE_TWO) { // a map to load
         strcpy(gMapFileName, loadName);
         gEditManager->LoadMap(gMapFileName);
         ProtectShippedMap();
@@ -3654,11 +3644,11 @@ i32 oldmain(void) {
     gEditManager->DrawRadar(true);
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
-    gpWindowManager->FadeScreen(FADE_IN, EDITOR_SLOW_FADE_STEPS, gPalette);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
     gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
     gpExec->MainLoop();
     gpExec->RemoveManager(gEditManager);
-    gpWindowManager->FadeScreen(FADE_OUT, EDITOR_FADE_STEPS, gPalette);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_FINE, gPalette);
     gpResourceManager->Dispose(gPalette);
     ShutDown(NULL);
     return 0;

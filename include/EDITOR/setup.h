@@ -9,6 +9,23 @@
 #include <Ints.h>
 #include <BASE/message.h>
 
+// Every set-up dialog (stpemain.bin, stpenew.bin, stpesize.bin) opens here.
+H2_ENUM_BEGIN(SetupWindowPlace)
+    SETUP_WINDOW_X = 405,
+    SETUP_WINDOW_Y = 8
+H2_ENUM_END(SetupWindowPlace)
+
+// A set-up dialog's choices: the main screen's new map and load map, the
+// new-map choice's blank and random map, the four map sizes, and the main
+// screen's quit button.
+H2_ENUM_BEGIN(SetupDialogChoice)
+    SETUP_CHOICE_ONE   = 1,
+    SETUP_CHOICE_TWO   = 2,
+    SETUP_CHOICE_THREE = 3,
+    SETUP_CHOICE_FOUR  = 4,
+    SETUP_CHOICE_QUIT  = 0x69
+H2_ENUM_END(SetupDialogChoice)
+
 // The side of the square map a new map starts with.
 extern i32 gNewMapSize;
 // Set when the new map is to come from the random-map generator.

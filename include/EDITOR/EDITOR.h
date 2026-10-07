@@ -10,6 +10,7 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
+#include <SOURCE/GAME.h>
 
 H2_ENUM_BEGIN(EditorStatusBar)
     // The status line under the map view.
@@ -73,10 +74,9 @@ H2_ENUM_BEGIN(EditorTableCount)
     RANDOM_MAP_DENSITY_COUNT = 5,
     // gWinSetup: the editor dialogs' captions.
     EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74,
-    // The map's time event and rumour capacities, and its player colours.
+    // The map's time event and rumour capacities.
     EDITOR_TIME_EVENT_CAPACITY = 50,
-    EDITOR_RUMOUR_CAPACITY = 30,
-    EDITOR_PLAYER_COLOR_COUNT = 6
+    EDITOR_RUMOUR_CAPACITY = 30
 H2_ENUM_END(EditorTableCount)
 
 H2_ENUM_BEGIN(RandomMapDensity)
@@ -185,7 +185,7 @@ extern u16 gTimeEventExtras[EDITOR_TIME_EVENT_CAPACITY];
 #define gRumourExtras gRumourExtrasSlotContent // spelling fixes .bss order
 extern u16 gRumourExtras[EDITOR_RUMOUR_CAPACITY];
 // The player colours' short names (the specification dialog's side lists).
-extern H2_CONST char* gColorAbbreviations[EDITOR_PLAYER_COLOR_COUNT];
+extern H2_CONST char* gColorAbbreviations[PLAYER_COLOR_COUNT];
 
 class heroWindow;
 struct tag_message;

@@ -13,16 +13,14 @@
 #include <BASE/message.h>
 #include <BASE/baseManager.h>
 #include <BASE/display.h>
+#include <BASE/font.h>
 
 H2_ENUM_CLASS_BEGIN(InputManagerScanCodeEncoding)
     SCAN_CODE_MASK          = 0xff,
-    WINDOWS_HIGH_WORD_SHIFT = 16,
-    ENCODED_SCAN_CODE_SHIFT = 8,
-    ASCII_ESCAPE_CODE       = 0x1b,
-    ASCII_DELETE_CODE       = 0x7f
+    WINDOWS_HIGH_WORD_SHIFT = 16
 H2_ENUM_CLASS_END(InputManagerScanCodeEncoding)
 
-#define EncodeScanCode(scanCode) (IDX(scanCode) << IDX(ENCODED_SCAN_CODE_SHIFT))
+#define EncodeScanCode(scanCode) (IDX(scanCode) << INPUT_KEY_CODE_SCAN_SHIFT)
 
 H2_ENUM_BEGIN(InputManagerCursorBounds)
     CURSOR_INTERIOR_MIN_EXCLUSIVE   = 3,
@@ -39,7 +37,7 @@ DATA(0x0053607c) b32 bLastMouseOffscreen = false;
 DATA(0x00536080) b32 bLastOnscreenMouseColor = false;
 DATA(0x00536084) b32 bInCheckChangeCursor = false;
 
-DATA(0x0051e51c) static u8 gInputCharacterMapCp1251[0x80] = {
+DATA(0x0051e51c) static u8 gInputCharacterMapCp1251[CP1251_ASCII_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
     0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
     0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0xdd, 0x23, 0x24, 0x25, 0x26,
@@ -356,7 +354,7 @@ void inputManager::AsciiConvert(tag_message& event) {
         event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode];
     else
         event.payload.keyboard.keyCode =
-            m_keyState[event.payload.keyboard.keyCode] & IDX(SCAN_CODE_MASK);
+            m_keyState[event.payload.keyboard.keyCode] & INPUT_KEY_CODE_CHARACTER_MASK;
 
     if ((event.payload.keyboard.modifiers & MESSAGE_MODIFIER_SHIFT_KEYS) == MESSAGE_MODIFIER_NONE
         && event.payload.keyboard.keyCode > 'A' - 1 && event.payload.keyboard.keyCode < 'Z' + 1)
@@ -436,7 +434,7 @@ void inputManager::MakeScanCodeTable(void) {
         m_keyState[scanCode] = EncodeScanCode(scanCode);
 
     m_keyState[IDX(INPUT_SCAN_NONE)] = 0;
-    m_keyState[IDX(INPUT_SCAN_ESCAPE)] = IDX(ASCII_ESCAPE_CODE);
+    m_keyState[IDX(INPUT_SCAN_ESCAPE)] = INPUT_KEY_CODE_ESCAPE;
     m_keyState[IDX(INPUT_SCAN_1)] = '1';
     m_keyState[IDX(INPUT_SCAN_2)] = '2';
     m_keyState[IDX(INPUT_SCAN_3)] = '3';
@@ -449,7 +447,7 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[IDX(INPUT_SCAN_0)] = '0';
     m_keyState[IDX(INPUT_SCAN_MINUS)] = '-';
     m_keyState[IDX(INPUT_SCAN_EQUALS)] = '=';
-    m_keyState[IDX(INPUT_SCAN_BACKSPACE)] = IDX(ASCII_DELETE_CODE);
+    m_keyState[IDX(INPUT_SCAN_BACKSPACE)] = INPUT_KEY_CODE_DELETE;
     m_keyState[IDX(INPUT_SCAN_TAB)] = '\t';
     m_keyState[IDX(INPUT_SCAN_Q)] = 'Q';
     m_keyState[IDX(INPUT_SCAN_W)] = 'W';
