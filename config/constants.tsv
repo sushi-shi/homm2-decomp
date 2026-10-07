@@ -1,0 +1,11 @@
+# homm2 constants work list - numeric constants kept on purpose, one row each,
+# with the reason. Every clang-tidy magic number in code, a local table or a
+# declaration is open until it is written as a name (an enumerator, a named
+# constant, NULL) or a row here keeps it numeric; files config/reviews/constants.tsv
+# marks third-party are not counted. `homm2 verify constants --list [FILTER]`
+# prints the open ones; the floor never rises (`--update-floor` lowers it).
+# Columns (tab-separated; every field is an fnmatch glob, `*` matches anything;
+# the first matching row wins): file owner spelling group detail reason.
+# owner is the enclosing function, group the finding's category (code,
+# local-table, declaration) and detail its source line.
+#floor	2003

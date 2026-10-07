@@ -69,8 +69,9 @@ GATES = {
     # Outside the build and the tier: known findings or reports.
     "text-coverage": ([PY, "-m", "homm2.verify.text_coverage"],
                       "every .text byte is claimed, padding or reviewed"),
-    "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4"],
-                  "numeric-literal inventory; no 0 spelled for a null pointer"),
+    "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4", "--gate"],
+                  "open numeric constants within config/constants.tsv's floor; "
+                  "no 0 spelled for a null pointer"),
     "enum-reuse": ([PY, "-m", "homm2.verify.enum_reuse"],
                    "enum, #define and const values of both images vs the reuse "
                    "review ledger (pending rows)"),

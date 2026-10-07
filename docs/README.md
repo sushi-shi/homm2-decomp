@@ -62,8 +62,9 @@ Their successors grow here from VC6-measured evidence.
   body-to-dependency hash upgrades, changed hashes, and pre-hash evidence, and marks hash
   transitions whose immediately preceding maximum was exact. Write campaign output to `/tmp`
   rather than committing a queue snapshot.
-- `constants-audit.md` defines the whole-tree numeric-literal inventory and per-file review
-  contract.
+- `constants-audit.md` defines the whole-tree numeric-literal inventory, its open floor and
+  per-file review contract; `enum-reuse.md` the value map of every enum, `#define` and
+  `const` constant of both programs and its reuse review ledger.
 - `iconf2bc-experiment-matrix.md` retains negative experiment evidence (measured on the
   PoL line's compiler; compiler-scoped).
 - `archive/` contains contracts for retired experiment tools; it is not active workflow guidance.
