@@ -48,13 +48,11 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SPLIT_CONFIRM             = DIALOG_BUTTON_2,
     CONTROL_CLOSE             = DIALOG_BUTTON_0,
     WINDOW_TEXT_ID            = 0x15,
-    SPLIT_MODIFIER_MASK       = 3,
     TITLE_WIDGET              = 0x4d,
     ADVENTURE_WIDGET_FIRST    = 1,
     ADVENTURE_WIDGET_LAST     = 6,
     MONO_ICON_SKIP            = 2,
     MONO_ICON_DEFAULT         = -1,
-    MANAGER_MESSAGE           = 0x100,
     SLOT_NONE                 = -1,
     ARTIFACT_COLUMN_COUNT     = 7,
     FADE_STEPS                = 8,
@@ -611,7 +609,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & IDX(SPLIT_MODIFIER_MASK))
+                                            & IDX(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[IDX(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -682,7 +680,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & IDX(SPLIT_MODIFIER_MASK))
+                                            & IDX(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[IDX(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]

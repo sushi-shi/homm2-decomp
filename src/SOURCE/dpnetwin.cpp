@@ -16,11 +16,6 @@
 
 #define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\DPNETWIN.CPP"
 
-H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
-    SESSION_OPEN_JOIN = 1,
-    SESSION_OPEN_CREATE = 2
-H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
-
 H2_ENUM_BEGIN(DirectPlayStorageConstant)
     RECEIVE_ARGUMENT_STORAGE_COUNT = 2,
     STATUS_TEXT_SIZE = 32
@@ -214,7 +209,7 @@ VA(0x00436da4, 0x48)
 i32 dpnet_snd(i32 position, i32 size, void* data) {
 
     dpProcessMessages();
-    dpSendMessage((position == DP_TRANSPORT_BROADCAST_POSITION ? 0 : giNetPosToDCOPos[position]), NETWORK_PACKET_DATA, static_cast<u16>(size), data);
+    dpSendMessage((position == REMOTE_BROADCAST_PLAYER ? 0 : giNetPosToDCOPos[position]), NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
@@ -343,7 +338,7 @@ i32 dpWaitForFirstGuest(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = IDX(SESSION_OPEN_CREATE);
+            session.dwFlags = DPOPEN_CREATE;
             strcpy(session.szSessionName, "Heroes 2");
             result = lpIDC->Open(&session);
             if (result != DP_OK)
@@ -447,7 +442,7 @@ i32 dpWaitForHost(void) {
             session.dwSize = sizeof(session);
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
-            session.dwFlags = IDX(SESSION_OPEN_JOIN);
+            session.dwFlags = DPOPEN_JOIN;
             session.dwSession = lSessions[iSessionToTry];
             strcpy(session.szSessionName, "Heroes 2");
             result = lpIDC->Open(&session);

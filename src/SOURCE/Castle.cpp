@@ -421,7 +421,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 );
                 if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
                 ++backFrame;
             }
         }
@@ -445,7 +445,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 );
                 if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
                 ++backFrame;
             }
         }
@@ -464,7 +464,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
             );
             if (backgroundWidget == NULL)
                 MemError();
-            casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+            casWin->AddWidget(backgroundWidget, WINDOW_Z_ORDER_TOP);
         }
     }
 }
