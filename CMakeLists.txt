@@ -340,6 +340,14 @@ if(BUILD_TESTING AND NOT WIN32 AND NOT EMSCRIPTEN)
   target_link_libraries(homm2_monochrome_cursor_assets_test PRIVATE
     homm2_platform homm2_compression ${HOMM2_FFMPEG_LIBRARIES})
 
+  add_executable(homm2_spell_ai_test
+    tools/spell_ai_test.cpp src/SOURCE/SPELLAI.cpp)
+  target_include_directories(homm2_spell_ai_test PRIVATE ${CMAKE_SOURCE_DIR}/include)
+  target_compile_definitions(homm2_spell_ai_test PRIVATE __cdecl= __stdcall= __fastcall=)
+  target_compile_options(homm2_spell_ai_test PRIVATE
+    -ffunction-sections -fdata-sections -Wno-invalid-offsetof)
+  target_link_options(homm2_spell_ai_test PRIVATE -Wl,--gc-sections)
+  add_test(NAME spell_ai COMMAND homm2_spell_ai_test)
   add_test(NAME source_policy
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tools/source_policy.py
       ${CMAKE_SOURCE_DIR})
