@@ -1,7 +1,25 @@
-"""Inventory numeric literals and semantic null/magic-number findings."""
+"""homm2.verify.constants - numeric literals, magic numbers and the open floor.
+
+clang-tidy's readability-magic-numbers (0 and 1 ignored) finds the numeric
+literals of every unit; a lexical pass classifies each by context. A finding
+in executable code, a local table or a declaration is open until it is spelled
+as a name (an enumerator, a named constant, NULL) or a row in
+config/constants.tsv keeps it numeric with a reason. Files the per-file
+checklist config/reviews/constants.tsv marks `third-party` are outside the
+count. The committed `#floor` in config/constants.tsv is the open count and
+only goes down.
+
+    homm2 verify constants                 # census, build/constants/
+    homm2 verify constants --list EVENTS   # open findings whose file/owner contains EVENTS
+    homm2 verify constants --gate          # fail on a 0 spelled for a null pointer,
+                                           # open findings above the floor, or
+                                           # stale/malformed kept rows
+    homm2 verify constants --update-floor  # lower the floor after a batch
+"""
 
 from __future__ import annotations
 
+import argparse
 import csv
 import io
 import json
@@ -11,6 +29,7 @@ import subprocess
 import sys
 from collections import Counter
 from dataclasses import dataclass
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 from homm2.verify.constants_syntax import lex, parse_enum_declarations
@@ -20,6 +39,12 @@ REPO = next(path for path in Path(__file__).resolve().parents if (path / "flake.
 OUTPUT = REPO / "build" / "constants"
 DATABASE = REPO / "build" / "clangd" / "compile_commands.json"
 REVIEW_MANIFEST = REPO / "config" / "reviews" / "constants.tsv"
+#: The work list: the committed floor and the constants kept numeric on purpose.
+WORKLIST = REPO / "config" / "constants.tsv"
+_WORKLIST_FIELDS = ("file", "owner", "spelling", "group", "detail", "reason")
+#: Finding categories that enter the cleanup queue (the rest are evidence:
+#: annotations, source lines, global payloads, enum values, directives).
+ACTIONABLE = ("code", "local-table", "declaration")
 SOURCE_PATTERN = r"src/(BASE|SOURCE|EDITOR)/.*\.cpp"
 ANNOTATION_MACROS = {
     "DATA", "DATA_COMPGEN", "DATA_COMPGEN_GUARD", "SIZE", "VA", "VA_COMPGEN",
@@ -58,6 +83,7 @@ class Literal:
     token: str
     category: str
     context: str
+    owner: str = ""
 
 
 def source_files() -> list[Path]:
@@ -105,6 +131,8 @@ def lexical_inventory(path: Path) -> list[Literal]:
     braces: list[str] = []
     parens: list[list[str | int]] = []
     statement_start = 0
+    owner = ""
+    owner_depth = -1
     result = []
     for index, token in enumerate(tokens):
         if token.text == "(":
@@ -114,9 +142,15 @@ def lexical_inventory(path: Path) -> list[Literal]:
         elif token.text == "," and parens:
             parens[-1][1] += 1
         elif token.text == "{":
-            braces.append(_brace_kind(tokens, index, braces, statement_start))
+            kind = _brace_kind(tokens, index, braces, statement_start)
+            if kind == "function" and "function" not in braces:
+                owner = _function_name(tokens, statement_start, index)
+                owner_depth = len(braces)
+            braces.append(kind)
         elif token.text == "}" and braces:
             braces.pop()
+            if len(braces) == owner_depth:
+                owner, owner_depth = "", -1
             statement_start = index + 1
         elif token.text == ";" and not any(kind == "function" for kind in braces):
             statement_start = index + 1
@@ -143,8 +177,50 @@ def lexical_inventory(path: Path) -> list[Literal]:
             token.text,
             category,
             line_text.strip().replace("\t", " "),
+            owner if "function" in braces or category == "local-table" else "",
         ))
     return result
+
+
+def _function_name(tokens, start: int, brace: int) -> str:
+    """The qualified name before a function body's parameter list
+    (`Class::Method`, `Class::~Class`, `Free`): the last named parenthesized
+    group before the body, past VA(...) annotations and enum blocks that end
+    without a semicolon, and before a constructor's initializer list; ''
+    when it is not plain."""
+    depth = 0
+    candidate = ""
+    for opening in range(start, brace):
+        text = tokens[opening].text
+        if text == ")":
+            depth -= 1
+            continue
+        if depth == 0 and text == ":" and opening > start and tokens[opening - 1].text == ")" \
+                and tokens[opening + 1].text != ":":
+            break
+        if text != "(":
+            continue
+        depth += 1
+        if depth != 1:
+            continue
+        parts: list[str] = []
+        cursor = opening - 1
+        while cursor >= start and tokens[cursor].text.isidentifier():
+            parts.append(tokens[cursor].text)
+            cursor -= 1
+            if cursor >= start and tokens[cursor].text == "~":
+                parts.append("~")
+                cursor -= 1
+            if (cursor - 1 >= start and tokens[cursor].text == ":"
+                    and tokens[cursor - 1].text == ":"):
+                parts.append("::")
+                cursor -= 2
+                continue
+            break
+        name = "".join(reversed(parts))
+        if name and name not in ANNOTATION_MACROS:
+            candidate = name
+    return candidate
 
 
 def _literal_lookup(rows: list[Literal]) -> dict[tuple[str, int], list[Literal]]:
@@ -196,6 +272,7 @@ def _diagnostic_rows(log: str, pattern: re.Pattern, lexical: list[Literal]) -> l
             "literal": spelling or (literal.token if literal else data.get("value", "")),
             "category": literal.category if literal else "unknown",
             "context": source_context or (literal.context if literal else ""),
+            "owner": literal.owner if literal else "",
         })
     return sorted(result, key=lambda item: (item["path"], item["line"], item["column"]))
 
@@ -224,17 +301,43 @@ def _is_zero_null_spelling(spelling: str) -> bool:
     return spelling == "false" or INTEGER_ZERO_RE.fullmatch(spelling) is not None
 
 
-def _run_tidy(check: str, *, config: dict | None = None, jobs: int = 8) -> str:
+#: The editor's view of the shared units that have editor-only code: the
+#: clangd database reads a shared unit as the game (homm2.lsp.compdb).
+EDITOR_DATABASE = REPO / "build" / "clangd" / "editor-view" / "compile_commands.json"
+
+
+def _editor_view_database() -> str | None:
+    """Write the editor-view database; return a run-clang-tidy file pattern
+    for its units, or None when no shared unit has editor-only code."""
+    from homm2.manifest import all_units, clang_image_defines, unit_images
+    database = json.loads(DATABASE.read_text())
+    shared = {unit["source"] for unit in all_units()
+              if len(unit_images(unit)) > 1 and unit["source"].endswith(".cpp")
+              and "HOMM2_EDITOR" in (REPO / unit["source"]).read_text(errors="replace")}
+    entries = []
+    for entry in database:
+        if entry["file"] in shared:
+            defines = clang_image_defines(REPO / entry["file"], "editor")
+            entries.append({**entry, "arguments": [*entry["arguments"], *defines]})
+    if not entries:
+        return None
+    EDITOR_DATABASE.parent.mkdir(parents=True, exist_ok=True)
+    EDITOR_DATABASE.write_text(json.dumps(entries, indent=2) + "\n")
+    return "(" + "|".join(re.escape(entry["file"]) for entry in entries) + ")$"
+
+
+def _run_tidy(check: str, *, config: dict | None = None, jobs: int = 8,
+              database: Path = DATABASE, pattern: str = SOURCE_PATTERN) -> str:
     runner = shutil.which("run-clang-tidy")
     if not runner:
         raise RuntimeError("run-clang-tidy not found; enter `nix develop .#build`")
-    command = [runner, "-j", str(jobs), "-quiet", "-p", str(DATABASE.parent),
+    command = [runner, "-j", str(jobs), "-quiet", "-p", str(database.parent),
                f"-checks=-*,{check}"]
     if config:
         command.extend(["-config", json.dumps(config, separators=(",", ":"))])
     if check == "modernize-use-nullptr":
         command.append(r"-header-filter=.*/include/(BASE|SOURCE|EDITOR)/.*")
-    command.append(SOURCE_PATTERN)
+    command.append(pattern)
     completed = subprocess.run(command, cwd=REPO, text=True, capture_output=True)
     log = completed.stdout + completed.stderr
     failures = _unexpected_failures(log)
@@ -251,7 +354,99 @@ def _write_tsv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
     path.write_text(stream.getvalue())
 
 
-def _review_rows(magic: list[dict]) -> list[dict]:
+@dataclass(frozen=True)
+class Keep:
+    """A config/constants.tsv row: fnmatch globs over a finding's file, owner
+    (the enclosing function), spelling, group (category) and detail (the
+    source line), then the reason it stays numeric."""
+    line: int
+    file: str
+    owner: str
+    spelling: str
+    group: str
+    detail: str
+    reason: str
+
+    def matches(self, item: dict) -> bool:
+        return (fnmatchcase(item["path"], self.file)
+                and fnmatchcase(item.get("owner", ""), self.owner)
+                and fnmatchcase(item["literal"], self.spelling)
+                and fnmatchcase(item["category"], self.group)
+                and fnmatchcase(item["context"], self.detail))
+
+
+def load_worklist(path: Path = WORKLIST) -> tuple[list[Keep], int | None, list[str]]:
+    """Kept rows, the committed floor of open findings, and format errors."""
+    keeps: list[Keep] = []
+    floor = None
+    errors: list[str] = []
+    if not path.is_file():
+        return keeps, floor, errors
+    for number, text in enumerate(path.read_text().splitlines(), 1):
+        if not text.strip():
+            continue
+        if text.startswith("#"):
+            parts = text[1:].split("\t")
+            if parts[0].strip() == "floor" and len(parts) == 2:
+                floor = int(parts[1])
+            continue
+        parts = text.split("\t")
+        if len(parts) != len(_WORKLIST_FIELDS):
+            errors.append(f"{path.name}:{number}: expected "
+                          f"{len(_WORKLIST_FIELDS)} tab-separated fields")
+            continue
+        keep = Keep(number, *parts)
+        if not keep.reason.strip() or keep.reason.strip() == "*":
+            errors.append(f"{path.name}:{number}: a kept constant needs a reason")
+            continue
+        keeps.append(keep)
+    return keeps, floor, errors
+
+
+def write_floor(path: Path, floor: int) -> None:
+    text = path.read_text() if path.is_file() else ""
+    lines = [line for line in text.splitlines() if not line.startswith("#floor")]
+    head = [line for line in lines if line.startswith("#")]
+    body = [line for line in lines if not line.startswith("#")]
+    path.write_text("\n".join(head + [f"#floor\t{floor}"] + body) + "\n")
+
+
+def open_findings(magic: list[dict], review: list[dict],
+                  keeps: list[Keep]) -> tuple[list[dict], list[Keep]]:
+    """Actionable findings no row keeps, and the rows that keep nothing."""
+    third_party = {row["path"] for row in review if row["status"] == "third-party"}
+    used: set[int] = set()
+    result = []
+    for item in magic:
+        if item["category"] not in ACTIONABLE or item["path"] in third_party:
+            continue
+        keep = next((row for row in keeps if row.matches(item)), None)
+        if keep is None:
+            result.append(item)
+        else:
+            used.add(keep.line)
+    return result, [row for row in keeps if row.line not in used]
+
+
+def _image_split(rows: list[dict]) -> Counter:
+    """Open findings by program: a unit by its config/units.toml images
+    (game, editor, or shared by both), a header by its include/ tier."""
+    from homm2.manifest import all_units, unit_images
+    unit_images_by_source = {unit["source"]: unit_images(unit) for unit in all_units()}
+    counts: Counter = Counter()
+    for item in rows:
+        images = unit_images_by_source.get(item["path"])
+        if images is None:
+            key = "editor" if item["path"].startswith("include/EDITOR/") else "game"
+        elif len(images) > 1:
+            key = "shared"
+        else:
+            key = images[0]
+        counts[key] += 1
+    return counts
+
+
+def _review_rows() -> list[dict]:
     with REVIEW_MANIFEST.open(newline="") as stream:
         rows = list(csv.DictReader(stream, dialect="excel-tab"))
     expected = {str(path.relative_to(REPO)) for path in source_files()}
@@ -266,36 +461,37 @@ def _review_rows(magic: list[dict]) -> list[dict]:
             "invalid constants review manifest: "
             f"duplicates={duplicates} missing={missing} extra={extra} invalid={invalid}"
         )
-    actionable = Counter(item["path"] for item in magic
-                         if item["category"] in ("code", "local-table", "declaration"))
-    premature = sorted(row["path"] for row in rows
-                       if row["status"] == "reviewed" and actionable[row["path"]])
-    if premature:
-        raise RuntimeError("reviewed files still have actionable constants: " + ", ".join(premature))
     return rows
 
 
+def _premature(review: list[dict], open_rows: list[dict]) -> list[str]:
+    """Files checked off as reviewed while they still have open findings."""
+    remaining = Counter(item["path"] for item in open_rows)
+    return sorted(row["path"] for row in review
+                  if row["status"] == "reviewed" and remaining[row["path"]])
+
+
 def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
-             review: list[dict]) -> str:
+             review: list[dict], open_rows: list[dict], keeps: list[Keep],
+             floor: int | None) -> str:
     lexical_categories = Counter(item.category for item in lexical)
     magic_categories = Counter(item["category"] for item in magic)
-    pending = {row["path"] for row in review if row["status"] == "pending"}
-    by_file = Counter(item["path"] for item in magic
-                      if item["path"] in pending
-                      and item["category"] in ("code", "local-table", "declaration"))
-    actionable = sum(by_file.values())
+    by_file = Counter(item["path"] for item in open_rows)
     retained_evidence = magic_categories["data-payload"] + magic_categories["source-line"]
     reviewed = sum(row["status"] == "reviewed" for row in review)
     third_party = sum(row["status"] == "third-party" for row in review)
+    split = _image_split(open_rows)
     lines = [
         "# Constants audit",
         "",
-        "Generated by `homm2 constants`. Scores are not used; this inventory records source",
-        "locations and semantic context.",
+        "Generated by `homm2 verify constants`. Scores are not used; this inventory",
+        "records source locations and semantic context.",
         "",
         f"- Numeric tokens: {len(lexical)}",
         f"- Clang magic-number diagnostics: {len(magic)}",
-        f"- Pending actionable findings: {actionable}",
+        f"- Open findings: {len(open_rows)} (floor {floor if floor is not None else 'unset'}; "
+        f"game {split['game']}, shared {split['shared']}, editor {split['editor']})",
+        f"- Kept by config/constants.tsv: {len(keeps)} row(s)",
         f"- Retained payload/source evidence findings: {retained_evidence}",
         f"- Remaining numeric null-pointer spellings: {len(null_zero)}",
         f"- Files resolved: {reviewed + third_party}/{len(review)}",
@@ -311,85 +507,131 @@ def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
     lines.extend(["", "## Magic-number findings by context", "", "| context | occurrences |",
                   "|---|---:|"])
     lines.extend(f"| {name} | {count} |" for name, count in sorted(magic_categories.items()))
-    lines.extend(["", "## Review queue", "", "| file | actionable findings |", "|---|---:|"])
+    lines.extend(["", "## Review queue", "", "| file | open findings |", "|---|---:|"])
     lines.extend(f"| `{path}` | {count} |" for path, count in by_file.most_common())
     lines.append("")
     return "\n".join(lines)
 
 
-def run(*, jobs: int = 8, magic_log: Path | None = None,
-        null_log: Path | None = None) -> int:
+def run(*, jobs: int = 8, magic_log: Path | None = None, null_log: Path | None = None,
+        gate: bool = False, update_floor: bool = False, listing: str | None = None) -> int:
     lexical = [item for path in source_files() for item in lexical_inventory(path)]
     if magic_log is None or null_log is None:
         from homm2.lsp.compdb import main as generate_database
         generate_database()
+    # One census covers both programs: editor-only units are in the database
+    # with the editor's defines, and the shared units with editor-only code
+    # are read a second time as the editor; diagnostics are joined by site.
+    editor_view = _editor_view_database() if magic_log is None or null_log is None else None
+    views = [(DATABASE, SOURCE_PATTERN)]
+    if editor_view is not None:
+        views.append((EDITOR_DATABASE, editor_view))
+    magic_config = {
+        "CheckOptions": {
+            "readability-magic-numbers.IgnoredIntegerValues": "0;1;",
+            "readability-magic-numbers.IgnoredFloatingPointValues": "0.0;1.0;",
+        }
+    }
     if magic_log is None:
-        magic_log_text = _run_tidy("readability-magic-numbers", config={
-            "CheckOptions": {
-                "readability-magic-numbers.IgnoredIntegerValues": "0;1;",
-                "readability-magic-numbers.IgnoredFloatingPointValues": "0.0;1.0;",
-            }
-        }, jobs=jobs)
+        magic_log_text = "".join(
+            _run_tidy("readability-magic-numbers", config=magic_config, jobs=jobs,
+                      database=database, pattern=pattern)
+            for database, pattern in views)
     else:
         magic_log_text = magic_log.read_text(errors="replace")
     if null_log is None:
-        null_log_text = _run_tidy("modernize-use-nullptr", jobs=jobs)
+        null_log_text = "".join(
+            _run_tidy("modernize-use-nullptr", jobs=jobs, database=database, pattern=pattern)
+            for database, pattern in views)
     else:
         null_log_text = null_log.read_text(errors="replace")
 
     magic = _diagnostic_rows(magic_log_text, MAGIC_RE, lexical)
     null_rows = _diagnostic_rows(null_log_text, NULL_RE, lexical)
     null_zero = [item for item in null_rows if _is_zero_null_spelling(item["literal"])]
-    review = _review_rows(magic)
+    keeps, floor, worklist_errors = load_worklist()
+    review = _review_rows()
+    open_rows, stale = open_findings(magic, review, keeps)
+    premature = _premature(review, open_rows)
+    fields = ["path", "line", "column", "literal", "category", "owner", "context"]
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "magic-numbers.log").write_text(magic_log_text)
     (OUTPUT / "null-pointers.log").write_text(null_log_text)
     _write_tsv(OUTPUT / "literals.tsv",
-               ["path", "line", "column", "token", "category", "context"],
+               ["path", "line", "column", "token", "category", "owner", "context"],
                [item.__dict__ for item in lexical])
-    _write_tsv(OUTPUT / "magic-numbers.tsv",
-               ["path", "line", "column", "literal", "category", "context"], magic)
-    _write_tsv(OUTPUT / "null-zero.tsv",
-               ["path", "line", "column", "literal", "category", "context"], null_zero)
-    (OUTPUT / "README.md").write_text(_summary(lexical, magic, null_zero, review))
-    pending = {row["path"] for row in review if row["status"] == "pending"}
-    actionable = sum(item["path"] in pending
-                     and item["category"] in ("code", "local-table", "declaration")
-                     for item in magic)
+    _write_tsv(OUTPUT / "magic-numbers.tsv", fields, magic)
+    _write_tsv(OUTPUT / "null-zero.tsv", fields, null_zero)
+    _write_tsv(OUTPUT / "open.tsv", fields, open_rows)
+    (OUTPUT / "README.md").write_text(_summary(lexical, magic, null_zero, review, open_rows,
+                                               keeps, floor))
+    if listing is not None:
+        for item in open_rows:
+            if listing in item["path"] or listing in item["owner"]:
+                print(f"{item['path']}:{item['line']}:{item['column']}\t{item['owner']}\t"
+                      f"{item['literal']}\t{item['category']}\t{item['context']}")
+    split = _image_split(open_rows)
     print(f"[constants] numeric={len(lexical)} magic={len(magic)} "
-          f"actionable={actionable} null-zero={len(null_zero)}")
-    print("[constants] wrote build/constants/{README.md,literals.tsv,magic-numbers.tsv,null-zero.tsv}")
-    return 1 if null_zero else 0
+          f"null-zero={len(null_zero)}")
+    print(f"[constants] {len(open_rows)} open finding(s) (game {split['game']}, shared "
+          f"{split['shared']}, editor {split['editor']}); floor "
+          f"{floor if floor is not None else 'unset'} "
+          f"({WORKLIST.relative_to(REPO)}: {len(keeps)} kept row(s))")
+    print("[constants] wrote build/constants/{README.md,literals.tsv,magic-numbers.tsv,"
+          "null-zero.tsv,open.tsv}")
+    for error in worklist_errors:
+        print(f"   {error}")
+    for keep in stale:
+        print(f"   {WORKLIST.name}:{keep.line}: keeps no constant (stale row)")
+    for path in premature:
+        print(f"   {REVIEW_MANIFEST.relative_to(REPO)}: {path} is reviewed but has open findings")
+    if update_floor:
+        if floor is None or len(open_rows) < floor:
+            write_floor(WORKLIST, len(open_rows))
+            print(f"[constants] floor -> {len(open_rows)}")
+        return 0
+    failed = []
+    if null_zero:
+        failed.append(f"{len(null_zero)} null pointer(s) spelled 0")
+    if premature:
+        failed.append(f"{len(premature)} reviewed file(s) with open findings")
+    if floor is not None and len(open_rows) > floor:
+        failed.append(f"open findings rose {floor} -> {len(open_rows)}")
+    if stale or worklist_errors:
+        failed.append(f"{len(stale)} stale and {len(worklist_errors)} malformed "
+                      f"work-list row(s)")
+    if gate and failed:
+        print(f"[constants] FAIL: {'; '.join(failed)}")
+        return 1
+    return 0
 
 
 from homm2.core.usage import logged
 
 
 @logged
-def main(argv: list[str]) -> int:
-    jobs = 8
-    magic_log = None
-    null_log = None
-    index = 0
-    while index < len(argv):
-        argument = argv[index]
-        if argument in ("--jobs", "--magic-log", "--null-log") and index + 1 < len(argv):
-            value = argv[index + 1]
-            if argument == "--jobs":
-                jobs = int(value)
-            elif argument == "--magic-log":
-                magic_log = Path(value)
-            else:
-                null_log = Path(value)
-            index += 2
-            continue
-        print("usage: homm2 constants [--jobs N] [--magic-log FILE --null-log FILE]")
-        return 1
-    if (magic_log is None) != (null_log is None):
-        print("--magic-log and --null-log must be supplied together")
-        return 1
-    return run(jobs=jobs, magic_log=magic_log, null_log=null_log)
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="homm2 verify constants", description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--jobs", type=int, default=8, help="clang-tidy workers")
+    parser.add_argument("--magic-log", type=Path,
+                        help="reuse a readability-magic-numbers log (with --null-log)")
+    parser.add_argument("--null-log", type=Path,
+                        help="reuse a modernize-use-nullptr log (with --magic-log)")
+    parser.add_argument("--gate", action="store_true",
+                        help="fail on a null pointer spelled 0, a reviewed file with open "
+                             "findings, open findings above the floor, or stale rows")
+    parser.add_argument("--list", metavar="FILTER", nargs="?", const="",
+                        help="print the open findings whose file or owner contains FILTER")
+    parser.add_argument("--update-floor", action="store_true",
+                        help="lower the committed floor to the current open count")
+    args = parser.parse_args(argv)
+    if (args.magic_log is None) != (args.null_log is None):
+        parser.error("--magic-log and --null-log must be supplied together")
+    from homm2.core.paths import job_cap
+    return run(jobs=job_cap(args.jobs), magic_log=args.magic_log, null_log=args.null_log,
+               gate=args.gate, update_floor=args.update_floor, listing=args.list)
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())

@@ -32,7 +32,7 @@ GATES = {
     "link-diff": (["ninja", "link-diff"],
                   "historical link byte-identical within config/link_diff.tsv"),
     "image-link-diff": ([PY, "-m", "homm2.verify.link_diff"],
-                        "another image's link within its ceiling (pending until it links)"),
+                        "another image's link byte-identical within its ceiling"),
     "localization": ([PY, "-m", "homm2.graph.localization"],
                      "every used text ID resolves in the catalog"),
     "strict-allocations": ([PY, "-m", "homm2.verify.strict_allocations"],
@@ -69,8 +69,12 @@ GATES = {
     # Outside the build and the tier: known findings or reports.
     "text-coverage": ([PY, "-m", "homm2.verify.text_coverage"],
                       "every .text byte is claimed, padding or reviewed"),
-    "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4"],
-                  "numeric-literal inventory; no 0 spelled for a null pointer"),
+    "constants": ([PY, "-m", "homm2.verify.constants", "--jobs", "4", "--gate"],
+                  "open numeric constants within config/constants.tsv's floor; "
+                  "no 0 spelled for a null pointer"),
+    "enum-reuse": ([PY, "-m", "homm2.verify.enum_reuse"],
+                   "enum, #define and const values of both images vs the reuse "
+                   "review ledger (pending rows)"),
     "relocs": ([PY, "-m", "homm2.verify.assert_relocs"],
                "focused relocation review (`relocs 0x<rva>`)"),
     "od-frames": ([PY, "-m", "homm2.verify.od_frames"],
