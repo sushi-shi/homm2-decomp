@@ -143,7 +143,7 @@ H2_ENUM_BEGIN(EditRadarGeometry)
     EDIT_RADAR_OUTLINE_112 = 7
 H2_ENUM_END(EditRadarGeometry)
 
-// A large map's radar cells per map cell (three dots to two cells).
+// A large map's radar pixels per map cell (four dots to three cells).
 #define EDIT_RADAR_LARGE_SCALE 1.3333
 
 H2_ENUM_BEGIN(EditCellDrawing)
@@ -159,6 +159,7 @@ H2_ENUM_BEGIN(EditCellDrawing)
     EDIT_LAYER_LOW   = 0,
     // Clouds hide the map while the generator works: one of four tiles.
     EDIT_CLOUD_TILE_MASK = 3,
+    // Moves a cell's EDIT_CELL_FLIP_* bits onto the tile drawer's TILE_FLIP_*.
     EDIT_TILE_FLAG_SHIFT = 14
 H2_ENUM_END(EditCellDrawing)
 
@@ -13150,10 +13151,12 @@ void ShowStatusWarning(char* text) {
     gStatusTextClearTime = KBTickCount() + EDIT_STATUS_WARNING_MILLISECONDS;
 }
 
-// The ground tiles of each terrain and shape, plain and varied, indexed on
-// the first call.
+// Each terrain's chance, in percent before ChooseGroundTile's scale, that a
+// cell takes a varied tile.
 DATA(0x0047d73c)
 i32 gGroundVariantChance[TERRAIN_COUNT] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
+// The ground tiles of each terrain and shape, plain and varied, indexed on
+// the first call.
 #define gGroundTilesIndexed gGroundTilesIndexedStateField // spelling fixes .bss order
 DATA(0x004a3a54) b32 gGroundTilesIndexed;
 #define gGroundTiles gGroundTilesAreaHolder // spelling fixes .bss order
@@ -14095,8 +14098,8 @@ void editManager::CheckScreenScroll(void) {
 // Numbers the parts of every catalogue entry: each occupied grid cell takes
 // the next frame of its tileset (an animated one its animation's frames as
 // well), from where the entry's frameNumbering says (a shared entry starts
-// at the previous entry's first frame), and the entry's width is the widest
-// occupied row.
+// at the previous entry's first frame), and the entry's width is the grid
+// columns from its leftmost part to the grid's right edge.
 #define typeFirstFrame runFrame // frame-slot spelling
 VA(0x0040e3a2, 0x1a8)
 void FillInOverlayTiles(void) {

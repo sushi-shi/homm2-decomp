@@ -52,9 +52,9 @@ H2_ENUM_BEGIN(RandomMapConstant)
     RANDOM_MAP_ESCAPED_WALK      = 1000,
     RANDOM_MAP_SEED_LIMIT        = 20,
     // RemoveSmallRegions merges a region of at most this many cells, and
-    // scans neighbours against the largest map's last cell.
+    // bounds its neighbour scan by a medium map's last cell, whatever the size.
     RANDOM_MAP_SMALL_REGION_SIZE = 15,
-    RANDOM_MAP_LARGEST_LAST_CELL = 71,
+    RANDOM_MAP_MEDIUM_LAST_CELL = 71,
     // PlaceObstacleChains: a chain per this many land cells (scaled by the
     // density), each worth this many placements, a link costing this many;
     // a root with mountains or trees within RANDOM_MAP_CHAIN_SPACING cells
@@ -548,12 +548,12 @@ void editManager::RemoveSmallRegions(void) {
                         }
                         if (MAP_GRID_CELL(inRegion, x, y))
                             continue;
-                        if (x < RANDOM_MAP_LARGEST_LAST_CELL
+                        if (x < RANDOM_MAP_MEDIUM_LAST_CELL
                             && *(inRegion + x + 1 + y * MAP_WIDTH))
                             MAP_GRID_CELL(inRegion, x, y)++;
                         else if (x > 0 && *(inRegion + x - 1 + y * MAP_WIDTH))
                             MAP_GRID_CELL(inRegion, x, y)++;
-                        else if (y < RANDOM_MAP_LARGEST_LAST_CELL
+                        else if (y < RANDOM_MAP_MEDIUM_LAST_CELL
                                  && MAP_GRID_CELL(inRegion, x, y + 1))
                             MAP_GRID_CELL(inRegion, x, y)++;
                         else if (y > 0 && MAP_GRID_CELL(inRegion, x, y - 1))

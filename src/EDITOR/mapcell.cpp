@@ -14,7 +14,7 @@ H2_ENUM_BEGIN(MapCellExtraConstant)
 H2_ENUM_END(MapCellExtraConstant)
 
 #ifdef HOMM2_EDITOR
-// The scenario editor keeps one pool of MAPCELL_EXTRA_FREE extra records,
+// The scenario editor keeps one pool of EXTRA_POOL_SIZE extra records,
 // all free until used; Compact closes the gaps (through an index remap
 // table) and leaves EXTRA_COMPACT_SLACK free records after the last one.
 H2_ENUM_BEGIN(EditMapExtraConstant)
@@ -343,7 +343,8 @@ void fullMap::RemoveExtraOverlay(i32 index) {
 }
 #undef nextExtraIndex
 
-// The overlay counterpart of RemoveCellObject.
+// The overlay counterpart of RemoveCellObject. As in RemoveExtraOverlay, the
+// retail check reads the record's overlay twice and never its object part.
 #define nextExtraIndex ni // frame-slot spelling
 VA_AT(editor, 0x004184aa, 0x163)
 void fullMap::RemoveCellOverlay(i32 x, i32 y) {

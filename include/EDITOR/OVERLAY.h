@@ -86,7 +86,7 @@ struct overlayType {
     // The type's catalogue index, which the editor compares types by.
     i32 id;
     // The catalogue's group key: the type's own id, the first of a run of
-    // variants (the town shadows) or 5001 (the mountain fillers). The editor
+    // variants (the town shadows) or 5001 (the mountain tilesets' mines). The editor
     // never reads it.
     i32 group;
     // The picker's sort key within a class.
@@ -95,7 +95,7 @@ struct overlayType {
     i8 tileset;
     // OverlayCategory.
     i8 category;
-    // How often ScatterDecorations picks it, in tenths of a percent.
+    // How often ScatterDecorations picks it, in percent.
     u16 frequency;
     // The frames an animated part runs through after its own.
     u8 animationFrames;
@@ -114,8 +114,8 @@ struct overlayType {
     OverlayGrid animatedRows;
     // The cells a resource marker goes on (OVERLAY_FLAG_SHOWS_RESOURCE).
     OverlayGrid resourceRows;
-    // A town's or hero's player colour (OVERLAY_NO_COLOR: none); a resource
-    // marker's resource.
+    // A town's or hero's player colour (OVERLAY_NO_COLOR: none); a mine's
+    // resource, the marker (from OVERLAY_RESOURCE_MARKERS) its resource cells show.
     u8 color;
     // OverlayTypeFlag.
     u8 flags;

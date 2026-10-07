@@ -134,13 +134,13 @@ i32 InMapArea(i32 x, i32 y);
 // Numbers the parts of every catalogue entry (gOverlayTypes) by the frames
 // of its tileset.
 void FillInOverlayTiles(void);
-// Whether a cell's object (its trigger) keeps a map-extra record, and
-// freeing one record (the later ones and their users move down).
-b32 HasExtraObjectData(i32 triggerType);
 // Whether a cell's object (its trigger type) has a detail editor: towns,
 // signs, bottles, events, sphinxes, monsters, the ultimate artifact, heroes
 // and jails.
 b32 LocationHasSpecialDetails(i32 triggerType);
+// Whether a cell's object (its trigger) keeps a map-extra record, and
+// freeing one record (the later ones and their users move down).
+b32 HasExtraObjectData(i32 triggerType);
 void DeleteExtraObjectData(u32 index);
 // Counts the players who may play and gives each one its faction.
 void CalculatePlayerNumbers(void);

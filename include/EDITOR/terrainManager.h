@@ -16,8 +16,8 @@ class textWidget;
 struct tag_message;
 
 H2_ENUM_BEGIN(TerrainBrushSize)
-    // editManager::m_brushSize: the brush's width in cells, or 1 for the
-    // dragged rectangle (whose cells the selection holds).
+    // editManager::m_brushSize: the brush's width in cells (0 for a single
+    // cell), or 1 for the dragged rectangle (whose cells the selection holds).
     TERRAIN_BRUSH_SIZE_SINGLE    = 0,
     TERRAIN_BRUSH_SIZE_AREA      = 1,
     TERRAIN_BRUSH_SIZE_DOUBLE    = 2,

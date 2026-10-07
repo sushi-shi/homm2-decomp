@@ -90,7 +90,7 @@ i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, H2_CONST char* file, i32 line);
 // Gold 2.1 abandoned the file/line debug allocator: BaseAlloc/BaseFree are
 // still compiled into Misc but have zero retail callers - every allocation
-// site lowers to plain operator new/delete (435/524 direct calls image-wide).
+// site lowers to plain operator new/delete.
 #define H2_ALLOC(size) static_cast<void*>(new u8[size])
 #define H2_FREE(ptr) delete (ptr)
 // Both operands must be stable. Allocation does not free an old destination.

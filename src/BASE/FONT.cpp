@@ -217,8 +217,8 @@ i32 font::GetCharacterWidth(u8 character) {
 #endif
 
 // Buka's Cyrillic line breaker. Retail compares the zero-extended byte, so
-// like RemapCyrillicCharacter the CP1251 codes stay numeric: with a u8
-// parameter a signed CP1251 'а' byte would compare -32 against 224 and never match.
+// like RemapCyrillicCharacter the CP1251 codes stay numeric: through a plain
+// char a signed CP1251 'а' byte would compare -32 against 224 and never match.
 static inline bool IsVowel(u8 c) {
     return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y'
         || c == 0xe0 /* а */ || c == 0xe5 /* е */ || c == 0xb8 /* ё */

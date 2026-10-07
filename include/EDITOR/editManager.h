@@ -203,7 +203,8 @@ public:
     // Redraws the rulers' cursor marks.
     void UpdateCursor(void);
     void DrawRulers(i32 viewX, i32 viewY, i32 cursorX, i32 cursorY);
-    // Turns screen coordinates into the map cell under them (clamped).
+    // Turns screen coordinates into the view cell under them (clamped);
+    // callers add the view origin.
     void ScreenToCell(i32& x, i32& y);
     // Redraws the map view at the current view origin.
     void DrawMap(void);
@@ -220,12 +221,12 @@ public:
     void DoVerticalKnob(void);
     // Moves the scroll knobs to the view origin (and redraws them).
     void UpdateKnobs(b32 updateScreen);
-    // The save checks: CheckObjects reports objects that cannot work, the
-    // Count helpers count map objects and the Write helpers write the map
-    // file's tables (and report what does not fit).
     // The map's texts to and from its .TXT (for translating).
     void ExportMapText(void);
     bool ImportMapText(void);
+    // The save checks: CheckObjects reports objects that cannot work, the
+    // Count helpers count map objects and the Write helpers write the map
+    // file's tables (WriteObelisks reports what does not fit).
     void CheckObjects(void);
     // Before a save: compacts the extras and gives every cell the trigger
     // of its catalogue type, its coast and its line flags.
