@@ -3143,6 +3143,7 @@ void ShutDown(const char* message) {
     } else {
         utf8::Copy(buffer, sizeof(buffer), localization::Tr("system.goodbye"));
     }
+    ironfist::runtime::Shutdown();
     ShutDownSmacker();
     ClearMapExtra();
     UnloadSystemwideIcons();
@@ -3167,7 +3168,6 @@ void ShutDown(const char* message) {
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
-    ironfist::runtime::Shutdown();
     CleanUpWinGraphics();
     CleanUpMenus();
     PrintMemoryLeaks();

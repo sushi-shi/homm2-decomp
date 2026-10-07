@@ -41,7 +41,8 @@ def main():
         data = temp / "data"
         modules = data / "SCRIPTS" / "MODULES"
         modules.mkdir(parents=True)
-        (modules / "binding.lua").write_text("")
+        binding = Path(__file__).resolve().parent.parent / "scripts" / "ironfist" / "binding.lua"
+        (modules / "binding.lua").write_text(binding.read_text())
         env = dict(os.environ, HOMM2_DATA=str(data), XDG_DATA_HOME=str(temp / "user"),
                    SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy")
         subprocess.run([str(executable)], cwd=temp, env=env, check=True, timeout=30)

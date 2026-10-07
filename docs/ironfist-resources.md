@@ -48,7 +48,12 @@ portable engine's expected name `MUSIC/Track44.ogg`. The portable audio path
 plays that Ogg directly, so the generated aggregate does not need a copied
 retail `MIDI0044.XMI` placeholder.
 
-No resource data is committed to this repository. The fetched source and built
+Packaging installs the maintained `scripts/ironfist/binding.lua` module.
+Object properties are provided by native typed handles; the module exports
+`isValid` for references retained by scripts. The aggregate is unaffected.
+
+No upstream asset data is committed to this repository. The maintained Lua
+binding adapter is engine source. The fetched source and built
 payload do exist in the user's Nix store. They are not included in the game
 package or uploaded anywhere by this repository. The upstream resources retain
 Project Ironfist's terms. The Heroes II retail aggregates are checked for
