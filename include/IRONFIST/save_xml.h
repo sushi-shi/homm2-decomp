@@ -4,24 +4,24 @@
 #include <string>
 
 #include <Ints.h>
-#include <IRONFIST/scripting.h>
+#include <IRONFIST/session.h>
 #include <IRONFIST/xml_utils.h>
 
 namespace ironfist::save {
 
 /*
- * Ironfist's XML save format: the whole game object graph plus the
- * Ironfist-only state (script text, map variables, vision/chase/ban state,
- * generated artifacts). Element names match upstream Ironfist saves; the
- * calendar-event index tables are written at the recovered widths, and
- * unknown elements are ignored on load.
+ * Codec for detached SessionData. Reading allocates only value-owned storage
+ * and leaves the running game, scripts, and managers untouched. The runtime
+ * applies the decoded records and controls initialization separately.
  */
 class XmlFile : public xml::XMLFile {
 public:
-    tinyxml2::XMLError Save(const char* fileName);
-    tinyxml2::XMLError Read(const char* fileName);
+    tinyxml2::XMLError Save(const char* fileName, const SessionData& data);
+    tinyxml2::XMLError Read(const char* fileName, SessionData& data);
+    const char* GetError();
 
 private:
+    std::string decodeError;
     template <typename T, size_t M, size_t N>
     void WriteCampaignDDArray(
         tinyxml2::XMLDocument* doc, tinyxml2::XMLNode* dest, const char* name, const T (&src)[M][N]
@@ -40,16 +40,16 @@ private:
     void WriteMapVarTable(
         tinyxml2::XMLNode* dest, const std::string& id, const script::LuaTable& table
     );
-    void WriteMapVariables(tinyxml2::XMLNode* dest);
-    void ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType);
-    void ReadCampaignSavedHero(tinyxml2::XMLNode* root);
-    void ReadMapHeader(tinyxml2::XMLNode* root);
-    void ReadMap(tinyxml2::XMLNode* root);
-    void ReadMapExtra(tinyxml2::XMLNode* root);
-    void ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex);
-    void ReadHero(tinyxml2::XMLNode* root, i32 heroIndex);
-    void ReadTown(tinyxml2::XMLNode* root, i32 townIdx);
-    void ReadRoot(tinyxml2::XMLNode* root);
+    void WriteMapVariables(tinyxml2::XMLNode* dest, const SessionData& data);
+    void ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType, SessionData& data);
+    void ReadCampaignSavedHero(tinyxml2::XMLNode* root, SessionData& data);
+    void ReadMapHeader(tinyxml2::XMLNode* root, SessionData& data);
+    void ReadMap(tinyxml2::XMLNode* root, SessionData& data);
+    void ReadMapExtra(tinyxml2::XMLNode* root, SessionData& data);
+    void ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex, SessionData& data);
+    void ReadHero(tinyxml2::XMLNode* root, i32 heroIndex, SessionData& data);
+    void ReadTown(tinyxml2::XMLNode* root, i32 townIdx, SessionData& data);
+    void ReadRoot(tinyxml2::XMLNode* root, SessionData& data);
 };
 
 // Campaign types as Ironfist's saves spell them.
@@ -59,10 +59,6 @@ enum CampaignType {
     CAMPAIGN_EXPANSION = 2
 };
 
-i32 GetCampaignType();
-b32 LoadGame(const char* fileName, i32 loadFromFile);
-i32 SaveGame(const char* saveFile, i32 autosave);
-std::string FileExtension(b32 isPickLoad);
 
 } // namespace ironfist::save
 

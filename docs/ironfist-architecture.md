@@ -23,7 +23,7 @@ fully qualified calls at the boundary; they do not import the namespace.
 | `ironfist::runtime` | process startup/shutdown and map lifecycle | game rules |
 | `ironfist::hooks` | optional Lua callback dispatch and result adaptation | unconditional mechanics |
 | `ironfist::script` | Lua states, registration, bindings, map variables | host object policy |
-| `ironfist::save` | the compatible Ironfist XML format | game simulation |
+| `ironfist::save` | XML encoding/decoding of detached `SessionData` | live game mutation or lifecycle |
 | `ironfist::state` | extension state which cannot enter a recovered retail layout | duplicate retail object state |
 
 Hooks are reserved for optional extension points. A rule that applies even
@@ -42,8 +42,34 @@ that rule.
 | disabled-Well weekly growth | `game::PerWeek` |
 | shared hero-pool mobility refresh | `game::NextPlayer` |
 
-Lua handlers call these owner methods. Save loading also restores policy through
-the owner methods rather than duplicating mechanics in persistence code.
+Lua handlers call these owner methods. The runtime restores complete policy
+snapshots after script defaults; the persistence codec only reads and writes
+their values.
+
+## Session lifecycle
+
+`SessionData` owns the persistent record values, world cell/extra vectors,
+visibility, object payloads, script source and variables, and extension policy.
+It contains no manager/window pointers or owning engine allocations. The shared
+record field list defines which recovered values cross this boundary and leaves
+UI state out of snapshot transfers.
+
+The XML codec decodes into a temporary snapshot. It checks dimensions and record
+indices without changing the active game, and publishes the snapshot only when
+decoding succeeds. Parsing failures return to the caller without terminating the
+process or partially replacing the world.
+
+`runtime::RestoreSession` prepares tracked engine storage, disables callbacks,
+replaces records, establishes the current player, initializes scripts, and
+restores saved variables and policy in that order. AI army sharing and building
+bans follow the same policy phase as vision and forced chases. File-format
+dispatch, save naming, post-load UI setup, and binary-loader completion belong
+to the runtime/engine boundary.
+
+The runtime tracks idle, new-map preparation, restoration, and ready phases.
+`AdventureManagerReady` dispatches initial map/day callbacks only for a newly
+prepared map and marks it ready before invoking user code. Loading a session
+does not infer this lifecycle from a special save filename.
 
 The disabled-Well calculation deliberately remains after neutral growth and AI
 difficulty scaling. That is where the original Ironfist post-processing took

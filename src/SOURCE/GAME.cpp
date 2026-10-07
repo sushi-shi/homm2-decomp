@@ -1072,7 +1072,7 @@ i32 game::GetMineId(i32 column, i32 row) {
 }
 
 i32 game::SaveGame(const char* filename, i32 generateName, i8) {
-    return ironfist::save::SaveGame(filename, generateName);
+    return ironfist::runtime::SaveGame(filename, generateName);
 }
 
 void game::SetupOrigData(void) {
@@ -1236,7 +1236,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     i32 wide;
 
     LogStr("LG1");
-    if (ironfist::save::LoadGame(filename, !loadFromFile))
+    if (ironfist::runtime::LoadGame(filename, !loadFromFile) != ironfist::runtime::LoadResult::Retail)
         return;
     if (loadFromFile) {
         SetupOrigData();
@@ -1443,6 +1443,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     LogStr("LG3");
     // Stable marker for external checks (tools/gameplay_roundtrip.py).
     platform::Host().Log(platform::LogLevel::Info, "save: loaded");
+    ironfist::runtime::RetailGameLoaded();
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
