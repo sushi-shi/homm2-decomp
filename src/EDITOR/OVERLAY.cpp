@@ -15,6 +15,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <BASE/icon2bs.h>
+#include <BASE/icon2bsd.h>
 #include <BASE/Iconm2b.h>
 #include <BASE/IconDraw.h>
 #include <BASE/IconEntry.h>
@@ -1030,7 +1031,7 @@ void overlayManager::DrawOverlay(
                         && y + (gridY - fromY) * tileSize >= EDIT_VIEW_ORIGIN
                         && y + (gridY - fromY + 1) * tileSize <= EDIT_VIEW_END))) {
                 if (type->tileset == TILESET_MINIHERO)
-                    IconToBitmapScaleShadow(
+                    IconToBitmapScaleDouble(
                         gEditManager->m_objectIcons[type->tileset][0],
                         gpWindowManager->m_screen,
                         x + (gridX - fromX) * tileSize,

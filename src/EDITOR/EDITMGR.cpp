@@ -26,9 +26,11 @@
 #include <BASE/font.h>
 #include <BASE/bmap2.h>
 #include <BASE/icon2bs.h>
+#include <BASE/icon2bsd.h>
 #include <BASE/IconEntry.h>
 #include <BASE/Misc.h>
 #include <BASE/TILE.h>
+#include <BASE/tile2bs.h>
 #include <BASE/icon.h>
 #include <BASE/tileset.h>
 #include <BASE/heroWindow.h>
@@ -11175,7 +11177,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         gZoomCellSize[m_zoomLevel]
                     );
                 else if (gDrawCell->m_objectTileset == TILESET_MINIHERO)
-                    IconToBitmapScaleShadow(
+                    IconToBitmapScaleDouble(
                         m_objectIcons[gDrawCell->m_objectTileset][0],
                         gpWindowManager->m_screen,
                         gDrawX,
@@ -11249,7 +11251,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                             gZoomCellSize[m_zoomLevel]
                         );
                     else if (gDrawExtra->objectTileset == TILESET_MINIHERO)
-                        IconToBitmapScaleShadow(
+                        IconToBitmapScaleDouble(
                             m_objectIcons[gDrawExtra->objectTileset][0],
                             gpWindowManager->m_screen,
                             gDrawX,

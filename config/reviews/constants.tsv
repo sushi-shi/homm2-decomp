@@ -42,7 +42,7 @@ include/BASE/heroWindowManager.h	pending
 include/BASE/icon.h	pending	
 include/BASE/icon2bc.h	pending	
 include/BASE/icon2bs.h	pending	
-include/BASE/icon2bss.h	pending	
+include/BASE/icon2bsd.h	pending	
 include/BASE/icon2by.h	pending	
 include/BASE/iconWidget.h	pending	
 include/BASE/iconf2bc.h	pending	
@@ -193,7 +193,7 @@ src/BASE/bmap2.cpp	pending
 src/BASE/droplist.cpp	pending	
 src/BASE/icon2bc.cpp	pending	
 src/BASE/icon2bs.cpp	pending	
-src/BASE/icon2bss.cpp	pending	
+src/BASE/icon2bsd.cpp	pending	
 src/BASE/icon2by.cpp	pending	
 src/BASE/iconf2bc.cpp	pending	
 src/BASE/iconf2by.cpp	pending	

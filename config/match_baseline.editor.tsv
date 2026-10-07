@@ -313,7 +313,7 @@ BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	ee512841a99
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	a20e3ef2d96b
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	100.0000	a78a4e25043a
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	2f15e51ccbc5
-BASE/icon2bss	?IconToBitmapScaleShadow@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	3b0e7fd2912c
+BASE/icon2bsd	?IconToBitmapScaleDouble@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	100.0000	fb3bff315d2a
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	a5fd52c40400
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	100.0000	1a5f535828f9
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	d46d700c890a
@@ -384,7 +384,7 @@ EDITOR/EDITMGR	?DeleteExtraObjectData@@YIXI@Z	100.0000	99d5b79115ce
 EDITOR/EDITMGR	?DoHorizontalKnob@editManager@@QAEXXZ	100.0000	429b480f89a0
 EDITOR/EDITMGR	?DoRadar@editManager@@QAEXXZ	100.0000	81a92defa8f4
 EDITOR/EDITMGR	?DoVerticalKnob@editManager@@QAEXXZ	100.0000	e4473a91bc59
-EDITOR/EDITMGR	?DrawCell@editManager@@QAEXHHHHH@Z	100.0000	b005080e0113
+EDITOR/EDITMGR	?DrawCell@editManager@@QAEXHHHHH@Z	100.0000	3526c6e84841
 EDITOR/EDITMGR	?DrawMap@editManager@@QAEXXZ	100.0000	9f349b2bd6af
 EDITOR/EDITMGR	?DrawRadar@editManager@@QAEXH@Z	100.0000	ba772d1a1771
 EDITOR/EDITMGR	?DrawRulers@editManager@@QAEXHHHH@Z	100.0000	725f28b67d60
@@ -493,7 +493,7 @@ EDITOR/OVERLAY	?CanPlaceOverlay@@YIHPAUoverlayType@@HHH@Z	100.0000	72ff9c50690c
 EDITOR/OVERLAY	?Close@overlayManager@@UAEXXZ	100.0000	fa8b82f0d157
 EDITOR/OVERLAY	?DragPickerKnob@overlayManager@@QAEXHHH@Z	100.0000	89f6ed7d20b3
 EDITOR/OVERLAY	?DrawFootprint@overlayManager@@QAEXHHHHPAUoverlayType@@H@Z	100.0000	2a7cbb39bc8d
-EDITOR/OVERLAY	?DrawOverlay@overlayManager@@QAEXPAUoverlayType@@HHHHHHHH@Z	100.0000	e8ee67630376
+EDITOR/OVERLAY	?DrawOverlay@overlayManager@@QAEXPAUoverlayType@@HHHHHHHH@Z	100.0000	f1441476bcf2
 EDITOR/OVERLAY	?DrawPicker@overlayManager@@QAEXH@Z	100.0000	480708ca841d
 EDITOR/OVERLAY	?DrawSelectedOverlay@overlayManager@@QAEXXZ	100.0000	3f4aa74c9bdc
 EDITOR/OVERLAY	?LoadClass@overlayManager@@QAEHH@Z	100.0000	fbfb53892201
