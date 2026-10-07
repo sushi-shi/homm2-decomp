@@ -17,7 +17,6 @@ typedef enum ButtonHotkeyConstant {
 } ButtonHotkeyConstant;
 
 typedef enum ButtonConstant {
-    RESOURCE_NAME_CAPACITY = 16,
     REPEAT_DELAY_TICKS     = 60
 } ButtonConstant;
 
@@ -75,7 +74,7 @@ button::button(
 }
 
 void button::Read(void) {
-    char iconName[RESOURCE_NAME_CAPACITY];
+    char iconName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();

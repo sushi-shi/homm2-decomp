@@ -115,6 +115,17 @@ typedef enum InputManagerCapacity {
     INPUT_SCAN_CODE_CAPACITY  = 128
 } InputManagerCapacity;
 
+
+typedef enum InputKeyCodeEncoding {
+    INPUT_KEY_CODE_CHARACTER_MASK = 0xff,
+    INPUT_KEY_CODE_SCAN_SHIFT     = 8,
+    INPUT_KEY_CODE_SCAN_MASK      = 0xff00,
+    INPUT_KEY_CODE_FIRST_SCAN     = 0x100,
+    INPUT_KEY_CODE_ENTER          = '\n',
+    INPUT_KEY_CODE_ESCAPE         = 0x1b,
+    INPUT_KEY_CODE_DELETE         = 0x7f
+} InputKeyCodeEncoding;
+
 #pragma pack(push, 1)
 class inputManager H2_FINAL : public baseManager {
 public:

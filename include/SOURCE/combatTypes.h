@@ -143,6 +143,7 @@ typedef enum CombatMissileAnimationConstant {
     COMBAT_MISSILE_HALF_HEIGHT = 25,
     COMBAT_MISSILE_SPACING     = 31,
     COMBAT_MISSILE_TIMER_DELAY = 25,
+    COMBAT_MISSILE_DIAMETER_MULTIPLIER = 2,
 } CombatMissileAnimationConstant;
 
 typedef enum CombatDirectionMask {

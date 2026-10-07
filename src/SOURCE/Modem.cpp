@@ -56,13 +56,13 @@ void ModemSetup(i32 mode) {
 
     LogStr("MS3");
     switch (mode) {
-        case MODEM_MODE_DIAL:
+        case H2EnumIndex(REMOTE_GAME_MODEM_HOST):
             if (gbDirectConnect == 0 && Dial() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;
             }
             break;
-        case MODEM_MODE_WAIT:
+        case H2EnumIndex(REMOTE_GAME_MODEM_GUEST):
             if (gbDirectConnect == 0 && Wait() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;

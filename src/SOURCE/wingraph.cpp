@@ -11,6 +11,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
+#include <SOURCE/ADVMGR.h>
 #include <BASE/display.h>
 
 #ifdef HOMM2_EDITOR
@@ -19,7 +20,6 @@
 #endif
 
 typedef enum WingraphPaletteConstant {
-    PALETTE_VALUE_SHIFT = 2,
     SYSTEM_PALETTE_REGION_COUNT = 2
 } WingraphPaletteConstant;
 
@@ -175,12 +175,12 @@ i32 DDAppPaint(HWND window, HDC paintDC [[maybe_unused]]) {
         sourceLeft = CLIENT_TO_GAME_X(gDDDestinationRect.left);
         sourceTop = CLIENT_TO_GAME_Y(gDDDestinationRect.top);
         if (giScrollX != 0) {
-            sourceLeft = giScrollX + WINGRAPH_SCROLL_MARGIN;
-            sourceWidth = WINGRAPH_SCROLL_SIZE;
+            sourceLeft = giScrollX + ADVENTURE_VIEW_BORDER;
+            sourceWidth = ADVENTURE_VIEW_SIZE;
         }
         if (giScrollY != 0) {
-            sourceTop = giScrollY + WINGRAPH_SCROLL_MARGIN;
-            sourceHeight = WINGRAPH_SCROLL_SIZE;
+            sourceTop = giScrollY + ADVENTURE_VIEW_BORDER;
+            sourceHeight = ADVENTURE_VIEW_SIZE;
         }
         gDDSourceRect.left = sourceLeft;
         gDDSourceRect.right = sourceLeft + sourceWidth - 1;

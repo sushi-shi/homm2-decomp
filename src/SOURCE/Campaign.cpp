@@ -12,6 +12,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SMACKMGR.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
@@ -20,10 +21,6 @@
 #include <SOURCE/Campaign.h>
 #include <BASE/dialog.h>
 #include <SOURCE/GAME.h>
-
-typedef enum CampaignNotification {
-    CAMPAIGN_MESSAGE_ACTIVATE = H2EnumIndex(WIDGET_NOTIFY_DESELECT)
-} CampaignNotification;
 
 typedef enum CampaignScenarioArmyCount {
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
@@ -36,38 +33,6 @@ typedef enum CampaignScenarioArmyCount {
     NECROMANCER_MUMMY_COUNT    = 18,
     NECROMANCER_VAMPIRE_COUNT  = 8
 } CampaignScenarioArmyCount;
-
-typedef enum CampaignSmacker {
-    SMACKER_ROLAND_INTRO    = 5,
-    SMACKER_ROLAND_1        = 6,
-    SMACKER_ROLAND_2        = 7,
-    SMACKER_ROLAND_3A       = 8,
-    SMACKER_ROLAND_3B       = 9,
-    SMACKER_ROLAND_4        = 10,
-    SMACKER_ROLAND_5A       = 11,
-    SMACKER_ROLAND_5B       = 12,
-    SMACKER_ROLAND_6        = 13,
-    SMACKER_ROLAND_7        = 14,
-    SMACKER_ROLAND_8        = 15,
-    SMACKER_ROLAND_9        = 16,
-    SMACKER_ROLAND_END      = 18,
-    SMACKER_ARCHIBALD_INTRO = 19,
-    SMACKER_ARCHIBALD_1     = 20,
-    SMACKER_ARCHIBALD_2     = 21,
-    SMACKER_ARCHIBALD_3     = 22,
-    SMACKER_ARCHIBALD_4A    = 23,
-    SMACKER_ARCHIBALD_4B    = 24,
-    SMACKER_ARCHIBALD_4_END = 25,
-    SMACKER_ARCHIBALD_5A    = 26,
-    SMACKER_ARCHIBALD_5B    = 27,
-    SMACKER_ARCHIBALD_6     = 28,
-    SMACKER_ARCHIBALD_7A    = 29,
-    SMACKER_ARCHIBALD_7B    = 30,
-    SMACKER_ARCHIBALD_8     = 31,
-    SMACKER_ARCHIBALD_9     = 32,
-    SMACKER_ARCHIBALD_10    = 33,
-    SMACKER_ARCHIBALD_END   = 34
-} CampaignSmacker;
 
 typedef enum CampaignMapIndex {
     MAP_ONE      = 0,
@@ -119,8 +84,6 @@ enum class CampaignTrackType : i32 {
 using enum CampaignTrackType;
 
 typedef enum CampaignTrackConstant {
-    TRACK_X                          = 0,
-    TRACK_Y                          = 1,
     TRACK_ICON_FILL_COLOR            = 1,
     TRACK_SELECTED_FRAME_ONE_STEP    = 3,
     TRACK_SELECTED_FRAME_TWO_STEPS   = 6,
@@ -395,7 +358,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     tag_message message;
     i32 trackMapIndex;
 
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
     gbUseEvilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
@@ -429,16 +392,16 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             continue;
         if (iCampaignTrackType == SWITCH_TO_ARCHIBALD_OPEN && mapIndex == MAP_TWELVE)
             continue;
-        if (trackXY[H2EnumIndex(iCurViewSide)][mapIndex][TRACK_X] != -1) {
+        if (trackXY[H2EnumIndex(iCurViewSide)][mapIndex][H2EnumIndex(COORDINATE_AXIS_X)] != -1) {
             trackMapIndex = mapIndex;
             if (trackMapIndex > CAMPAIGN_REGULAR_MAP_COUNT)
                 trackMapIndex = CAMPAIGN_REGULAR_MAP_COUNT;
             trackWidget = new iconWidget(
                 trackXY[H2EnumIndex(mapIndex < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
-                                                               : m_campaignType)][mapIndex][TRACK_X]
+                                                               : m_campaignType)][mapIndex][H2EnumIndex(COORDINATE_AXIS_X)]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
                 trackXY[H2EnumIndex(mapIndex < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
-                                                               : m_campaignType)][mapIndex][TRACK_Y]
+                                                               : m_campaignType)][mapIndex][H2EnumIndex(COORDINATE_AXIS_Y)]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
                 CAMPAIGN_TRACK_ICON_SIZE,
                 CAMPAIGN_TRACK_ICON_SIZE,
@@ -463,7 +426,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
-        m_campaignType == CAMPAIGN_ROLAND ? CAMPAIGN_GOOD_MUSIC : CAMPAIGN_EVIL_MUSIC
+        m_campaignType == CAMPAIGN_ROLAND ? MUSIC_TRACK_CAMPAIGN_GOOD : MUSIC_TRACK_CAMPAIGN_EVIL
     );
     CampaignInfoUpdate(0);
     gpWindowManager->DoDialog(campWin, CampaignHandler, 0);
@@ -473,7 +436,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
             localization::Tr("campaign.confirm.restart_scenario"),
-            CAMPAIGN_RESTART_CONFIRM
+            NORMAL_DIALOG_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitCampaignMap();
@@ -753,7 +716,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                 }
                 break;
 
-            case BaseWidgetCommand(CAMPAIGN_MESSAGE_ACTIVATE):
+            case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case CAMPAIGN_DIALOG_REPLAY:
                         gpGame->PlayPreScenarioSmacker(iCurViewSide, iCurViewMap);
@@ -1075,7 +1038,7 @@ void game::InitCampaignMap(void) {
 }
 
 i16 trackXY[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
-                                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
+                                  [H2EnumIndex(COORDINATE_AXIS_COUNT)] = {
     {{39, 336},
      {113, 336},
      {150, 294},

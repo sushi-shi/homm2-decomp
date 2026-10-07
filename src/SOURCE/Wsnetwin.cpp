@@ -265,7 +265,7 @@ i32 wsnet_snd(i32 destination, i32 size, void* data) {
     i32 result [[maybe_unused]];
 
     wsProcessMessages();
-    if (destination != WS_TRANSPORT_BROADCAST_POSITION)
+    if (destination != REMOTE_BROADCAST_PLAYER)
         wsSendMessage(
             giNetPosToDCOPos[destination],
             NETWORK_PACKET_DATA,
@@ -286,7 +286,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
     H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail]);
-    iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
+    iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
 

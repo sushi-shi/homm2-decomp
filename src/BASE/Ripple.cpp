@@ -19,7 +19,8 @@ typedef enum RippleConstant {
     REDRAW_RADIUS = 18,
     REDRAW_WIDTH  = 37,
     SWEEP_STEP    = 4,
-    SWEEP_END     = LOGICAL_SCREEN_WIDTH + PROFILE_RADIUS
+    SWEEP_END     = LOGICAL_SCREEN_WIDTH + PROFILE_RADIUS,
+    SWEEP_FRAME_TICKS = 9
 } RippleConstant;
 
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
@@ -44,7 +45,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     for (sweepPosition = -PROFILE_RADIUS; sweepPosition < SWEEP_END; sweepPosition += step) {
         PollSound();
         deadline =
-            KBTickCount() + static_cast<i32>(9.0f * gfCombatSpeedMod[gConfig.combatSpeed]);
+            KBTickCount() + static_cast<i32>(static_cast<float>(SWEEP_FRAME_TICKS) * gfCombatSpeedMod[gConfig.combatSpeed]);
 
         for (index = 0; index <= PROFILE_SIZE - 1; index++) {
             column = sweepPosition + index - PROFILE_RADIUS;

@@ -32,17 +32,16 @@ static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT] = {};
 
 namespace {
 
-
     inline i32 MilesSampleFormat(SamplePlaybackData* sampleData) {
         if (sampleData->sampleFormat != FORMAT_8_BIT) {
             if (sampleData->stereo != 0)
-                return 3;
+                return MILES_DIG_F_STEREO_16;
             else
-                return 1;
+                return MILES_DIG_F_MONO_16;
         } else if (sampleData->stereo != 0) {
-            return 2;
+            return MILES_DIG_F_STEREO_8;
         } else {
-            return 0;
+            return MILES_DIG_F_MONO_8;
         }
     }
 

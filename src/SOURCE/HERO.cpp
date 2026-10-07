@@ -171,7 +171,6 @@ typedef enum HeroMobilityConstant {
     COMPASS_MOBILITY_BONUS = 500,
     NOMAD_BOOTS_MOBILITY_BONUS = 600,
     TRAVELER_BOOTS_MOBILITY_BONUS = 300,
-    STABLES_MOBILITY_BONUS = 400,
     AI_DIFFICULTY_MOBILITY_BONUS = 75,
     AI_STATE_MOBILITY_BONUS = 50
 } HeroMobilityConstant;
@@ -575,12 +574,12 @@ void hero::Deallocate(i32 updateMap) {
             availSlot = 1 - availSlot;
         }
         if (gpGame->m_availableHeroes[gpGame->m_players[H2EnumIndex(m_owner)].m_availableHeroIds[availSlot]]
-            == HERO_AVAILABILITY_RETREATED) {
+            == HERO_AVAILABILITY_FOR_HIRE) {
             gpGame->m_availableHeroes[gpGame->m_players[H2EnumIndex(m_owner)].m_availableHeroIds[availSlot]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
         gpGame->m_players[H2EnumIndex(m_owner)].m_availableHeroIds[availSlot] = m_id;
-        gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
+        gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_FOR_HIRE;
         m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | H2EnumIndex(HERO_EVENT_RESERVED_FOR_RECRUITMENT));
     }
 

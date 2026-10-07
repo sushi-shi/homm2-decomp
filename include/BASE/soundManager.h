@@ -10,6 +10,40 @@ typedef enum MidiTrackConstant {
     MIDI_TRACK_COUNT = 60
 } MidiTrackConstant;
 
+
+typedef enum MusicTrack {
+    MUSIC_TRACK_BATTLE_FIRST     = 2,
+    MUSIC_TRACK_BATTLE_LAST      = 4,
+    MUSIC_TRACK_SORCERESS_TOWN   = 5,
+    MUSIC_TRACK_WARLOCK_TOWN     = 6,
+    MUSIC_TRACK_NECROMANCER_TOWN = 7,
+    MUSIC_TRACK_KNIGHT_TOWN      = 8,
+    MUSIC_TRACK_BARBARIAN_TOWN   = 9,
+    MUSIC_TRACK_WIZARD_TOWN      = 10,
+    MUSIC_TRACK_LAVA             = 11,
+    MUSIC_TRACK_WASTELAND        = 12,
+    MUSIC_TRACK_DESERT           = 13,
+    MUSIC_TRACK_SNOW             = 14,
+    MUSIC_TRACK_SWAMP            = 15,
+    MUSIC_TRACK_WATER            = 16,
+    MUSIC_TRACK_DIRT             = 17,
+    MUSIC_TRACK_GRASS            = 18,
+    MUSIC_TRACK_NEW_WEEK         = 20,
+    MUSIC_TRACK_NEW_MONTH        = 21,
+    MUSIC_TRACK_CAMPAIGN_EVIL    = 22,
+    MUSIC_TRACK_CAMPAIGN_GOOD    = 24,
+    MUSIC_TRACK_AI_TURN          = 28,
+    MUSIC_TRACK_BATTLE_VICTORY   = 29,
+    MUSIC_TRACK_BATTLE_LOSS      = 30,
+    MUSIC_TRACK_MAIN_MENU        = 42,
+    MUSIC_TRACK_HIGH_SCORE       = 43
+} MusicTrack;
+
+
+typedef enum SoundVolumeScale {
+    SOUND_VOLUME_FULL = 127
+} SoundVolumeScale;
+
 typedef enum SoundStorageConstant {
     SOUND_CHANNEL_TYPE_COUNT = 4
 } SoundStorageConstant;

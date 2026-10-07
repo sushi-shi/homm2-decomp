@@ -150,6 +150,7 @@ typedef enum OverlayCatalogueEntry {
     OVERLAY_RESOURCE_MARKERS  = 128,
 
     OVERLAY_TOWN_FLAGS        = 134,
+    OVERLAY_TOWN_FLAG_PARTS   = 2,
 
     OVERLAY_RANDOM_MONSTER             = 214,
     OVERLAY_RANDOM_MONSTER_WEAK        = 215,
@@ -204,6 +205,8 @@ typedef enum OverlayCatalogueEntry {
     OVERLAY_TOWN_LAST         = 918,
     OVERLAY_TOWN_SHADOWS      = 919,
     OVERLAY_TOWN_VARIANTS     = 12,
+
+    OVERLAY_TOWN_KINDS        = 2,
 
 
     OVERLAY_TOWN_GROUNDS      = 930,

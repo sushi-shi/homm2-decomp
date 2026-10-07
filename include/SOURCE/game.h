@@ -72,9 +72,14 @@ typedef enum GameStateStorageConstant {
     GAME_TIME_EVENT_CAPACITY             = 50,
     GAME_MAP_EVENT_CAPACITY              = 50,
     GAME_CURRENT_MAP_NAME_SIZE           = 16,
-    GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
 } GameStateStorageConstant;
+
+
+typedef enum GameViewArmyPosition {
+    VIEW_ARMY_STANDARD_X = 119,
+    VIEW_ARMY_STANDARD_Y = 20
+} GameViewArmyPosition;
 
 #pragma pack(push, 1)
 template <i32 Capacity>
@@ -294,6 +299,7 @@ public:
         MapTriggerCode objectType,
         i32 objectMetadata,
         class mapCell* passedCell,
+
         i32 unused
     );
     void SetMapSize(i32 width, i32 height);
@@ -334,7 +340,7 @@ extern OverviewType giOverviewType;
 extern i32 giOverviewTop[H2EnumIndex(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
 extern i16 trackXY[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
-                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
+                  [H2EnumIndex(COORDINATE_AXIS_COUNT)];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;

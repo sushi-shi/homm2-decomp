@@ -10,7 +10,8 @@
 typedef enum IconScaleDoubleConstant {
     SCALE_DOUBLE_NATIVE_SIZE = 0x20,
     SCALE_DOUBLE_FRAME_SIZE = 0x40,
-    SCALE_DOUBLE_WORK_BYTES = SCALE_DOUBLE_FRAME_SIZE * SCALE_DOUBLE_FRAME_SIZE
+    SCALE_DOUBLE_WORK_BYTES = SCALE_DOUBLE_FRAME_SIZE * SCALE_DOUBLE_FRAME_SIZE,
+    SCALE_DOUBLE_CELLS = SCALE_DOUBLE_FRAME_SIZE / SCALE_DOUBLE_NATIVE_SIZE
 } IconScaleDoubleConstant;
 
 void IconToBitmapScaleDouble(
@@ -42,7 +43,7 @@ void IconToBitmapScaleDouble(
         IconToBitmap(sourceIcon, destination, destinationX, destinationY, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    steps = scale * 2;
+    steps = scale * SCALE_DOUBLE_CELLS;
     increment = SCALE_DOUBLE_NATIVE_SIZE / scale;
     sourceBase = (SCALE_DOUBLE_NATIVE_SIZE - (scale - 1) * increment) >> 1;
     lineStep = increment * SCALE_DOUBLE_FRAME_SIZE;

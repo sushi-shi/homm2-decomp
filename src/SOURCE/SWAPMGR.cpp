@@ -48,16 +48,13 @@ typedef enum SwapManagerConstant {
     SPLIT_CONFIRM             = DIALOG_BUTTON_2,
     CONTROL_CLOSE             = DIALOG_BUTTON_0,
     WINDOW_TEXT_ID            = 0x15,
-    SPLIT_MODIFIER_MASK       = 3,
     TITLE_WIDGET              = 0x4d,
     ADVENTURE_WIDGET_FIRST    = 1,
     ADVENTURE_WIDGET_LAST     = 6,
     MONO_ICON_SKIP            = 2,
     MONO_ICON_DEFAULT         = -1,
-    MANAGER_MESSAGE           = 0x100,
     SLOT_NONE                 = -1,
     ARTIFACT_COLUMN_COUNT     = 7,
-    FADE_STEPS                = 8,
     VIEW_FULL                 = 0,
     VIEW_QUICK                = 1,
     CLOSE_REQUESTED           = 1,
@@ -70,8 +67,6 @@ typedef enum SwapManagerConstant {
     RIGHT_PRIMARY_SKILL_FIRST = 0x48,
     LEFT_ARMY_COUNT_FIRST     = 0x74,
     RIGHT_ARMY_COUNT_FIRST    = 0x79,
-    ARMY_VIEW_X               = 0x77,
-    ARMY_VIEW_Y               = 0x14,
     SPLIT_WINDOW_X            = 0xb1,
     SPLIT_WINDOW_Y            = 0x14,
     SPLIT_TEXT_CONTROL        = 1,
@@ -371,7 +366,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_RIGHT_HERO:
@@ -382,7 +377,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:
@@ -531,8 +526,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_LEFT_ARMY_FIRST],
@@ -573,7 +568,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & H2EnumIndex(SPLIT_MODIFIER_MASK))
+                                            & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[H2EnumIndex(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -602,8 +597,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_RIGHT_ARMY_FIRST],
@@ -644,7 +639,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & H2EnumIndex(SPLIT_MODIFIER_MASK))
+                                            & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[H2EnumIndex(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -693,8 +688,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
 void swapManager::ViewMon(void) {
     gpGame->ViewArmy(
-        ARMY_VIEW_X,
-        ARMY_VIEW_Y,
+        VIEW_ARMY_STANDARD_X,
+        VIEW_ARMY_STANDARD_Y,
         m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureTypes[m_targetSlot],
         m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureCounts[m_targetSlot],
         NULL,

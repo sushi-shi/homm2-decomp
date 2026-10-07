@@ -441,8 +441,7 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_WHIRLPOOL                  = 39,
     MAP_OBJECT_WINDMILL                   = 40,
     MAP_OBJECT_ARTIFACT                   = 41,
-    MAP_OBJECT_MERMAID                    = 42,
-    MAP_OBJECT_HERO_INTERACTION           = H2EnumIndex(MAP_OBJECT_MERMAID),
+    MAP_OBJECT_HERO_INTERACTION           = 42,
     MAP_OBJECT_BOAT                       = 43,
     MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT   = 44,
     MAP_OBJECT_RANDOM_ARTIFACT            = 45,
@@ -523,9 +522,15 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_TRAVELER_TENT              = 120,
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
-    MAP_OBJECT_JAIL                       = 123
+    MAP_OBJECT_JAIL                       = 123,
+    MAP_OBJECT_COUNT                      = 124
 };
 using enum MapObjectType;
+
+
+typedef enum MapItemSpriteConstant {
+    MAP_ITEM_SPRITE_FRAME_COUNT = 2
+} MapItemSpriteConstant;
 
 class MapTriggerCode {
 public:

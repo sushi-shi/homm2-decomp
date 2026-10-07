@@ -39,15 +39,9 @@ typedef enum WindowColorCyclePaletteOffset {
     DEFAULT_CYCLE_SAVE_OFFSET           = 69
 } WindowColorCyclePaletteOffset;
 
-typedef enum WindowScreenConstant {
-    FRAMEBUFFER_FILL_COLOR = 0x24
-} WindowScreenConstant;
-
 typedef enum WindowFizzleConstant {
-    FIZZLE_DEFAULT_DELAY          = 150,
     FIZZLE_CYCLE_TABLE_BYTES      = 0x10000,
     FIZZLE_LOOKUP_HIGH_BYTE_SHIFT = 8,
-    DIALOG_FADE_STEPS             = 8,
     SCREENSHOT_FILENAME_CAPACITY  = 16
 } WindowFizzleConstant;
 
@@ -280,7 +274,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen->m_pixels = static_cast<u8*>(lpInitWin);
     memset(
         m_screen->m_pixels,
-        FRAMEBUFFER_FILL_COLOR,
+        SCREEN_FILL_COLOR,
         LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
     );
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
@@ -420,7 +414,7 @@ i32 heroWindowManager::DoDialog(
     if (window != NULL)
         AddWindow(window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
     if (fade != 0)
-        gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
+        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
     gpInputManager->Flush();
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
     done = false;

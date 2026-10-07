@@ -27,9 +27,6 @@ typedef enum RandomMapConstant {
 
     RANDOM_MAP_ATTEMPTS          = 5,
 
-
-    RANDOM_MAP_FULL_PERCENT      = 100,
-
     RANDOM_MAP_NEUTRAL_DENSITY   = 50,
 
 
@@ -62,7 +59,6 @@ typedef enum RandomMapConstant {
     RANDOM_MAP_MINE_RESOURCE_COUNT = 5,
 
 
-    RANDOM_MAP_CASTLE_SLOTS      = 6,
     RANDOM_MAP_REGION_LIMIT      = 255,
     RANDOM_MAP_END_SCAN          = 999,
 
@@ -84,6 +80,9 @@ typedef enum RandomMapConstant {
 
     RANDOM_MAP_LAND_PER_TREASURE = 40,
     RANDOM_MAP_LAND_PER_MONSTER  = 130,
+
+
+    RANDOM_MAP_GROUND_VARIETY    = 5,
 
     RANDOM_MAP_DECORATION_ROLL   = 1000
 } RandomMapConstant;
@@ -195,11 +194,11 @@ void editManager::GenerateRandomMap(void) {
         DrawMap();
         UpdateMapView();
         DrawRadar(true);
-        unusedPercent = 100.0;
+        unusedPercent = NEW_MAP_ALL_PERCENT;
         paintFrom = 0;
         for (terrain = 0; terrain <= H2EnumIndex(TERRAIN_WASTELAND); terrain++) {
             if (gTerrainPercent[terrain] > 0.0) {
-                PaintRandomTerrain(terrain, RANDOM_MAP_FULL_PERCENT, H2EnumIndex(TERRAIN_WATER));
+                PaintRandomTerrain(terrain, NEW_MAP_PERCENT, H2EnumIndex(TERRAIN_WATER));
                 paintFrom = terrain + 1;
                 terrain = RANDOM_MAP_END_TERRAIN_SCAN;
             }
@@ -235,7 +234,7 @@ void editManager::GenerateRandomMap(void) {
             BlendTerrain(terrain, true, false, true, false);
         gVaryTiles = true;
         BlendTerrain(H2EnumIndex(TERRAIN_WATER), true, false, false, true);
-        RandomizeGround(5);
+        RandomizeGround(RANDOM_MAP_GROUND_VARIETY);
         gVaryTiles = false;
         ShowStatusText(localization::Tr("editor.random.status.treasure"));
         PlaceTreasures(
@@ -303,13 +302,13 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
 
     seedX = 0;
     seedY = 0;
-    if (percent == RANDOM_MAP_FULL_PERCENT) {
+    if (percent == NEW_MAP_PERCENT) {
         for (walkX = 0; walkX < MAP_WIDTH; walkX++)
             for (walkY = 0; walkY < MAP_HEIGHT; walkY++)
                 gMap.CellAt(walkX, walkY)->m_terrainImageIndex =
                     ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, false, walkX, walkY, false, 1.0f);
     } else {
-        targetCells = MAP_WIDTH * MAP_HEIGHT * percent / RANDOM_MAP_FULL_PERCENT;
+        targetCells = MAP_WIDTH * MAP_HEIGHT * percent / NEW_MAP_PERCENT;
         patches = Random(0, percent + 51) / 30 + 1;
         balance = targetCells;
         escapes = 0;
@@ -563,7 +562,7 @@ void ScaleByDensity(i32* count, i32 density) {
 
     base = *count;
     if (density < RANDOM_MAP_NEUTRAL_DENSITY)
-        *count = *count * (density + RANDOM_MAP_NEUTRAL_DENSITY) / RANDOM_MAP_FULL_PERCENT;
+        *count = *count * (density + RANDOM_MAP_NEUTRAL_DENSITY) / NEW_MAP_PERCENT;
     else
         *count = *count * density / RANDOM_MAP_NEUTRAL_DENSITY;
 }
@@ -807,19 +806,19 @@ b32 editManager::PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains [[m
 
 void editManager::PlaceTowns(void) {
     i32 terrain;
-    b32 cutOff[RANDOM_MAP_CASTLE_SLOTS];
-    b32 extraRoads[RANDOM_MAP_CASTLE_SLOTS];
+    b32 cutOff[GAME_PLAYER_COUNT];
+    b32 extraRoads[GAME_PLAYER_COUNT];
     i32 nearX;
-    i32 castleRegion[RANDOM_MAP_CASTLE_SLOTS];
+    i32 castleRegion[GAME_PLAYER_COUNT];
     i32 tileX;
-    i32 reachable[RANDOM_MAP_CASTLE_SLOTS];
+    i32 reachable[GAME_PLAYER_COUNT];
     i32 regionId;
     double shareValue[RANDOM_MAP_REGION_LIMIT];
     i32 destY;
     b32 coastAt;
     i32 destX;
     i32 continents;
-    mapStep keeps[RANDOM_MAP_CASTLE_SLOTS];
+    mapStep keeps[GAME_PLAYER_COUNT];
     b32 tracing;
     i32 fromX;
     i32 roadMask [[maybe_unused]];
@@ -831,7 +830,7 @@ void editManager::PlaceTowns(void) {
     i32 dist;
     i32 peerIndex;
     i32 steps;
-    overlayType* castles[RANDOM_MAP_CASTLE_SLOTS];
+    overlayType* castles[GAME_PLAYER_COUNT];
     i32 attempt;
     i32 t;
     i32 rating;
@@ -851,22 +850,22 @@ void editManager::PlaceTowns(void) {
     i32 top;
     i32 unusedTotal [[maybe_unused]];
     b32 castlePlaced;
-    u8* reachedGrids[RANDOM_MAP_CASTLE_SLOTS];
+    u8* reachedGrids[GAME_PLAYER_COUNT];
 
     tileX = tileY = 0;
-    for (slot = 0; slot < RANDOM_MAP_CASTLE_SLOTS; slot++) {
+    for (slot = 0; slot < GAME_PLAYER_COUNT; slot++) {
         cutOff[slot] = false;
         extraRoads[slot] = false;
     }
-    castles[0] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_0];
-    castles[1] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_1];
-    castles[2] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_2];
-    castles[3] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_3];
-    castles[4] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_4];
-    castles[5] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_5];
+    castles[PLAYER_COLOR_BLUE] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_0];
+    castles[PLAYER_COLOR_GREEN] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_1];
+    castles[PLAYER_COLOR_RED] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_2];
+    castles[PLAYER_COLOR_YELLOW] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_3];
+    castles[PLAYER_COLOR_ORANGE] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_4];
+    castles[PLAYER_COLOR_PURPLE] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_5];
     regionGrid = new u8[MAP_WIDTH * MAP_HEIGHT];
     memset(regionGrid, 0, MAP_WIDTH * MAP_HEIGHT);
-    for (slot = 0; slot < RANDOM_MAP_CASTLE_SLOTS; slot++) {
+    for (slot = 0; slot < GAME_PLAYER_COUNT; slot++) {
         reachedGrids[slot] = new u8[MAP_WIDTH * MAP_HEIGHT];
         memset(reachedGrids[slot], 0, MAP_WIDTH * MAP_HEIGHT);
     }
@@ -1254,7 +1253,7 @@ void editManager::PlaceTowns(void) {
         }
     }
     delete regionGrid;
-    for (slot = 0; slot < RANDOM_MAP_CASTLE_SLOTS; slot++)
+    for (slot = 0; slot < GAME_PLAYER_COUNT; slot++)
         delete reachedGrids[slot];
 }
 

@@ -12,21 +12,10 @@
 #include <SOURCE/X_GLOBAL.h>
 
 typedef enum SetupConstant {
-    WINDOW_X          = 405,
-    WINDOW_Y          = 8,
     DIALOG_CANCEL     = DIALOG_BUTTON_1,
     HELP_DIALOG       = NORMAL_DIALOG_QUICK_VIEW,
     DIALOG_RESULT_MAX = 1000
 } SetupConstant;
-
-typedef enum SetupDialogChoice {
-    CHOICE_ONE   = 1,
-    CHOICE_TWO   = 2,
-    CHOICE_THREE = 3,
-    CHOICE_FOUR  = 4,
-
-    CHOICE_QUIT  = 0x69
-} SetupDialogChoice;
 
 typedef enum SetupHelpIndex {
     NO_HELP = -1,
@@ -37,17 +26,17 @@ i32 gNewMapSize = MAP_DIMENSION_MEDIUM;
 b32 gNewRandomMap;
 
 b32 SetupNewMap(void) {
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpenew.bin");
+    heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpenew.bin");
     if (window == NULL)
         MemError();
     gpWindowManager->DoDialog(window, SetupNewMapHandler, 0);
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case CHOICE_ONE:
+        case SETUP_CHOICE_ONE:
             gNewRandomMap = false;
             break;
-        case CHOICE_TWO:
+        case SETUP_CHOICE_TWO:
             gNewRandomMap = true;
             break;
         case DIALOG_CANCEL:
@@ -59,23 +48,23 @@ b32 SetupNewMap(void) {
 }
 
 b32 SetupMapSize(void) {
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpesize.bin");
+    heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpesize.bin");
     if (window == NULL)
         MemError();
     gpWindowManager->DoDialog(window, SetupMapSizeHandler, 0);
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case CHOICE_ONE:
+        case SETUP_CHOICE_ONE:
             gNewMapSize = MAP_DIMENSION_SMALL;
             break;
-        case CHOICE_TWO:
+        case SETUP_CHOICE_TWO:
             gNewMapSize = MAP_DIMENSION_MEDIUM;
             break;
-        case CHOICE_THREE:
+        case SETUP_CHOICE_THREE:
             gNewMapSize = MAP_DIMENSION_LARGE;
             break;
-        case CHOICE_FOUR:
+        case SETUP_CHOICE_FOUR:
             gNewMapSize = MAP_DIMENSION_XLARGE;
             break;
         case DIALOG_CANCEL:
@@ -91,10 +80,10 @@ MessageDispatchResult SetupNewMapHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case CHOICE_ONE:
+            case SETUP_CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case CHOICE_TWO:
+            case SETUP_CHOICE_TWO:
                 helpIndex = 1;
                 break;
             case DIALOG_CANCEL:
@@ -114,16 +103,16 @@ MessageDispatchResult SetupMapSizeHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case CHOICE_ONE:
+            case SETUP_CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case CHOICE_TWO:
+            case SETUP_CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case CHOICE_THREE:
+            case SETUP_CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case CHOICE_FOUR:
+            case SETUP_CHOICE_FOUR:
                 helpIndex = 3;
                 break;
             case DIALOG_CANCEL:
@@ -147,7 +136,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
                 if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
                     || message.payload.widget.id == DIALOG_CANCEL
-                    || message.payload.widget.id == CHOICE_QUIT)
+                    || message.payload.widget.id == SETUP_CHOICE_QUIT)
                     handled = true;
         }
     }
@@ -170,13 +159,13 @@ MessageDispatchResult SetupMainHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case CHOICE_ONE:
+            case SETUP_CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case CHOICE_TWO:
+            case SETUP_CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case CHOICE_QUIT:
+            case SETUP_CHOICE_QUIT:
                 helpIndex = 2;
                 break;
         }

@@ -26,7 +26,7 @@ const char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
 
     localization::Tr("table.xSetupStandardGameHelp.2")
 };
-const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+const char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT] = {
      localization::Tr("table.xCampaignAwards.0"),
      localization::Tr("table.xCampaignAwards.1"),
      localization::Tr("table.xCampaignAwards.2"),
@@ -40,7 +40,7 @@ const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
      localization::Tr("table.xCampaignAwards.10")
 };
 const char*
-    xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
+    xScenarioName[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
         { localization::Tr("table.xScenarioName.0.0"),
           localization::Tr("table.xScenarioName.0.1"),
           localization::Tr("table.xScenarioName.0.2"),
@@ -75,7 +75,7 @@ const char*
          ""}
 };
 const char*
-    xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
+    xScenarioDescription[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] =
         {
             {
                  localization::Tr("table.xScenarioDescription.0.0"),
@@ -118,13 +118,13 @@ const char*
                 ""
             }
         };
-const char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {
+const char* xShortCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)] = {
      localization::Tr("table.xShortCampaignNames.0"),
      localization::Tr("table.xShortCampaignNames.1"),
      localization::Tr("table.xShortCampaignNames.2"),
      localization::Tr("table.xShortCampaignNames.3")
 };
-const char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {
+const char* xHSCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)] = {
       localization::Tr("table.xHSCampaignNames.0"),
      localization::Tr("table.xHSCampaignNames.1"),
      localization::Tr("table.xHSCampaignNames.2"),
@@ -170,7 +170,7 @@ const char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {
      localization::Tr("table.xUncleIvanName.4"),
      localization::Tr("table.xUncleIvanName.5")
 };
-const char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {
+const char* xShortSSLevelNames[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
      localization::Tr("table.xShortSSLevelNames.0"),
      localization::Tr("table.xShortSSLevelNames.1"),
      localization::Tr("table.xShortSSLevelNames.2")

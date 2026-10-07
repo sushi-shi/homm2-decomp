@@ -295,7 +295,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                         localization::Tr("adventure.confirm.quit"),
                         NORMAL_DIALOG_CONFIRM
                     );
-                    if (gpWindowManager->m_dialogResult == APP_MENU_CONFIRM_OK)
+                    if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES)
                         DestroyWindow(window);
                     return 0;
                 }

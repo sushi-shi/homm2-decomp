@@ -12,6 +12,20 @@ typedef enum MilesSampleStorageConstant {
 } MilesSampleStorageConstant;
 
 
+typedef enum MilesDigitalFormat {
+    MILES_DIG_F_MONO_8    = 0,
+    MILES_DIG_F_MONO_16   = 1,
+    MILES_DIG_F_STEREO_8  = 2,
+    MILES_DIG_F_STEREO_16 = 3
+} MilesDigitalFormat;
+
+
+typedef enum AudiereChannelCount {
+    AUDIERE_CHANNELS_MONO   = 1,
+    AUDIERE_CHANNELS_STEREO = 2
+} AudiereChannelCount;
+
+
 struct MilesSampleState {
     i32 ready;
     struct _SAMPLE* handles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];

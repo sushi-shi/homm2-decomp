@@ -63,13 +63,6 @@ namespace {
     } TownManagerInputCode;
 
 
-    enum class TownObjectRenderMask : i32 {
-        RENDER_SORCERESS_LEFT_OPTION = 0x800,
-        RENDER_RACE_OVERLAY_FIRST_OPTION = 0x4000,
-        RENDER_DOCK_GATE = 0x4000
-    };
-using enum TownObjectRenderMask;
-
     enum class TownCommandTextId : i32 {
         TEXT_REDISTRIBUTE_ARMY = 0,
         TEXT_CANNOT_COMBINE_LAST_ARMY = 1,
@@ -110,7 +103,6 @@ using enum TownCommandTextId;
 
     typedef enum TownMainConstant {
         BUILDING_DESCRIPTION_CAPACITY = 400,
-        TOWN_VIEW_FIZZLE_WIDTH = 552,
         TOWN_VIEW_FIZZLE_HEIGHT = 204,
         BUILDING_DIALOG_ICON_FRAME_BASE = 19,
         MAGE_GUILD_WINDOW_TEXT_ID = 17,
@@ -123,7 +115,8 @@ using enum TownCommandTextId;
         MARKETPLACE_EFFICIENCY_MAX_INDEX = KB_TRADING_POST_EFFICIENCY_COUNT - 1,
         TOWN_REDRAW_FIRST_CONTROL = 136,
         TOWN_REDRAW_LAST_CONTROL = 137,
-        TOWN_VIEWPORT_HEIGHT = TOWN_GARRISON_STRIP_Y
+        TOWN_VIEWPORT_HEIGHT = TOWN_GARRISON_STRIP_Y,
+        TOWN_MIDI_THEME_SWITCH_DELAY = 100
     } TownMainConstant;
 
     typedef enum TownSplitConstant {
@@ -172,7 +165,6 @@ using enum TownCommandTextId;
         RECRUIT_PORTRAIT_CONTROL = 2,
         RECRUIT_BUTTON_TEXT_CONTROL = 8,
         RECRUIT_BUTTON_ICON_CONTROL = 9,
-        HEROES_PER_FACTION = H2EnumIndex(GAME_HERO_COUNT) / H2EnumIndex(FACTION_COUNT),
         TAVERN_WINDOW_X = 162,
         TAVERN_WINDOW_Y = 10,
         TAVERN_WINDOW_TEXT_ID = 22,
@@ -553,24 +545,24 @@ void townObject::Draw(i32 advanceAnimation) {
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
         && (!(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_STATUE))))
-            || !(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION))))))
+            || !(H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_WELL_EXTRA))))))
         return;
     if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
         && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_STATUE))))
-        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_SORCERESS_LEFT_OPTION)))))
+        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_WELL_EXTRA)))))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
         && (gpTownManager->m_town->m_type == FACTION_NECROMANCER
             || gpTownManager->m_town->m_type == FACTION_WARLOCK
             || gpTownManager->m_town->m_type == FACTION_SORCERESS
             || gpTownManager->m_town->m_type == FACTION_KNIGHT)
-        && ((H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_RACE_OVERLAY_FIRST_OPTION))))
+        && ((H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_EXTRA_DOCK_GRAPHIC_MASK))))
             || (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_DOCK))))))
         return;
     if (m_buildingId == TOWN_OBJECT_DOCK
-        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(RENDER_DOCK_GATE)))))
+        && (H2EnumIndex((gpTownManager->m_town->m_buildings) & (H2EnumIndex(TOWN_EXTRA_DOCK_GRAPHIC_MASK)))))
         return;
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
@@ -583,7 +575,7 @@ void townObject::Draw(i32 advanceAnimation) {
         m_icon->DrawToBuffer(0, 0, baseFrame, ICON_DRAW_NORMAL);
         if (m_animationFrameCount != 0) {
             if (gpTownManager->m_town->m_type == FACTION_BARBARIAN
-                && gpTownManager->m_town->m_mageGuildLevel < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
+                && gpTownManager->m_town->m_mageGuildLevel < TOWN_MAGE_GUILD_LEVEL_COUNT)
                 return;
             m_icon->DrawToBuffer(0, 0, baseFrame + m_animationFrame + 1, ICON_DRAW_NORMAL);
             if (advanceAnimation == 1) {
@@ -670,12 +662,12 @@ i32 townManager::Open(i32 id) {
     SetupExtraStuff();
     SetupTown();
     KBChangeMenu(hmnuTown);
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     m_messageMask = BASE_MANAGER_ACCEPT_TOWN_EVENT;
     m_priority = id;
     m_active = true;
     strcpy(m_name, "townManager");
-    gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
     return 0;
 }
 
@@ -690,7 +682,7 @@ void townManager::ChangeTown(void) {
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            Sleep(100);
+            Sleep(TOWN_MIDI_THEME_SWITCH_DELAY);
         gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     }
 }
@@ -757,7 +749,7 @@ void townManager::SetupTown(void) {
                     }
                     m_townWindow->AddWidget(
                         m_townObjects[m_townObjectCount]->m_border,
-                        TOWN_WIDGET_INSERT_DEFAULT
+                        WINDOW_Z_ORDER_TOP
                     );
                 }
                 ++m_townObjectCount;
@@ -903,9 +895,9 @@ void townManager::Close(void) {
     m_townWindow = NULL;
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
-    gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
-    gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
+        gpSoundManager->SwitchAmbientMusic(MIDI_NO_TRACK);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
+    gpMouseManager->SetPointer(MOUSE_INVALID_CURSOR_FRAME);
     m_active = false;
     m_town->m_buildings &= H2EnumIndex(TOWN_CLOSE_DYNAMIC_CLEAR_MASK);
 }
@@ -1020,7 +1012,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_garrisonStrip;
                 m_pendingArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
-                SetArmyCommand(message.payload.widget.parameter & TOWN_ARMY_QUALIFIER_MASK);
+                SetArmyCommand(message.payload.widget.parameter & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS));
             } else {
                 m_selectedStrip = m_garrisonStrip;
                 m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
@@ -1049,7 +1041,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_heroStrip;
                 m_pendingArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
-                SetArmyCommand(message.payload.widget.parameter & TOWN_ARMY_QUALIFIER_MASK);
+                SetArmyCommand(message.payload.widget.parameter & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS));
             } else {
                 m_selectedStrip = m_heroStrip;
                 m_selectedArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
@@ -1257,7 +1249,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     gpWindowManager->SaveFizzleSource(
                                         0,
                                         TOWN_VIEWPORT_HEIGHT,
-                                        TOWN_VIEW_FIZZLE_WIDTH,
+                                        STRIP_WINDOW_WIDTH,
                                         TOWN_VIEW_FIZZLE_HEIGHT
                                     );
                                     delete m_heroStrip;
@@ -1278,7 +1270,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     buildSound = LoadPlaySample("buildtwn.82M");
                                     hero* townHero [[maybe_unused]] =
                                         gpGame->GetHero(m_town->m_occupyingHeroId);
-                                    i32 width = TOWN_VIEW_FIZZLE_WIDTH;
+                                    i32 width = STRIP_WINDOW_WIDTH;
                                     m_townWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
@@ -1666,8 +1658,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                                      ? gpGame->GetHero(m_town->m_occupyingHeroId)
                                                      : NULL;
                                     gpGame->ViewArmy(
-                                        TOWN_ARMY_VIEW_X,
-                                        TOWN_ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_selectedStrip->m_army
                                             ->m_creatureTypes[m_selectedArmySlot],
                                         m_selectedStrip->m_army
@@ -1794,8 +1786,8 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
                              ? gpGame->GetHero(m_town->m_occupyingHeroId)
                              : NULL;
             gpGame->ViewArmy(
-                TOWN_ARMY_VIEW_X,
-                TOWN_ARMY_VIEW_Y,
+                VIEW_ARMY_STANDARD_X,
+                VIEW_ARMY_STANDARD_Y,
                 m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot],
                 m_selectedStrip->m_army->m_creatureCounts[m_selectedArmySlot],
                 m_town,
@@ -1852,7 +1844,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
         case ARMY_COMMAND_VIEW_HERO:
             HeroView(m_town->m_occupyingHeroId, true, false);
             RedrawTownScreen();
-            gpWindowManager->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
             break;
 
         case ARMY_COMMAND_SPLIT:
@@ -2105,7 +2097,7 @@ i32 townManager::BuyBuild(
         if (resourceTypes[index] != -1)
             ++resourceCount;
     }
-    if (resourceCount <= 4) {
+    if (resourceCount <= BUILD_ROW_RESOURCE_CAPACITY) {
         topRowCount = resourceCount;
     } else if (resourceCount == 5) {
         topRowCount = 2;
@@ -2454,7 +2446,7 @@ void townManager::SetupMage(heroWindow* window) {
         for (slot = 0; slot < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; ++slot) {
             if (slot >= gSpellLimits[level]
                               + (m_town->m_type == FACTION_WIZARD
-                                 && (H2EnumIndex((m_town->m_buildings) & (TOWN_WIZARD_LIBRARY_BUILDING_FLAG))))) {
+                                 && (H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_LIBRARY)))))) {
                 spellState = TOWN_MAGE_SPELL_UNAVAILABLE;
             } else {
                 spellState =
@@ -2700,13 +2692,13 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
             m_town->GiveSpells(NULL);
 
         newHeroClass = static_cast<FactionType>(
-            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
+            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / GAME_HEROES_PER_FACTION
         );
         newHeroClass = (newHeroClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % H2EnumIndex(FACTION_COUNT);
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
-            AI_HERO_AVAILABLE_FLAG;
+            HERO_AVAILABILITY_FOR_HIRE;
     } else {
         if (m_castleDialogActive != 0)
             SetupCastle(m_heroWindow0, 0);
@@ -2877,12 +2869,12 @@ void townManager::SetupWell(heroWindow* window) {
 
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         if (dwellingResult == TOWN_WELL_DWELLING_COUNT - 1
-            && (H2EnumIndex((m_town->m_buildings) & ((1L << TOWN_WELL_LAST_UPGRADE_BUILDING))))) {
+            && (H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))) {
             dwellingTypes[dwellingResult] = WELL_ALTERNATE_UPGRADE_INDEX;
         } else if (dwellingResult >= 1
                    && (H2EnumIndex((m_town->m_buildings) & ((1L << (dwellingResult + TOWN_WELL_FIRST_UPGRADE_BUILDING)))))) {
             dwellingTypes[dwellingResult] =
-                dwellingResult + TOWN_WELL_FIRST_UPGRADE_OFFSET;
+                dwellingResult + CASTLE_UPGRADE_OFFSET;
         } else {
             dwellingTypes[dwellingResult] = dwellingResult;
         }
@@ -2980,7 +2972,7 @@ void townManager::SetupWell(heroWindow* window) {
                           .growth;
             creatureGrowth += TOWN_WELL_BASE_GROWTH_BONUS;
             if (dwellingResult == 0
-                && (H2EnumIndex((m_town->m_buildings) & ((1L << TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING)))))
+                && (H2EnumIndex((m_town->m_buildings) & (H2EnumIndex(TOWN_BUILDING_WELL_EXTRA)))))
                 creatureGrowth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
             sprintf(detailText, cWellDetail[WELL_DETAIL_GROWTH], creatureGrowth);
             strcat(gText, detailText);

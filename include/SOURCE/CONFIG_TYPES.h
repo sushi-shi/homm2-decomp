@@ -90,6 +90,7 @@ using enum ConfigComPort;
 
 enum class ConfigBaudRate : i32 {
     CONFIG_BAUD_2400  = 2400,
+    CONFIG_BAUD_4800  = 4800,
     CONFIG_BAUD_9600  = 9600,
     CONFIG_BAUD_19200 = 19200,
     CONFIG_BAUD_38400 = 38400

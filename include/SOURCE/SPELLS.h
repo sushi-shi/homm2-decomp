@@ -44,7 +44,6 @@ typedef enum SpellGameplayConstant {
     MIRROR_SEARCH_DISTANCE_LIMIT                   = 10,
     ELEMENTAL_SUMMON_QUANTITY_PER_POWER            = 3,
     RESURRECT_HIT_POINTS_PER_POWER                 = 50,
-    EARTHQUAKE_STRUCTURE_COUNT                     = 4,
     EARTHQUAKE_MAX_IMPACTS                         = 10,
     EARTHQUAKE_WALL_HIT_CHANCE                     = 75,
     EARTHQUAKE_WALL_SECOND_HIT_CHANCE              = 15,
@@ -55,12 +54,7 @@ typedef enum SpellGameplayConstant {
 
 typedef enum SpellDrawingConstant {
     COMBAT_HEX_EMPTY                     = -1,
-    COMBAT_DRAW_DELAY                    = 75,
     COMBAT_SPELL_TARGET_Y_OFFSET         = 17,
-    COMBAT_HERO_CAST_LEFT_X_OFFSET       = 30,
-    COMBAT_HERO_CAST_RIGHT_X             = 610,
-    COMBAT_HERO_CAST_LEFT_Y_OFFSET       = 183,
-    COMBAT_HERO_CAST_RIGHT_Y_OFFSET      = 148,
     SPELL_FIREBALL_FRAME_COUNT           = 12,
     SPELL_COLD_RING_FRAME_COUNT          = 7,
     SPELL_METEOR_PASS_COUNT              = 2,
@@ -76,7 +70,6 @@ typedef enum SpellDrawingConstant {
     SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT   = 15,
     SPELL_ARMAGEDDON_RESTORE_PASS_COUNT  = 16,
     SPELL_ARMAGEDDON_CHANNEL_STEP        = 3,
-    SPELL_FIZZLE_FRAME_DELAY             = 75,
     SPELL_PETRIFY_FIZZLE_STEPS           = 75,
     SPELL_BLOOD_LUST_FIZZLE_STEPS        = 110,
     VAPORIZE_STRIPE_WIDTH                = 5,
@@ -108,13 +101,19 @@ typedef enum SpellDrawingConstant {
     EARTHQUAKE_EXTENT_MIN_X              = 252,
     EARTHQUAKE_EXTENT_MAX_X              = 575,
     SPELL_SAMPLE_NAME_CAPACITY           = 16,
-    SPELL_MISSILE_ANGLE_COUNT            = 9,
 } SpellDrawingConstant;
 
+
 typedef enum HeroCastPose {
-    COMBAT_HERO_CAST_NO_TARGET = 3,
-    COMBAT_HERO_CAST_LOW       = 5,
-    COMBAT_HERO_CAST_HIGH      = 7,
+    HERO_ANIMATION_STAND                  = 0,
+    HERO_ANIMATION_LOSS_REACTION          = 1,
+    HERO_ANIMATION_OPPONENT_LOSS_REACTION = 2,
+    COMBAT_HERO_CAST_NO_TARGET            = 3,
+    COMBAT_HERO_CAST_LOW                  = 5,
+    COMBAT_HERO_CAST_HIGH                 = 7,
+    HERO_ANIMATION_IDLE_FIRST             = 9,
+    HERO_ANIMATION_IDLE_SECOND            = 10,
+    HERO_ANIMATION_IDLE_LAST              = 11,
 } HeroCastPose;
 
 typedef enum SpellAreaConstant {

@@ -66,7 +66,7 @@ typedef enum HeroConstant {
     HERO_STARTING_STAT_COUNT                  = 5,
     HERO_AVAILABLE_SLOT_COUNT                 = 2,
     HERO_AVAILABILITY_UNAVAILABLE             = -1,
-    HERO_AVAILABILITY_RETREATED               = 0x40,
+    HERO_AVAILABILITY_FOR_HIRE               = 0x40,
     HERO_AVAILABILITY_JAILED                  = 0x41,
     HERO_EXPERIENCE_LEVEL_TABLE_COUNT         = 12,
     HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL = 13,

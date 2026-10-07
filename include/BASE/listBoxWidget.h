@@ -20,6 +20,22 @@ typedef enum ListBoxSelectedIndex {
     LIST_BOX_NO_SELECTION = -1
 } ListBoxSelectedIndex;
 
+typedef enum ListBoxLayout {
+
+
+    LIST_BOX_EDGE_ROW_COUNT              = 2,
+    LIST_BOX_TEXT_LEFT_INSET             = 5,
+    LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT = 2,
+    LIST_BOX_FIRST_ROW_TEXT_TOP_INSET    = 4,
+    LIST_BOX_ROW_TEXT_TOP_INSET          = 2,
+    LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT = 2,
+    LIST_BOX_SCROLL_THUMB_X_INSET        = 5,
+    LIST_BOX_SCROLL_THUMB_Y_INSET        = 3,
+    LIST_BOX_SCROLL_THUMB_TRAVEL_PADDING = 7,
+    LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR = 2,
+    LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT    = 4
+} ListBoxLayout;
+
 #pragma pack(push, 1)
 class font;
 class icon;

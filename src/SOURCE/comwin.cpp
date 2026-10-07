@@ -28,11 +28,6 @@ typedef enum ComErrorText {
     ERROR_TEXT_LOWER_BAUD_RATE = 5
 } ComErrorText;
 
-typedef enum ComSerialConstant {
-    BAUD_VALUE_4800        = 4800,
-
-} ComSerialConstant;
-
 
 static ComPortState s_comPorts[PORT_COUNT];
 
@@ -174,7 +169,7 @@ i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
             state.BaudRate = H2EnumIndex(CONFIG_BAUD_2400);
             break;
         case COM_BAUD_4800:
-            state.BaudRate = BAUD_VALUE_4800;
+            state.BaudRate = H2EnumIndex(CONFIG_BAUD_4800);
             break;
         case COM_BAUD_9600:
             state.BaudRate = H2EnumIndex(CONFIG_BAUD_9600);

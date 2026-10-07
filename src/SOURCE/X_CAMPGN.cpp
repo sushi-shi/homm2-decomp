@@ -11,6 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SMACKMGR.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -24,38 +25,7 @@
 #include <BASE/dialog.h>
 #include <SOURCE/Campaign.h>
 
-typedef enum ExpansionCampaignSmacker {
-    SMACKER_POL_INTRO             = 0x27,
-    SMACKER_POL_UPRISING          = 0x28,
-    SMACKER_POL_ISLAND_OF_CHAOS   = 0x29,
-    SMACKER_POL_ARROWS_FLIGHT     = 0x2a,
-    SMACKER_POL_BRANCH_REUNITED   = 0x2b,
-    SMACKER_POL_AURORA_BOREALIS   = 0x2c,
-    SMACKER_POL_BETRAYALS_END     = 0x2d,
-    SMACKER_POL_CORRUPTIONS_HEART = 0x2e,
-    SMACKER_DES_INTRO             = 0x2f,
-    SMACKER_DES_CONQUER_AND_UNIFY = 0x30,
-    SMACKER_DES_BORDER_TOWNS      = 0x31,
-    SMACKER_DES_FAMILY_REUNITED   = 0x32,
-    SMACKER_DES_SOUTHERN_WAR      = 0x33,
-    SMACKER_DES_BRANCH_REUNITED   = 0x34,
-    SMACKER_DES_EPIC_BATTLE       = 0x35,
-    SMACKER_WIZ_INTRO             = 0x36,
-    SMACKER_WIZ_SHROUDED_ISLES    = 0x37,
-    SMACKER_WIZ_ETERNAL_SCROLLS   = 0x38,
-    SMACKER_WIZ_POWERS_END        = 0x39,
-    SMACKER_WIZ_FOUNT_OF_WIZARDRY = 0x3a,
-    SMACKER_VOY_INTRO             = 0x3b,
-    SMACKER_VOY_STRANDED          = 0x3c,
-    SMACKER_VOY_PIRATE_ISLES      = 0x3d,
-    SMACKER_VOY_KING_AND_COUNTRY  = 0x3e,
-    SMACKER_VOY_BLOOD_IS_THICKER  = 0x3f,
-    SMACKER_CAMPAIGN_CHOICE       = 0x43
-} ExpansionCampaignSmacker;
-
 typedef enum ExpansionCampaignChoiceConstant {
-    CAMPAIGN_CHOICE_UNUSED_VALUE       = -1,
-    CAMPAIGN_CHOICE_NO_AMOUNT          = -1,
     CAMPAIGN_CHOICE_ZERO_AMOUNT        = 0,
     CAMPAIGN_ARTIFACT_AMOUNT_ONE       = 1,
     CAMPAIGN_PRIMARY_BONUS_ONE         = 1,
@@ -64,7 +34,6 @@ typedef enum ExpansionCampaignChoiceConstant {
     CAMPAIGN_MAGE_COUNT                = 5,
     CAMPAIGN_WOOD_FIVE                 = 5,
     CAMPAIGN_ORE_FIVE                  = 5,
-    CAMPAIGN_WOOD_TEN                  = 10,
     CAMPAIGN_SULFUR_TEN                = 10,
     CAMPAIGN_CRYSTAL_TEN               = 10,
     CAMPAIGN_SULFUR_FIFTEEN            = 15,
@@ -80,7 +49,6 @@ typedef enum ExpansionCampaignChoiceConstant {
 } ExpansionCampaignChoiceConstant;
 
 typedef enum ExpansionCampaignImplementationConstant {
-    TRACK_COORDINATE_COUNT         = 2,
     CAMPAIGN_ICON_X                = 24,
     CAMPAIGN_ICON_Y                = 25,
     CAMPAIGN_ICON_WIDTH            = 376,
@@ -94,7 +62,7 @@ typedef enum ExpansionCampaignImplementationConstant {
 
 static i32
     expansionCampaignTrackXY[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
-                            [TRACK_COORDINATE_COUNT] = {
+                            [H2EnumIndex(COORDINATE_AXIS_COUNT)] = {
         {{113, 310},
          {187, 310},
          {261, 352},
@@ -200,22 +168,22 @@ SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSIO
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_ORE)}, CAMPAIGN_ORE_FIVE},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GOLD)}, CAMPAIGN_GOLD_ONE_THOUSAND}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}}},
@@ -234,22 +202,22 @@ SCampaignChoice xCampaignChoices[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSIO
       {CAMPAIGN_CHOICE_SECONDARY_SKILL, {H2EnumIndex(HERO_SKILL_LOGISTICS)}, H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GOLD)}, CAMPAIGN_GOLD_TWO_THOUSAND}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}},
      {{CAMPAIGN_CHOICE_INVALID,
-       {CAMPAIGN_CHOICE_UNUSED_VALUE},
+       {CAMPAIGN_CHOICE_NO_VALUE},
        CAMPAIGN_CHOICE_NO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT},
       {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_WOOD)}, CAMPAIGN_CHOICE_ZERO_AMOUNT}}}
@@ -495,7 +463,7 @@ void ExpCampaign::InitMap(void) {
 
 void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     b32 savedTheme = gbUseEvilInterface;
     gbUseEvilInterface = true;
@@ -549,7 +517,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
-    gpSoundManager->SwitchAmbientMusic(EXPANSION_CAMPAIGN_MUSIC);
+    gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_CAMPAIGN_GOOD);
     UpdateInfo(0);
     gpWindowManager->DoDialog(m_window, MessageHandler, 0);
     delete m_window;
@@ -559,7 +527,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         NormalDialog(
 
             localization::Tr("campaign.confirm.restart_scenario"),
-            CAMPAIGN_RESTART_CONFIRM
+            NORMAL_DIALOG_CONFIRM
         );
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES) {
             InitMap();

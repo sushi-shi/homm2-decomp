@@ -40,6 +40,7 @@ typedef enum MapEventEncodingConstant {
 
 typedef enum MapEventGameplayConstant {
     PYRAMID_GUARD_STACK_QUANTITY = 10,
+    MINE_GUARDIAN_MAX_POWER      = 51,
 } MapEventGameplayConstant;
 
 enum class GenericSiteType : i32 {
@@ -129,6 +130,9 @@ struct mapTownExtra {
 #pragma pack(pop)
 
 typedef enum MapObjectEncodingConstant {
+
+
+    MAP_ITEM_FRAME_STRIDE                = 2,
     MAP_EVENT_DATA_EMPTY                 = 0,
     MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
@@ -194,7 +198,11 @@ typedef enum MapEventRewardConstant {
     SEA_CHEST_ARTIFACT_GOLD             = 1000,
     MAGELLAN_MAP_COST                   = 1000,
     WATERING_HOLE_MOBILITY_BONUS        = 400,
+    STABLES_MOBILITY_BONUS              = 400,
+    ALCHEMIST_CURSE_REMOVAL_COST        = 750,
     XANADU_ADMISSION_LEVEL              = 10,
+    XANADU_DIPLOMACY_MULTIPLIER         = 2,
+    ARTESIAN_SPRING_MANA_MULTIPLIER     = 2,
     TREE_KNOWLEDGE_GOLD_COST            = 2000,
     TREE_KNOWLEDGE_GEM_COST             = 10,
     PYRAMID_GUARD_COUNT                 = 50,
@@ -264,10 +272,6 @@ typedef enum MapEventDisplayConstant {
     MINE_RESOURCE_ICON_OFFSET = 59,
     BOAT_RESTORE_MODE         = 2,
     ORACLE_WINDOW_TEXT_ID     = 14,
-    COAST_FIZZLE_X            = 192,
-    COAST_FIZZLE_Y            = 192,
-    COAST_FIZZLE_WIDTH        = 96,
-    COAST_FIZZLE_HEIGHT       = 96,
 } MapEventDisplayConstant;
 
 enum class UndeadEventLevel : i32 {

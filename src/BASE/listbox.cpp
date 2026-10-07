@@ -32,24 +32,6 @@ typedef enum ListBoxFrame {
     FRAME_SCROLL_THUMB        = 10
 } ListBoxFrame;
 
-typedef enum ListBoxStorageConstant {
-    RESOURCE_NAME_CAPACITY = 16
-} ListBoxStorageConstant;
-
-typedef enum ListBoxLayoutConstant {
-    LIST_EDGE_ROW_COUNT         = 2,
-    TEXT_LEFT_INSET             = 5,
-    TEXT_HORIZONTAL_INSET_COUNT = 2,
-    FIRST_ROW_TEXT_TOP_INSET    = 4,
-    ROW_TEXT_TOP_INSET          = 2,
-    SCROLL_TRACK_EDGE_ROW_COUNT = 2,
-    SCROLL_THUMB_X_INSET        = 5,
-    SCROLL_THUMB_Y_INSET        = 3,
-    SCROLL_THUMB_TRAVEL_PADDING = 7,
-    SCROLL_THUMB_CENTER_DIVISOR = 2,
-    SCROLL_DRAG_Y_ADJUSTMENT    = 4
-} ListBoxLayoutConstant;
-
 
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_itemCount = 0;
@@ -73,7 +55,7 @@ listBoxWidget::~listBoxWidget() {
 
 void listBoxWidget::Read(void) {
     IconEntry* entry;
-    char name[RESOURCE_NAME_CAPACITY];
+    char name[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
 
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(name);
@@ -113,7 +95,7 @@ void listBoxWidget::Read(void) {
     m_listY = m_y;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
     m_listWidth = entry->w;
-    m_listHeight = (m_maxVisibleItems - LIST_EDGE_ROW_COUNT) * m_rowHeight + m_firstRowHeight
+    m_listHeight = (m_maxVisibleItems - LIST_BOX_EDGE_ROW_COUNT) * m_rowHeight + m_firstRowHeight
                    + m_lastRowHeight;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollUpFrame;
     m_scrollUpWidth = entry->w;
@@ -129,7 +111,7 @@ void listBoxWidget::Read(void) {
     m_scrollTrackY = m_scrollUpY + m_scrollUpHeight;
     m_scrollTrackWidth = m_scrollDownWidth;
     m_scrollTrackHeight = m_scrollDownY - m_scrollTrackY;
-    m_scrollThumbTravel = m_scrollTrackHeight - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
+    m_scrollThumbTravel = m_scrollTrackHeight - m_scrollThumbHeight - LIST_BOX_SCROLL_THUMB_TRAVEL_PADDING;
     m_scrollUpPressed = 0;
     m_scrollDownPressed = 0;
     m_itemSelectionTracking = 0;
@@ -290,9 +272,9 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
                     m_items[m_topIndex],
-                    x + TEXT_LEFT_INSET,
-                    y + FIRST_ROW_TEXT_TOP_INSET,
-                    m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+                    x + LIST_BOX_TEXT_LEFT_INSET,
+                    y + LIST_BOX_FIRST_ROW_TEXT_TOP_INSET,
+                    m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     m_topIndex == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
@@ -303,9 +285,9 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
                     *(m_items + m_topIndex + row),
-                    x + TEXT_LEFT_INSET,
-                    y + ROW_TEXT_TOP_INSET,
-                    m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+                    x + LIST_BOX_TEXT_LEFT_INSET,
+                    y + LIST_BOX_ROW_TEXT_TOP_INSET,
+                    m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     m_topIndex + row == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
@@ -315,9 +297,9 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
                     *(m_items + m_topIndex + row),
-                    x + TEXT_LEFT_INSET,
-                    y + ROW_TEXT_TOP_INSET,
-                    m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
+                    x + LIST_BOX_TEXT_LEFT_INSET,
+                    y + LIST_BOX_ROW_TEXT_TOP_INSET,
+                    m_listWidth - LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT * LIST_BOX_TEXT_LEFT_INSET,
                     m_font->m_height + 1,
                     m_topIndex + row == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
@@ -337,7 +319,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         m_scrollTrackFirstFrame,
         ICON_DRAW_NORMAL
     );
-    for (row = SCROLL_TRACK_EDGE_ROW_COUNT; row < m_maxVisibleItems - SCROLL_TRACK_EDGE_ROW_COUNT;
+    for (row = LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT; row < m_maxVisibleItems - LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT;
          row++)
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_scrollTrackX,
@@ -357,11 +339,11 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame,
         ICON_DRAW_NORMAL
     );
-    m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
+    m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + LIST_BOX_SCROLL_THUMB_X_INSET;
     m_scrollThumbY = m_owner->m_posY + m_scrollTrackY
                      + (m_scrollRange > 0 ? m_scrollThumbTravel * m_topIndex / m_scrollRange
-                                          : m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR)
-                     + SCROLL_THUMB_Y_INSET;
+                                          : m_scrollThumbTravel / LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR)
+                     + LIST_BOX_SCROLL_THUMB_Y_INSET;
     m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     if (doUpdate)
         gpWindowManager
@@ -409,8 +391,8 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                         m_scrollThumbDragging = 1;
                         gbSendMouseMoveMessages = true;
                     }
-                    m_topIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
-                                  - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                    m_topIndex = (y - m_scrollTrackY - LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT
+                                  - m_scrollThumbHeight / LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR)
                                  * (m_scrollRange + 1) / m_scrollThumbTravel;
                     if (m_topIndex < 0)
                         m_topIndex = 0;
@@ -461,8 +443,8 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                     DrawLBStuff(1);
                 }
             } else if (m_scrollThumbDragging) {
-                itemIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
-                             - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                itemIndex = (y - m_scrollTrackY - LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT
+                             - m_scrollThumbHeight / LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR)
                             * (m_scrollRange + 1) / m_scrollThumbTravel;
                 if (itemIndex < 0)
                     itemIndex = 0;

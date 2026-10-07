@@ -11,7 +11,6 @@
 #include <string.h>
 
 typedef enum TextWidgetConstant {
-    RESOURCE_NAME_CAPACITY = 16,
     DRAW_MODE_MASK         = 0xff,
     TEXT_BUFFER_GROWTH     = 5
 } TextWidgetConstant;
@@ -45,7 +44,7 @@ textWidget::textWidget(
 }
 
 void textWidget::Read(void) {
-    char resourceName[RESOURCE_NAME_CAPACITY];
+    char resourceName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     i16 length = gpResourceManager->ReadWord();
     m_text = static_cast<char*>(H2_ALLOC(length));
