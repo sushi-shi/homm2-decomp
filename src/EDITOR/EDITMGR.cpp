@@ -1,7 +1,11 @@
 // The scenario editor's main manager (EDITMGR, PoL editor editmgr.cpp): the
 // map view and its rulers, the radar and scroll knobs, the tool panel, the
 // map file and the edits the tool managers ask for.
-// Descriptive names: DrawRulers, DrawView, InitializeMap, FillInOverlayTiles.
+// Descriptive names (no retail string or assertion names them): DrawRulers,
+// DrawView, InitializeMap, FillInOverlayTiles, OverlayTypeAt, GrabObject,
+// CheckObjects, UpdateTriggers, the Count and Write helpers, the map text
+// export and import and their line helpers and textFile, RemoveLinkedObject,
+// and the x_loc frame ranges.
 
 #include <va.h>
 #include <EDITOR/EDITMGR.h>
