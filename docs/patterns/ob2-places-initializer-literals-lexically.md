@@ -47,10 +47,20 @@ per-function literal sections into the main `.data`).
 
 ## Inference
 
-The editor project compiled its own sources with `/Ob2` ("any suitable"
-inline expansion): EDITMGR's `.data` then equals retail byte for byte, and
-every other editor-own object is unchanged. `homm2.manifest.unit_flags`
-applies `/Ob2` to the EDITOR tier for the editor image. Which other units of
-either program shared the setting is not decided by this evidence: a unit
-without a file-scope initializer literal after a function literal is
-indifferent to it.
+- The editor project compiled its own sources with `/Ob2` ("any suitable"
+  inline expansion): EDITMGR's `.data` then equals retail byte for byte, and
+  every other editor-own object is unchanged. `homm2.manifest.unit_flags`
+  applies `/Ob2` to the EDITOR tier for the editor image.
+- BASE's Misc is one translation unit compiled with `/Ob2` (profile
+  `base_nogf_ob2`). `gcCDTrackName = "\\Tracks2\\..."`, `giChangeThreshold`
+  and `iLastSeed` are defined between IsCDDrive and DriveSupportsFreeSpaceQuery
+  (their first users follow), so the pointer and the tables lead Misc's
+  `.data` while the track text sits between the two halves' literals, in
+  both programs. This replaces the earlier two-unit split
+  (`docs/matching/Misc-track-name-data/owner-split.cpp`): the editor's Rich
+  header counts one C++ object per `ctype` registration (65 and 65), which
+  the split could not meet, and both linked images are byte-identical with
+  the one-object Misc.
+- Which other units shared the setting is not decided by this evidence: a
+  unit without a file-scope initializer literal after a function literal is
+  indifferent to it in its linked bytes.
