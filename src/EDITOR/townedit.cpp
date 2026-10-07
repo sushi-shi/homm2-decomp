@@ -41,7 +41,7 @@ VA(0x00429e80, 0x4cc)
 void eventsManager::EditTown(i32 x, i32 y) {
     // Never read: a copy of the cell and a slot of the retail frame.
     mapCell original;
-    i32 unused;
+    i32 H2_UNUSED(unused);
     i32 slot;
     i32 j;
     tag_message msg;
@@ -89,11 +89,11 @@ void eventsManager::EditTown(i32 x, i32 y) {
         msg.payload.widget.id = slot + TOWN_EDIT_FIRST_BUILDING_NAME;
         msg.payload.widget.data.text = gText;
         if (gTownEditBuildings[slot] == BUILDING_SLOT_SPECIAL)
-            sprintf(gText, gSpecialBuildingNames[gTownEdit.faction]);
+            sprintf(gText, gSpecialBuildingNames[IDX(gTownEdit.faction)]);
         else if (gTownEditBuildings[slot] == BUILDING_SLOT_WELL_EXTRA)
-            sprintf(gText, gWellExtraNames[gTownEdit.faction]);
+            sprintf(gText, gWellExtraNames[IDX(gTownEdit.faction)]);
         else
-            sprintf(gText, gNeutralBuildingNames[gTownEditBuildings[slot]]);
+            sprintf(gText, gNeutralBuildingNames[IDX(gTownEditBuildings[slot])]);
         gEditDialog->BroadcastMessage(msg);
     }
     FillInTownEdit(&gTownEdit);
@@ -115,7 +115,7 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     tag_message msg;
 
     msg.type = MESSAGE_WIDGET;
-    msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     msg.payload.widget.id = TOWN_EDIT_CUSTOM_ARMY_TOGGLE;
     msg.payload.widget.command =
         town->hasCustomArmy ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -137,11 +137,11 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
         msg.payload.widget.id = i + TOWN_EDIT_FIRST_TROOP_COUNT;
         gEditDialog->BroadcastMessage(msg);
         msg.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
-        msg.payload.widget.data.value = town->troopTypes[i] + 1;
+        msg.payload.widget.data.value = IDX(town->troopTypes[i]) + 1;
         msg.payload.widget.id = i + TOWN_EDIT_FIRST_TROOP_TYPE;
         gEditDialog->BroadcastMessage(msg);
     }
-    msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     msg.payload.widget.id = TOWN_EDIT_CUSTOM_NAME_TOGGLE;
     msg.payload.widget.command =
         town->hasCustomName ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -159,13 +159,13 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     msg.payload.widget.id = TOWN_EDIT_NAME;
     msg.payload.widget.data.text = text;
     gEditDialog->BroadcastMessage(msg);
-    msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     msg.payload.widget.id = TOWN_EDIT_CAPTAIN;
     msg.payload.widget.command =
         town->hasCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     gEditDialog->BroadcastMessage(msg);
     if (town->isCastle) {
-        msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         msg.payload.widget.id = TOWN_EDIT_ALLOW_CASTLE;
         gEditDialog->BroadcastMessage(msg);
@@ -174,13 +174,13 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
         msg.payload.widget.id = TOWN_EDIT_CASTLE_LABEL;
         gEditDialog->BroadcastMessage(msg);
     } else {
-        msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         msg.payload.widget.id = TOWN_EDIT_ALLOW_CASTLE;
         msg.payload.widget.command = 1 - town->disallowCastle ? WIDGET_COMMAND_SET_FLAGS
                                                               : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
     }
-    msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     msg.payload.widget.id = TOWN_EDIT_CUSTOM_BUILDINGS_TOGGLE;
     msg.payload.widget.command =
         town->hasCustomBuildings ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -199,7 +199,7 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     msg.payload.widget.data.value = town->mageGuildLevel;
     msg.payload.widget.id = TOWN_EDIT_MAGE_GUILD;
     gEditDialog->BroadcastMessage(msg);
-    msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     for (i = 0; i < TOWN_EDIT_DWELLING_COUNT; i++) {
         msg.payload.widget.id = i * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING;
         msg.payload.widget.command =
@@ -219,17 +219,17 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
     for (i = 0; i < TOWN_EDIT_BUILDING_COUNT; i++) {
         msg.payload.widget.id = i + TOWN_EDIT_FIRST_BUILDING;
         msg.payload.widget.command =
-            town->hasCustomBuildings && town->buildings & (1 << gTownEditBuildings[i])
+            town->hasCustomBuildings && town->buildings & BIT(gTownEditBuildings[i])
                 ? WIDGET_COMMAND_SET_FLAGS
                 : WIDGET_COMMAND_CLEAR_FLAGS;
         gEditDialog->BroadcastMessage(msg);
     }
     if (gTownEdit.faction < FACTION_COUNT) {
         for (i = IDX(BUILDING_SLOT_UPGRADE_FIRST); i <= IDX(BUILDING_SLOT_UPGRADE_LAST); i++) {
-            if (!(gTownEligibleBuildMask[gTownEdit.faction] & (1 << i))) {
+            if (!(gTownEligibleBuildMask[IDX(gTownEdit.faction)] & (1 << i))) {
                 msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
                 index = i - IDX(BUILDING_SLOT_DWELLING_SIXTH);
-                msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+                msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                 msg.payload.widget.id =
                     index * TOWN_EDIT_DWELLING_STRIDE + TOWN_EDIT_FIRST_DWELLING + 1;
                 gEditDialog->BroadcastMessage(msg);
@@ -244,7 +244,7 @@ void eventsManager::FillInTownEdit(TownExtra* town) {
         // A necromancer town has no tavern.
         if (gTownEdit.faction == FACTION_NECROMANCER) {
             msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            msg.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             msg.payload.widget.id = TOWN_EDIT_TAVERN;
             gEditDialog->BroadcastMessage(msg);
             msg.payload.widget.id = TOWN_EDIT_TAVERN - TOWN_EDIT_LABEL_STEP;
@@ -263,8 +263,8 @@ MessageDispatchResult EditTownHandler(tag_message& message) {
     i32 number;
     // Never read: slots of the retail frame, the cell editor's handler
     // constants.
-    const i16 firstTextId = 1;
-    const i16 toggleBase = CELL_WINDOW_FIRST_FLAG;
+    const i16 H2_UNUSED(firstTextId) = 1;
+    const i16 H2_UNUSED(toggleBase) = CELL_WINDOW_FIRST_FLAG;
 
     update = false;
     switch (message.type) {
@@ -349,7 +349,7 @@ MessageDispatchResult EditTownHandler(tag_message& message) {
                         case TOWN_EDIT_FIRST_BUILDING + 9:
                         case TOWN_EDIT_FIRST_BUILDING + 10:
                             number = message.payload.widget.id - TOWN_EDIT_FIRST_BUILDING;
-                            building = 1 << gTownEditBuildings[number];
+                            building = BIT(gTownEditBuildings[number]);
                         toggleBuilding:
                             present = gTownEdit.buildings & building;
                             if (present)

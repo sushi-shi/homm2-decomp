@@ -72,7 +72,7 @@ H2_ENUM_BEGIN(StreamTile)
     STREAM_TILE_STRAIGHT_ALT = 0xc
 H2_ENUM_END(StreamTile)
 
-DATA(0x00498c84) i32 gLineTileset = TILESET_ROAD;
+DATA(0x00498c84) TilesetId gLineTileset = TILESET_ROAD;
 DATA(0x00498c88) i32 gLineOverlayFirst = LINE_ROAD_OVERLAY_FIRST;
 DATA(0x004a50f8) u8* gLineMap;
 DATA(0x004a50fc) i32 gLineType;
@@ -103,7 +103,7 @@ void lineManager::Close(void) {
 
 VA(0x004163d1, 0x36c)
 MessageDispatchResult lineManager::Main(tag_message& message) {
-    mapCell* targetCell;
+    mapCell* H2_UNUSED(targetCell);
     i32 newY;
     i32 newX;
     tag_message event;
@@ -215,7 +215,7 @@ void AddLineCell(i32 x, i32 y) {
 }
 
 VA(0x004168aa, 0x7a)
-b32 IsLineTile(i32 tileset, i32 index, b32 alternate) {
+b32 IsLineTile(TilesetId tileset, i32 index, b32 alternate) {
     switch (gLineType) {
         case LINE_ROAD:
             return tileset == TILESET_ROAD
@@ -230,7 +230,7 @@ VA(0x00416924, 0x293)
 void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate) {
     mapCell* cell;
     i32 y;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
     i32 x;
     mapCellExtra* extra;
 
@@ -283,7 +283,7 @@ void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate) {
 #define downLeft downLeft_d   // frame-slot spelling
 VA(0x00416bb7, 0x507)
 void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY) {
-    i32 unusedA;
+    i32 H2_UNUSED(unusedA);
     const i32 up = 0x80;
     const i32 down = 0x40;
     const i32 left = 0x20;
@@ -292,10 +292,10 @@ void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY) {
     const i32 downLeft = 4;
     const i32 downRight = 2;
     i32 x;
-    i32 unused1;
+    i32 H2_UNUSED(unused1);
     const i32 upRight = 1;
     i32 y;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
     i32 mask;
     mapCell* cell;
 
@@ -360,13 +360,13 @@ void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY) {
 
 VA(0x004170be, 0x1fa)
 void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY) {
-    i32 unusedX;
+    i32 H2_UNUSED(unusedX);
     i32 mask;
     i32 y;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
     i32 x;
-    i32 unused1;
-    i32 unused;
+    i32 H2_UNUSED(unused1);
+    i32 H2_UNUSED(unused);
     i32 variant;
 
     if (fromX < 0)
@@ -415,7 +415,7 @@ void DrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY) {
 }
 
 VA(0x00417308, 0x2fa)
-void SetLineTile(i32 x, i32 y, i32 tileset, i32 index, i32 variant) {
+void SetLineTile(i32 x, i32 y, TilesetId tileset, i32 index, i32 variant) {
     mapCellExtra* extra;
     mapCell* cell;
 

@@ -223,7 +223,7 @@ void IncrementArgumentA(i32 value);
 void EditorIdleHook(void);
 void IncrementArgumentB(i32 value);
 void DelayTicks(i32 ticks);
-void ShowStatusText(char* text);
+void ShowStatusText(H2_CONST char* text);
 void ClearStatusText(void);
 
 #endif

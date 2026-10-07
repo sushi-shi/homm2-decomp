@@ -13,6 +13,7 @@
 #include <EDITOR/OVERLAY.h>
 
 struct tag_message;
+H2_ENUM_CLASS_FORWARD(FileRequesterMode);
 
 H2_ENUM_BEGIN(EditClearMask)
     // ClearArea's layer masks: everything, or what a road may cross.
@@ -118,13 +119,13 @@ void AppendTextLine(H2_CONST char* text);
 void WriteTextHeader(i32 x, i32 y, H2_CONST char* kind);
 void ReadTextLine(FILE* file, char* line);
 bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind);
-// The map file requester: loads or saves (`mode`, a FileRequesterMode) and
+// The map file requester: loads or saves by `mode` and
 // stores the chosen file name in gMapFileName.
-b32 PickMap(i32 mode);
+b32 PickMap(FileRequesterMode mode);
 // A map code of the serial (a letter from 'V' and three base-26 letters).
 char* MakeMapCode(i32 serial);
 // Shows a warning on the status bar with a beep.
-void ShowStatusWarning(char* text);
+void ShowStatusWarning(H2_CONST char* text);
 // The ground tile of a terrain and shape: the plain or a varied tile (vary),
 // whose variant is rolled at (x, y) with the given chance (force: whenever
 // the terrain has variants).

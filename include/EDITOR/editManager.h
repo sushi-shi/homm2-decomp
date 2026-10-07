@@ -124,10 +124,8 @@ H2_ENUM_BEGIN(EditToolPanel)
 H2_ENUM_END(EditToolPanel)
 
 H2_ENUM_BEGIN(EditManagerSetting)
-    // The editor manager's Main accepts these messages; its pointer is
-    // editor.mse frame 0.
-    EDIT_MANAGER_DISPATCH_MASK = 0x4000,
-    EDIT_POINTER_DEFAULT       = 0
+    // The editor manager's pointer is editor.mse frame 0.
+    EDIT_POINTER_DEFAULT = 0
 H2_ENUM_END(EditManagerSetting)
 
 H2_ENUM_BEGIN(EditManagerLayout)
@@ -230,7 +228,7 @@ public:
     // Before a save: compacts the extras and gives every cell the trigger
     // of its catalogue type, its coast and its line flags.
     void UpdateTriggers(void);
-    b32 Confirm(char* question);
+    b32 Confirm(H2_CONST char* question);
     b32 HasObject(i32 trigger);
     i32 CountArtifacts(void);
     i32 CountEvents(void);
@@ -244,7 +242,7 @@ public:
     // The save checks' message list.
     void ClearErrors(void);
     void ShowErrors(void);
-    void AddError(char* text);
+    void AddError(H2_CONST char* text);
     void ResetArea(i32 x, i32 y, i32 width, i32 height);
     // Clears the cells and gives them the terrain's tiles: PaintGround in
     // view cells, FillGround in map cells.
@@ -285,7 +283,7 @@ public:
     void RandomizeTownNames(void);
     // Scrolls the view one cell in a MapDirection, and while the pointer
     // rests at a screen edge.
-    void ScreenScroll(i32 direction, b32 updatePointer);
+    void ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, b32 updatePointer);
     void CheckScreenScroll(void);
     // The map cell of the index-th artifact in row order (see FindTown).
     b32 FindArtifact(i32 index, i32* x, i32* y);

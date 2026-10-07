@@ -172,7 +172,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
 
 VA(0x0042602c, 0xaa)
 MessageDispatchResult SetupMainHandler(struct tag_message& message) {
-    b32 handled = false;
+    b32 H2_UNUSED(handled) = false;
     i32 helpIndex;
 
     PollSound();

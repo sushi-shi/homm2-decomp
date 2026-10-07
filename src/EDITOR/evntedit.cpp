@@ -27,7 +27,7 @@ VA(0x004134b0, 0x392)
 i32 eventsManager::EditEvent(i32 extra) {
     i32 control;
     // Never read: a slot of the retail frame.
-    i32 unused;
+    i32 H2_UNUSED(unused);
     i32 byteCount;
     tag_message message;
     i32 i;
@@ -59,7 +59,7 @@ i32 eventsManager::EditEvent(i32 extra) {
         gEditDialog->BroadcastMessage(message);
     }
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     for (control = EVENT_EDIT_FIRST_MAP_ROW; control < EVENT_EDIT_MAP_ROW_END; control++) {
         message.payload.widget.id = control;
         message.payload.widget.command =
@@ -98,7 +98,7 @@ void eventsManager::FillInEventEdit(EventExtra* event) {
     i32 i;
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         message.payload.widget.id = i + EVENT_EDIT_FIRST_PLAYER;
         message.payload.widget.command = gEditMapHeader.playerEnabled[i]
@@ -155,10 +155,10 @@ VA(0x00413aca, 0x447)
 MessageDispatchResult EditEventHandler(tag_message& message) {
     tag_message query;
     // Never read: slots of the retail frame.
-    i32 unused;
-    i32 unusedValue;
+    i32 H2_UNUSED(unused);
+    i32 H2_UNUSED(unusedValue);
     b32 update;
-    i32 reserved;
+    i32 H2_UNUSED(reserved);
     i32 playerIndex;
 
     update = false;
