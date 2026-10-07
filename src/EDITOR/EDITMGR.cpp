@@ -25,6 +25,7 @@
 #include <EDITOR/RANDOM.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <SOURCE/ADVMGR.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/CONFIG_TYPES.h>
 #include <BASE/bitmap.h>
@@ -119,17 +120,12 @@ H2_ENUM_BEGIN(EditCellLayer)
 H2_ENUM_END(EditCellLayer)
 
 H2_ENUM_BEGIN(EditRadarGeometry)
-    // The radar at (480, 16) of the 640-pixel screen: a 144-pixel square a
-    // small map fills with 4x4 dots, a medium one with 2x2, a large one with
-    // a 2-1-1 pattern of rows and columns (EDIT_RADAR_LARGE_SCALE), an extra
-    // large one with 1x1.
-    EDIT_RADAR_LEFT   = 0x1e0,
-    EDIT_RADAR_TOP    = 0x10,
+    // The adventure radar square (ADVMGR.h) of the 640-pixel screen: a small
+    // map fills it with 4x4 dots, a medium one with 2x2, a large one with a
+    // 2-1-1 pattern of rows and columns (ADVENTURE_RADAR_LARGE_SCALE_DIVISOR),
+    // an extra large one with 1x1.
     EDIT_SCREEN_PITCH = LOGICAL_SCREEN_WIDTH,
-    EDIT_RADAR_OFFSET = EDIT_RADAR_TOP * EDIT_SCREEN_PITCH + EDIT_RADAR_LEFT,
-    EDIT_RADAR_SMALL_DOT  = 4,
-    EDIT_RADAR_MEDIUM_DOT = 2,
-    EDIT_RADAR_PHASES = 3,
+    EDIT_RADAR_OFFSET = IDX(ADVENTURE_RADAR_TOP) * EDIT_SCREEN_PITCH + IDX(ADVENTURE_RADAR_LEFT),
     EDIT_RADAR_LARGE_WIDE_DOT = 2,
     // The obstacle, town and unseen colours, and the view outline's.
     EDIT_RADAR_OBSTACLE_SHADE = 3,
@@ -6135,14 +6131,14 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
         dst = line;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                line += EDIT_RADAR_SMALL_DOT * EDIT_SCREEN_PITCH;
+                line += IDX(ADVENTURE_RADAR_SMALL_CELL_PIXELS) * EDIT_SCREEN_PITCH;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                line += EDIT_RADAR_MEDIUM_DOT * EDIT_SCREEN_PITCH;
+                line += IDX(ADVENTURE_RADAR_MEDIUM_CELL_PIXELS) * EDIT_SCREEN_PITCH;
                 break;
             case MAP_DIMENSION_LARGE:
                 rowPhase++;
-                if (rowPhase > EDIT_RADAR_PHASES - 1)
+                if (rowPhase > ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1)
                     rowPhase = 0;
                 if (rowPhase)
                     line += EDIT_SCREEN_PITCH;
@@ -6202,16 +6198,16 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                 color = EDIT_RADAR_UNSEEN_COLOR;
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    memset(dst, color, EDIT_RADAR_SMALL_DOT);
-                    memset(dst + EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
-                    memset(dst + 2 * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
-                    memset(dst + 3 * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);
-                    dst += EDIT_RADAR_SMALL_DOT;
+                    memset(dst, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
+                    memset(dst + EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
+                    memset(dst + 2 * EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
+                    memset(dst + 3 * EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
+                    dst += ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    memset(dst, color, EDIT_RADAR_MEDIUM_DOT);
-                    memset(dst + EDIT_SCREEN_PITCH, color, EDIT_RADAR_MEDIUM_DOT);
-                    dst += EDIT_RADAR_MEDIUM_DOT;
+                    memset(dst, color, ADVENTURE_RADAR_MEDIUM_CELL_PIXELS);
+                    memset(dst + EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_MEDIUM_CELL_PIXELS);
+                    dst += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     if (xPhase) {
@@ -6235,7 +6231,7 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                         dst += EDIT_RADAR_LARGE_WIDE_DOT;
                     }
                     xPhase++;
-                    if (xPhase > EDIT_RADAR_PHASES - 1)
+                    if (xPhase > ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1)
                         xPhase = 0;
                     break;
                 case MAP_DIMENSION_XLARGE:
@@ -6256,8 +6252,8 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                     frame = EDIT_RADAR_OUTLINE_56;
                     break;
             }
-            radarX = m_viewX * EDIT_RADAR_SMALL_DOT;
-            radarY = m_viewY * EDIT_RADAR_SMALL_DOT;
+            radarX = m_viewX * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
+            radarY = m_viewY * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
             switch (m_zoomLevel) {
@@ -6271,8 +6267,8 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                     frame = EDIT_RADAR_OUTLINE_28;
                     break;
             }
-            radarX = m_viewX * EDIT_RADAR_MEDIUM_DOT;
-            radarY = m_viewY * EDIT_RADAR_MEDIUM_DOT;
+            radarX = m_viewX * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
+            radarY = m_viewY * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             switch (m_zoomLevel) {
@@ -6306,7 +6302,7 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
             break;
     }
     m_radarIcons->FillToBuffer(
-        radarX + EDIT_RADAR_LEFT, radarY + EDIT_RADAR_TOP, frame, EDIT_RADAR_VIEW_COLOR,
+        radarX + ADVENTURE_RADAR_LEFT, radarY + ADVENTURE_RADAR_TOP, frame, EDIT_RADAR_VIEW_COLOR,
         ICON_DRAW_NORMAL, NULL
     );
     UpdateKnobs(true);
@@ -6768,15 +6764,15 @@ void editManager::DoRadar(void) {
     float scale;
 
     gpMouseManager->MouseCoords(x, y);
-    if (x < EDIT_RADAR_LEFT || x > EDIT_RADAR_LEFT + IDX(EDIT_RADAR_SIZE) || y < EDIT_RADAR_TOP
-        || y > EDIT_RADAR_TOP + IDX(EDIT_RADAR_SIZE))
+    if (x < ADVENTURE_RADAR_LEFT || x > ADVENTURE_RADAR_LEFT + IDX(EDIT_RADAR_SIZE)
+        || y < ADVENTURE_RADAR_TOP || y > ADVENTURE_RADAR_TOP + IDX(EDIT_RADAR_SIZE))
         return;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
-            scale = EDIT_RADAR_SMALL_DOT;
+            scale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
-            scale = EDIT_RADAR_MEDIUM_DOT;
+            scale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             scale = static_cast<float>(EDIT_RADAR_LARGE_SCALE);
@@ -6785,8 +6781,8 @@ void editManager::DoRadar(void) {
             scale = 1.0f;
             break;
     }
-    x = (x - EDIT_RADAR_LEFT) / scale;
-    y = (y - EDIT_RADAR_TOP) / scale;
+    x = (x - ADVENTURE_RADAR_LEFT) / scale;
+    y = (y - ADVENTURE_RADAR_TOP) / scale;
     m_viewX = x - gZoomViewCells[m_zoomLevel] / 2;
     if (m_viewX + gZoomViewCells[m_zoomLevel] > MAP_WIDTH)
         m_viewX = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
@@ -6809,8 +6805,8 @@ void editManager::DoRadar(void) {
                 input = gpInputManager->GetEvent();
             }
             gpMouseManager->Main(mouseMove);
-            x = (mouseMove.payload.mouse.x - EDIT_RADAR_LEFT) / scale;
-            y = (mouseMove.payload.mouse.y - EDIT_RADAR_TOP) / scale;
+            x = (mouseMove.payload.mouse.x - ADVENTURE_RADAR_LEFT) / scale;
+            y = (mouseMove.payload.mouse.y - ADVENTURE_RADAR_TOP) / scale;
             m_viewX = x - gZoomViewCells[m_zoomLevel] / 2;
             if (m_viewX + gZoomViewCells[m_zoomLevel] > MAP_WIDTH)
                 m_viewX = MAP_WIDTH - gZoomViewCells[m_zoomLevel];
@@ -9189,9 +9185,7 @@ H2_ENUM_BEGIN(EditScreenScroll)
     // The pointer scrolls the view every 70 ms while it rests within 8
     // pixels of a screen edge, showing the scroll pointer of the direction.
     EDIT_SCROLL_TICK_INTERVAL = 70,
-    EDIT_SCROLL_BORDER        = 8,
-    EDIT_SCROLL_POINTER_FIRST = 32,
-    EDIT_SCROLL_POINTER_END   = 40
+    EDIT_SCROLL_BORDER        = 8
 H2_ENUM_END(EditScreenScroll)
 
 // The tick the view last scrolled.
@@ -9237,7 +9231,7 @@ void editManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, b32 u
             break;
     }
     if (updatePointer)
-        gpMouseManager->SetPointer(IDX(direction) + EDIT_SCROLL_POINTER_FIRST);
+        gpMouseManager->SetPointer(IDX(direction) + ADVENTURE_POINTER_SCROLL_FIRST);
     if (xOrigin < 0)
         xOrigin = 0;
     if (xOrigin > MAP_WIDTH - gZoomViewCells[m_zoomLevel])
@@ -9298,8 +9292,8 @@ void editManager::CheckScreenScroll(void) {
                 ScreenScroll(MAP_DIRECTION_SOUTH, 1);
             }
         }
-        if (gpMouseManager->m_cursorFrame >= EDIT_SCROLL_POINTER_FIRST
-            && gpMouseManager->m_cursorFrame < EDIT_SCROLL_POINTER_END && oldMapX == m_viewX
+        if (gpMouseManager->m_cursorFrame >= ADVENTURE_POINTER_SCROLL_FIRST
+            && gpMouseManager->m_cursorFrame < ADVENTURE_POINTER_SCROLL_END && oldMapX == m_viewX
             && oldMapY == m_viewY)
             gpMouseManager->SetPointer(EDIT_POINTER_DEFAULT);
     }

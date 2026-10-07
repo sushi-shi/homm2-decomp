@@ -71,6 +71,65 @@ src/SOURCE/GAME.cpp	game::SetupTowns	500	code	*attempts++ > 500*	the mage-guild 
 src/SOURCE/GAME.cpp	CompressTest2	255	code	fromData[[]index[]] = Random(0, 255);	a random byte of compression test data
 src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	cell->m_objectMetadata = Random(*	a random resource's amount range by kind (wood and ore, gold, the rest), retail values
 src/SOURCE/GAME.cpp	game::SetupTowns	99	code	*defaultDwellingRoll[[]Random(0, 99) / *	a 0..99 percentage roll, bucketed into the ten deciles of defaultDwellingRoll
+# adventure, world and AI: ADVMGR, EVENTS, Viewwrld, DRAWING, HERO, AI, ARMYGRP, SPELLAI, PHILAI
+src/SOURCE/ADVMGR.cpp	advManager::GetCursorSampleSet	*	local-table	*	Retail sample-suffix table: the wsnd sample variant each of the ADVMGR_CURSOR_SAMPLE_COUNT cursor sounds loads.
+src/SOURCE/ADVMGR.cpp	advManager::Main	*	code	commandValue = *;	Cheat digit: the decimal value the INPUT_SCAN_0..INPUT_SCAN_9 key types, folded into giCheatSeq by CHEAT_SEQUENCE_RADIX.
+src/SOURCE/ADVMGR.cpp	advManager::ProcessSelect	1.3333f	code	fScale = 1.3333f;	Large-map radar scale: ADVENTURE_RADAR_SIZE / MAP_DIMENSION_LARGE pixels per cell as the float retail stores (no integer name).
+src/SOURCE/ADVMGR.cpp	advManager::UpdateRadar	1.33f	code	fScale = 1.33f;	Large-map radar scale: ADVENTURE_RADAR_SIZE / MAP_DIMENSION_LARGE pixels per cell as the float retail stores (no integer name).
+src/SOURCE/ADVMGR.cpp	advManager::UpdateScreen	[35]	code	if (m_animationTick == 1 || m_animationTick == 3 || m_animationTick == 5) {	The odd ticks of the UPDATE_ANIMATION_PHASES cycle, which advance the odd animation columns.
+src/SOURCE/ADVMGR.cpp	advManager::UpdBottomViewHero	*	local-table	*	Retail layout tables: the creature icon positions of the bottom hero view and the positions used for one to five occupied army slots (-1 unused).
+src/SOURCE/ADVMGR.cpp	advManager::SetHeroContext	4	code	4	game::RestoreCell's unused last argument: each retail call site passes its own tag, which the callee never reads.
+src/SOURCE/ADVMGR.cpp	advManager::ViewPuzzle	*	local-table	*	Retail puzzle reveal order: the PUZZLE_PIECE_COUNT piece indices in the order obelisk visits uncover them.
+src/SOURCE/EVENTS.cpp	advManager::EraseObj	*	code	*	Tileset frame table: the object frame of each wide or shadowed adventure object (X_LOC2, OBJNMULT, OBJNDSRT, OBJNWATR, OBJNRSRC), the frame its erase redraw starts from, and the wide X_LOC2 object's cell offsets by frame.
+src/SOURCE/EVENTS.cpp	advManager::CombatMonsterEvent	*	code	*	Army-slot permutation: slot indices 0..4 (ARMY_GROUP_SLOT_COUNT) that centre one to three stacks and spread secondary and tertiary stacks, selected by those stack counts.
+src/SOURCE/EVENTS.cpp	GiveTakeArtifactStat	*	code	stats[[]IDX(HERO_PRIMARY_*)] = *;	Artifact primary-stat bonus: the retail amount each artifact adds to that HERO_PRIMARY_* stat.
+src/SOURCE/EVENTS.cpp	advManager::GenericSiteAIEvent	*	code	i32 H2_UNUSED(*)[[]*];	Unused local arrays sized as the retail stack frame reserves them.
+src/SOURCE/Viewwrld.cpp	advManager::VWCompleteDraw	*	code	case *:	Ground tile shape (giGroundShape & WORLD_GROUND_SHAPE_MASK) grouped onto the GROUND_FRAME_* view-world frame it draws.
+src/SOURCE/Viewwrld.cpp	advManager::VWCompleteDraw	*	code	*[[]SCALE_INDEX_*] = *;	Per-scale pixel offsets of the town flag, the town and hero icon and the mine letter for SCALE_INDEX_FAR, _MIDDLE and _NEAR.
+src/SOURCE/Viewwrld.cpp	ViewWorldDialogHandler	1.3333f	code	radarScale = 1.3333f;	Large-map radar scale: ADVENTURE_RADAR_SIZE / MAP_DIMENSION_LARGE pixels per cell as the float retail stores (no integer name).
+src/SOURCE/DRAWING.cpp	combatManager::DrawFrame	*	local-table	*	Retail castle wall tables: the screen x/y of the four wall sections per faction and the frame offset of each wall damage state.
+src/SOURCE/HERO.cpp	hero::CalcMobility	*	local-table	*	Retail land mobility by the army's slowest creature speed (LAND_SPEED_COUNT entries).
+src/SOURCE/AI.cpp	combatManager::DoCompAI	*	code	rowLimit[[]*] = COMBAT_AI_CASTLE_BOUNDARY_ROW_*;	Combat grid row index: each row's limit is the COMBAT_AI_CASTLE_BOUNDARY_ROW_n of the same row.
+src/SOURCE/ARMYGRP.cpp	armyGroup::DamageGroup	0.999	code	*	Casualty fraction just below one: the first troop keeps one creature unless the whole group dies.
+src/SOURCE/SPELLAI.cpp	combatManager::EffectSpellDamage	2	code	*COMBAT_DIRECTION_ADJACENT_COUNT * 2*	Two rings of adjacent hexes: steps past the first COMBAT_DIRECTION_ADJACENT_COUNT walk the second ring.
+src/SOURCE/PHILAI.cpp	philAI::*	*	code	*H2_UNUSED(*)[[]*];	Unused local arrays sized as the retail stack frame reserves them.
+src/SOURCE/PHILAI.cpp	philAI::DoAI	3	code	b32 savedShow[[]3];	Saved bShowIt slots: the retail frame reserves three and the move loop uses the first.
+src/SOURCE/PHILAI.cpp		*	declaration	DATA(*) float gfAttack*Bonus = *;	Retail initial value of the attack-bonus globals, which GetTurnAIVars rewrites every turn.
+src/SOURCE/PHILAI.cpp	philAI::DoDimensionDoor	7	code	*abs(*) <= 7*	Dimension Door reach: seven cells either side of the hero, the half-width of the 15-cell adventure view a human casts into.
+src/SOURCE/PHILAI.cpp	philAI::DoAnywhereDDoorTownGate	7	code	*abs(*) > 7*	Dimension Door reach: seven cells either side of the hero, the half-width of the 15-cell adventure view a human casts into.
+src/SOURCE/PHILAI.cpp	philAI::GetBestBHC	100.0f	code	LogInt(*	Debug log scale: the purchase value printed as a percentage.
+src/SOURCE/PHILAI.cpp	philAI::GoodAdjacent	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::CheckReload	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::CheckBerserk	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::DoAnywhereDDoorTownGate	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::DoDimensionDoor	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::DoAI	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetTurnAIVars	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetBestBHC	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::DetermineTargetPosition	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ValueOfBuyingBuilding	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetBestBuilding	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetBestCreature	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ValueOfBuyingHero	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetBestHero	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::LikelihoodOfEnemyAttacking	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetGameAttentionValue	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::GetTurnAttentionValue	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::TurnsToBuy	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::StrategicValueOfPosition	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ValueOfTown	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::TurnCostResource	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::TurnValueOfObelisk	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::FightValueOfStack	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::HeroInteractionAtTown	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ChooseGoldOrExperience	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ManaRefreshValue	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::ValueOfEventAtPosition	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::EvaluateBarrier	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::EvaluatePassword	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::EvaluateJail	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::EvaluateMonsterEvent	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
+src/SOURCE/PHILAI.cpp	philAI::EvaluateHeroEvent	*	code	*	An AI tuning weight, threshold, estimate or sentinel of the philAI evaluation heuristics (retail value, no game-rule domain).
 src/BASE/FONT.cpp	font::ExtractLine	2	code	*	the hyphenation offsets: the break scan starts two characters before the overflowing word's end, and the terminator follows the inserted hyphen (+ 1 is the hyphen)
 src/BASE/Ripple.cpp	DoRipple	*	local-table	*	the ripple profile's per-column row displacements (retail table)
 src/BASE/WINMGR.cpp	CycleColors	*	local-table	*	the world view's cycled palette entries (retail table)
@@ -79,7 +138,7 @@ src/EDITOR/*.cpp	*	*	code	case *FIRST* + *:	the n-th control of a widget-id run 
 src/EDITOR/*.cpp	*	*	code	i32 H2_UNUSED(unused*)[[]*];	an unused local array kept for the retail stack frame
 src/EDITOR/*.cpp	*	*	declaration	DATA(*) i32 gUnusedData*	an unreferenced retail datum's initializer or element count (it keeps its retail .data place)
 src/EDITOR/EDITMGR.cpp	editManager::Main	*	code	amount = ?;	the digit key's ground-variety level (Ctrl+0..9 calls RandomizeGround with 0..9)
-src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, EDIT_RADAR_SMALL_DOT);	the third and fourth rows of a small map's 4x4 radar dot
+src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);	the third and fourth rows of a small map's 4x4 radar dot
 src/EDITOR/EDITMGR.cpp	editManager::DoRadar	2	code	*gZoomViewCells[[]m_zoomLevel] / 2;	half the view: a radar click centres the view on its cell
 src/EDITOR/*.cpp	*Knob	0.5	code	* + 0.5;	rounds the knob's scaled position to the nearest cell or row
 src/EDITOR/EDITMGR.cpp	editManager::CheckObjects	2	code	*gates[[]2]*	the third travel-gate kind's count (gates holds EDIT_TRAVEL_GATE_KINDS counts)

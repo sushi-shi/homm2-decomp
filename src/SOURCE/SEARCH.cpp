@@ -368,7 +368,7 @@ void searchArray::SeedPosition(
                                     s_neighborCell =
                                         gpAdvManager->GetCell(s_adjacentX, s_candidateY);
                                     s_directionOpen = true;
-                                    if (((1 << IDX(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
+                                    if (((1 << IDX(s_direction)) & MAP_DIRECTIONS_SOUTHWARD) != 0
                                         && CELL_HAS_NON_SHADOW_OBJECT(s_neighborCell)) {
                                         s_directionOpen = false;
                                     }

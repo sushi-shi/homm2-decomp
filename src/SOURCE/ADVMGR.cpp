@@ -80,10 +80,6 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
     VIEW_EDGE_MARGIN = 8,
     VIEW_CENTER_CELL = VIEW_EDGE_MARGIN - 1,
     VIEW_LAST_CELL = VIEW_CELL_COUNT - 1,
-    RADAR_LEFT = 480,
-    RADAR_RIGHT = 624,
-    RADAR_TOP = 16,
-    RADAR_BOTTOM = 160,
     PUZZLE_TILE_SIZE = 32,
     PUZZLE_X_TRIM = 12
 H2_ENUM_END(AdventureScreenConstant)
@@ -130,8 +126,6 @@ H2_ENUM_END(AdventureDrawConstant)
 
 H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
     UPDATE_NONE = -1,
-    UPDATE_VIEWPORT_ORIGIN = 16,
-    UPDATE_VIEWPORT_SIZE = 448,
     UPDATE_ANIMATION_PHASES = 6,
     UPDATE_FRAME_CYCLE = 18
 H2_ENUM_END(AdventureUpdateScreenConstant)
@@ -148,28 +142,6 @@ H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
     ANIMATION_PHASE_COLUMN_3_INITIAL = 13
 H2_ENUM_END(AdventureAnimationPhaseIndex)
 
-H2_ENUM_BEGIN(AdventureSourceLineConstant)
-    CLOSE_BORDER_FREE_LINE_BASE = 0x0124,
-    BORDER_INITIAL_FREE_LINE_OFFSET = 22,
-    BORDER_SECONDARY_FREE_LINE_OFFSET = 9,
-    BORDER_ALLOC_LINE_OFFSET = 4,
-    NEW_TURN_LINE_BASE = 0x11d0,
-    RESOURCE_VIEW_LINE_BASE = 0x122f,
-    KINGDOM_VIEW_LINE_BASE = 0x1296,
-    BOTTOM_HERO_LINE_BASE = 0x12e3,
-    BOTTOM_HERO_ALLOC_LINE_OFFSET = 0x44,
-    QUICK_VIEW_LINE_BASE = 0x1376,
-    QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET = 0x9b,
-    QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET = 0xe3,
-    QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x10e,
-    TOWN_VIEW_LINE_BASE = 0x14e2,
-    TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET = 0x83,
-    TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET = 0xd6,
-    TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET = 0x108,
-    REDRAW_BORDER_FREE_LINE_BASE = 0x1628,
-    SAVE_BORDER_ALLOC_LINE_BASE = 0x2025
-H2_ENUM_END(AdventureSourceLineConstant)
-
 H2_ENUM_BEGIN(AdventureBorderConstant)
     BORDER_BUFFER_SIZE = 0x7400,
     BORDER_EDGE_SIZE = 16,
@@ -184,14 +156,6 @@ H2_ENUM_BEGIN(AdventureScrollConstant)
 H2_ENUM_END(AdventureScrollConstant)
 
 H2_ENUM_BEGIN(AdventureButtonConstant)
-    BUTTON_FIRST         = 1,
-    BUTTON_LAST          = 6,
-    BUTTON_SLOT_1        = 1,
-    BUTTON_SLOT_2        = 2,
-    BUTTON_SLOT_3        = 3,
-    BUTTON_SLOT_4        = 4,
-    BUTTON_SLOT_5        = 5,
-    BUTTON_SLOT_6        = 6,
     BUTTON_BROADCAST_ARG = 1,
 H2_ENUM_END(AdventureButtonConstant)
 
@@ -205,22 +169,7 @@ H2_ENUM_BEGIN(AdventureHoverConstant)
     HOVER_UNREACHABLE = 0x80,
     HOVER_ROUTE_DAY_LIMIT = 3,
     HOVER_ROUTE_FRAMES_PER_DAY = 6,
-    HOVER_SCROLL_FRAME_FIRST = 32,
-    HOVER_SCROLL_FRAME_END = 40
 H2_ENUM_END(AdventureHoverConstant)
-
-H2_ENUM_BEGIN(AdventurePointerFrame)
-    POINTER_DEFAULT = 0,
-    POINTER_HERO = 2,
-    POINTER_TOWN = 3,
-    POINTER_MOVE = 4,
-    POINTER_ATTACK = 5,
-    POINTER_SAIL = 6,
-    POINTER_DISEMBARK = 7,
-    POINTER_SELECT_HERO = 8,
-    POINTER_ACTION = 9,
-    POINTER_WATER_ACTION = 28
-H2_ENUM_END(AdventurePointerFrame)
 
 H2_ENUM_BEGIN(AdventureFrameConstant)
     MOBILITY_SCALE = 22,
@@ -254,20 +203,14 @@ H2_ENUM_BEGIN(AdventureStateConstant)
     CURSOR_SAMPLE_FAST_SET = 2,
 #endif
     HERO_ICON_FROTH = IDX(HERO_TYPE_BOAT) + 1,
-    ADVENTURE_FADE_STEPS = 8,
     FORCED_MUSIC_DELAY = 6000,
     QUICK_VIEW_NONE = -99,
     UNUSED_OBJECT_ICON_1 = 21,
     UNUSED_OBJECT_ICON_2 = 38
 H2_ENUM_END(AdventureStateConstant)
 
-H2_ENUM_BEGIN(AdventureMainConstant)
-    ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
-H2_ENUM_END(AdventureMainConstant)
-
 H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_ORIGIN_NONE = -1,
-    ENVIRONMENT_SOUND_LOG_UNUSED = -999,
     ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
     ENVIRONMENT_SOUND_MAX_DISTANCE = 5,
     ENVIRONMENT_VOLUME_COUNT = 8,
@@ -278,8 +221,6 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
 H2_ENUM_END(AdventureEnvironmentSoundConstant)
 
 H2_ENUM_BEGIN(AdventureTeleportConstant)
-    TELEPORT_MAP_CHANGE_VALUE = -999,
-    TELEPORT_CELL_OBJECT_FLAG = 0x40,
     TELEPORT_RESTORE_MODE = 99,
     TELEPORT_DELAY = 90,
     TELEPORT_FIZZLE_TIME = 128,
@@ -340,11 +281,8 @@ H2_ENUM_BEGIN(AdventureSystemOptionConstant)
 H2_ENUM_END(AdventureSystemOptionConstant)
 
 H2_ENUM_BEGIN(AdventureSummonBoatConstant)
-    SUMMON_OCCUPIED_FLAG = 0x80,
     SUMMON_MIN_DISTANCE = 2,
     SUMMON_RESTORE_MODE = 5,
-    SUMMON_SCREEN_MARGIN = 16,
-    SUMMON_SCREEN_LIMIT = 464,
     SUMMON_FIZZLE_X_OFFSET = 48,
     SUMMON_FIZZLE_WIDTH = 112,
     SUMMON_FIZZLE_HEIGHT = 80,
@@ -404,9 +342,6 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
-    RADAR_SIZE = MAP_DIMENSION_XLARGE,
-    RADAR_ROW_GROUPS = 5,
-    RADAR_GROUP_BYTES = 128,
     RADAR_UNSEEN_COLOR = 0x24,
     RADAR_VIEWPORT_COLOR = 181,
     RADAR_NEUTRAL_OWNER = GAME_PLAYER_COUNT,
@@ -414,10 +349,6 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_PARTIAL_MARGIN = 2,
     RADAR_PARTIAL_SPAN = 16,
     RADAR_TOWN_RADIUS = 2,
-    RADAR_SMALL_CELL_PIXELS = 4,
-    RADAR_MEDIUM_CELL_PIXELS = 2,
-    RADAR_LARGE_SCALE_DIVISOR = 3,
-    RADAR_LARGE_SCALE_ROUNDING = RADAR_LARGE_SCALE_DIVISOR - 1,
     RADAR_FRAME_NONE = -1,
     RADAR_FRAME_NORMAL_XLARGE = 1,
     RADAR_FRAME_NORMAL_LARGE = 2,
@@ -587,9 +518,9 @@ H2_ENUM_END(AdventureLocatorConstant)
 
 H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
     QUICK_VIEW_MIN_X = 30,
-    QUICK_VIEW_MIN_Y = 16,
+    QUICK_VIEW_MIN_Y = ADVENTURE_VIEW_BORDER,
     QUICK_VIEW_RIGHT = 448,
-    QUICK_VIEW_BOTTOM = 464,
+    QUICK_VIEW_BOTTOM = ADVENTURE_VIEW_END,
     HERO_QUICK_VIEW_X_OFFSET = 73,
     HERO_QUICK_VIEW_Y_OFFSET = 72,
     HERO_QUICK_VIEW_WIDTH = 192,
@@ -606,10 +537,7 @@ H2_ENUM_END(AdventureQuickViewPlacementConstant)
 
 H2_ENUM_BEGIN(AdventureSpellConstant)
     TRAVEL_SPELL_MOBILITY_COST = 225,
-    MINE_GUARDIAN_MAX_POWER = 51,
     MINE_GUARDIANS_PER_POWER = 4,
-    MINE_GUARDIAN_VALUE_COUNT = 2,
-    MINE_GUARDIAN_TYPE_INDEX = 0
 H2_ENUM_END(AdventureSpellConstant)
 
 H2_ENUM_BEGIN(AdventureSaveConstant)
@@ -617,7 +545,6 @@ H2_ENUM_BEGIN(AdventureSaveConstant)
     SAVE_PATTERN_SIZE = 16,
     SAVE_REQUESTER_X = 131,
     SAVE_REQUESTER_Y = 58,
-    SAVE_POINTER_FRAME = 0
 H2_ENUM_END(AdventureSaveConstant)
 
 H2_ENUM_BEGIN(AdventureBottomViewConstant)
@@ -647,8 +574,6 @@ H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
     NEW_TURN_WEEK_TEXT_HEIGHT = 12,
     NEW_TURN_DAY_TEXT_HEIGHT = 25,
     NEW_TURN_FIRST_DAY = 1,
-    NEW_TURN_WEEK_ALLOC_LINE_OFFSET = 0x29,
-    NEW_TURN_DAY_ALLOC_LINE_OFFSET = 0x43
 H2_ENUM_END(AdventureNewTurnViewConstant)
 
 H2_ENUM_BEGIN(AdventureResourceViewConstant)
@@ -666,8 +591,6 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
     RESOURCE_VIEW_COUNT_Y = 453,
     RESOURCE_VIEW_COUNT_WIDTH = 80,
     RESOURCE_VIEW_COUNT_HEIGHT = 12,
-    RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET = 0x26,
-    RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x50
 H2_ENUM_END(AdventureResourceViewConstant)
 
 H2_ENUM_BEGIN(AdventureKingdomViewConstant)
@@ -691,7 +614,6 @@ H2_ENUM_BEGIN(AdventureKingdomViewConstant)
     KINGDOM_VIEW_GOLD_TEXT_X = 123,
     KINGDOM_VIEW_CASTLE_TEXT_X = 27,
     KINGDOM_VIEW_VILLAGE_TEXT_X = 80,
-    KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x32
 H2_ENUM_END(AdventureKingdomViewConstant)
 
 H2_ENUM_BEGIN(AdventureVisionsConstant)
@@ -747,8 +669,6 @@ H2_ENUM_END(AdventureCloudNeighbor)
 
 H2_ENUM_BEGIN(AdventureQuickInfoObject)
     OBELISK_INDEX_BASE             = 1,
-    RESOURCE_FRAME_PAIR_MASK       = ~1,
-    RESOURCE_FRAME_PAIR_STRIDE     = 2,
     CRYSTAL_BALL_RADIUS            = 8,
     ROUTE_BEYOND_MOBILITY_FLAG     = 0x100,
     HERO_FRAME_MIRROR_FLAG         = 0x80,
@@ -758,7 +678,7 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     QUICK_INFO_X_OFFSET            = 57,
     QUICK_INFO_MIN_X               = QUICK_VIEW_MIN_X,
     QUICK_INFO_WIDTH               = 160,
-    QUICK_INFO_RIGHT               = 464,
+    QUICK_INFO_RIGHT               = ADVENTURE_VIEW_END,
     QUICK_INFO_RIGHT_X             = QUICK_INFO_RIGHT - QUICK_INFO_WIDTH,
     QUICK_INFO_Y_OFFSET            = 25,
     QUICK_INFO_MIN_Y               = QUICK_VIEW_MIN_Y,
@@ -781,6 +701,7 @@ H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_RESOURCE_AMOUNT = 10,
     CHEAT_GOLD_AMOUNT = 1000,
     CHEAT_EXPERIENCE_AMOUNT = 3000,
+    CHEAT_PUZZLE_PIECE_AMOUNT = 12,
     CHEAT_BLACK_DRAGON_COUNT = 5,
     CHEAT_REVEAL_CENTER = 30,
     CHEAT_REVEAL_RADIUS = 180
@@ -826,6 +747,17 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     LOCATOR_PAGE_STEP         = 4
 H2_ENUM_END(AdventurePanelCommand)
 
+H2_ENUM_BEGIN(AdventureMenuHelp)
+    MENU_HELP_NEXT_HERO         = 0,
+    MENU_HELP_CONTINUE_ROUTE    = 1,
+    MENU_HELP_OVERVIEW          = 2,
+    MENU_HELP_END_TURN          = 3,
+    MENU_HELP_ADVENTURE_OPTIONS = 4,
+    MENU_HELP_CONTROL_OPTIONS   = 5,
+    MENU_HELP_SYSTEM_OPTIONS    = 6,
+    MENU_HELP_CAST_SPELL        = 7
+H2_ENUM_END(AdventureMenuHelp)
+
 H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
     ADJACENT_MONSTER_RADIUS = 1,
     ADJACENT_MONSTER_END_OFFSET = 2,
@@ -833,11 +765,8 @@ H2_ENUM_END(AdventureAdjacentMonsterConstant)
 
 H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_MUSIC = 23,
-    PUZZLE_WINDOW_X = ADVENTURE_VIEWPORT_EXTENT,
-    PUZZLE_WINDOW_Y = SCROLL_BORDER,
-    PUZZLE_VIEW_ORIGIN = SCROLL_BORDER,
-    PUZZLE_VIEW_SIZE = UPDATE_VIEWPORT_SIZE,
-    PUZZLE_VIEW_END = IDX(PUZZLE_VIEW_ORIGIN) + IDX(PUZZLE_VIEW_SIZE),
+    PUZZLE_WINDOW_X = ADVENTURE_RADAR_LEFT,
+    PUZZLE_WINDOW_Y = ADVENTURE_RADAR_TOP,
     PUZZLE_COORDINATE_OFFSET = 7,
     PUZZLE_ALIGNMENT_DIVISOR = 3,
     PUZZLE_Y_ADJUST_X_FACTOR = 2,
@@ -898,9 +827,9 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_RADAR_LEFT_FLOAT \
-    static_cast<float>(RADAR_LEFT)
+    static_cast<float>(ADVENTURE_RADAR_LEFT)
 #define ADVMGR_RADAR_TOP_FLOAT \
-    static_cast<float>(RADAR_TOP)
+    static_cast<float>(ADVENTURE_RADAR_TOP)
 #define ADVMGR_LOCATOR_SCROLL_BASE_Y_DOUBLE \
     static_cast<double>(LOCATOR_SCROLL_BASE_Y)
 #define ADVMGR_LOCATOR_HERO_SCROLL_SPAN_DOUBLE \
@@ -1289,7 +1218,7 @@ i32 advManager::Open(i32 id) {
     }
     KBChangeMenu(hmnuAdv);
     ForceNewHover();
-    gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, gPalette);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
     giBottomViewOverride = BOTTOM_VIEW_NONE;
     gConfig.soundVolume = savedVolume;
     gpSoundManager->AdjustSoundVolumes();
@@ -1543,7 +1472,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             TrimLoopingSounds(0);
             HeroView(gpCurPlayer->m_currentHero, false, false);
             RedrawAdvScreen(1, 0);
-            gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, NULL);
+            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
             break;
 
         case ADVMGR_COMMAND_SELECT_HERO:
@@ -1694,31 +1623,31 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case WIDGET_NOTIFY_SELECT:
                     case WIDGET_NOTIFY_RIGHT_CLICK:
                         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                            helpId = -1;
+                            helpId = PANEL_NO_HELP;
                             switch (message.payload.widget.id) {
                                 case PANEL_NEXT_HERO:
-                                    helpId = 0;
+                                    helpId = MENU_HELP_NEXT_HERO;
                                     break;
                                 case PANEL_CONTINUE_ROUTE:
-                                    helpId = 1;
+                                    helpId = MENU_HELP_CONTINUE_ROUTE;
                                     break;
                                 case PANEL_OVERVIEW:
-                                    helpId = 2;
+                                    helpId = MENU_HELP_OVERVIEW;
                                     break;
                                 case PANEL_END_TURN:
-                                    helpId = 3;
+                                    helpId = MENU_HELP_END_TURN;
                                     break;
                                 case PANEL_ADVENTURE_OPTIONS:
-                                    helpId = 4;
+                                    helpId = MENU_HELP_ADVENTURE_OPTIONS;
                                     break;
                                 case PANEL_CONTROL_OPTIONS:
-                                    helpId = 5;
+                                    helpId = MENU_HELP_CONTROL_OPTIONS;
                                     break;
                                 case PANEL_SYSTEM_OPTIONS:
-                                    helpId = 6;
+                                    helpId = MENU_HELP_SYSTEM_OPTIONS;
                                     break;
                                 case PANEL_CAST_SPELL:
-                                    helpId = 7;
+                                    helpId = MENU_HELP_CAST_SPELL;
                                     break;
                             }
                             if (helpId >= 0) {
@@ -1764,7 +1693,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
-                        gpCurPlayer->m_bonusPuzzlePieces += 12;
+                        gpCurPlayer->m_bonusPuzzlePieces += CHEAT_PUZZLE_PIECE_AMOUNT;
                         if (curHero != NULL) {
                             GiveExperience(curHero, CHEAT_EXPERIENCE_AMOUNT, 1);
                         }
@@ -2377,10 +2306,10 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             DemobilizeCurrHero();
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    fScale = 4.0f;
+                    fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    fScale = 2.0f;
+                    fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     fScale = 1.3333f;
@@ -2389,8 +2318,8 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     fScale = 1.0f;
                     break;
             }
-            mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / fScale);
-            mouseY = static_cast<i32>((mouseY - RADAR_TOP) / fScale);
+            mouseX = static_cast<i32>((mouseX - ADVENTURE_RADAR_LEFT) / fScale);
+            mouseY = static_cast<i32>((mouseY - ADVENTURE_RADAR_TOP) / fScale);
             m_mapOriginX = mouseX - VIEW_CENTER_CELL;
             m_mapOriginY = mouseY - VIEW_CENTER_CELL;
             if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2423,23 +2352,25 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     inputMessage = gpInputManager->GetEvent();
                 }
                 if (radarMessage.type == MESSAGE_MOUSE_MOVE) {
-                    if (radarMessage.payload.mouse.x < RADAR_LEFT) {
-                        radarMessage.payload.mouse.x = RADAR_LEFT;
+                    if (radarMessage.payload.mouse.x < ADVENTURE_RADAR_LEFT) {
+                        radarMessage.payload.mouse.x = ADVENTURE_RADAR_LEFT;
                     }
-                    if (radarMessage.payload.mouse.x >= RADAR_RIGHT) {
-                        radarMessage.payload.mouse.x = RADAR_RIGHT - 1;
+                    if (radarMessage.payload.mouse.x >= ADVENTURE_RADAR_RIGHT) {
+                        radarMessage.payload.mouse.x = ADVENTURE_RADAR_RIGHT - 1;
                     }
-                    if (radarMessage.payload.mouse.y < RADAR_TOP) {
-                        radarMessage.payload.mouse.y = RADAR_TOP;
+                    if (radarMessage.payload.mouse.y < ADVENTURE_RADAR_TOP) {
+                        radarMessage.payload.mouse.y = ADVENTURE_RADAR_TOP;
                     }
-                    if (radarMessage.payload.mouse.y >= RADAR_BOTTOM) {
-                        radarMessage.payload.mouse.y = RADAR_BOTTOM - 1;
+                    if (radarMessage.payload.mouse.y >= ADVENTURE_RADAR_BOTTOM) {
+                        radarMessage.payload.mouse.y = ADVENTURE_RADAR_BOTTOM - 1;
                     }
                     gpMouseManager->Main(radarMessage);
-                    mouseX =
-                        static_cast<i32>((radarMessage.payload.mouse.x - RADAR_LEFT) / fScale);
-                    mouseY =
-                        static_cast<i32>((radarMessage.payload.mouse.y - RADAR_TOP) / fScale);
+                    mouseX = static_cast<i32>(
+                        (radarMessage.payload.mouse.x - ADVENTURE_RADAR_LEFT) / fScale
+                    );
+                    mouseY = static_cast<i32>(
+                        (radarMessage.payload.mouse.y - ADVENTURE_RADAR_TOP) / fScale
+                    );
                     m_mapOriginX = mouseX - VIEW_CENTER_CELL;
                     m_mapOriginY = mouseY - VIEW_CENTER_CELL;
                     if (m_mapOriginX < SCROLL_MIN_ORIGIN) {
@@ -2554,7 +2485,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
             }
             RedrawAdvScreen(1, 0);
             if (fadeAfter) {
-                gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
             }
             break;
         }
@@ -2762,7 +2693,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
     if (InMapArea(mouseX, mouseY)) {
         if (mouseX > ADVENTURE_VIEWPORT_EXTENT) {
-            gpMouseManager->SetPointer(POINTER_DEFAULT);
+            gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
             return MESSAGE_DISPATCH_CONSUME;
         }
 
@@ -2793,7 +2724,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 || m_commandTargetY > MAP_HEIGHT - 1
                 || !(MAP_EXTRA_AT_WFIRST(m_commandTargetX, m_commandTargetY)
                      & giCurPlayerBit)) {
-                gpMouseManager->SetPointer(POINTER_DEFAULT);
+                gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                 return MESSAGE_DISPATCH_CONSUME;
             }
 
@@ -2801,7 +2732,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
             if (gpCurPlayer->m_currentHero == INVALID_HERO) {
                 if ((hoverCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE
                     && gpGame->GetTown(hoverCell->m_objectMetadata)->m_owner == giCurPlayer) {
-                    gpMouseManager->SetPointer(POINTER_TOWN);
+                    gpMouseManager->SetPointer(ADVENTURE_POINTER_TOWN);
                     m_pendingCommand = ADVMGR_COMMAND_TOWN_VIEW;
                     return MESSAGE_DISPATCH_CONSUME;
                 } else {
@@ -2809,11 +2740,11 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             == MAP_OBJECT_HERO_INTERACTION
                         && gpGame->GetHero(hoverCell->m_objectMetadata)->m_owner
                                == giCurPlayer) {
-                        gpMouseManager->SetPointer(POINTER_HERO);
+                        gpMouseManager->SetPointer(ADVENTURE_POINTER_HERO);
                         m_pendingCommand = ADVMGR_COMMAND_HERO_VIEW;
                         return MESSAGE_DISPATCH_CONSUME;
                     } else {
-                        gpMouseManager->SetPointer(POINTER_DEFAULT);
+                        gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
@@ -2822,7 +2753,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 heroPosX = pHero->m_x - m_mapOriginX;
                 heroPosY = pHero->m_y - m_mapOriginY;
                 if (mouseCellX == heroPosX && mouseCellY == heroPosY) {
-                    gpMouseManager->SetPointer(POINTER_HERO);
+                    gpMouseManager->SetPointer(ADVENTURE_POINTER_HERO);
                     m_pendingCommand = ADVMGR_COMMAND_HERO_VIEW;
                     return MESSAGE_DISPATCH_CONSUME;
                 }
@@ -2832,13 +2763,13 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                         == MAP_OBJECT_CASTLE) {
                         pTown = gpGame->GetTown(hoverCell->m_objectMetadata);
                         if (pTown->m_owner == giCurPlayer) {
-                            gpMouseManager->SetPointer(POINTER_TOWN);
+                            gpMouseManager->SetPointer(ADVENTURE_POINTER_TOWN);
                             m_pendingCommand = ADVMGR_COMMAND_SELECT_TOWN;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
                     }
                     gpSearchArray->m_pathLength = 0;
-                    gpMouseManager->SetPointer(POINTER_DEFAULT);
+                    gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                     return MESSAGE_DISPATCH_CONSUME;
                 }
 
@@ -2850,7 +2781,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                       && (m_cursorType != HERO_TYPE_BOAT || CELL_TERRAIN(hoverCell) == TERRAIN_WATER
                           || hoverCell->m_triggerType == MAP_OBJECT_COAST))) {
                     gpSearchArray->m_pathLength = 0;
-                    gpMouseManager->SetPointer(POINTER_DEFAULT);
+                    gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                     return MESSAGE_DISPATCH_CONSUME;
                 }
                 SeedTo(m_commandTargetX, m_commandTargetY);
@@ -2873,7 +2804,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     switch (hoverCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                         case MAP_OBJECT_BOAT:
                             if (m_cursorType != HERO_TYPE_BOAT) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_SAIL);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_SAIL);
                                 m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                             } else {
                                 gpMouseManager->SetPointer(cursorBase);
@@ -2881,27 +2812,31 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             break;
                         case MAP_OBJECT_COAST:
                             if (m_cursorType == HERO_TYPE_BOAT) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_DISEMBARK);
+                                gpMouseManager->SetPointer(
+                                    cursorBase + ADVENTURE_POINTER_DISEMBARK
+                                );
                             } else if (*(mapExtra + m_commandTargetX
                                          + m_commandTargetY * MAP_WIDTH)
                                        & HOVER_UNREACHABLE) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_ATTACK);
                             } else {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_MOVE);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_MOVE);
                             }
                             m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                             break;
                         case MAP_OBJECT_MONSTER:
-                            gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
+                            gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_ATTACK);
                             m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                             break;
                         case MAP_OBJECT_HERO_INTERACTION:
                             if (gpGame->GetHero(hoverCell->m_objectMetadata)->m_owner
                                 != giCurPlayer) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_ATTACK);
                                 m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                             } else {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_SELECT_HERO);
+                                gpMouseManager->SetPointer(
+                                    cursorBase + ADVENTURE_POINTER_SELECT_HERO
+                                );
                                 m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                             }
                             break;
@@ -2910,7 +2845,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             if (HAS(hoverCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                                 && pTown->m_owner != giCurPlayer
                                 && pTown->HasGarrison()) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_ATTACK);
                                 m_pendingCommand = ADVMGR_COMMAND_MOVE_TO;
                                 break;
                             }
@@ -2923,45 +2858,45 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                 && m_cursorType != HERO_TYPE_BOAT
                                 && (!(hoverCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                     || !StopOnTrigger(hoverCell))) {
-                                gpMouseManager->SetPointer(cursorBase + POINTER_ATTACK);
+                                gpMouseManager->SetPointer(cursorBase + ADVENTURE_POINTER_ATTACK);
                             } else {
                                 if (HAS(hoverCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                                     if (m_cursorType != HERO_TYPE_BOAT) {
                                         if (CELL_TERRAIN(hoverCell) != TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
-                                                cursorBase + POINTER_ACTION
+                                                cursorBase + ADVENTURE_POINTER_ACTION
                                             );
                                         } else if (hoverCell->m_triggerType
                                                    == (MAP_TRIGGER_ACTION_FLAG
                                                        | MAP_OBJECT_SHIPWRECK)) {
                                             gpMouseManager->SetPointer(
-                                                cursorBase + POINTER_ACTION
+                                                cursorBase + ADVENTURE_POINTER_ACTION
                                             );
                                         } else {
                                             gpMouseManager->SetPointer(
-                                                cursorBase + POINTER_MOVE
+                                                cursorBase + ADVENTURE_POINTER_MOVE
                                             );
                                             break;
                                         }
                                     } else {
                                         if (CELL_TERRAIN(hoverCell) == TERRAIN_WATER) {
                                             gpMouseManager->SetPointer(
-                                                daysLeft + POINTER_WATER_ACTION
+                                                daysLeft + ADVENTURE_POINTER_WATER_ACTION
                                             );
                                         } else {
                                             gpMouseManager->SetPointer(
-                                                cursorBase + POINTER_SAIL
+                                                cursorBase + ADVENTURE_POINTER_SAIL
                                             );
                                         }
                                     }
                                 } else {
                                     if (m_cursorType == HERO_TYPE_BOAT) {
                                         gpMouseManager->SetPointer(
-                                            cursorBase + POINTER_SAIL
+                                            cursorBase + ADVENTURE_POINTER_SAIL
                                         );
                                     } else {
                                         gpMouseManager->SetPointer(
-                                            cursorBase + POINTER_MOVE
+                                            cursorBase + ADVENTURE_POINTER_MOVE
                                         );
                                     }
                                 }
@@ -2971,15 +2906,16 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     }
                     return MESSAGE_DISPATCH_CONSUME;
                 } else {
-                    gpMouseManager->SetPointer(POINTER_DEFAULT);
+                    gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                     return MESSAGE_DISPATCH_CONSUME;
                 }
             }
         }
     } else {
-        if (!(gpMouseManager->m_cursorFrame >= HOVER_SCROLL_FRAME_FIRST
-              && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END && MouseInScrollZone())) {
-            gpMouseManager->SetPointer(POINTER_DEFAULT);
+        if (!(gpMouseManager->m_cursorFrame >= ADVENTURE_POINTER_SCROLL_FIRST
+              && gpMouseManager->m_cursorFrame < ADVENTURE_POINTER_SCROLL_END
+              && MouseInScrollZone())) {
+            gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
         }
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -2999,12 +2935,12 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (giLimitUpdMinX == UPDATE_NONE) {
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER
         );
     } else {
         BlitBitmapToScreen(
@@ -3918,7 +3854,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
+                if (m_cursorActive != 0 && (s_drawCell->m_flags & HERO_MAP_CELL_PRESENT) != 0
                     && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
@@ -4167,29 +4103,35 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
             line = gpWindowManager->m_screen->m_pixels
-                   + (minY * RADAR_SMALL_CELL_PIXELS + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
-            offX = minX * RADAR_SMALL_CELL_PIXELS;
+                   + (minY * ADVENTURE_RADAR_SMALL_CELL_PIXELS + ADVENTURE_RADAR_TOP)
+                         * LOGICAL_SCREEN_WIDTH
+                   + ADVENTURE_RADAR_LEFT;
+            offX = minX * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
             line = gpWindowManager->m_screen->m_pixels
-                   + (minY * RADAR_MEDIUM_CELL_PIXELS + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
-            offX = minX * RADAR_MEDIUM_CELL_PIXELS;
+                   + (minY * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS + ADVENTURE_RADAR_TOP)
+                         * LOGICAL_SCREEN_WIDTH
+                   + ADVENTURE_RADAR_LEFT;
+            offX = minX * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             line = gpWindowManager->m_screen->m_pixels
-                   + (minY + (minY + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR
-                      + RADAR_TOP)
+                   + (minY
+                      + (minY + ADVENTURE_RADAR_LARGE_SCALE_ROUNDING)
+                            / ADVENTURE_RADAR_LARGE_SCALE_DIVISOR
+                      + ADVENTURE_RADAR_TOP)
                          * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
-            offX = minX + (minX + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR;
-            xrem = minX % RADAR_LARGE_SCALE_DIVISOR;
-            ymod = minY % RADAR_LARGE_SCALE_DIVISOR;
+                   + ADVENTURE_RADAR_LEFT;
+            offX = minX
+                   + (minX + ADVENTURE_RADAR_LARGE_SCALE_ROUNDING)
+                         / ADVENTURE_RADAR_LARGE_SCALE_DIVISOR;
+            xrem = minX % ADVENTURE_RADAR_LARGE_SCALE_DIVISOR;
+            ymod = minY % ADVENTURE_RADAR_LARGE_SCALE_DIVISOR;
             break;
         default:
-            line = gpWindowManager->m_screen->m_pixels + (minY + RADAR_TOP) * LOGICAL_SCREEN_WIDTH
-                   + RADAR_LEFT;
+            line = gpWindowManager->m_screen->m_pixels
+                   + (minY + ADVENTURE_RADAR_TOP) * LOGICAL_SCREEN_WIDTH + ADVENTURE_RADAR_LEFT;
             offX = minX;
             break;
     }
@@ -4198,20 +4140,20 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         pixelPointer = line + offX;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_SMALL_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
+                line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 ++ymod;
-                if (ymod > RADAR_LARGE_SCALE_DIVISOR - 1) {
+                if (ymod > ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1) {
                     ymod = 0;
                 }
                 if (ymod != 0) {
                     line += LOGICAL_SCREEN_WIDTH;
                 } else {
-                    line += IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS;
+                    line += IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 }
                 break;
             case MAP_DIMENSION_XLARGE:
@@ -4224,7 +4166,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
                 cell = m_mapData->GetCell(i, j);
-                if ((cell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
+                if ((cell->m_flags & HERO_MAP_CELL_PRESENT) != 0
                     && i == m_mapOriginX + VIEW_CENTER_CELL
                     && j == m_mapOriginY + VIEW_CENTER_CELL) {
                     color = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
@@ -4335,32 +4277,34 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    memset(pixelPointer, color, RADAR_SMALL_CELL_PIXELS);
+                    memset(pixelPointer, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);
                     memset(
                         pixelPointer + LOGICAL_SCREEN_WIDTH,
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixelPointer + IDX(LOGICAL_SCREEN_WIDTH) * RADAR_MEDIUM_CELL_PIXELS,
+                        pixelPointer
+                            + IDX(LOGICAL_SCREEN_WIDTH) * ADVENTURE_RADAR_MEDIUM_CELL_PIXELS,
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
                     memset(
-                        pixelPointer + LOGICAL_SCREEN_WIDTH * (RADAR_SMALL_CELL_PIXELS - 1),
+                        pixelPointer
+                            + LOGICAL_SCREEN_WIDTH * (ADVENTURE_RADAR_SMALL_CELL_PIXELS - 1),
                         color,
-                        RADAR_SMALL_CELL_PIXELS
+                        ADVENTURE_RADAR_SMALL_CELL_PIXELS
                     );
-                    pixelPointer += RADAR_SMALL_CELL_PIXELS;
+                    pixelPointer += ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    memset(pixelPointer, color, RADAR_MEDIUM_CELL_PIXELS);
+                    memset(pixelPointer, color, ADVENTURE_RADAR_MEDIUM_CELL_PIXELS);
                     memset(
                         pixelPointer + LOGICAL_SCREEN_WIDTH,
                         color,
-                        RADAR_MEDIUM_CELL_PIXELS
+                        ADVENTURE_RADAR_MEDIUM_CELL_PIXELS
                     );
-                    pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                    pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     if (xrem != 0) {
@@ -4375,16 +4319,16 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     } else if (ymod != 0) {
                         pixelPointer[0] = color;
                         pixelPointer[1] = color;
-                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     } else {
                         pixelPointer[0] = color;
                         pixelPointer[1] = color;
                         pixelPointer[LOGICAL_SCREEN_WIDTH] = color;
                         pixelPointer[LOGICAL_SCREEN_WIDTH + 1] = color;
-                        pixelPointer += RADAR_MEDIUM_CELL_PIXELS;
+                        pixelPointer += ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                     }
                     ++xrem;
-                    if (xrem > RADAR_LARGE_SCALE_DIVISOR - 1) {
+                    if (xrem > ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1) {
                         xrem = 0;
                     }
                     break;
@@ -4400,11 +4344,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (gbInViewWorld != 0) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                fScale = RADAR_SMALL_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 bNoFrame = true;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                fScale = RADAR_MEDIUM_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
                     bNoFrame = true;
                 } else {
@@ -4436,11 +4380,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
                 frame = RADAR_FRAME_NORMAL_SMALL;
-                fScale = RADAR_SMALL_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
                 frame = RADAR_FRAME_NORMAL_MEDIUM;
-                fScale = RADAR_MEDIUM_CELL_PIXELS;
+                fScale = ADVENTURE_RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 frame = RADAR_FRAME_NORMAL_LARGE;
@@ -4461,10 +4405,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
-                RADAR_LEFT,
-                RADAR_TOP,
-                RADAR_SIZE,
-                RADAR_SIZE
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
@@ -4473,10 +4417,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 frame,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
-                RADAR_LEFT,
-                RADAR_TOP,
-                RADAR_SIZE,
-                RADAR_SIZE
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
             );
         }
     }
@@ -4490,7 +4434,12 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 static_cast<i32>((maxY - minY + 1) * fScale)
             );
         } else {
-            gpWindowManager->UpdateScreenRegion(RADAR_LEFT, RADAR_TOP, RADAR_SIZE, RADAR_SIZE);
+            gpWindowManager->UpdateScreenRegion(
+                ADVENTURE_RADAR_LEFT,
+                ADVENTURE_RADAR_TOP,
+                ADVENTURE_RADAR_SIZE,
+                ADVENTURE_RADAR_SIZE
+            );
         }
     }
 }
@@ -4804,7 +4753,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         "%s",
-                        gResourceNames[currentCell->m_objectIndex / RESOURCE_FRAME_PAIR_STRIDE]
+                        gResourceNames[currentCell->m_objectIndex / MAP_ITEM_FRAME_STRIDE]
                     );
                     break;
                 case MAP_OBJECT_MONSTER:
@@ -6849,7 +6798,7 @@ void advManager::DemobilizeCurrHero(void) {
     }
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroPointer->m_id;
-    cell->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+    cell->m_flags &= ~HERO_MAP_CELL_PRESENT;
     m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -6929,7 +6878,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
     mapCell* currentCell = GetCell(contextHero->m_x, contextHero->m_y);
-    currentCell->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+    currentCell->m_flags |= HERO_MAP_CELL_PRESENT;
     gpGame->RestoreCell(
         contextHero->m_x,
         contextHero->m_y,
@@ -7189,7 +7138,7 @@ i32 SaveGame(void) {
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer(
         "advmice.mse",
-        SAVE_POINTER_FRAME,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     i32 i;
@@ -7256,7 +7205,7 @@ void advManager::CheckCastSpell(void) {
         UpdateScreen(0, 0);
         gpMouseManager->SetPointer(
             "advmice.mse",
-            POINTER_DEFAULT,
+            ADVENTURE_POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
         CastSpell(gpGame->ViewSpells(
@@ -7335,15 +7284,15 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                         || (cell->m_flags & IDX(MAP_CELL_OCCUPIED))) {
                         gpWindowManager->m_dialogResult = 0;
-                        gpMouseManager->SetPointer(POINTER_DEFAULT);
+                        gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                     } else {
                         gpWindowManager->m_dialogResult = TRAVEL_DIALOG_ACCEPT;
-                        gpMouseManager->SetPointer(POINTER_MOVE);
+                        gpMouseManager->SetPointer(ADVENTURE_POINTER_MOVE);
                     }
                 }
             } else {
                 gpWindowManager->m_dialogResult = 0;
-                gpMouseManager->SetPointer(POINTER_DEFAULT);
+                gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
                 return MESSAGE_DISPATCH_CONSUME;
             }
             break;
@@ -8054,7 +8003,7 @@ void advManager::TeleportTo(
             mapHero->m_id,
             static_cast<u8>(destinationX),
             static_cast<u8>(destinationY),
-            TELEPORT_MAP_CHANGE_VALUE,
+            MAP_CHANGE_CURRENT_PLAYER,
             0,
             0
         );
@@ -8068,8 +8017,8 @@ void advManager::TeleportTo(
     }
 
     oldCellFlag = false;
-    if (cellOld->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
-        cellOld->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
+    if (cellOld->m_flags & HERO_MAP_CELL_PRESENT) {
+        cellOld->m_flags -= HERO_MAP_CELL_PRESENT;
         oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
@@ -8113,12 +8062,12 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+        destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
         gpWindowManager->SaveFizzleSource(
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE
         );
         CompleteDraw(0);
         PollSound();
@@ -8127,10 +8076,10 @@ void advManager::TeleportTo(
             fizzleTime -= TELEPORT_REMOTE_FIZZLE_ADJUSTMENT;
         }
         gpWindowManager->FizzleForward(
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_ORIGIN,
-            UPDATE_VIEWPORT_SIZE,
-            UPDATE_VIEWPORT_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
             -1,
             NULL,
             NULL
@@ -8140,7 +8089,7 @@ void advManager::TeleportTo(
         mapHero->m_locationType = destinationCell->m_triggerType;
         mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
         if (oldCellFlag != 0) {
-            destinationCell->m_flags |= TELEPORT_CELL_OBJECT_FLAG;
+            destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
         } else {
             destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
@@ -8405,7 +8354,7 @@ void advManager::SummonBoat(void) {
         for (slotIndex = 0; slotIndex < GAME_BOAT_COUNT; ++slotIndex) {
             if (gpGame->m_boatSlots[slotIndex] != -1
                 && gpGame->m_boats[slotIndex].heroId
-                       == (heroSlot | SUMMON_OCCUPIED_FLAG)) {
+                       == (heroSlot | BOAT_OCCUPIED_FLAG)) {
                 foundBoat = true;
                 break;
             }
@@ -8414,7 +8363,7 @@ void advManager::SummonBoat(void) {
         if (!foundBoat) {
             for (slotIndex = 0; slotIndex < GAME_BOAT_COUNT; ++slotIndex) {
                 if (gpGame->m_boatSlots[slotIndex] != -1
-                    && (gpGame->m_boats[slotIndex].heroId & SUMMON_OCCUPIED_FLAG)
+                    && (gpGame->m_boats[slotIndex].heroId & BOAT_OCCUPIED_FLAG)
                     && gpGame->m_boats[slotIndex].owner == giCurPlayer
                     && MANHATTAN_LENGTH(
                            gpGame->m_boats[slotIndex].x - summonHero->m_x,
@@ -8441,21 +8390,21 @@ void advManager::SummonBoat(void) {
             if (boatRec->x >= m_mapOriginX && boatRec->x < m_mapOriginX + VIEW_CELL_COUNT
                 && boatRec->y >= m_mapOriginY && boatRec->y < m_mapOriginY + VIEW_CELL_COUNT) {
                 clipX = (boatRec->x - m_mapOriginX) * CELL_PIXELS - SUMMON_FIZZLE_X_OFFSET;
-                if (clipX < SUMMON_SCREEN_MARGIN) {
-                    clipX = SUMMON_SCREEN_MARGIN;
+                if (clipX < ADVENTURE_VIEW_BORDER) {
+                    clipX = ADVENTURE_VIEW_BORDER;
                 }
                 clipY = (boatRec->y - m_mapOriginY) * CELL_PIXELS - SUMMON_FIZZLE_X_OFFSET;
-                if (clipY < SUMMON_SCREEN_MARGIN) {
-                    clipY = SUMMON_SCREEN_MARGIN;
+                if (clipY < ADVENTURE_VIEW_BORDER) {
+                    clipY = ADVENTURE_VIEW_BORDER;
                 }
 
                 clipWidth = SUMMON_FIZZLE_WIDTH;
                 clipHeight = SUMMON_FIZZLE_HEIGHT;
-                if (clipX + clipWidth >= SUMMON_SCREEN_LIMIT) {
-                    clipWidth = SUMMON_SCREEN_LIMIT - clipX;
+                if (clipX + clipWidth >= ADVENTURE_VIEW_END) {
+                    clipWidth = ADVENTURE_VIEW_END - clipX;
                 }
-                if (clipY + clipHeight >= SUMMON_SCREEN_LIMIT) {
-                    clipHeight = SUMMON_SCREEN_LIMIT - clipY;
+                if (clipY + clipHeight >= ADVENTURE_VIEW_END) {
+                    clipHeight = ADVENTURE_VIEW_END - clipY;
                 }
                 gpWindowManager
                     ->SaveFizzleSource(clipX, clipY, clipWidth, clipHeight);
@@ -8825,7 +8774,7 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 
     if (updatePointer) {
-        gpMouseManager->SetPointer(IDX(direction) + IDX(HOVER_SCROLL_FRAME_FIRST));
+        gpMouseManager->SetPointer(IDX(direction) + IDX(ADVENTURE_POINTER_SCROLL_FIRST));
     }
 
     if (xOrigin < SCROLL_MIN_ORIGIN) {
@@ -8888,10 +8837,10 @@ void advManager::CheckScreenScroll(void) {
             }
         }
 
-        if (gpMouseManager->m_cursorFrame >= HOVER_SCROLL_FRAME_FIRST
-            && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END && oldMapX == m_mapOriginX
-            && oldMapY == m_mapOriginY) {
-            gpMouseManager->SetPointer(POINTER_DEFAULT);
+        if (gpMouseManager->m_cursorFrame >= ADVENTURE_POINTER_SCROLL_FIRST
+            && gpMouseManager->m_cursorFrame < ADVENTURE_POINTER_SCROLL_END
+            && oldMapX == m_mapOriginX && oldMapY == m_mapOriginY) {
+            gpMouseManager->SetPointer(ADVENTURE_POINTER_DEFAULT);
         }
     }
 }
@@ -8982,7 +8931,7 @@ void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer(
             "advmice.mse",
-            POINTER_DEFAULT,
+            ADVENTURE_POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
     }
@@ -9452,7 +9401,7 @@ void advManager::ViewPuzzle(void) {
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
     gpMouseManager->SetPointer(
         "advmice.mse",
-        POINTER_DEFAULT,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     puzzleIcn = gpResourceManager->GetIcon("puzzle.icn");
@@ -9462,16 +9411,16 @@ void advManager::ViewPuzzle(void) {
     }
 
     gpWindowManager->UpdateScreenRegion(
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_SIZE,
-        PUZZLE_VIEW_SIZE
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_SIZE,
+        ADVENTURE_VIEW_SIZE
     );
     gpWindowManager->SaveFizzleSource(
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_ORIGIN,
-        PUZZLE_VIEW_SIZE,
-        PUZZLE_VIEW_SIZE
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_BORDER,
+        ADVENTURE_VIEW_SIZE,
+        ADVENTURE_VIEW_SIZE
     );
     pWin = new heroWindow(
         PUZZLE_WINDOW_X,
@@ -9515,10 +9464,10 @@ void advManager::ViewPuzzle(void) {
 
     u8* pixelPointer;
     u8* end;
-    for (i = PUZZLE_VIEW_ORIGIN; i < PUZZLE_VIEW_END; ++i) {
+    for (i = ADVENTURE_VIEW_BORDER; i < ADVENTURE_VIEW_END; ++i) {
         pixelPointer =
-            gpWindowManager->m_screen->m_pixels + i * LOGICAL_SCREEN_WIDTH + PUZZLE_VIEW_ORIGIN;
-        end = pixelPointer + PUZZLE_VIEW_SIZE;
+            gpWindowManager->m_screen->m_pixels + i * LOGICAL_SCREEN_WIDTH + ADVENTURE_VIEW_BORDER;
+        end = pixelPointer + ADVENTURE_VIEW_SIZE;
         for (; pixelPointer < end; ++pixelPointer) {
             *pixelPointer = gColorTableTan[*pixelPointer];
         }
@@ -9532,10 +9481,10 @@ void advManager::ViewPuzzle(void) {
     }
     if (visibleCount != PUZZLE_PIECE_COUNT) {
         gpWindowManager->FizzleForward(
-            PUZZLE_VIEW_ORIGIN,
-            PUZZLE_VIEW_ORIGIN,
-            PUZZLE_VIEW_SIZE,
-            PUZZLE_VIEW_SIZE,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_BORDER,
+            ADVENTURE_VIEW_SIZE,
+            ADVENTURE_VIEW_SIZE,
             PUZZLE_FIZZLE_TIME,
             NULL,
             NULL
@@ -9599,7 +9548,7 @@ void advManager::AdvPanel(void) {
         TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
         gpMouseManager->SetPointer(
             "advmice.mse",
-            POINTER_DEFAULT,
+            ADVENTURE_POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
         b32 heroWasMobilized = m_heroContextLocked;
@@ -9737,7 +9686,7 @@ i32 advManager::ControlPanel(void) {
     i32 selectedCommand = PANEL_NO_HELP;
     gpMouseManager->SetPointer(
         "advmice.mse",
-        POINTER_DEFAULT,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     b32 heroWasMobilized = m_heroContextLocked;
@@ -9888,7 +9837,7 @@ void advManager::SystemOptions(void) {
     TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
     gpMouseManager->SetPointer(
         "advmice.mse",
-        POINTER_DEFAULT,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     prevWalkSpeed = gConfig.walkSpeeds[IDX(CONFIG_WALK_SPEED_HUMAN)];
