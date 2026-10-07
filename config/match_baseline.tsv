@@ -562,8 +562,8 @@ SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	100.0000	3a109965c3cb
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	50514bf8cb22
 SOURCE/AI	?GetWalkerMask@combatManager@@QAEHH@Z	100.0000	2d83ff466c74
 SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	100.0000	c816ccd261c6
-SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	3fd7244d426d
-SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	98561e3a25c4
+SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	4a4e396eb70e
+SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	450e05337695
 SOURCE/ARMY	??0army@@QAE@XZ	100.0000	533e0ff9f0d6
 SOURCE/ARMY	?AttackTo@army@@QAEHH@Z	100.0000	57cfe7c8b08d
 SOURCE/ARMY	?AttackTo@army@@QAEHXZ	100.0000	02f14f262fb1
@@ -1234,7 +1234,7 @@ SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	100.0000	dc530
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	bff21f860d44
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	100.0000	e1d7ab05afcf
 SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	100.0000	eb5a195620ac
-SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	100.0000	e1c1572e7c2c
+SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	100.0000	4de23d2b0874
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	100.0000	e171d4330861
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	e590a6be71b6
 SOURCE/SPELLAI	?FirstResurrectable@combatManager@@QAEHHPAHH@Z	100.0000	9032589270f0

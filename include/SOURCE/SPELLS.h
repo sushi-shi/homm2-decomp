@@ -52,7 +52,6 @@ H2_ENUM_BEGIN(SpellGameplayConstant)
 H2_ENUM_END(SpellGameplayConstant)
 
 H2_ENUM_BEGIN(SpellDrawingConstant)
-    COMBAT_HEX_EMPTY                     = -1,
     COMBAT_SPELL_TARGET_Y_OFFSET         = 17,
     SPELL_FIREBALL_FRAME_COUNT           = 12,
     SPELL_COLD_RING_FRAME_COUNT          = 7,
