@@ -3,9 +3,9 @@
 # lower it when the residual shrinks, never raise it to admit a regression.
 region	bytes
 size	0
-headers	282
-.text	115
+headers	0
+.text	0
 .rdata	0
-.data	2068
+.data	0
 .rsrc	0
 overlay	0

@@ -594,8 +594,17 @@ class Placer:
         self.resolve_calls()
         self.place_data()
 
+    def owners(self) -> dict[str, str]:
+        """Game units this image compiles inside another of its units
+        (`compiled_into` in config/units.toml): their placed identities
+        belong to that unit's object here."""
+        from homm2.manifest import all_units
+        return {u["unit"]: u["compiled_into"][self.image] for u in all_units()
+                if self.image in u.get("compiled_into", {})}
+
     def rows(self) -> list[dict]:
-        claims = {c["rva"]: c for c in self.claims}
+        claims = {c["rva"]: dict(c, unit=self.owners().get(c["unit"], c["unit"]))
+                  for c in self.claims}
         out = []
         for grva, (erva, why) in self.functions.items():
             c = claims[grva]

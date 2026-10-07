@@ -1,3 +1,10 @@
+// SUPERSEDED 2026-10-07: Misc is one translation unit compiled with /Ob2
+// (docs/patterns/ob2-places-initializer-literals-lexically.md). Auto-inlining
+// changes the emission point of a file-scope initializer's literal, which is
+// what this split emulated; the editor's Rich header (one C++ object per
+// ctype registration) rules the split out, and both programs link
+// byte-identical with the one-object Misc and the game's separate MusicFlags.
+//
 // Unit hypothesis: the inferred BASE/Misc owner spans two native compiler TUs.
 // Measured: 2026-09-26, matcher/bss-misc, pinned VC6 SP5 and native LIB/LINK.
 // This is a source/build hypothesis, not a claim that the original files have

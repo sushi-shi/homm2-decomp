@@ -59,13 +59,13 @@ publication yet (`STAGED_GATES` in `scripts/homm2/cli.py`). Promote each one to
 the hard list once its findings are resolved.
 
 - `assert_defs_declared`: 74 free functions are not declared in their owner
-  header, 65 of them in `SOURCE/KB.cpp`; five BASE units (`AudiereEffects`,
-  `AudiereMusic`, `FONT`, `MilesSound`, `MiscRuntime`) do not include an owner
+  header, 65 of them in `SOURCE/KB.cpp`; four BASE units (`AudiereEffects`,
+  `AudiereMusic`, `FONT`, `MilesSound`) do not include an owner
   header of their own name. BASE compiles with automatic precompiled headers,
   where header structure affects inline emission, so these moves need their own
   measured change.
-- `assert_relocs` (the unordered identity audit): it reports anonymous string
-  literals (`$SG…`) at addresses retail does not reference, for 160 functions.
-  The ordered `--resolved` audit and the byte-identical `link-diff` gate both pass
-  for the same functions, so the findings point at the audit's literal-identity
-  resolution rather than at the source.
+- `assert_relocs` (the unordered identity audit) was promoted to a build gate
+  on 2026-10-07. Its literal findings came from resolving `$SG<n>` names
+  image-wide: `$SG<n>` is a per-object counter, so the data manifest's first
+  unit with that spelling answered for every unit. The audit now resolves a
+  base `$SG<n>` within its own unit and reports nothing.

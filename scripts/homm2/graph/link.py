@@ -98,8 +98,7 @@ def final_inputs(configured: list[str], *, include_resources: bool) -> list[str]
                          if path.startswith("build/objdiff/base/")), None)
     first_base = configured.index("build/link/BASE-prefix.lib")
     expected_tail = [
-        "build/link/BASE-prefix.lib", "build/link/Misc.lib",
-        "build/link/MiscRuntime.lib", "build/link/BASE-middle.lib", "build/link/Midi.lib",
+        "build/link/BASE-prefix.lib", "build/link/Midi.lib",
         "build/link/BASE-suffix.lib", "LIBCMT.LIB", "build/link/HMM2PL.res",
     ]
     if configured[first_base:] != expected_tail:
