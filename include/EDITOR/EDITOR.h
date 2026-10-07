@@ -111,8 +111,8 @@ extern H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 
 // The object dialog the detail tool has open, and the map cell it edits.
 // The compiled spellings keep EDITOR's .bss in its name-hash order.
-#define gEditDialog gEditDlg
-#define gEditCell gpCell
+#define gEditDialog gEditDlg // spelling fixes .bss order
+#define gEditCell gpCell     // spelling fixes .bss order
 extern class heroWindow* gEditDialog;
 extern class mapCell* gEditCell;
 

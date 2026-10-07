@@ -94,6 +94,16 @@ valid output target.
 | `__cdecl`, `__stdcall`, `__fastcall` | preserved |
 | `// ...`, `/* ... */` | deleted |
 | `localization::Tr("id")`, `locales/*` | preserved in source; Russian UTF-8 literals in classic |
+| `#define readable storage // frame-slot spelling` … `#undef readable` | deleted; the function keeps the readable name |
+| `#define readable storage // spelling fixes .bss order` | deleted; a definition spelled `storage` takes the readable name |
+
+The matching source keeps readable names and aliases them to the spellings
+VC6's name hashes need: an `/Od` function's frame-slot order and a unit's
+`.bss` order. A frame-slot group must bracket exactly one function, be
+`#undef`'d right after it, and alias only that function's locals; a malformed
+or unclosed group, or a marked line that is not a plain alias, fails the
+export. The residue check fails if a `#define` or `#undef` of an aliased name
+survives. Ported from the HoMM1 exporter (`scripts/homm1/clean/source.py`).
 
 Source Gold retains build-time locale selection: `./build.py --ru` (default)
 or `./build.py --en`, with independent objects and executables under

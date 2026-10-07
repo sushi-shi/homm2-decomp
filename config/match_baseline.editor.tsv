@@ -363,6 +363,8 @@ EDITOR/EDITMGR	??1textFile@@QAE@XZ	100.0000	0b4c16db1737
 EDITOR/EDITMGR	??BtextFile@@QAEPAU_iobuf@@XZ	100.0000	ca439d679e6d
 EDITOR/EDITMGR	?AddError@editManager@@QAEXPAD@Z	100.0000	ec75ceea3728
 EDITOR/EDITMGR	?AppendTextLine@@YIXPAD@Z	100.0000	b7f93bcc4ee3
+EDITOR/EDITMGR	?BlendShallowWater@editManager@@QAEXXZ	100.0000	be6d99355cc3
+EDITOR/EDITMGR	?BlendTerrain@editManager@@QAEXHHHHH@Z	100.0000	03d5cee74649
 EDITOR/EDITMGR	?CalculatePlayerNumbers@@YIXXZ	100.0000	359d8bdceb5b
 EDITOR/EDITMGR	?CanBeCoast@editManager@@QAEHHH@Z	100.0000	3e448161db8d
 EDITOR/EDITMGR	?CheckObjects@editManager@@QAEXXZ	100.0000	1ac7c17d09ff
@@ -509,7 +511,7 @@ EDITOR/OVERLAY	?SelectOverlay@overlayManager@@QAEHH@Z	100.0000	8392d46d9e49
 EDITOR/OVERLAY	?ShowClass@overlayManager@@QAEXH@Z	100.0000	04ba31fbea7d
 EDITOR/RANDOM	?CanPlaceOverlayAt@@YIHPAUoverlayType@@HHH@Z	100.0000	cdbfb0245754
 EDITOR/RANDOM	?CountNearbyObstacles@editManager@@QAEHHH@Z	100.0000	6a2c89b25ae3
-EDITOR/RANDOM	?GenerateRandomMap@editManager@@QAEXXZ	99.9275	2ecbb10018c9
+EDITOR/RANDOM	?GenerateRandomMap@editManager@@QAEXXZ	100.0000	2ecbb10018c9
 EDITOR/RANDOM	?HasEnoughCastles@editManager@@QAEHXZ	100.0000	a00ea98417e8
 EDITOR/RANDOM	?PaintRandomTerrain@editManager@@QAEXHHH@Z	100.0000	ea125a9dc68f
 EDITOR/RANDOM	?PlaceChainLink@editManager@@QAEHPAH0HHD@Z	100.0000	b92af67414bf
@@ -591,7 +593,7 @@ EDITOR/terrain	??0terrainManager@@QAE@XZ	100.0000	a6f3293dd972
 EDITOR/terrain	?Close@terrainManager@@UAEXXZ	100.0000	c3a8d117ed18
 EDITOR/terrain	?GetBrushSize@terrainManager@@QAEHXZ	100.0000	b8f6676a64d2
 EDITOR/terrain	?Idle@terrainManager@@QAEXXZ	100.0000	82c9ec683309
-EDITOR/terrain	?Main@terrainManager@@UAEHAAUtag_message@@@Z	99.9920	78e35a01ff19
+EDITOR/terrain	?Main@terrainManager@@UAEHAAUtag_message@@@Z	100.0000	78e35a01ff19
 EDITOR/terrain	?Open@terrainManager@@UAEHH@Z	100.0000	f82450525902
 EDITOR/terrain	?SelectBrush@terrainManager@@QAEXHHH@Z	100.0000	35265a053b49
 EDITOR/terrain	?SelectTerrain@terrainManager@@QAEXH@Z	100.0000	a63421b534d9
