@@ -398,49 +398,50 @@ void fullMap::RemoveCellOverlay(i32 x, i32 y) {
 // records after the last used one.
 VA_AT(editor, 0x0041860d, 0x2bf)
 void fullMap::Compact(void) {
-    u16* remap;
-    i32 freeIndex;
-    i32 index;
+    u16* indexMap;
+    i32 newIndex;
+    i32 oldIndex;
     i32 x;
     i32 y;
     i32 i;
-    mapCellExtra* newExtras;
-    i32 slack;
+    mapCellExtra* newCellExtras;
+    i32 spare;
 
-    remap = static_cast<u16*>(H2_ALLOC(EXTRA_REMAP_TABLE_BYTES));
-    freeIndex = 1;
-    for (index = 1; index < extraCount; index++) {
-        if (extras[index].nextIndex != MAPCELL_EXTRA_FREE) {
-            if (freeIndex != index) {
-                for (; freeIndex < EXTRA_POOL_SIZE; freeIndex++) {
-                    if (extras[freeIndex].nextIndex == MAPCELL_EXTRA_FREE)
+    indexMap = static_cast<u16*>(H2_ALLOC(EXTRA_REMAP_TABLE_BYTES));
+    newIndex = 1;
+    for (oldIndex = 1; oldIndex < extraCount; oldIndex++) {
+        if (extras[oldIndex].nextIndex != MAPCELL_EXTRA_FREE) {
+            if (newIndex != oldIndex) {
+                for (; newIndex < EXTRA_POOL_SIZE; newIndex++) {
+                    if (extras[newIndex].nextIndex == MAPCELL_EXTRA_FREE)
                         break;
                 }
-                extras[freeIndex] = extras[index];
-                extras[index].nextIndex = MAPCELL_EXTRA_FREE;
+                extras[newIndex] = extras[oldIndex];
+                extras[oldIndex].nextIndex = MAPCELL_EXTRA_FREE;
             }
-            remap[index] = freeIndex;
-            freeIndex++;
+            indexMap[oldIndex] = newIndex;
+            newIndex++;
         }
     }
-    remap[0] = 0;
-    remap[MAPCELL_EXTRA_FREE] = MAPCELL_EXTRA_FREE;
-    extraCount = freeIndex;
+    indexMap[0] = 0;
+    indexMap[MAPCELL_EXTRA_FREE] = MAPCELL_EXTRA_FREE;
+    extraCount = newIndex;
     for (x = 0; x < MAP_WIDTH; x++)
         for (y = 0; y < MAP_HEIGHT; y++)
-            Column(x)[y * width].m_extraIndex = remap[Column(x)[y * width].m_extraIndex];
+            Column(x)[y * width].m_extraIndex = indexMap[Column(x)[y * width].m_extraIndex];
     for (i = 1; i < extraCount; i++)
-        extras[i].nextIndex = remap[extras[i].nextIndex];
-    delete remap;
-    slack = EXTRA_COMPACT_SLACK;
-    newExtras = static_cast<mapCellExtra*>(H2_ALLOC((extraCount + slack) * sizeof(mapCellExtra)));
-    memcpy(newExtras, extras, extraCount * sizeof(mapCellExtra));
+        extras[i].nextIndex = indexMap[extras[i].nextIndex];
+    delete indexMap;
+    spare = EXTRA_COMPACT_SLACK;
+    newCellExtras
+        = static_cast<mapCellExtra*>(H2_ALLOC((extraCount + spare) * sizeof(mapCellExtra)));
+    memcpy(newCellExtras, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
-    extras = newExtras;
-    for (i = extraCount; i < extraCount + slack; i++)
+    extras = newCellExtras;
+    for (i = extraCount; i < extraCount + spare; i++)
         extras[i].nextIndex = MAPCELL_EXTRA_FREE;
-    extraCount += slack;
-    ClearCellExtra(extraCount - slack);
+    extraCount += spare;
+    ClearCellExtra(extraCount - spare);
 }
 #endif
 

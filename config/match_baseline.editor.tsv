@@ -352,11 +352,11 @@ BASE/soundmgr	?SwitchAmbientMusic@soundManager@@QAEXH@Z	100.0000	2dbb27de9e21
 BASE/tile2bs	?TileToBitmapScale@@YIXPAVtileset@@IPAVbitmap@@HHH@Z	100.0000	10172bbc3fce
 EDITOR/CLEARMGR	??0clearManager@@QAE@XZ	100.0000	3188c60e980e
 EDITOR/CLEARMGR	?Close@clearManager@@UAEXXZ	100.0000	aada4df85f55
-EDITOR/CLEARMGR	?Main@clearManager@@UAEHAAUtag_message@@@Z	98.5491	76b0d569d062
-EDITOR/CLEARMGR	?Open@clearManager@@UAEHH@Z	99.3103	4919badab27c
-EDITOR/CLEARMGR	?SelectBrush@clearManager@@QAEXHHH@Z	98.3784	1188fd2be73a
-EDITOR/CLEARMGR	?TrackCursor@clearManager@@QAEXXZ	98.0860	8307277786b2
-EDITOR/CLEARMGR	?UpdateBrushButtons@clearManager@@QAEXXZ	99.7143	550795b00b21
+EDITOR/CLEARMGR	?Main@clearManager@@UAEHAAUtag_message@@@Z	100.0000	0fde68b6765f
+EDITOR/CLEARMGR	?Open@clearManager@@UAEHH@Z	100.0000	c0241ac0fa55
+EDITOR/CLEARMGR	?SelectBrush@clearManager@@QAEXHHH@Z	100.0000	08306a14205e
+EDITOR/CLEARMGR	?TrackCursor@clearManager@@QAEXXZ	100.0000	f0e30d845253
+EDITOR/CLEARMGR	?UpdateBrushButtons@clearManager@@QAEXXZ	100.0000	093b0ff33fdf
 EDITOR/EDITMGR	??0editManager@@QAE@XZ	100.0000	89759809e9d9
 EDITOR/EDITMGR	??0textFile@@QAE@XZ	100.0000	71f4fbe5254d
 EDITOR/EDITMGR	??1textFile@@QAE@XZ	100.0000	0b4c16db1737
@@ -548,7 +548,7 @@ EDITOR/mapcell	??1fullMap@@QAE@XZ	100.0000	13926594114c
 EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	0801a23a4abe
 EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	cb50b1b4261a
 EDITOR/mapcell	?Close@fullMap@@QAEXXZ	100.0000	44590acf6616
-EDITOR/mapcell	?Compact@fullMap@@QAEXXZ	99.7623	d727bdc81ea7
+EDITOR/mapcell	?Compact@fullMap@@QAEXXZ	100.0000	b44e0c1fdf23
 EDITOR/mapcell	?Copy@fullMap@@QAEXAAV1@@Z	100.0000	933227c3c3a7
 EDITOR/mapcell	?GetNewCellExtraIndex@fullMap@@QAEHXZ	100.0000	38b033339fbb
 EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	100.0000	15dce8d87f9e
