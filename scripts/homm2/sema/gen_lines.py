@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gen_lines.py <unit> - per-statement source<->code map for the nvim base overlay.
+"""gen_lines.py <unit> - per-statement source<->code map for `homm2 sema disasm --source`.
 
 Compiles one TU's source with the matching flags PLUS /Z7 (CodeView debug; proven
 codegen-NEUTRAL - the .text is byte-identical to the matching `base` obj, so the

@@ -85,18 +85,18 @@ def emit_rules(w, *, locale='ru', builddir='build', image=None) -> None:
            command=(f"{PY} -m homm2.verify.link_diff --candidate $in "
                     "--stamp $out"),
            description="link-diff ceiling $in")
+    from homm2.graph.link import PROFILES
     w.rule("link_resources",
            command=(f"{PY} -m homm2.graph.rc "
-                    "--rc res/HMM2PL.rc --out build/link/HMM2PL.res "
+                    f"--rc {PROFILES['game'].resources} --out build/link/HMM2PL.res "
                     "--verify-exe build/orig/HMM2PL.exe "
                     "--report build/link/HMM2PL.resources.json"),
            description="rc-res HMM2PL.res")
     if image.key != "game":
-        from homm2.graph.link import PROFILES
         stem = PROFILES[image.key].stem
         w.rule("image_link_resources",
                command=(f"{PY} -m homm2.graph.rc "
-                        f"--rc res/{stem}.rc --out {B}/link/{stem}.res "
+                        f"--rc {PROFILES[image.key].resources} --out {B}/link/{stem}.res "
                         f"--verify-exe {image.exe} --icon {image.key}.ico "
                         f"--report {B}/link/{stem}.resources.json"),
                description=f"rc-res {stem}.res")

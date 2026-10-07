@@ -98,7 +98,7 @@ valid output target.
 | `#define readable storage // spelling fixes .bss order` | deleted; a definition spelled `storage` takes the readable name |
 | `#if H2_RETAIL_COMPILER` blocks | deleted with their retail-only spellings |
 | `#ifdef HOMM2_EDITOR` blocks | preserved; the editor build defines `HOMM2_EDITOR` |
-| `res/EDT2PL.rc` | comments and the retail icon deleted; Windows-1251 escapes become UTF-8 text under code page 65001 |
+| `src/EDITOR/EDT2PL.rc` | comments and the retail icon deleted; Windows-1251 escapes become UTF-8 text under code page 65001 |
 
 The matching source keeps readable names and aliases them to the spellings
 VC6's name hashes need: an `/Od` function's frame-slot order and a unit's
@@ -127,7 +127,7 @@ Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
 the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
-The branch carries `include/`, `src/`, `res/EDT2PL.rc`, vendor SDK headers,
+The branch carries `include/`, `src/` (with the editor's `src/EDITOR/EDT2PL.rc`), vendor SDK headers,
 import definitions, `build.ninja`, and a standalone Nix flake. The Ninja graph
 builds `build/<locale>/HMM2PL.exe` and, as its `editor` target,
 `build/<locale>/EDT2PL.exe` for 32-bit Windows with Clang at `-O0`, x87
