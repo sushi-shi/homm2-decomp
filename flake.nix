@@ -1,5 +1,5 @@
 {
-  description = "HoMM2 Gold 2.1 / Buka HMM2PL.exe (NWC, 1997, VC6 SP5) - matching decompilation environment";
+  description = "Heroes II matching-decompilation environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/64c08a7ca051951c8eae34e3e3cb1e202fe36786";
@@ -17,40 +17,62 @@
     };
   };
 
-  outputs = { self, nixpkgs, rust-overlay, vostok-delinker-src, objdiff-src }:
+  outputs = { nixpkgs, rust-overlay, vostok-delinker-src, objdiff-src, ... }:
     let
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; overlays = [ rust-overlay.overlays.default ]; };
-
-      rust = pkgs.rust-bin.nightly.latest.default.override { extensions = [ "rust-src" "rustfmt" "clippy" ]; };
-      nightly-rustPlatform = pkgs.makeRustPlatform { cargo = rust; rustc = rust; };
-
-      # vostok-delinker - slices the EXE into per-symbol COFF "target" objects (needs a PDB).
-      vostok-delinker = nightly-rustPlatform.buildRustPackage {
-        pname = "vostok-delinker"; version = "0.1.0";
-        src = vostok-delinker-src;
-        patches = [
-          ./patches/vostok-data-comdat-sections.patch
-          ./patches/vostok-common-symbols.patch
-          ./patches/vostok-canonical-data-sinks.patch
-          ./patches/vostok-data-manifest-folded-comdat.patch
-          ./patches/vostok-reviewed-static-reuse.patch
-        ];
-        cargoHash = "sha256-ZwFdbqUyh4b0S+fUYKGMN1fWaxRu1zU2ozKpe7CbcYs=";
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ rust-overlay.overlays.default ];
       };
 
-      # Build the CLI from the pinned upstream source so its machine-readable diff
-      # schema can expose the allocation evidence used by strict data audits.
+      rust = pkgs.rust-bin.nightly.latest.default.override {
+        extensions = [ "rust-src" "rustfmt" "clippy" ];
+      };
+      nightly-rustPlatform = pkgs.makeRustPlatform {
+        cargo = rust;
+        rustc = rust;
+      };
+
+      vostok-delinker = nightly-rustPlatform.buildRustPackage {
+        pname = "vostok-delinker";
+        version = "0.1.0";
+        src = vostok-delinker-src;
+        cargoHash = "sha256-ZwFdbqUyh4b0S+fUYKGMN1fWaxRu1zU2ozKpe7CbcYs=";
+        patches = [
+          ./nix/patches/vostok-data-comdat-sections.patch
+          ./nix/patches/vostok-common-symbols.patch
+          ./nix/patches/vostok-canonical-data-sinks.patch
+          ./nix/patches/vostok-data-manifest-folded-comdat.patch
+          ./nix/patches/vostok-reviewed-static-reuse.patch
+        ];
+      };
+
+      # The CLI is built from the pinned source so its machine-readable diff
+      # schema exposes the allocation evidence the strict data audits read.
       objdiffVersion = "3.7.3";
-      objdiffUrl = name: "https://github.com/encounter/objdiff/releases/download/v${objdiffVersion}/${name}";
-      objdiffGuiLibs = with pkgs; [ libGL libxkbcommon wayland fontconfig freetype libx11 libxcursor libxi libxrandr libxcb ];
+      objdiffUrl = name:
+        "https://github.com/encounter/objdiff/releases/download/v${objdiffVersion}/${name}";
+      objdiffGuiLibs = with pkgs; [
+        libGL
+        libxkbcommon
+        wayland
+        fontconfig
+        freetype
+        libx11
+        libxcursor
+        libxi
+        libxrandr
+        libxcb
+      ];
+
       objdiff-cli = nightly-rustPlatform.buildRustPackage {
-        pname = "objdiff-cli"; version = objdiffVersion;
+        pname = "objdiff-cli";
+        version = objdiffVersion;
         src = objdiff-src;
         patches = [
-          ./patches/objdiff-data-symbol-details.patch
-          ./patches/objdiff-complete-data-sections.patch
-          ./patches/objdiff-score-reloc-addend.patch
+          ./nix/patches/objdiff-data-symbol-details.patch
+          ./nix/patches/objdiff-complete-data-sections.patch
+          ./nix/patches/objdiff-score-reloc-addend.patch
         ];
         cargoHash = "sha256-Z9vyUj35nrHuUoOYM54RLCn7CzcQ6k3A6FsDYKCVqVM=";
         cargoBuildFlags = [ "-p" "objdiff-cli" ];
@@ -59,27 +81,46 @@
         nativeBuildInputs = [ pkgs.protobuf ];
         OBJDIFF_REGENERATE_PROTO = "1";
       };
+
       objdiff = pkgs.stdenv.mkDerivation {
-        pname = "objdiff"; version = objdiffVersion;
-        src = pkgs.fetchurl { url = objdiffUrl "objdiff-linux-x86_64"; hash = "sha256-1pzhzJUl/BJQP2XS333KIfkx1YYi8ZyRdPMv5MnJGyA="; };
-        dontUnpack = true; nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ]; buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ objdiffGuiLibs;
+        pname = "objdiff";
+        version = objdiffVersion;
+        src = pkgs.fetchurl {
+          url = objdiffUrl "objdiff-linux-x86_64";
+          hash = "sha256-1pzhzJUl/BJQP2XS333KIfkx1YYi8ZyRdPMv5MnJGyA=";
+        };
+        dontUnpack = true;
+        nativeBuildInputs = [ pkgs.autoPatchelfHook pkgs.makeWrapper ];
+        buildInputs = [ pkgs.stdenv.cc.cc.lib ] ++ objdiffGuiLibs;
         installPhase = ''
           install -Dm755 $src $out/bin/objdiff
-          wrapProgram $out/bin/objdiff --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath objdiffGuiLibs}"
+          wrapProgram $out/bin/objdiff \
+            --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath objdiffGuiLibs}"
         '';
       };
 
-      # `homm2` CLI on PATH (survives `nix develop --command fish`): python -m homm2.
+      # PyGhidra boots Ghidra's JVM in-process for `homm2 sema` xref and the
+      # whole-.text function-boundary map; libclang parses source DATA claims;
+      # capstone backs the image census.
+      python = pkgs.python3.withPackages (ps: [ ps.pyghidra ps.libclang ps.capstone ]);
       homm2-cli = pkgs.writeShellScriptBin "homm2" ''
-        d="''${HOMM2_DIR:-$PWD}"
-        export PYTHONPATH="$d/scripts''${PYTHONPATH:+:$PYTHONPATH}"
-        exec python3 -m homm2 "$@"
+        project_dir="''${HOMM2_DIR:-}"
+        if [ -z "$project_dir" ]; then
+          project_dir="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+        fi
+        export PYTHONPATH="$project_dir/scripts''${PYTHONPATH:+:$PYTHONPATH}"
+        exec ${python}/bin/python3 -m homm2 "$@"
       '';
+      commonTools = with pkgs; [
+        homm2-cli python git ninja binutils llvm llvmPackages.clang-unwrapped
+        ripgrep file xxd jq p7zip vostok-delinker objdiff objdiff-cli
+        rust ghidra jdk21
+        gh # `homm2 init` fetches the pinned toolchain release
+      ];
 
-      # Resolve the checkout independently of the directory from which the shell
-      # command was invoked.  Nix does not expose the original local-flake path to
-      # shellHook, so callers outside the checkout provide HOMM2_DIR explicitly;
-      # callers anywhere inside a worktree are discovered through Git.
+      # Nix does not tell shellHook which local flake was entered, so the
+      # checkout is found through Git from anywhere inside a worktree, and a
+      # caller outside it names it with HOMM2_DIR.
       projectRootHook = ''
         _homm2_root="$(git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || true)"
         if [ ! -f "$_homm2_root/config/units.toml" ]; then
@@ -94,8 +135,8 @@
         unset _homm2_root
       '';
 
-      # objdiff shim: open this checkout's generated project unless the caller
-      # explicitly selects another project directory.
+      # `objdiff` opens this checkout's generated project unless the caller
+      # selects another project directory.
       objdiffShimHook = ''
         if command -v objdiff >/dev/null 2>&1 \
             && [ -f "$HOMM2_DIR/build/objdiff/objdiff.json" ]; then
@@ -116,7 +157,6 @@
               && chmod +x "$_homm2_objdiff_bin/objdiff"; then
             export PATH="$_homm2_objdiff_bin:$PATH"
             export HOMM2_OBJDIFF_WRAPPED="$HOMM2_DIR"
-            echo "[homm2] objdiff    : WRAPPED -> $HOMM2_OBJDIFF_PROJECT/objdiff.json" >&2
           else
             echo "[homm2] objdiff    : wrapper setup failed" >&2
           fi
@@ -124,29 +164,22 @@
         fi
       '';
 
-      # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
-      # xref and supplies the WHOLE-.text function-boundary map; on this stripped
-      # target its analysis is also the candidate function inventory
-      # (config/retail/functions.csv), while source VA() markers stay authoritative
-      # for names. Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
-      # rev) so they're store cache hits, not a rebuild.
-      commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
-        (python3.withPackages (ps: [ ps.pyghidra ps.libclang ps.capstone ])) # Ghidra + source DATA parsing + the image census
-        ghidra jdk21                      # Ghidra 12.0.4 headless + JRE (homm2 sema xref)
-        ninja
-        llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
-        llvmPackages.clang-unwrapped      # clangd + clang-format + clang driver (UNWRAPPED: no host gcc/glibc include shadowing)
-        ripgrep file xxd jq binutils p7zip
-        gh                                # `homm2 init` fetches the pinned toolchain release
-      ]);
-
-      # PyGhidra env, shared by both shells: pyghidra.start() reads GHIDRA_INSTALL_DIR
-      # to boot the Ghidra JVM via jpype (JAVA_HOME picks the JRE).
-      ghidraEnvHook = ''
+      commonHook = projectRootHook + ''
+        export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
+        export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
+        [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
+        export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
+        # `homm2 audit reloc-sweep` reads find_relocs.py from the delinker's
+        # source tree; the package installs only the binary.
+        export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
+        export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
+        export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
         export GHIDRA_INSTALL_DIR="${pkgs.ghidra}/lib/ghidra"
         export JAVA_HOME="${pkgs.jdk21}/lib/openjdk"
-      '';
+        export PYTHONDONTWRITEBYTECODE=1
+      '' + objdiffShimHook;
 
+      # `nix run`: the rebuilt game under Wine, from this checkout.
       run-game = pkgs.writeShellApplication {
         name = "homm2-run";
         runtimeInputs = commonTools ++ [
@@ -185,80 +218,33 @@
       };
     in {
       packages.${system} = {
-        inherit vostok-delinker objdiff objdiff-cli;
-        run-game = run-game;
+        inherit vostok-delinker objdiff objdiff-cli run-game;
         default = vostok-delinker;
       };
-
       apps.${system} = {
         default = {
           type = "app";
           program = "${run-game}/bin/homm2-run";
         };
       };
-
       devShells.${system} = {
-        # Default - analysis, target-side delink, objdiff, clangd. No MSVC.
         default = pkgs.mkShell {
-          name = "homm2-decomp";
           packages = commonTools;
-          shellHook = ''
-            ${projectRootHook}
-            export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
-            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
-            export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
-            export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
-            # The delinker's own scripts/ ships in its source tree, not its
-            # binary; `homm2 audit reloc-sweep` reads find_relocs.py from here.
-            export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
-            ${ghidraEnvHook}
-            echo "[homm2] target EXE : $HOMM2_EXE (stripped - no debug stream, no .reloc)" >&2
-            echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
-            echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
-            echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC6 SP5 + wine)" >&2
-            ${objdiffShimHook}
-          '';
+          shellHook = commonHook;
         };
-
-        # Build - VC6 SP5 under wine, the compiler this target was built with.
-        # Toolchain defaults to build/toolchain, which `homm2 init` populates from the
-        # pinned toolchain-vc6-sp5 release; set $HOMM2_TOOLCHAIN to point somewhere
-        # else. Unlike the VC 4.2 line there is no separate final-link component: VC6
-        # links with its own LINK.EXE out of the same tree. Making it a fetchurl
-        # derivation instead (the sibling Gruntz layout) is the better endgame - a
-        # store path cannot drift - and is a small change once the release is
-        # anonymously fetchable.
         build = pkgs.mkShell {
-          name = "homm2-build";
-          packages = commonTools ++ [
-            pkgs.wineWow64Packages.staging
-            pkgs.libfaketime
-          ];
-          shellHook = ''
-            ${projectRootHook}
-            export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
-            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
-            export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
-            export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
-            # The delinker's own scripts/ ships in its source tree, not its
-            # binary; `homm2 audit reloc-sweep` reads find_relocs.py from here.
-            export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
-            export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
-            export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
+          # VC6 SP5 under Wine. `homm2 init` provisions build/toolchain from
+          # the pinned release; $HOMM2_TOOLCHAIN points elsewhere.
+          packages = commonTools ++ [ pkgs.wineWow64Packages.staging pkgs.libfaketime ];
+          shellHook = commonHook + ''
             export WINEPREFIX="$HOMM2_DIR/build/wineprefix"
-            export WINEDEBUG="fixme-all,err-kerberos"
             export WINEDLLOVERRIDES="mscoree,mshtml="
+            export WINEDEBUG="fixme-all,err-kerberos"
             case "$-" in *i*) trap 'wineserver -k >/dev/null 2>&1 || true' EXIT ;; esac
-            echo "[homm2] VC6 SP5    : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
-            echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
               echo "[homm2] VC6 SP5    : NOT PROVISIONED - run \`homm2 init\` to fetch the pinned release" >&2
               echo "[homm2]              (or rebuild it from media: nix-shell scripts/toolchain/create-toolchain-release.nix)" >&2
             fi
-            ${ghidraEnvHook}
-            echo "[homm2] target EXE : $HOMM2_EXE" >&2
-            echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/sema/ghidra/...)" >&2
-            ${objdiffShimHook}
           '';
         };
       };
