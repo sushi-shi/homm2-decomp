@@ -5294,7 +5294,7 @@ i32 editManager::Open(i32 priority) {
     UpdateMapView();
     gpMouseManager->SetPointer("editor.mse", EDIT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ShowColorPointer();
-    m_messageMask = EDIT_MANAGER_DISPATCH_MASK;
+    m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
     m_active = true;
     strcpy(m_name, "editManager");
@@ -5342,7 +5342,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
     cell = gMap.CellAt(x, y);
     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
         if (cell->m_overlayTileset != TILESET_FLAG32 && cell->m_overlayTileset != TILESET_EXTRAOVR) {
-            set = cell->m_overlayTileset;
+            set = IDX(cell->m_overlayTileset);
             sprite = cell->m_overlayIndex;
         }
         if (cell->m_extraIndex
@@ -5352,7 +5352,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
             part = NULL;
         while (part) {
             if (part->overlayTileset != TILESET_FLAG32 && part->overlayTileset != TILESET_EXTRAOVR) {
-                set = part->overlayTileset;
+                set = IDX(part->overlayTileset);
                 sprite = part->overlayIndex;
             }
             if (part->nextIndex && gMap.Extra(part->nextIndex)->overlayIndex != MAPCELL_SPRITE_NONE)
@@ -5363,7 +5363,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
     } else if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
         if (!cell->m_objectShadow && cell->m_objectTileset != TILESET_FLAG32
             && cell->m_objectTileset != TILESET_EXTRAOVR) {
-            set = cell->m_objectTileset;
+            set = IDX(cell->m_objectTileset);
             sprite = cell->m_objectIndex;
             isLow = cell->m_objectHighLayer;
         }
@@ -5375,7 +5375,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
         while (part) {
             if ((!part->objectHighLayer || isLow) && !part->objectShadow
                 && part->objectTileset != TILESET_FLAG32 && part->objectTileset != TILESET_EXTRAOVR) {
-                set = part->objectTileset;
+                set = IDX(part->objectTileset);
                 sprite = part->objectIndex;
                 isLow = part->objectHighLayer;
             }
@@ -5443,7 +5443,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
     i32 cellEvent;
     i32 mapY;
     i32 iconIndex;
-    i32 tilesetId;
+    TilesetId tilesetId;
     i32 kindIndex;
     mapCell* cell;
     char initial;
@@ -5709,24 +5709,24 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                             cellEvent = OVERLAY_NONE;
                             if (objectKind != OVERLAY_NONE)
                                 cellEvent = gOverlayTypes[objectKind].trigger;
-                            if (cellEvent == OVERLAY_NONE || cellEvent == MAP_OBJECT_NOTHING_SPECIAL
-                                || cellEvent == MAP_OBJECT_MOSSY_ROCK) {
+                            if (cellEvent == OVERLAY_NONE || cellEvent == IDX(MAP_OBJECT_NOTHING_SPECIAL)
+                                || cellEvent == IDX(MAP_OBJECT_MOSSY_ROCK)) {
                                 sprintf(gText,
-                                        gTerrainNames[giGroundToTerrain[gMap.CellAt(mapX, mapY)
-                                                                            ->m_terrainImageIndex]]);
+                                        gTerrainNames[IDX(giGroundToTerrain[gMap.CellAt(mapX, mapY)
+                                                                            ->m_terrainImageIndex])]);
                             } else {
                                 cell = gMap.CellAt(mapX, mapY);
                                 switch (cellEvent) {
-                                    case MAP_OBJECT_BARRIER:
-                                    case MAP_OBJECT_TRAVELER_TENT:
+                                    case IDX(MAP_OBJECT_BARRIER):
+                                    case IDX(MAP_OBJECT_TRAVELER_TENT):
                                         sprintf(gText,
-                                                gQuickViewText[MAP_TRIGGER_OBJECT(cell->m_triggerType)],
+                                                gQuickViewText[IDX(MAP_TRIGGER_OBJECT(cell->m_triggerType))],
                                                 xBarrierColor[cell->m_objectMetadata
                                                               & EDIT_BARRIER_COLOR_MASK]);
                                         initial = toupper(static_cast<i32>(gText[0]));
                                         gText[0] = initial;
                                         break;
-                                    case MAP_OBJECT_EXPANSION_OBJECT:
+                                    case IDX(MAP_OBJECT_EXPANSION_OBJECT):
                                         if (cell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                                             iconIndex = cell->m_objectIndex;
                                             tilesetId = cell->m_objectTileset;
@@ -5734,43 +5734,43 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                             iconIndex = cell->m_overlayIndex;
                                             tilesetId = cell->m_overlayTileset;
                                         }
-                                        kindIndex = GENERIC_SITE_UNKNOWN;
+                                        kindIndex = IDX(GENERIC_SITE_UNKNOWN);
                                         switch (tilesetId) {
                                             case TILESET_X_LOC1:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC1_ALCHEMIST_TOWER_END)
-                                                    kindIndex = GENERIC_SITE_ALCHEMIST_TOWER;
+                                                    kindIndex = IDX(GENERIC_SITE_ALCHEMIST_TOWER);
                                                 else if (iconIndex < EDIT_X_LOC1_ARENA_END)
-                                                    kindIndex = GENERIC_SITE_ARENA;
+                                                    kindIndex = IDX(GENERIC_SITE_ARENA);
                                                 break;
                                             case TILESET_X_LOC2:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC2_STABLES_END)
-                                                    kindIndex = GENERIC_SITE_STABLES;
+                                                    kindIndex = IDX(GENERIC_SITE_STABLES);
                                                 else if (iconIndex < EDIT_X_LOC2_STRAY_END)
                                                     kindIndex = EDIT_SITE_NAME_STRAY;
                                                 else if (iconIndex < EDIT_X_LOC2_MERMAID_END)
-                                                    kindIndex = GENERIC_SITE_MERMAID;
+                                                    kindIndex = IDX(GENERIC_SITE_MERMAID);
                                                 else if (iconIndex < EDIT_X_LOC2_SIRENS_END)
-                                                    kindIndex = GENERIC_SITE_SIRENS;
+                                                    kindIndex = IDX(GENERIC_SITE_SIRENS);
                                                 break;
                                             case TILESET_X_LOC3:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC3_HUT_OF_MAGI_END)
-                                                    kindIndex = GENERIC_SITE_HUT_OF_MAGI;
+                                                    kindIndex = IDX(GENERIC_SITE_HUT_OF_MAGI);
                                                 else if (iconIndex < EDIT_X_LOC3_EYE_OF_MAGI_END)
-                                                    kindIndex = GENERIC_SITE_EYE_OF_MAGI;
+                                                    kindIndex = IDX(GENERIC_SITE_EYE_OF_MAGI);
                                                 break;
                                         }
-                                        if (kindIndex == GENERIC_SITE_UNKNOWN)
+                                        if (kindIndex == IDX(GENERIC_SITE_UNKNOWN))
                                             sprintf(gText, localization::Tr("editor.quick_view.unknown"));
                                         else
                                             sprintf(gText, xGenericSiteNames[kindIndex]);
                                         break;
-                                    case MAP_OBJECT_EXPANSION_DWELLING:
+                                    case IDX(MAP_OBJECT_EXPANSION_DWELLING):
                                         if (cell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                                             iconIndex = cell->m_objectIndex;
                                             tilesetId = cell->m_objectTileset;
@@ -5778,7 +5778,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                             iconIndex = cell->m_overlayIndex;
                                             tilesetId = cell->m_overlayTileset;
                                         }
-                                        kindIndex = GENERIC_SITE_UNKNOWN;
+                                        kindIndex = IDX(GENERIC_SITE_UNKNOWN);
                                         switch (tilesetId) {
                                             case TILESET_X_LOC1:
                                                 if (iconIndex < EDIT_X_LOC1_ARENA_END)
@@ -5795,12 +5795,12 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                                     kindIndex = IDX(RECRUITMENT_SITE_WATER_ALTAR);
                                                 break;
                                         }
-                                        if (kindIndex == GENERIC_SITE_UNKNOWN)
+                                        if (kindIndex == IDX(GENERIC_SITE_UNKNOWN))
                                             sprintf(gText, localization::Tr("editor.quick_view.unknown"));
                                         else
                                             sprintf(gText, xRecruitmentSiteNames[kindIndex]);
                                         break;
-                                    case MAP_OBJECT_ROCK:
+                                    case IDX(MAP_OBJECT_ROCK):
                                         if (cell->m_objectTileset == TILESET_X_LOC2)
                                             sprintf(gText, localization::Tr("editor.quick_view.reefs"));
                                         else
@@ -6157,9 +6157,9 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
             cell = &gMap.Column(x)[mapY * gMap.width];
             tile = -1;
             if (cell->m_objectIndex != MAPCELL_SPRITE_NONE)
-                tile = cell->m_objectTileset;
+                tile = IDX(cell->m_objectTileset);
             else if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
-                tile = cell->m_overlayTileset;
+                tile = IDX(cell->m_overlayTileset);
             switch (tile) {
                 case IDX(TILESET_MTNSNOW):
                 case IDX(TILESET_MTNSWMP):
@@ -6185,7 +6185,7 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                             color = EDIT_RADAR_TOWN_COLOR;
                             break;
                         default:
-                            color = gMapColors[giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex]]
+                            color = gMapColors[IDX(giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex])]
                                     + EDIT_RADAR_OBSTACLE_SHADE;
                             break;
                     }
@@ -6195,7 +6195,7 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
                     color = EDIT_RADAR_TOWN_COLOR;
                     break;
                 default:
-                    color = gMapColors[giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex]];
+                    color = gMapColors[IDX(giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex])];
                     break;
             }
             if (gGeneratingMap)
@@ -6352,7 +6352,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         && !gDrawCell->m_objectShadow))) {
                 if (gDrawCell->m_objectTileset == TILESET_MONS32)
                     IconToBitmapScale(
-                        m_objectIcons[gDrawCell->m_objectTileset][0],
+                        m_objectIcons[IDX(gDrawCell->m_objectTileset)][0],
                         gpWindowManager->m_screen,
                         gDrawX,
                         gDrawY - EDIT_MONSTER_LIFT / gZoomScale[m_zoomLevel],
@@ -6366,7 +6366,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                     );
                 else if (gDrawCell->m_objectTileset == TILESET_MINIHERO)
                     IconToBitmapScaleDouble(
-                        m_objectIcons[gDrawCell->m_objectTileset][0],
+                        m_objectIcons[IDX(gDrawCell->m_objectTileset)][0],
                         gpWindowManager->m_screen,
                         gDrawX,
                         gDrawY - EDIT_HERO_LIFT / gZoomScale[m_zoomLevel],
@@ -6380,7 +6380,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                     );
                 else
                     IconToBitmapScale(
-                        m_objectIcons[gDrawCell->m_objectTileset][0],
+                        m_objectIcons[IDX(gDrawCell->m_objectTileset)][0],
                         gpWindowManager->m_screen,
                         gDrawX,
                         gDrawY,
@@ -6394,13 +6394,13 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                     );
                 if (gDrawCell->m_animatedObject) {
                     gDrawFrames = GetIconEntry(
-                                      m_objectIcons[gDrawCell->m_objectTileset][0],
+                                      m_objectIcons[IDX(gDrawCell->m_objectTileset)][0],
                                       gDrawCell->m_objectIndex
                                   )->flags;
                     if (gDrawCell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MAGIC_GARDEN))
                         gDrawFrames--;
                     IconToBitmapScale(
-                        m_objectIcons[gDrawCell->m_objectTileset][0],
+                        m_objectIcons[IDX(gDrawCell->m_objectTileset)][0],
                         gpWindowManager->m_screen,
                         gDrawX,
                         gDrawY,
@@ -6426,7 +6426,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         && !gDrawExtra->objectShadow)) {
                     if (gDrawExtra->objectTileset == TILESET_MONS32)
                         IconToBitmapScale(
-                            m_objectIcons[gDrawExtra->objectTileset][0],
+                            m_objectIcons[IDX(gDrawExtra->objectTileset)][0],
                             gpWindowManager->m_screen,
                             gDrawX,
                             gDrawY - EDIT_MONSTER_LIFT / gZoomScale[m_zoomLevel],
@@ -6440,7 +6440,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         );
                     else if (gDrawExtra->objectTileset == TILESET_MINIHERO)
                         IconToBitmapScaleDouble(
-                            m_objectIcons[gDrawExtra->objectTileset][0],
+                            m_objectIcons[IDX(gDrawExtra->objectTileset)][0],
                             gpWindowManager->m_screen,
                             gDrawX,
                             gDrawY - EDIT_HERO_LIFT / gZoomScale[m_zoomLevel],
@@ -6454,7 +6454,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         );
                     else
                         IconToBitmapScale(
-                            m_objectIcons[gDrawExtra->objectTileset][0],
+                            m_objectIcons[IDX(gDrawExtra->objectTileset)][0],
                             gpWindowManager->m_screen,
                             gDrawX,
                             gDrawY,
@@ -6468,11 +6468,11 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
                         );
                     if (gDrawExtra->animatedObject) {
                         gDrawFrames = GetIconEntry(
-                                          m_objectIcons[gDrawExtra->objectTileset][0],
+                                          m_objectIcons[IDX(gDrawExtra->objectTileset)][0],
                                           gDrawExtra->objectIndex
                                       )->flags;
                         IconToBitmapScale(
-                            m_objectIcons[gDrawExtra->objectTileset][0],
+                            m_objectIcons[IDX(gDrawExtra->objectTileset)][0],
                             gpWindowManager->m_screen,
                             gDrawX,
                             gDrawY,
@@ -6497,7 +6497,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
     if (layers & EDIT_DRAW_OVERHANGING) {
         if (gDrawCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             IconToBitmapScale(
-                m_objectIcons[gDrawCell->m_overlayTileset][0],
+                m_objectIcons[IDX(gDrawCell->m_overlayTileset)][0],
                 gpWindowManager->m_screen,
                 gDrawX,
                 gDrawY,
@@ -6511,11 +6511,11 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
             );
             if (gDrawCell->m_animatedOverlay) {
                 gDrawFrames = GetIconEntry(
-                                  m_objectIcons[gDrawCell->m_overlayTileset][0],
+                                  m_objectIcons[IDX(gDrawCell->m_overlayTileset)][0],
                                   gDrawCell->m_overlayIndex
                               )->flags;
                 IconToBitmapScale(
-                    m_objectIcons[gDrawCell->m_overlayTileset][0],
+                    m_objectIcons[IDX(gDrawCell->m_overlayTileset)][0],
                     gpWindowManager->m_screen,
                     gDrawX,
                     gDrawY,
@@ -6536,7 +6536,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
             gDrawExtra = NULL;
         while (gDrawExtra) {
             IconToBitmapScale(
-                m_objectIcons[gDrawExtra->overlayTileset][0],
+                m_objectIcons[IDX(gDrawExtra->overlayTileset)][0],
                 gpWindowManager->m_screen,
                 gDrawX,
                 gDrawY,
@@ -6550,11 +6550,11 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
             );
             if (gDrawExtra->animatedOverlay) {
                 gDrawFrames = GetIconEntry(
-                                  m_objectIcons[gDrawExtra->overlayTileset][0],
+                                  m_objectIcons[IDX(gDrawExtra->overlayTileset)][0],
                                   gDrawExtra->overlayIndex
                               )->flags;
                 IconToBitmapScale(
-                    m_objectIcons[gDrawExtra->overlayTileset][0],
+                    m_objectIcons[IDX(gDrawExtra->overlayTileset)][0],
                     gpWindowManager->m_screen,
                     gDrawX,
                     gDrawY,
@@ -6750,7 +6750,7 @@ void SetCellGround(i32 x, i32 y, i32 terrain, i32 shape) {
     mapCell* cell;
 
     cell = &gMap.Column(x)[y * gMap.width];
-    if (giGroundToTerrain[cell->m_terrainImageIndex] == terrain
+    if (IDX(giGroundToTerrain[cell->m_terrainImageIndex]) == terrain
         && (giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK)
                == (shape & EDIT_SHAPE_MASK))
         return;
@@ -6768,8 +6768,8 @@ void editManager::DoRadar(void) {
     float scale;
 
     gpMouseManager->MouseCoords(x, y);
-    if (x < EDIT_RADAR_LEFT || x > EDIT_RADAR_LEFT + EDIT_RADAR_SIZE || y < EDIT_RADAR_TOP
-        || y > EDIT_RADAR_TOP + EDIT_RADAR_SIZE)
+    if (x < EDIT_RADAR_LEFT || x > EDIT_RADAR_LEFT + IDX(EDIT_RADAR_SIZE) || y < EDIT_RADAR_TOP
+        || y > EDIT_RADAR_TOP + IDX(EDIT_RADAR_SIZE))
         return;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
@@ -7138,7 +7138,7 @@ void ReadTextLine(FILE* file, char* line) {
 
 VA(0x00406cf2, 0xf0)
 bool FindTextHeader(FILE* file, i32 x, i32 y, H2_CONST char* kind) {
-    char line[EDIT_TEXT_LINE_SIZE];
+    char H2_UNUSED(line)[EDIT_TEXT_LINE_SIZE];
     char* mark;
     i32 fileX;
     i32 fileY;
@@ -7275,8 +7275,8 @@ bool editManager::ImportMapText(void) {
         return false;
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
-            i32 unused2;
-            i32 unused;
+            i32 H2_UNUSED(unused2);
+            i32 H2_UNUSED(unused);
             char* newEvent;
             i32 length;
             char* riddleRecord;
@@ -7419,7 +7419,7 @@ VA(0x004081dc, 0x4a6)
 void editManager::UpdateTriggers(void) {
     i32 type;
     i32 x;
-    i32 temp;
+    i32 H2_UNUSED(temp);
     mapCell* cell;
     i32 y;
     i32 lineType;
@@ -7488,7 +7488,7 @@ void editManager::UpdateTriggers(void) {
 
 // Asks a yes/no question; true when answered yes.
 VA(0x00408682, 0x41)
-b32 editManager::Confirm(char* question) {
+b32 editManager::Confirm(H2_CONST char* question) {
     NormalDialog(question, NORMAL_DIALOG_CONFIRM);
     if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_YES)
         return true;
@@ -7595,16 +7595,16 @@ i32 editManager::CountMines(void) {
 VA(0x00408a25, 0x190)
 void editManager::WriteTowns(i32 file) {
     i32 count;
-    i32 setTowns;
+    i32 H2_UNUSED(setTowns);
     i32 type;
-    i32 setCastles;
+    i32 H2_UNUSED(setCastles);
     i32 x;
     mapCell* cell;
     i32 y;
-    i32 notUsed;
+    i32 H2_UNUSED(notUsed);
     EditMapRecord empty;
-    i32 castleCount;
-    i32 index;
+    i32 H2_UNUSED(castleCount);
+    i32 H2_UNUSED(index);
     TownExtra* townExtra;
 
     count = 0;
@@ -7621,7 +7621,7 @@ void editManager::WriteTowns(i32 file) {
                 write(file, &x, 1);
                 write(file, &y, 1);
                 townExtra = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
-                type = townExtra->faction;
+                type = IDX(townExtra->faction);
                 if (townExtra->isCastle)
                     type |= EDIT_MAP_CASTLE_FLAG;
                 write(file, &type, 1);
@@ -7650,17 +7650,17 @@ void editManager::WriteTowns(i32 file) {
 VA(0x00408bb5, 0x313)
 void editManager::WriteMines(i32 file) {
     u8 type;
-    i32 lighthouseCount;
-    u8 cityX;
-    u8 cityY;
+    i32 H2_UNUSED(lighthouseCount);
+    u8 H2_UNUSED(cityX);
+    u8 H2_UNUSED(cityY);
     u8 x;
     mapCell* cell;
     u8 y;
     EditMapRecord empty;
-    u8 lighthouseX;
+    u8 H2_UNUSED(lighthouseX);
     i32 mineNumber;
-    u8 lighthouseY;
-    i32 cityCount;
+    u8 H2_UNUSED(lighthouseY);
+    i32 H2_UNUSED(cityCount);
     mapCell* markerCell;
     i32 extraIndex;
 
@@ -7771,12 +7771,12 @@ i32 editManager::SaveMap(char* name) {
     char oldName[EDITOR_MAP_FILE_NAME_SIZE];
     i32 length;
     char* mark;
-    i32 mapHeight;
-    char* chars;
-    i32 height;
+    i32 H2_UNUSED(mapHeight);
+    H2_CONST char* chars;
+    i32 H2_UNUSED(height);
     char base[EDIT_MAP_BASE_NAME_SIZE];
     i32 n;
-    i32 formatWord;
+    i32 H2_UNUSED(formatWord);
     char* namePos;
     i32 file;
     char target[EDIT_MAP_TARGET_NAME_SIZE];
@@ -7874,13 +7874,13 @@ VA(0x00409465, 0x2db)
 i32 editManager::LoadMap(char* name) {
     char fileName[EDIT_MAP_PATH_SIZE];
     char tmpName[EDITOR_MAP_FILE_NAME_SIZE];
-    i32 width;
+    i32 H2_UNUSED(width);
     u8 ignored[EDIT_MAP_SKIPPED_SIZE];
-    i32 mapFormat;
+    i32 H2_UNUSED(mapFormat);
     i32 i;
     i32 handle;
     SMapHeader mapHeader;
-    i32 height;
+    i32 H2_UNUSED(height);
 
     strcpy(tmpName, name);
     FreeMapExtras();
@@ -7919,7 +7919,7 @@ i32 editManager::LoadMap(char* name) {
 // name in gMapFileName. The view's up and down scroll arrows are disabled
 // while it is open.
 VA(0x00409740, 0x1cc)
-b32 PickMap(i32 mode) {
+b32 PickMap(FileRequesterMode mode) {
     fileRequester* requester;
     char pattern[EDIT_FILE_PATTERN_SIZE];
     b32 picked;
@@ -7940,7 +7940,7 @@ b32 PickMap(i32 mode) {
     sprintf(pattern, "*.%s", "M*2");
     sprintf(ext, ".%s", "MP2");
     requester = new fileRequester(EDIT_FILE_REQUESTER_X, EDIT_FILE_REQUESTER_Y,
-                                  static_cast<FileRequesterMode>(mode), pattern, ".\\MAPS\\", ext);
+                                  mode, pattern, ".\\MAPS\\", ext);
     button = gpExec->DoDialog(requester);
     if (button == FILE_REQUESTER_OK) {
         picked = true;
@@ -7990,7 +7990,7 @@ void editManager::ShowErrors(void) {
 }
 
 VA(0x00409a36, 0x72)
-void editManager::AddError(char* text) {
+void editManager::AddError(H2_CONST char* text) {
     i32 length;
 
     if (gEditErrorCount < EDIT_MANAGER_ERROR_CAPACITY) {
@@ -8013,8 +8013,8 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
     u16 nextIndex;
     i32 i;
     i32 j;
-    i32 pass;
-    i32 oy;
+    i32 H2_UNUSED(pass);
+    i32 H2_UNUSED(oy);
     mapCell* cell;
 
     gLinesRemoved = false;
@@ -8031,7 +8031,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
             cell = gMap.CellAt(i, j);
             while (cell->m_objectIndex != MAPCELL_SPRITE_NONE
                    && (!cell->m_objectShadow || cell->m_objectHighLayer || allLayers)
-                   && (!filtered || gClearTilesets[cell->m_objectTileset]))
+                   && (!filtered || gClearTilesets[IDX(cell->m_objectTileset)]))
                 RemoveLinkedObject(cell->m_objectLink);
             if (cell->m_extraIndex
                 && gMap.Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
@@ -8041,7 +8041,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
             while (part) {
                 nextIndex = part->nextIndex;
                 if ((!part->objectShadow || part->objectHighLayer || allLayers)
-                    && (!filtered || gClearTilesets[part->objectTileset]))
+                    && (!filtered || gClearTilesets[IDX(part->objectTileset)]))
                     RemoveLinkedObject(part->objectLink);
                 if (nextIndex && gMap.Extra(nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
                     part = gMap.Extra(nextIndex);
@@ -8138,7 +8138,7 @@ void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
             gMap.CellAt(i, j)->m_overlayLink = 0;
             gMap.CellAt(i, j)->m_extraIndex = 0;
             gMap.CellAt(i, j)->m_terrainImageIndex
-                = ChooseGroundTile(TERRAIN_WATER, EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
+                = ChooseGroundTile(IDX(TERRAIN_WATER), EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
             gMap.CellAt(i, j)->m_objectTileset = TILESET_NONE;
             gMap.CellAt(i, j)->m_objectIndex = MAPCELL_SPRITE_NONE;
             gMap.CellAt(i, j)->m_overlayTileset = TILESET_NONE;
@@ -8153,7 +8153,7 @@ void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
 
 // The letters of a map code.
 DATA(0x0047d738)
-char* gMapCodeLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+H2_CONST char* gMapCodeLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // A map code of the serial: a letter from 'V' to 'Z' and three letters.
 VA(0x0040a165, 0xe5)
@@ -8354,7 +8354,7 @@ void editManager::SetCoast(i32 x, i32 y) {
 // Shows a warning on the status bar with a beep (not while the random map
 // generator runs).
 VA(0x0040acba, 0x35)
-void ShowStatusWarning(char* text) {
+void ShowStatusWarning(H2_CONST char* text) {
     if (gGeneratingRandomMap)
         return;
     ShowStatusText(text);
@@ -8365,14 +8365,14 @@ void ShowStatusWarning(char* text) {
 // Each terrain's chance, in percent before ChooseGroundTile's scale, that a
 // cell takes a varied tile.
 DATA(0x0047d73c)
-i32 gGroundVariantChance[TERRAIN_COUNT] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
+i32 gGroundVariantChance[IDX(TERRAIN_COUNT)] = {0, 5, 8, 8, 8, 6, 4, 8, 7};
 // The ground tiles of each terrain and shape, plain and varied, indexed on
 // the first call.
 #define gGroundTilesIndexed gGroundTilesIndexedStateField // spelling fixes .bss order
 DATA(0x004a3a54) b32 gGroundTilesIndexed;
 #define gGroundTiles gGroundTilesAreaHolder // spelling fixes .bss order
-DATA(0x0049f94c) u16 gGroundTiles[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
-DATA(0x004a372c) u16 gGroundTileCounts[TERRAIN_COUNT][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
+DATA(0x0049f94c) u16 gGroundTiles[IDX(TERRAIN_COUNT)][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS][EDIT_GROUND_TILES_PER_SHAPE];
+DATA(0x004a372c) u16 gGroundTileCounts[IDX(TERRAIN_COUNT)][EDIT_SHAPE_COUNT][EDIT_GROUND_VARIANTS];
 #define gGroundTileCount gGroundTileCountCopyInfo // spelling fixes .bss order
 DATA(0x0049f948) i32 gGroundTileCount;
 DATA(0x0049f5ec) i32 gGroundTileChoice;
@@ -8387,17 +8387,17 @@ i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, 
     variant = EDIT_GROUND_PLAIN;
     if (!gGroundTilesIndexed) {
         gGroundTilesIndexed = true;
-        for (terrainIndex = 0; terrainIndex < TERRAIN_COUNT; terrainIndex++)
+        for (terrainIndex = 0; terrainIndex < IDX(TERRAIN_COUNT); terrainIndex++)
             for (shapeIndex = 0; shapeIndex < EDIT_SHAPE_COUNT; shapeIndex++)
                 for (variant = 0; variant < EDIT_GROUND_VARIANTS; variant++)
                     gGroundTileCounts[terrainIndex][shapeIndex][variant] = 0;
         for (tile = 0; tile < GROUND_TILE_IMAGE_COUNT; tile++) {
             variant = (giGroundShape[tile] & GROUND_SHAPE_VARIED) != 0;
-            gGroundTiles[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]
-                        [gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK]
+            gGroundTiles[IDX(giGroundToTerrain[tile])][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]
+                        [gGroundTileCounts[IDX(giGroundToTerrain[tile])][giGroundShape[tile] & EDIT_SHAPE_MASK]
                                           [variant]]
                 = tile;
-            gGroundTileCounts[giGroundToTerrain[tile]][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]++;
+            gGroundTileCounts[IDX(giGroundToTerrain[tile])][giGroundShape[tile] & EDIT_SHAPE_MASK][variant]++;
         }
     }
     if (vary) {
@@ -8500,7 +8500,7 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
     b32 waterUpLeft;
     i32 H2_UNUSED(unused);
     b32 repeat;
-    u8 terrainCounts[TERRAIN_COUNT];
+    u8 terrainCounts[IDX(TERRAIN_COUNT)];
     b32 waterUpRight;
     i32 newTerrain;
     b32 sameUpLeft;
@@ -8525,49 +8525,49 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
         passes++;
         for (y = 0; y < MAP_HEIGHT; y++) {
             for (x = 0; x < MAP_WIDTH; x++) {
-                thisTerrain = CELL_TERRAIN(gMap.CellAt(x, y));
+                thisTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
                 // A constant condition: retail keeps its compiled test.
                 if (1) {
                     waterUp = waterDown = waterRight = waterLeft = sameUp = sameDown = sameRight = sameLeft
                         = sameUpLeft = sameUpRight = sameDownLeft = sameDownRight = 0;
-                    if (!y || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == thisTerrain)
+                    if (!y || IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) == thisTerrain)
                         sameUp = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x, y - 1)))
                         waterUp = true;
-                    if (y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == thisTerrain)
+                    if (y == MAP_HEIGHT - 1 || IDX(CELL_TERRAIN(gMap.CellAt(x, y + 1))) == thisTerrain)
                         sameDown = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x, y + 1)))
                         waterDown = true;
-                    if (x == MAP_WIDTH - 1 || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == thisTerrain)
+                    if (x == MAP_WIDTH - 1 || IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y))) == thisTerrain)
                         sameRight = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x + 1, y)))
                         waterRight = true;
-                    if (!x || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == thisTerrain)
+                    if (!x || IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y))) == thisTerrain)
                         sameLeft = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x - 1, y)))
                         waterLeft = true;
-                    if (!x || !y || CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) == thisTerrain)
+                    if (!x || !y || IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))) == thisTerrain)
                         sameUpLeft = true;
-                    if (!x || y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) == thisTerrain)
+                    if (!x || y == MAP_HEIGHT - 1 || IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y + 1))) == thisTerrain)
                         sameDownLeft = true;
-                    if (x == MAP_WIDTH - 1 || !y || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == thisTerrain)
+                    if (x == MAP_WIDTH - 1 || !y || IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))) == thisTerrain)
                         sameUpRight = true;
                     if (x == MAP_WIDTH - 1 || y == MAP_HEIGHT - 1
-                        || CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) == thisTerrain)
+                        || IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y + 1))) == thisTerrain)
                         sameDownRight = true;
                     if (!sameUp || !sameDown || !sameRight || !sameLeft) {
                         memset(terrainCounts, 0, sizeof(terrainCounts));
                         if (x < MAP_WIDTH - 1)
-                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x + 1, y))]++;
+                            terrainCounts[IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y)))]++;
                         if (x > 0)
-                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x - 1, y))]++;
+                            terrainCounts[IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y)))]++;
                         if (y < MAP_HEIGHT - 1)
-                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x, y + 1))]++;
+                            terrainCounts[IDX(CELL_TERRAIN(gMap.CellAt(x, y + 1)))]++;
                         if (y > 0)
-                            terrainCounts[CELL_TERRAIN(gMap.CellAt(x, y - 1))]++;
+                            terrainCounts[IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1)))]++;
                         newTerrain = 0;
                         bestCount = 0;
-                        for (k = 0; k < TERRAIN_COUNT; k++) {
+                        for (k = 0; k < IDX(TERRAIN_COUNT); k++) {
                             if (terrainCounts[k] >= bestCount && k != thisTerrain) {
                                 newTerrain = k;
                                 bestCount = terrainCounts[k];
@@ -8579,28 +8579,28 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
                         if (thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1) {
                             if (waterUp + waterDown + waterRight + waterLeft
                                 >= EDIT_BLEND_WATER_SIDES) {
-                                SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_PLAIN);
+                                SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_PLAIN);
                             } else if (waterUp && waterRight) {
-                                newTerrain = CELL_TERRAIN(gMap.CellAt(x - 1, y + 1));
+                                newTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)));
                                 SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
                             } else if (waterUp && waterLeft) {
-                                newTerrain = CELL_TERRAIN(gMap.CellAt(x + 1, y + 1));
+                                newTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)));
                                 SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x, y + 1, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
                             } else if (waterDown && waterRight) {
-                                newTerrain = CELL_TERRAIN(gMap.CellAt(x - 1, y - 1));
+                                newTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)));
                                 SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x - 1, y, newTerrain, EDIT_SHAPE_PLAIN);
                             } else if (waterDown && waterLeft) {
-                                newTerrain = CELL_TERRAIN(gMap.CellAt(x + 1, y - 1));
+                                newTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)));
                                 SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x, y - 1, newTerrain, EDIT_SHAPE_PLAIN);
                                 SetCellGround(x + 1, y, newTerrain, EDIT_SHAPE_PLAIN);
-                            } else if (thisTerrain != TERRAIN_DIRT) {
+                            } else if (thisTerrain != IDX(TERRAIN_DIRT)) {
                                 SetCellGround(x, y, newTerrain, EDIT_SHAPE_PLAIN);
                             }
                         } else if (!thisTerrain || terrainCounts[newTerrain] >= terrainCounts[thisTerrain]) {
@@ -8611,15 +8611,15 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
                     if (!thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && sameUp && sameDown
                         && sameLeft && sameRight) {
                         if (CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1))) {
-                            SetCellGround(x, y, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
-                            SetCellGround(x - 1, y, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
-                            SetCellGround(x, y - 1, CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x - 1, y, IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y - 1, IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))), EDIT_SHAPE_PLAIN);
                             repeat = true;
                         }
                         if (CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1))) {
-                            SetCellGround(x, y, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
-                            SetCellGround(x + 1, y, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
-                            SetCellGround(x, y - 1, CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y, IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x + 1, y, IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))), EDIT_SHAPE_PLAIN);
+                            SetCellGround(x, y - 1, IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))), EDIT_SHAPE_PLAIN);
                             repeat = true;
                         }
                     } else if (!thisTerrain && x > 0 && y > 0 && x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && sameUp
@@ -8679,38 +8679,38 @@ borders:
     for (y = 0; y < MAP_HEIGHT; y++) {
         for (x = 0; x < MAP_WIDTH; x++) {
             cell = gMap.CellAt(x, y);
-            thisTerrain = CELL_TERRAIN(cell);
-            if (thisTerrain == TERRAIN_BEACH)
+            thisTerrain = IDX(CELL_TERRAIN(cell));
+            if (thisTerrain == IDX(TERRAIN_BEACH))
                 continue;
             otherUpRight = otherUpLeft = otherDownRight = otherDownLeft = otherUp = otherDown = otherRight
                 = otherLeft = 0;
             waterUpRight = waterUpLeft = waterDownRight = waterDownLeft = waterUp = waterDown = waterRight
                 = waterLeft = 0;
-            if (thisTerrain != TERRAIN_DIRT) {
-                if (y > 0 && CELL_TERRAIN(gMap.CellAt(x, y - 1)) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x, y - 1)))
+            if (thisTerrain != IDX(TERRAIN_DIRT)) {
+                if (y > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x, y - 1)))
                     otherUp = true;
-                if (y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x, y + 1)) != thisTerrain
+                if (y < MAP_HEIGHT - 1 && IDX(CELL_TERRAIN(gMap.CellAt(x, y + 1))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x, y + 1)))
                     otherDown = true;
-                if (x < MAP_WIDTH - 1 && CELL_TERRAIN(gMap.CellAt(x + 1, y)) != thisTerrain
+                if (x < MAP_WIDTH - 1 && IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x + 1, y)))
                     otherRight = true;
-                if (x > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y)) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x - 1, y)))
+                if (x > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y))) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x - 1, y)))
                     otherLeft = true;
-                if (x > 0 && y > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) != thisTerrain
+                if (x > 0 && y > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y - 1))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)))
                     otherUpLeft = true;
-                if (x > 0 && y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) != thisTerrain
+                if (x > 0 && y < MAP_HEIGHT - 1 && IDX(CELL_TERRAIN(gMap.CellAt(x - 1, y + 1))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)))
                     otherDownLeft = true;
-                if (x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) != thisTerrain
+                if (x < MAP_WIDTH - 1 && y < MAP_HEIGHT - 1 && IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y + 1))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)))
                     otherDownRight = true;
-                if (x < MAP_WIDTH - 1 && y > 0 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != thisTerrain
+                if (x < MAP_WIDTH - 1 && y > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x + 1, y - 1))) != thisTerrain
                     && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)))
                     otherUpRight = true;
             }
-            if (thisTerrain != TERRAIN_WATER && thisTerrain != TERRAIN_BEACH) {
+            if (thisTerrain != IDX(TERRAIN_WATER) && thisTerrain != IDX(TERRAIN_BEACH)) {
                 if (y > 0
                     && (!CELL_TERRAIN(gMap.CellAt(x, y - 1)) || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_BEACH))
                     waterUp = true;
@@ -9150,32 +9150,32 @@ void editManager::BlendShallowWater(void) {
                 if (shape == EDIT_SHAPE_EAST_EDGE || shape == EDIT_SHAPE_EAST_EDGE_ALT) {
                     if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperLeft
                         || *(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_EAST_EDGE);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_EAST_EDGE);
                     else
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_EAST_EDGE_ALT);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_EAST_EDGE_ALT);
                 } else if (shape == EDIT_SHAPE_NORTH_EDGE || shape == EDIT_SHAPE_NORTH_EDGE_ALT) {
                     if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight
                         || *(shadeCopy + x + y * MAP_WIDTH) == tileLowerRight)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_NORTH_EDGE);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_NORTH_EDGE);
                     else
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_NORTH_EDGE_ALT);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_NORTH_EDGE_ALT);
                 } else if (shape == EDIT_SHAPE_PLAIN || shape == EDIT_SHAPE_DECORATED_FIRST
                            || shape == EDIT_SHAPE_DECORATED_SECOND || shape == EDIT_SHAPE_DECORATED_THIRD
                            || shape == EDIT_SHAPE_DECORATED_FOURTH) {
                     if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperRight)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_FIRST);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_DECORATED_FIRST);
                     else if (*(shadeCopy + x + y * MAP_WIDTH) == tileLowerRight)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_THIRD);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_DECORATED_THIRD);
                     else if (*(shadeCopy + x + y * MAP_WIDTH) == tileLowerLeft)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_FOURTH);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_DECORATED_FOURTH);
                     else if (*(shadeCopy + x + y * MAP_WIDTH) == tileUpperLeft)
-                        SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_DECORATED_SECOND);
+                        SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_DECORATED_SECOND);
                 }
             } else if (!CELL_TERRAIN(cell)
                        && (shape == EDIT_SHAPE_PLAIN || shape == EDIT_SHAPE_DECORATED_FIRST
                            || shape == EDIT_SHAPE_DECORATED_SECOND || shape == EDIT_SHAPE_DECORATED_THIRD
                            || shape == EDIT_SHAPE_DECORATED_FOURTH)) {
-                SetCellGround(x, y, TERRAIN_WATER, EDIT_SHAPE_PLAIN);
+                SetCellGround(x, y, IDX(TERRAIN_WATER), EDIT_SHAPE_PLAIN);
             }
         }
     }
@@ -9199,7 +9199,7 @@ DATA(0x004a3a58) i32 iLastScrollTime;
 
 // Scrolls the view one cell in the direction (a MapDirection).
 VA(0x0040e053, 0x1c9)
-void editManager::ScreenScroll(i32 direction, b32 updatePointer) {
+void editManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, b32 updatePointer) {
     i32 yOrigin;
     i32 xOrigin;
 
@@ -9237,7 +9237,7 @@ void editManager::ScreenScroll(i32 direction, b32 updatePointer) {
             break;
     }
     if (updatePointer)
-        gpMouseManager->SetPointer(direction + EDIT_SCROLL_POINTER_FIRST);
+        gpMouseManager->SetPointer(IDX(direction) + EDIT_SCROLL_POINTER_FIRST);
     if (xOrigin < 0)
         xOrigin = 0;
     if (xOrigin > MAP_WIDTH - gZoomViewCells[m_zoomLevel])
@@ -9258,15 +9258,15 @@ void editManager::ScreenScroll(i32 direction, b32 updatePointer) {
 // Scrolls the view while the pointer rests at a screen edge.
 VA(0x0040e21c, 0x186)
 void editManager::CheckScreenScroll(void) {
-    i16 leftSide;
-    i16 bottomSide;
-    i16 rightSide;
-    i16 topSide;
+    i16 H2_UNUSED(leftSide);
+    i16 H2_UNUSED(bottomSide);
+    i16 H2_UNUSED(rightSide);
+    i16 H2_UNUSED(topSide);
 
     leftSide = EDIT_SCROLL_BORDER;
-    rightSide = LOGICAL_SCREEN_WIDTH - EDIT_SCROLL_BORDER - 1;
+    rightSide = LOGICAL_SCREEN_WIDTH - IDX(EDIT_SCROLL_BORDER) - 1;
     topSide = EDIT_SCROLL_BORDER;
-    bottomSide = LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER;
+    bottomSide = LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER);
     if (KBTickCount() - iLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
         i32 mouseX;
         i32 mouseY;
@@ -9281,20 +9281,20 @@ void editManager::CheckScreenScroll(void) {
             if (mouseX < EDIT_SCROLL_BORDER) {
                 if (mouseY < EDIT_SCROLL_BORDER)
                     ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
-                else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER)
+                else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER))
                     ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
                 else
                     ScreenScroll(MAP_DIRECTION_WEST, 1);
-            } else if (mouseX > LOGICAL_SCREEN_WIDTH - EDIT_SCROLL_BORDER - 1) {
+            } else if (mouseX > LOGICAL_SCREEN_WIDTH - IDX(EDIT_SCROLL_BORDER) - 1) {
                 if (mouseY < EDIT_SCROLL_BORDER)
                     ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
-                else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER)
+                else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER))
                     ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
                 else
                     ScreenScroll(MAP_DIRECTION_EAST, 1);
             } else if (mouseY < EDIT_SCROLL_BORDER) {
                 ScreenScroll(MAP_DIRECTION_NORTH, 1);
-            } else if (mouseY > LOGICAL_SCREEN_HEIGHT - EDIT_SCROLL_BORDER) {
+            } else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER)) {
                 ScreenScroll(MAP_DIRECTION_SOUTH, 1);
             }
         }
@@ -9410,7 +9410,7 @@ void DeleteExtraObjectData(u32 index) {
     mapCell* cell;
 
     delete gEditManager->m_extras[index];
-    if (index + 1 < gEditManager->m_extraCount) {
+    if (index + 1 < static_cast<u32>(gEditManager->m_extraCount)) {
         memmove(
             &gEditManager->m_extras[index],
             &gEditManager->m_extras[index + 1],
@@ -9549,7 +9549,7 @@ void CalculatePlayerNumbers(void) {
                 town = static_cast<TownExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
                 if (town->owner != TOWN_OWNER_NONE) {
                     player = town->owner;
-                    cellFaction = town->faction;
+                    cellFaction = IDX(town->faction);
                     factionSeen[player][cellFaction] = true;
                 }
             }
@@ -9559,7 +9559,7 @@ void CalculatePlayerNumbers(void) {
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         if (!gEditMapHeader.playerEnabled[i])
             continue;
-        if (factionSeen[i][FACTION_NEUTRAL]) {
+        if (factionSeen[i][IDX(FACTION_NEUTRAL)]) {
             gEditMapHeader.playerRace[i] = FACTION_RANDOM;
         } else {
             nFactions = 0;
@@ -9991,7 +9991,7 @@ void editManager::ToggleGroundVariant(void) {
     x += m_viewX;
     y += m_viewY;
     ground = gMap.CellAt(x, y)->m_terrainImageIndex;
-    terrain = giGroundToTerrain[ground];
+    terrain = IDX(giGroundToTerrain[ground]);
     if (giGroundShape[ground] & GROUND_SHAPE_VARIED)
         vary = false;
     else
@@ -10032,7 +10032,7 @@ void editManager::RandomizeGround(i32 variety) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             groundTile = gMap.CellAt(x, y)->m_terrainImageIndex;
-            terrain = giGroundToTerrain[groundTile];
+            terrain = IDX(giGroundToTerrain[groundTile]);
             if (gMap.CellAt(x, y)->m_objectIndex == MAPCELL_SPRITE_NONE
                 && gMap.CellAt(x, y)->m_overlayIndex == MAPCELL_SPRITE_NONE)
                 isEmpty = true;
@@ -10071,7 +10071,7 @@ b8 UsesExpansionObjects(void) {
                 case MAP_OBJECT_JAIL:
                     return true;
                 case MAP_OBJECT_ARTIFACT:
-                    if (cell->m_objectIndex >> 1 > ARTIFACT_MAGIC_BOOK)
+                    if (cell->m_objectIndex >> 1 > IDX(ARTIFACT_MAGIC_BOOK))
                         return true;
                     break;
                 case MAP_OBJECT_HERO:
@@ -10080,7 +10080,7 @@ b8 UsesExpansionObjects(void) {
 
                         hero = static_cast<HeroExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
                         for (k = 0; k < EVENT_RECORD_HERO_ARTIFACT_COUNT; k++) {
-                            if (hero->artifacts[k] > ARTIFACT_MAGIC_BOOK)
+                            if (hero->artifacts[k] > IDX(ARTIFACT_MAGIC_BOOK))
                                 return true;
                         }
                     }
@@ -10090,7 +10090,7 @@ b8 UsesExpansionObjects(void) {
                         mapEventExtra* sphinx;
 
                         sphinx = static_cast<mapEventExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
-                        if (sphinx->artifact > ARTIFACT_MAGIC_BOOK)
+                        if (sphinx->artifact > IDX(ARTIFACT_MAGIC_BOOK))
                             return true;
                     }
                     break;
@@ -10099,7 +10099,7 @@ b8 UsesExpansionObjects(void) {
                         EventExtra* event;
 
                         event = static_cast<EventExtra*>(gEditManager->m_extras[cell->m_objectMetadata]);
-                        if (event->artifact > ARTIFACT_MAGIC_BOOK)
+                        if (event->artifact > IDX(ARTIFACT_MAGIC_BOOK))
                             return true;
                     }
                     break;

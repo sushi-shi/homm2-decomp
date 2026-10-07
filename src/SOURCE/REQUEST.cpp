@@ -274,9 +274,9 @@ fileRequester::fileRequester(
     i32 x,
     i32 y,
     FileRequesterMode mode,
-    char* pattern,
-    char* directory,
-    char* defaultExtension
+    H2_CONST char* pattern,
+    H2_CONST char* directory,
+    H2_CONST char* defaultExtension
 ) {
     strcpy(m_filePattern, pattern);
     strcpy(m_directory, directory);
@@ -398,8 +398,8 @@ i32 fileRequester::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     u8 enabled;
-    i32 fileSlot;
-    char* dot;
+    i32 H2_UNUSED(fileSlot);
+    char* H2_UNUSED(dot);
 #ifdef HOMM2_EDITOR
     // The editor's requester only loads maps: nothing to preselect. Its
     // frame keeps the game's selection locals.

@@ -30,7 +30,7 @@ DATA(0x004a5834) char* gSignText;
 VA(0x00426110, 0x36e)
 void eventsManager::EditSign(i32 x, i32 y) {
     mapCell original;
-    i32 unused[3];
+    i32 H2_UNUSED(unused)[3];
     tag_message message;
     i32 len;
     char* newRecord;
@@ -77,8 +77,8 @@ void eventsManager::EditSign(i32 x, i32 y) {
 }
 
 VA(0x0042647e, 0x3b)
-void eventsManager::FillInSignEdit(signEventExtra* sign) {
-    i32 unused;
+void eventsManager::FillInSignEdit(signEventExtra* H2_UNUSED(sign)) {
+    i32 H2_UNUSED(unused);
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
@@ -90,10 +90,10 @@ void eventsManager::FillInSignEdit(signEventExtra* sign) {
 
 VA(0x004264b9, 0x14d)
 MessageDispatchResult EditSignHandler(struct tag_message& message) {
-    i32 unused[2];
+    i32 H2_UNUSED(unused)[2];
     b32 modified = false;
     tag_message reply;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
 
     switch (message.type) {
         case MESSAGE_WIDGET:

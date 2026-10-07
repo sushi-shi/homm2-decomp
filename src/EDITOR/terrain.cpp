@@ -92,8 +92,8 @@ i32 terrainManager::Open(i32 priority) {
     );
     gEditManager->m_window->AddWidget(m_terrainName, -1);
     m_highlight = new iconWidget(
-        gTerrainButtonPositions[m_terrain].x - TERRAIN_HIGHLIGHT_INSET,
-        gTerrainButtonPositions[m_terrain].y - TERRAIN_HIGHLIGHT_INSET,
+        gTerrainButtonPositions[IDX(m_terrain)].x - TERRAIN_HIGHLIGHT_INSET,
+        gTerrainButtonPositions[IDX(m_terrain)].y - TERRAIN_HIGHLIGHT_INSET,
         0,
         0,
         "terrains.icn",
@@ -151,7 +151,7 @@ void terrainManager::UpdateButtons(void) {
             = EDIT_BRUSH_FRAME_FIRST + i * EDIT_BUTTON_FRAMES + (i == gTerrainBrush);
         gEditManager->m_window->BroadcastMessage(message);
     }
-    sprintf(gText, gTerrainNames[m_terrain]);
+    sprintf(gText, gTerrainNames[IDX(m_terrain)]);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TERRAIN_NAME_ID;
@@ -257,8 +257,8 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                         break;
                     switch (message.payload.widget.id) {
                         case EDIT_BRUSH_BUTTON_ID_FIRST:
-                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
-                        case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_DOUBLE):
+                        case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_QUADRUPLE):
                         case EDIT_BRUSH_BUTTON_ID_LAST:
                             gTerrainBrush
                                 = message.payload.widget.id - EDIT_BRUSH_BUTTON_ID_FIRST;
@@ -300,16 +300,16 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                 help = TERRAIN_HELP_FIRST_TERRAIN + IDX(TERRAIN_BEACH);
                                 break;
                             case EDIT_BRUSH_BUTTON_ID_FIRST:
-                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_SINGLE;
+                                help = TERRAIN_HELP_FIRST_BRUSH + IDX(EDIT_BRUSH_SINGLE);
                                 break;
-                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_DOUBLE:
-                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_DOUBLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_DOUBLE):
+                                help = TERRAIN_HELP_FIRST_BRUSH + IDX(EDIT_BRUSH_DOUBLE);
                                 break;
-                            case EDIT_BRUSH_BUTTON_ID_FIRST + EDIT_BRUSH_QUADRUPLE:
-                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_QUADRUPLE;
+                            case EDIT_BRUSH_BUTTON_ID_FIRST + IDX(EDIT_BRUSH_QUADRUPLE):
+                                help = TERRAIN_HELP_FIRST_BRUSH + IDX(EDIT_BRUSH_QUADRUPLE);
                                 break;
                             case EDIT_BRUSH_BUTTON_ID_LAST:
-                                help = TERRAIN_HELP_FIRST_BRUSH + EDIT_BRUSH_AREA;
+                                help = TERRAIN_HELP_FIRST_BRUSH + IDX(EDIT_BRUSH_AREA);
                                 break;
                         }
                         if (help >= 0)
@@ -348,7 +348,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                         MESSAGE_MODIFIER_RIGHT_BUTTON))
                                     ground = IDX(TERRAIN_WATER);
                                 else
-                                    ground = m_terrain;
+                                    ground = IDX(m_terrain);
                                 gSelectionX = EDIT_NO_CELL;
                                 gEditManager->m_brushSize = GetBrushSize();
                                 anchorX = message.payload.widget.screenX;
@@ -443,7 +443,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                         gSelectionX, gSelectionY,
                                         gSelectionWidth, gSelectionHeight, ground);
                                 gSelectionX = gSelectionY = EDIT_NO_CELL;
-                                gEditManager->BlendTerrain(m_terrain, false, true, false, false);
+                                gEditManager->BlendTerrain(IDX(m_terrain), false, true, false, false);
                                 gEditManager->DrawMap();
                                 gEditManager->UpdateMapView();
                                 gEditManager->DrawRadar(true);
@@ -498,8 +498,8 @@ void terrainManager::Idle(void) {}
 VA(0x00429de1, 0x5c)
 void terrainManager::SelectTerrain(H2_ENUM_PARAM(TerrainType, i32) terrain) {
     m_terrain = terrain;
-    m_highlight->m_x = gTerrainButtonPositions[m_terrain].x - TERRAIN_HIGHLIGHT_INSET;
-    m_highlight->m_y = gTerrainButtonPositions[m_terrain].y - TERRAIN_HIGHLIGHT_INSET;
+    m_highlight->m_x = gTerrainButtonPositions[IDX(m_terrain)].x - TERRAIN_HIGHLIGHT_INSET;
+    m_highlight->m_y = gTerrainButtonPositions[IDX(m_terrain)].y - TERRAIN_HIGHLIGHT_INSET;
     gTerrainChoice = terrain;
     UpdateButtons();
 }

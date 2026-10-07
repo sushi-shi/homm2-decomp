@@ -134,7 +134,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
     i32 i;
 
     message.type = MESSAGE_WIDGET;
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.id = HERO_EDIT_CUSTOM_ARMY_TOGGLE;
     message.payload.widget.command =
         hero->hasCustomArmy ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -176,7 +176,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
         message.payload.widget.id = i + HERO_EDIT_FIRST_TROOP_COUNT;
         gEditDialog->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
-        message.payload.widget.data.value = hero->troopTypes[i] + 1;
+        message.payload.widget.data.value = IDX(hero->troopTypes[i]) + 1;
         message.payload.widget.id = i + HERO_EDIT_FIRST_TROOP_TYPE;
         gEditDialog->BroadcastMessage(message);
     }
@@ -197,7 +197,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
     message.payload.widget.id = HERO_EDIT_EXPERIENCE;
     message.payload.widget.data.text = text;
     gEditDialog->BroadcastMessage(message);
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.id = HERO_EDIT_CUSTOM_SKILLS_TOGGLE;
     message.payload.widget.command =
         hero->hasCustomSkills ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
@@ -223,7 +223,7 @@ void eventsManager::FillInHeroEdit(HeroExtra* hero) {
                 + (hero->skillLevels[i] - IDX(HERO_SKILL_LEVEL_BASIC)) * IDX(HERO_SKILL_COUNT) + 1;
         gEditDialog->BroadcastMessage(message);
     }
-    message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
     message.payload.widget.id = HERO_EDIT_CUSTOM_NAME_TOGGLE;
     message.payload.widget.command =
         hero->hasCustomName ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;

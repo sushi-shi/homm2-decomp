@@ -385,11 +385,6 @@ the import-thunk table keeps its reviewed `coff` column.
 
 Open, in order:
 
-- The editor: its own units (EDITMGR first), its data claims, its gates,
-  link graph and `link_diff.tsv`, its clean export, and `homm2 build`
-  building both images as HoMM1's does. Until then `homm2 build` builds the
-  game and `homm2 --image editor build` the editor; the README block has a
-  section per image with a report.
 - `audit dna-bands` (the census classifies the LIBCMT contributions, but the
   runtime and compiler-helper bands are not tabulated per image).
 - `walls` (the residual queue) and `permute campaign` have no editor users

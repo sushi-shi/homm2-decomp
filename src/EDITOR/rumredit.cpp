@@ -23,7 +23,7 @@ DATA(0x004a581c) char* gRumourText;
 
 VA(0x00425820, 0x20c)
 i32 eventsManager::EditRumour(i32 extra) {
-    i32 unused[3];
+    i32 H2_UNUSED(unused)[3];
     char* newRecord;
     i32 len;
 
@@ -52,7 +52,7 @@ i32 eventsManager::EditRumour(i32 extra) {
 }
 
 VA(0x00425a2c, 0x3b)
-void eventsManager::FillInRumourEdit(rumourEventExtra* rumour) {
+void eventsManager::FillInRumourEdit(rumourEventExtra* H2_UNUSED(rumour)) {
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
@@ -64,10 +64,10 @@ void eventsManager::FillInRumourEdit(rumourEventExtra* rumour) {
 
 VA(0x00425a67, 0x14d)
 MessageDispatchResult EditRumourHandler(struct tag_message& message) {
-    i32 unused[2];
+    i32 H2_UNUSED(unused)[2];
     b32 modified = false;
     tag_message reply;
-    i32 unusedIndex;
+    i32 H2_UNUSED(unusedIndex);
 
     switch (message.type) {
         case MESSAGE_WIDGET:

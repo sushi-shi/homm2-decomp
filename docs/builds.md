@@ -28,7 +28,8 @@ maps, graphics, videos, or other assets. The existing `nix run` play workflow
 below still uses the Russian resource build, not these locale outputs.
 
 Generated `source-gold-2.1-buka` preserves the same IDs and catalogs, with its own
-modern build (`./build.py --ru` / `./build.py --en`). Generated
+modern build of the game and the scenario editor (`./build.py --ru` /
+`./build.py --en`, `--target game|editor|all`). Generated
 `classic-gold-2.1-buka` instead resolves IDs into readable Russian UTF-8 literals
 and remains a reading-only view. See [localization](localization.md).
 
