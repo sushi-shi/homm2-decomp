@@ -526,6 +526,12 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_JAIL                       = 123
 H2_ENUM_CLASS_END_SPLIT(MapObjectType, i16)
 
+// An artifact's or a resource's map sprite is a shadow frame and an item frame
+// (objnarti.icn, objnrsrc.icn): the item id is the sprite frame over this count.
+H2_ENUM_BEGIN(MapItemSpriteConstant)
+    MAP_ITEM_SPRITE_FRAME_COUNT = 2
+H2_ENUM_END(MapItemSpriteConstant)
+
 #if H2_STRICT_ENUMS
 class MapTriggerCode {
 public:

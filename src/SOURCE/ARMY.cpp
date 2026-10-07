@@ -542,9 +542,9 @@ void army::DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly) {
         } else {
             statusIcon = EFFECT_STATUS_DEFAULT_FRAME;
             if (goodEffects > 0 && badSpells > 0) {
-                statusIcon += 1;
+                statusIcon += EFFECT_STATUS_MIXED_FRAME - EFFECT_STATUS_DEFAULT_FRAME;
             } else if (badSpells > 0) {
-                statusIcon += 2;
+                statusIcon += EFFECT_STATUS_BAD_FRAME - EFFECT_STATUS_DEFAULT_FRAME;
             }
             drawn = gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_STATUS)]->CombatClipDrawToBuffer(
                 quantX,

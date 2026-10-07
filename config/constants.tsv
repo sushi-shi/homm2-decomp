@@ -9,3 +9,65 @@
 # owner is the enclosing function, group the finding's category (code,
 # local-table, declaration) and detail its source line.
 #floor	1959
+src/SOURCE/COMMAND.cpp	combatManager::Main	COMBAT_SOUND_POLL_DELAY	code	*COMBAT_DEADLINE(COMBAT_SOUND_POLL_DELAY);	a named float delay (#define 75.0f): clang-tidy reports the macro's floating literal where COMBAT_DEADLINE expands it
+src/SOURCE/SPELLS.cpp	combatManager::*	SPELL_*_DELAY	code	*COMBAT_DEADLINE(SPELL_*_DELAY);	a named float delay (#define ...f): clang-tidy reports the macro's floating literal where COMBAT_DEADLINE expands it
+src/SOURCE/tradpost.cpp	ComputeTradeRatios	0.999	code	*tRatio + 0.999*	rounds the positive trade ratio up to the next whole unit before the i32 truncation
+src/SOURCE/Overview.cpp	game::SetupNewOverviewType	*	local-table	*	the overview's column-title x positions per overview type, a retail local table of pixels
+src/SOURCE/SETUP.cpp	Setup*Handler	[2-5]	code	helpIndex = *;	the right-clicked choice's row in that dialog's help-text table (the choices in order, then Cancel)
+src/SOURCE/SETUP.cpp	Exp*Handler	2	code	helpIndex = 2;	the right-clicked choice's row in that dialog's help-text table (the choices in order, then Cancel)
+src/SOURCE/TOWNMGR.cpp	townManager::SetCommandAndText	[23]	code	case TOWN_*_SLOT_FIRST + *:	one slot of the five-slot garrison or hero strip control range between its _FIRST and _LAST ids; retail lists every case
+src/SOURCE/TOWNMGR.cpp	townManager::*	*	code	*H2_UNUSED(*) = *;	an unused local's retail initializer: no code reads the value, so no domain names it
+src/SOURCE/TOWNMGR.cpp	townManager::BuyBuild	*	code	dialog* = *;	stores to BuyBuild's unused dialog-geometry locals: retail keeps the dead stores and no code reads them
+src/SOURCE/TOWNMGR.cpp	townManager::BuyBuild	[2-6]	code	*Row*	the build dialog's cost layout: five costs split two over three, six three over three, seven three over four
+src/SOURCE/TOWNMGR.cpp	townManager::BuyBuild	[56]	code	} else if (resourceCount == *) {	the build dialog's cost layout: five costs split two over three, six three over three, seven three over four
+src/SOURCE/CMBTMGR.cpp	combatManager::LoadArmies	2	code	hex = COMBAT_GRID_ROW_LENGTH * groupSlot * 2 + *	the spread formation puts each stack two grid rows below the previous one
+src/SOURCE/CMBTMGR.cpp	combatManager::CatAttack	*	local-table	{32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114};	the catapult's miss-target hexes, a retail local table of grid indices
+src/SOURCE/CMBTMGR.cpp	combatManager::KeepAttack	*	local-table	*{{586, 177}, {428, 60}, {428, 314}}*	the keep towers' missile origins per faction, a retail local table of pixels
+src/SOURCE/CMBTMGR.cpp	combatManager::KeepAttack	*	local-table	{90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};	the keep missile's nine sprite angles in degrees, a retail local table
+src/SOURCE/SWAPMGR.cpp	swapManager::Main	*	code	case CONTROL_*_FIRST + *:	one slot of a named contiguous control range between its _FIRST and _LAST ids; retail lists every case
+src/SOURCE/KB.cpp	*	[2-9]	code	*APP_MENU_*_FIRST + *	the n-th volume step: the music and sound menu commands map one-to-one onto the volume levels
+src/SOURCE/KB.cpp	*	[2-9]	code	*CONFIG_VOLUME_MIN + *	the n-th volume step: the music and sound menu commands map one-to-one onto the volume levels
+src/SOURCE/KB.cpp	InterpretCommandLine	[23]	code	*	character offsets after a switch's '/': the switch letter is +1, its argument +2, a two-letter switch's argument +3
+src/SOURCE/KB.cpp	RecruitHeroHandler	*	code	*H2_UNUSED(*) = *	an unused local's retail initializer: no code reads the value, so no domain names it
+src/SOURCE/KB.cpp	InitVars	[23]	code	*cNetBox*[[]*[]]*	the third and fourth of the net box's four scrolling lines (retail unrolls BOX_LINE_COUNT)
+src/SOURCE/KB.cpp	PopNetBox	[23]	code	*	the third and fourth of the net box's four scrolling lines and their colour widgets (retail unrolls BOX_LINE_COUNT)
+src/SOURCE/KB.cpp	AddNetBoxLine	[23]	code	*cNetBox*[[]*[]]*	the third and fourth of the net box's four scrolling lines (retail unrolls BOX_LINE_COUNT)
+src/SOURCE/KB.cpp	PopNetBox	0xff	code	*keyCode & 0xff*	the keyboard key code's low byte, the typed character
+src/SOURCE/SPELLS.cpp	combatManager::CastSpell	*	code	missileAngles[[]*[]] = *;	the bolt missile's nine sprite angles in degrees, filled element by element as retail does
+src/SOURCE/SPELLS.cpp	combatManager::Armageddon	*	local-table	{*, *},	the screen-shake offsets of each frame, a retail local table of pixels
+src/SOURCE/SPELLS.cpp	combatManager::Earthquake	*	local-table	{*, *},	the screen-shake offsets of each frame, a retail local table of pixels
+src/SOURCE/SPELLS.cpp	combatManager::DrawBolt	[234]	code	else if (edgeShade == *)	the bolt's edge shade index n selects BOLT_LIGHTNING_SHADE_n
+src/SOURCE/SPELLS.cpp	combatManager::ChainLightning	2	code	if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2	every strike but the last (zero-based strikes up to the next-to-last)
+src/SOURCE/SPELLS.cpp	combatManager::VaporizeCreature	[23]	code	*Offset = *;	the vaporize phases' stripe row offsets (top and bottom), a retail per-phase switch
+src/SOURCE/SPELLS.cpp	combatManager::MirrorImage	2	code	&& distance <= 2)	a two-hex creature's rear half: a search hex up to two cells behind the image's front cell
+src/SOURCE/GAME.cpp	GenerateStandardFileName	999	code	i = 999;	forces the scan loop past the end of the source name once the basename is full (retail's loop exit)
+src/SOURCE/GAME.cpp	game::RandomizeEvents	[2-9]	code	case *:	one bucket of the 0..9 decile roll (EVENT_BUCKET_COUNT) that picks the site's reward
+src/SOURCE/GAME.cpp	game::RandomizeEvents	*	code	cell->m_objectMetadata = Random(*	a site's initial stock, guard or reward roll: retail per-object values with no shared domain
+src/SOURCE/GAME.cpp	game::RandomizeEvents	2	code	cell->m_objectMetadata = BANK_GUARDIAN_FLAG | 2;	the dragon city's fixed guardian roll (other banks roll 4..6)
+src/SOURCE/GAME.cpp	game::RandomizeEvents	[2-9]	code	artifactGuardianChoices[[]*[]] = CREATURE_*;	the major artifact's guardian choices, a retail local table filled element by element
+src/SOURCE/GAME.cpp	game::RandomizeEvents	4	code	*->m_flags & 4)))	mapCell::m_flags bit 0x04, the bit the editor sets as EDIT_CELL_SHORE: an object standing above such a cell occupies its own cell
+src/SOURCE/GAME.cpp	game::GetRandomNumTroops	*	code	return *;	the creature's random wandering-stack size range, a retail per-creature table spelled as a switch
+src/SOURCE/GAME.cpp	game::PerWeek	*	code	WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata *	a site's weekly refill or growth: retail per-object values with no shared domain
+src/SOURCE/GAME.cpp	game::WeeklyRecruitSite	[2-4]	code	case *:	a recruit-site kind (the low EVENT_RECRUIT_TYPE_MASK bits); every kind grows alike
+src/SOURCE/GAME.cpp	game::WeeklyGenericSite	4	code	case 4:	the one generic-site kind (low GENERIC_SITE_TYPE_MASK bits) whose weekly reset rewrites its metadata
+src/SOURCE/GAME.cpp	game::RandomizeMine	*	code	*Frame = *;	the mine's sprite and overlay frames per resource and terrain, retail icon frame numbers
+src/SOURCE/GAME.cpp	game::SetRandomHeroArmies	*	local-table	*	the random hero's starting stacks per faction (creature, minimum, maximum), a retail RandomHeroArmyRange table
+src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	m??Value = *;	the random monster's fight-value band per strength, retail values
+src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	1[67],	the random-resource placeholder's sprite frames in objnrsrc.icn (shadow, item) that ConvertObject replaces
+src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	1[67]?,	the random-artifact placeholders' sprite frames in objnarti.icn (shadow, item) that ConvertObject replaces
+src/SOURCE/GAME.cpp	game::SetupTowns	[2-9]	code	defaultDwellingRoll[[]*[]] = *;	the default town's extra-dwelling count per decile, a retail local table filled element by element
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	*if (roll < *)	equal percentage bands choosing one of the four (or five) guaranteed mage-guild spells
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	? 4	the AI's mage-guild spell weight: power spells count four times their aiValue
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	+ 50;	the AI's mage-guild spell weight: a flat 50 over the aiValue
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	spellValue = 1500;	a full weight on the Random(1, 1500) spell acceptance scale: always accepted
+src/SOURCE/GAME.cpp	game::SetupTowns	1500	code	|| Random(1, 1500) > spellValue	the spell acceptance scale a pick's weight is rolled against
+src/SOURCE/GAME.cpp	game::SetupTowns	10	code	|| Random(0, 10)	the 0..10 scale of a spell's per-faction guild chance (gsSpellInfo raceChance)
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	*dwellingCount == 1 && Random(1, 10) < 4)	a computer-owned default town's three-in-ten chance of a second dwelling
+src/SOURCE/GAME.cpp	game::SetupTowns	*	code	if (Random(0, 100) < 50)	the computer necromancer town's even choice between Death Ripple and Death Wave
+src/SOURCE/GAME.cpp	game::SetupTowns	100	code	roll = Random(0, 100);	retail's percentage roll (0..100 inclusive)
+src/SOURCE/GAME.cpp	game::SetupNewRumour	100	code	*Random(0, 100)*	retail's percentage roll (0..100 inclusive)
+src/SOURCE/GAME.cpp	game::SetupNewRumour	9	code	*Random(0, 9) < m_rumourEvents.count*	a decile roll: the more map rumours, the likelier one is told (always from ten on)
+src/SOURCE/GAME.cpp	game::SetupTowns	500	code	*attempts++ > 500*	the mage-guild spell pick's retry cap
+src/SOURCE/GAME.cpp	CompressTest2	255	code	fromData[[]index[]] = Random(0, 255);	a random byte of compression test data
+src/SOURCE/GAME.cpp	game::ProcessRandomObjects	*	code	cell->m_objectMetadata = Random(*	a random resource's amount range by kind (wood and ore, gold, the rest), retail values
+src/SOURCE/GAME.cpp	game::SetupTowns	99	code	*defaultDwellingRoll[[]Random(0, 99) / *	a 0..99 percentage roll, bucketed into the ten deciles of defaultDwellingRoll

@@ -88,72 +88,72 @@ include/EDITOR/townedit.h	pending
 include/EDITOR/x_spedit.h	pending	
 include/SOURCE/ADVMGR.h	pending	
 include/SOURCE/ADVMGR_TYPES.h	pending	
-include/SOURCE/ARMY.h	pending	
-include/SOURCE/CMBTMGR.h	pending	
-include/SOURCE/COMMAND.h	pending	
-include/SOURCE/CONFIG_TYPES.h	pending	
+include/SOURCE/ARMY.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/CMBTMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/COMMAND.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/CONFIG_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/CURSOR.h	pending	
-include/SOURCE/Campaign.h	pending	
-include/SOURCE/Castle.h	pending	
+include/SOURCE/Campaign.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/Castle.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/EVENTS.h	pending	
 include/SOURCE/EVENTS_TYPES.h	pending	
-include/SOURCE/ExpCampaign.h	pending	
+include/SOURCE/ExpCampaign.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/FINDPATH.h	pending	
-include/SOURCE/GAME.h	pending	
+include/SOURCE/GAME.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/HERO.h	pending	
-include/SOURCE/KB.h	pending	
-include/SOURCE/KBDeclarations.h	pending	
-include/SOURCE/KBForward.h	pending	
-include/SOURCE/KB_TYPES.h	pending	
-include/SOURCE/Modem.h	pending	
-include/SOURCE/NOOPT.h	pending	
-include/SOURCE/Netbios.h	pending	
-include/SOURCE/Newgame.h	pending	
-include/SOURCE/Overview.h	pending	
+include/SOURCE/KB.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/KBDeclarations.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/KBForward.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/KB_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/Modem.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/NOOPT.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/Netbios.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/Newgame.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/Overview.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/PATH.h	pending	
 include/SOURCE/PHILAI.h	pending	
-include/SOURCE/RECRUIT.h	pending	
-include/SOURCE/REMOTE.h	pending	
-include/SOURCE/REMOTE_SAVE.h	pending	
-include/SOURCE/REMOTE_TYPES.h	pending	
-include/SOURCE/REQUEST.h	pending	
-include/SOURCE/SETUP.h	pending	
-include/SOURCE/SMACKMGR.h	pending	
-include/SOURCE/SPELLS.h	pending	
-include/SOURCE/TOWNMGR.h	pending	
+include/SOURCE/RECRUIT.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/REMOTE.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/REMOTE_SAVE.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/REMOTE_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/REQUEST.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/SETUP.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/SMACKMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/SPELLS.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/TOWNMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/VIEW.h	pending	
 include/SOURCE/Viewwrld.h	pending	
-include/SOURCE/Wsnetwin.h	pending	
-include/SOURCE/X_GLOBAL.h	pending	
+include/SOURCE/Wsnetwin.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/X_GLOBAL.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/advManager.h	pending	
-include/SOURCE/army.h	pending	
+include/SOURCE/army.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/armyGroup.h	pending	
-include/SOURCE/bankBox.h	pending	
-include/SOURCE/combatManager.h	pending	
-include/SOURCE/combatTypes.h	pending	
-include/SOURCE/comwin.h	pending	
+include/SOURCE/bankBox.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/combatManager.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/combatTypes.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/comwin.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/dimPalette.h	pending	
-include/SOURCE/dpnetwin.h	pending	
-include/SOURCE/fileRequester.h	pending	
-include/SOURCE/game.h	pending	
+include/SOURCE/dpnetwin.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/fileRequester.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/game.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/hero.h	pending	
-include/SOURCE/hexcell.h	pending	
-include/SOURCE/highScoreManager.h	pending	
-include/SOURCE/kbwin.h	pending	
-include/SOURCE/netwin.h	pending	
-include/SOURCE/netwin_private.h	pending	
+include/SOURCE/hexcell.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/highScoreManager.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/kbwin.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/netwin.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/netwin_private.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/philAI.h	pending	
-include/SOURCE/playerData.h	pending	
-include/SOURCE/recruitUnit.h	pending	
+include/SOURCE/playerData.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/recruitUnit.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/searchArray.h	pending	
-include/SOURCE/strip.h	pending	
-include/SOURCE/swapManager.h	pending	
-include/SOURCE/town.h	pending	
-include/SOURCE/townManager.h	pending	
-include/SOURCE/townObject.h	pending	
-include/SOURCE/tradpost.h	pending	
-include/SOURCE/wingraph.h	pending	
-include/SOURCE/x_arena.h	pending	
+include/SOURCE/strip.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/swapManager.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/town.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/townManager.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/townObject.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/tradpost.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/wingraph.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/x_arena.h	reviewed	literals named or kept with a reason in config/constants.tsv
 src/BASE/AudiereEffects.cpp	pending	
 src/BASE/AudiereMusic.cpp	pending	
 src/BASE/BASEMGR.cpp	pending	
@@ -222,50 +222,50 @@ src/EDITOR/townedit.cpp	pending
 src/EDITOR/x_spedit.cpp	pending	
 src/SOURCE/ADVMGR.cpp	pending	
 src/SOURCE/AI.cpp	pending	
-src/SOURCE/ARMY.cpp	pending	
+src/SOURCE/ARMY.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/ARMYGRP.cpp	pending	
-src/SOURCE/CMBTMGR.cpp	pending	
-src/SOURCE/COMMAND.cpp	pending	
+src/SOURCE/CMBTMGR.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/COMMAND.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/CURSOR.cpp	pending	
-src/SOURCE/Campaign.cpp	pending	
-src/SOURCE/Castle.cpp	pending	
+src/SOURCE/Campaign.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/Castle.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/DRAWING.cpp	pending	
 src/SOURCE/EVENTS.cpp	pending	
 src/SOURCE/FINDPATH.cpp	pending	
-src/SOURCE/FLY.cpp	pending	
-src/SOURCE/GAME.cpp	pending	
+src/SOURCE/FLY.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/GAME.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/HERO.cpp	pending	
-src/SOURCE/HEXCELL.cpp	pending	
-src/SOURCE/HISCORE.cpp	pending	
-src/SOURCE/KB.cpp	pending	
-src/SOURCE/Modem.cpp	pending	
-src/SOURCE/NOOPT.cpp	pending	
-src/SOURCE/Netbios.cpp	pending	
-src/SOURCE/Newgame.cpp	pending	
-src/SOURCE/Overview.cpp	pending	
+src/SOURCE/HEXCELL.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/HISCORE.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/KB.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/Modem.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/NOOPT.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/Netbios.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/Newgame.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/Overview.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/PATH.cpp	pending	
 src/SOURCE/PHILAI.cpp	pending	
-src/SOURCE/RECRUIT.cpp	pending	
-src/SOURCE/REMOTE.cpp	pending	
-src/SOURCE/REQUEST.cpp	pending	
+src/SOURCE/RECRUIT.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/REMOTE.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/REQUEST.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/SEARCH.cpp	pending	
-src/SOURCE/SETUP.cpp	pending	
-src/SOURCE/SMACKMGR.cpp	pending	
+src/SOURCE/SETUP.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/SMACKMGR.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/SPELLAI.cpp	pending	
-src/SOURCE/SPELLS.cpp	pending	
-src/SOURCE/STRIP.cpp	pending	
-src/SOURCE/SWAPMGR.cpp	pending	
-src/SOURCE/TOWN.cpp	pending	
-src/SOURCE/TOWNMGR.cpp	pending	
+src/SOURCE/SPELLS.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/STRIP.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/SWAPMGR.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/TOWN.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/TOWNMGR.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
 src/SOURCE/VIEW.cpp	pending	
 src/SOURCE/Viewwrld.cpp	pending	
-src/SOURCE/Wsnetwin.cpp	pending	
-src/SOURCE/X_CAMPGN.cpp	pending	
-src/SOURCE/X_GLOBAL.cpp	pending	
-src/SOURCE/comwin.cpp	pending	
-src/SOURCE/dpnetwin.cpp	pending	
-src/SOURCE/kbwin.cpp	pending	
-src/SOURCE/netwin.cpp	pending	
-src/SOURCE/tradpost.cpp	pending	
-src/SOURCE/wingraph.cpp	pending	
-src/SOURCE/x_arena.cpp	pending	
+src/SOURCE/Wsnetwin.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/X_CAMPGN.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/X_GLOBAL.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/comwin.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/dpnetwin.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/kbwin.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/netwin.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/tradpost.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/wingraph.cpp	reviewed	literals named or kept with a reason in config/constants.tsv
+src/SOURCE/x_arena.cpp	reviewed	literals named or kept with a reason in config/constants.tsv

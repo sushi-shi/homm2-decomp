@@ -121,7 +121,8 @@ namespace {
         MARKETPLACE_EFFICIENCY_MAX_INDEX = KB_TRADING_POST_EFFICIENCY_COUNT - 1,
         TOWN_REDRAW_FIRST_CONTROL = 136,
         TOWN_REDRAW_LAST_CONTROL = 137,
-        TOWN_VIEWPORT_HEIGHT = TOWN_GARRISON_STRIP_Y
+        TOWN_VIEWPORT_HEIGHT = TOWN_GARRISON_STRIP_Y,
+        TOWN_MIDI_THEME_SWITCH_DELAY = 100
     H2_ENUM_END(TownMainConstant)
 
     H2_ENUM_BEGIN(TownSplitConstant)
@@ -711,7 +712,7 @@ void townManager::ChangeTown(void) {
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            Sleep(100);
+            Sleep(TOWN_MIDI_THEME_SWITCH_DELAY);
         gpSoundManager->SwitchAmbientMusic(townTheme[IDX(m_town->m_type)]);
     }
 }
@@ -2199,7 +2200,7 @@ i32 townManager::BuyBuild(
         if (resourceTypes[index] != -1)
             ++resourceCount;
     }
-    if (resourceCount <= 4) {
+    if (resourceCount <= BUILD_ROW_RESOURCE_CAPACITY) {
         topRowCount = resourceCount;
     } else if (resourceCount == 5) {
         topRowCount = 2;

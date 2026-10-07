@@ -2002,7 +2002,8 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         for (armyIndex = 0; armyIndex < displayedCount; ++armyIndex) {
             m_winLoseBottomWidgets[side * CASUALTY_WIDGETS_PER_SIDE + armyIndex] =
                 new iconWidget(
-                    startX + spacing * armyIndex + CASUALTY_ICON_CELL_WIDTH / 2
+                    startX + spacing * armyIndex
+                        + CASUALTY_ICON_CELL_WIDTH / CASUALTY_CENTER_DIVISOR
                         - GetIconEntry(monsterIcons, casualtyType[side][armyIndex])->x
                         + (CASUALTY_ICON_CELL_WIDTH
                            - GetIconEntry(monsterIcons, casualtyType[side][armyIndex])->w)

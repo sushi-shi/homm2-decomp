@@ -278,6 +278,11 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_INIT_MENU_HOTSPOT_COUNT          = 5
 H2_ENUM_END(KbGameTableConstant)
 
+// cDirections: the eight compass texts in MapDirection order, then the centre.
+H2_ENUM_BEGIN(KbDirectionText)
+    KB_DIRECTION_TEXT_CENTRAL = IDX(MAP_DIRECTION_COUNT)
+H2_ENUM_END(KbDirectionText)
+
 H2_ENUM_CLASS_BEGIN(InitMenuHotSpotField)
     INIT_MENU_HOTSPOT_X           = 0,
     INIT_MENU_HOTSPOT_Y           = 1,

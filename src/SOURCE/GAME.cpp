@@ -58,6 +58,7 @@
 #define GAME_SCORE_MEDIUM_DAY_SCALE 1.0
 #define GAME_SCORE_SMALL_DAY_SCALE 1.4
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
+#define GAME_ULTIMATE_ARTIFACT_ONE_THIRD 0.33
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
     0.66
 
@@ -501,7 +502,13 @@ H2_ENUM_END(GameCompressionTestConstant)
 
 H2_ENUM_BEGIN(GameRumourConstant)
     RUMOUR_SCRATCH_CAPACITY        = 100,
-    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT
+    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT,
+    RUMOUR_PICK_ATTEMPTS           = 200,
+    RUMOUR_EVENT_SHORT_TEXT_LENGTH = 2,
+    RUMOUR_TAVERN_TEXT_CHANCE      = 30,
+    RUMOUR_LEADER_CHANCE           = 80,
+    RUMOUR_ULTIMATE_REGION_CHANCE  = 33,
+    RUMOUR_ULTIMATE_TERRAIN_CHANCE = 66
 H2_ENUM_END(GameRumourConstant)
 
 DATA(0x0052499c) b32 gbGameOver = false;
@@ -2586,7 +2593,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE):
-                    cell->m_objectMetadata = cell->m_objectIndex / 2;
+                    cell->m_objectMetadata = cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT;
                     switch (cell->m_objectMetadata) {
                         case IDX(RES_WOOD):
                         case IDX(RES_ORE):
@@ -2685,7 +2692,9 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT):
                     randomValue = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+                    value = static_cast<ArtifactType>(
+                        cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT
+                    );
                     if (value == ARTIFACT_SPELL_SCROLL)
                         break;
                     if (randomValue < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
@@ -5379,7 +5388,7 @@ void game::InitRandomArtifacts(void) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->GetCell(x, y);
             if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)))
-                m_randomArtifacts[cell->m_objectIndex / 2] = 1;
+                m_randomArtifacts[cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT] = 1;
         }
     }
 }
@@ -5622,14 +5631,14 @@ void game::ProcessRandomObjects(void) {
                     }
                 monsterBoundsReady:
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
-                    cell->m_objectIndex = Random(0, 65);
+                    cell->m_objectIndex = Random(0, IDX(CREATURE_COUNT) - 1);
                     while (gMonsterDatabase[cell->m_objectIndex].fightValue <= minValue
                            || gMonsterDatabase[cell->m_objectIndex].fightValue >= maxValue)
-                        cell->m_objectIndex = Random(0, 65);
+                        cell->m_objectIndex = Random(0, IDX(CREATURE_COUNT) - 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE);
-                    randomType = Random(0, 6);
+                    randomType = Random(IDX(RES_WOOD), IDX(RES_GOLD));
                     ConvertObject(
                         x - 1,
                         y,
@@ -5639,7 +5648,7 @@ void game::ProcessRandomObjects(void) {
                         16,
                         16,
                         TILESET_OBJNRSRC,
-                        randomType * 2,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5652,16 +5661,16 @@ void game::ProcessRandomObjects(void) {
                         17,
                         17,
                         TILESET_OBJNRSRC,
-                        randomType * 2 + 1,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     switch (randomType) {
-                        case 0:
-                        case 2:
+                        case IDX(RES_WOOD):
+                        case IDX(RES_ORE):
                             cell->m_objectMetadata = Random(8, 16);
                             break;
-                        case 6:
+                        case IDX(RES_GOLD):
                             cell->m_objectMetadata = Random(5, 10);
                             break;
                         default:
@@ -5681,7 +5690,7 @@ void game::ProcessRandomObjects(void) {
                         162,
                         162,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5694,7 +5703,7 @@ void game::ProcessRandomObjects(void) {
                         163,
                         163,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5711,7 +5720,7 @@ void game::ProcessRandomObjects(void) {
                         166,
                         166,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5724,7 +5733,7 @@ void game::ProcessRandomObjects(void) {
                         167,
                         167,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5741,7 +5750,7 @@ void game::ProcessRandomObjects(void) {
                         168,
                         168,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5754,7 +5763,7 @@ void game::ProcessRandomObjects(void) {
                         169,
                         169,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5771,7 +5780,7 @@ void game::ProcessRandomObjects(void) {
                         170,
                         170,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5784,7 +5793,7 @@ void game::ProcessRandomObjects(void) {
                         171,
                         171,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -7946,14 +7955,14 @@ void game::SetupNewRumour(void) {
     i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
     if (m_rumourEvents.count != 0 && Random(0, 9) < m_rumourEvents.count) {
         attempts = 0;
-        while (attempts++ < 200) {
+        while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
             if (m_rumourEvents.count > 1)
                 eventIndex = Random(0, m_rumourEvents.count - 1);
             else
                 eventIndex = 0;
             event =
                 reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEvents.indices[eventIndex]]);
-            if (strlen(event->text) > 2 && event->text[0] != '@') {
+            if (strlen(event->text) > RUMOUR_EVENT_SHORT_TEXT_LENGTH && event->text[0] != '@') {
                 strcpy(m_rumour, event->text);
                 event->text[0] = '@';
                 return;
@@ -7961,13 +7970,16 @@ void game::SetupNewRumour(void) {
         }
     }
 
-    if (Random(0, 100) < 30) {
-        strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+    if (Random(0, 100) < RUMOUR_TAVERN_TEXT_CHANCE) {
+        strcpy(
+            m_rumour,
+            cRandomTavernText[(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]
+        );
     } else {
         roll = Random(0, 100);
-        if (roll < 80 && giCurTurn > 1) {
+        if (roll < RUMOUR_LEADER_CHANCE && giCurTurn > 1) {
             attempts = 0;
-            while (attempts++ < 200) {
+            while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
                 selectionRoll = Random(
                     IDX(THIEVES_CATEGORY_OBELISKS), IDX(THIEVES_CATEGORY_INCOME)
                 );
@@ -8009,42 +8021,48 @@ void game::SetupNewRumour(void) {
         } else {
         ultimateRumour:
             selectionRoll = Random(0, 100);
-            if (selectionRoll < 33) {
-                if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
-                      || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 7;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
+            if (selectionRoll < RUMOUR_ULTIMATE_REGION_CHANCE) {
+                if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                          * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
+                      || m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                             * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH_WEST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                     * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 5;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33)) {
-                    direction = 6;
+                    direction = IDX(MAP_DIRECTION_SOUTH_WEST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_WEST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
-                             || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 1;
+                             || m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                                    * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH_EAST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                     * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 3;
+                    direction = IDX(MAP_DIRECTION_SOUTH_EAST);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 2;
-                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
-                    direction = 0;
+                    direction = IDX(MAP_DIRECTION_EAST);
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.height)
+                                 * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                    direction = IDX(MAP_DIRECTION_NORTH);
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.height)
                                  * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                    direction = 4;
+                    direction = IDX(MAP_DIRECTION_SOUTH);
                 } else {
-                    direction = 8;
+                    direction = KB_DIRECTION_TEXT_CENTRAL;
                 }
                 sprintf(
                     m_rumour,
                     localization::Tr("rumor.ultimate_artifact.region"),
                     cDirections[direction]
                 );
-            } else if (selectionRoll < 66) {
+            } else if (selectionRoll < RUMOUR_ULTIMATE_TERRAIN_CHANCE) {
                 sprintf(
                     m_rumour,
                     localization::Tr("rumor.ultimate_artifact.terrain"),
@@ -8059,7 +8077,11 @@ void game::SetupNewRumour(void) {
                     gArtifactNames[IDX(m_ultimateArtifactId)]
                 );
             } else {
-                strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+                strcpy(
+                    m_rumour,
+                    cRandomTavernText
+                        [(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]
+                );
             }
         }
     }
