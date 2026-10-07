@@ -3587,7 +3587,7 @@ void ProtectShippedMap(void) {
     if (gbShowAllMaps)
         return;
     for (i = 0; i < EDITOR_SHIPPED_MAP_COUNT; i++) {
-        if (!strcmpi(gMapFileName, gShippedMaps[i][0])) {
+        if (!stricmp(gMapFileName, gShippedMaps[i][0])) {
             strcpy(gMapFileName, gShippedMaps[i][1]);
             memmove(gEditMapHeader.name + 1, gEditMapHeader.name, sizeof(gEditMapHeader.name) - 1);
             gEditMapHeader.name[sizeof(gEditMapHeader.name) - 1] = 0;

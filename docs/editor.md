@@ -217,17 +217,43 @@ its link-diff stamp are the editor's default build target.
   window) and `gUnusedData...` storage.
 
 `.text` layout, `.rdata` (imports, IAT, debug directory), `.rsrc`, the
-overlay and the file size are byte-identical. The residual (2,466 bytes,
+overlay and the file size are byte-identical. The residual (2,465 bytes,
 `config/retail/editor/link_diff.tsv`):
 
 | Region | Bytes | Cause |
 | --- | ---: | --- |
-| `.data` | 2,068 | EDITMGR's literal for `gMapCodeLetters` (`"ABC...Z"`): retail emits it among the function literals at `MakeMapCode`'s place (0x47e018), VC6 SP5 after the object's globals; the 28-byte cell shifts EDITMGR's string block. No initializer, linkage, cast, const, aggregate, `/Gf`, `/Gy`, `/YX` or TU-size variant moved it (probes, `build/exp/lit`) |
+| `.data` | 2,068 | EDITMGR's literal for `gMapCodeLetters` (`"ABC...Z"`): retail emits it among the function literals at `MakeMapCode`'s place (0x47e018), VC6 SP5 with the object's static data, right after its globals; the 28-byte cell shifts EDITMGR's string block |
 | `.text` | 115 | the same shift: operands that address EDITMGR's strings |
-| headers | 283 | the Rich header: retail counts 65 C++ (SP5) objects and 12 OLDNAMES alias objects where the link has 66 and 11, and LINK reserves one more Rich slot (PE header at 0x100, not 0xf8), shifting the PE header |
+| headers | 282 | the Rich header: 66 SP5 C++ objects where retail counts 65, so the key and the PE header offset differ |
+
+Measured on the two (`build/exp/lit*`, `build/exp/rich*`):
+
+- VC6 emits every global initializer's literal with the object's static
+  data, after all globals and before every function literal, whatever the
+  definition position, linkage, cv-qualification, aggregate, cast,
+  `selectany`, preceding initializer size (64 B to 128 KB), `/Gf`, `/Gy`,
+  `/YX`, `/Zi`, `/Z7` or `/O1`. A function-local static pointer puts its
+  literal in function order, but the pointer object moves next to it,
+  whereas retail keeps the pointer at 0x47d738 among the globals.
+- Retail's alias count (12 OLDNAMES objects) is reached by EDITOR's
+  shipped-map test calling `stricmp`, besides the `strcmpi` REQUEST and RESMGR
+  call: its alias member pulls `__stricmp`, already pulled by `strcmpi`, so
+  no runtime object moves (the HoMM1 Buka game shows the same second
+  spelling).
+- LINK's zero padding after the Rich key depends only on the Rich entries
+  (not on time, object names, order or library packaging), so it follows
+  from the counts.
+- Every retail editor C++ object registers `std::ctype<wchar_t>::id`
+  (65 sites, 65 objects), while Misc, which has no registration, is a
+  separate 66th object here. The game has 95 sites for 96 objects, Misc being
+  the one without. The editor's evidence therefore puts Misc and MiscRuntime
+  in one object, yet their `.data` keeps the game's split layout (Misc's
+  literals before the track-name text). That is the same literal emission
+  as `gMapCodeLetters` (`docs/matching/Misc-track-name-data/`): one compiler
+  behaviour, not yet reproduced from source, would explain both residuals.
 
 ## Open work
 
-- The two residuals above: the initializer literal's emission point in
-  EDITMGR, and which object composition gives retail's Rich counts.
+- The initializer-literal emission point (EDITMGR's `gMapCodeLetters`, and
+  with it a one-object Misc giving retail's 65 C++ objects).
 - The editor's clean export.
