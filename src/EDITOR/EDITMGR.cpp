@@ -9189,7 +9189,8 @@ H2_ENUM_BEGIN(EditScreenScroll)
 H2_ENUM_END(EditScreenScroll)
 
 // The tick the view last scrolled.
-DATA(0x004a3a58) i32 iLastScrollTime;
+#define gLastScrollTime iLastScrollTime // spelling fixes .bss order
+DATA(0x004a3a58) i32 gLastScrollTime;
 
 // Scrolls the view one cell in the direction (a MapDirection).
 VA(0x0040e053, 0x1c9)
@@ -9199,7 +9200,7 @@ void editManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, b32 u
 
     xOrigin = m_viewX;
     yOrigin = m_viewY;
-    iLastScrollTime = KBTickCount();
+    gLastScrollTime = KBTickCount();
     switch (direction) {
         case MAP_DIRECTION_NORTH:
             yOrigin--;
@@ -9261,13 +9262,13 @@ void editManager::CheckScreenScroll(void) {
     rightSide = LOGICAL_SCREEN_WIDTH - IDX(EDIT_SCROLL_BORDER) - 1;
     topSide = EDIT_SCROLL_BORDER;
     bottomSide = LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER);
-    if (KBTickCount() - iLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
+    if (KBTickCount() - gLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
         i32 mouseX;
         i32 mouseY;
         i32 oldMapY;
         i32 oldMapX;
 
-        iLastScrollTime = KBTickCount();
+        gLastScrollTime = KBTickCount();
         oldMapX = m_viewX;
         oldMapY = m_viewY;
         gpMouseManager->MouseCoords(mouseX, mouseY);
@@ -9839,22 +9840,24 @@ H2_ENUM_BEGIN(EditSystemOptions)
 H2_ENUM_END(EditSystemOptions)
 
 // The system options window, and whether a toggle changed the preferences.
-DATA(0x004a3a44) heroWindow* ESPanel;
-DATA(0x0049f5dc) b32 bEPrefsChanged;
+#define gSystemOptionsWindow ESPanel // spelling fixes .bss order
+DATA(0x004a3a44) heroWindow* gSystemOptionsWindow;
+#define gPrefsChanged bEPrefsChanged // spelling fixes .bss order
+DATA(0x0049f5dc) b32 gPrefsChanged;
 
 VA(0x0040f682, 0xe9)
 void editManager::SystemOptions(void) {
     tag_message H2_UNUSED(message);
 
-    bEPrefsChanged = false;
-    ESPanel = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
-    if (!ESPanel)
+    gPrefsChanged = false;
+    gSystemOptionsWindow = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
+    if (!gSystemOptionsWindow)
         MemError();
-    SetWinText(ESPanel, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
+    SetWinText(gSystemOptionsWindow, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
     UpdateEditorSystemOptions(true);
-    gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
-    delete ESPanel;
-    if (bEPrefsChanged)
+    gpWindowManager->DoDialog(gSystemOptionsWindow, EditorSystemOptionsHandler, 0);
+    delete gSystemOptionsWindow;
+    if (gPrefsChanged)
         WritePrefs();
 }
 
@@ -9864,32 +9867,32 @@ void UpdateEditorSystemOptions(b32 initialDraw) {
 
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, EDIT_OPTIONS_ANIMATION_BUTTON);
     message.payload.widget.data.value = gConfig.editorScreenAnimation + EDIT_OPTIONS_ANIMATION_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_CYCLING_BUTTON;
     message.payload.widget.data.value = gConfig.editorPaletteCycling + EDIT_OPTIONS_CYCLING_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_BUTTON;
     message.payload.widget.data.value = gConfig.showObjectBoxes + EDIT_OPTIONS_OBJECT_BOXES_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_BUTTON;
     message.payload.widget.data.value
         = CURRENT_GRAPHICS_CONFIG.colorMouseCursor + EDIT_OPTIONS_COLOR_MICE_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = EDIT_OPTIONS_ANIMATION_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.editorScreenAnimation];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_CYCLING_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.editorPaletteCycling];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.showObjectBoxes];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_TEXT;
     message.payload.widget.data.text = onOffText[CURRENT_GRAPHICS_CONFIG.colorMouseCursor];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     if (!initialDraw)
-        ESPanel->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
+        gSystemOptionsWindow->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
 }
 
 VA(0x0040f8d0, 0x269)
@@ -9935,24 +9938,24 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                         case EDIT_OPTIONS_ANIMATION_BUTTON:
                             gConfig.editorScreenAnimation = 1 - gConfig.editorScreenAnimation;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_CYCLING_BUTTON:
                             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
                             gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
                             gConfig.showObjectBoxes = 1 - gConfig.showObjectBoxes;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_COLOR_MICE_BUTTON:
                             CURRENT_GRAPHICS_CONFIG.colorMouseCursor
                                 = 1 - CURRENT_GRAPHICS_CONFIG.colorMouseCursor;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
                             break;
                     }
