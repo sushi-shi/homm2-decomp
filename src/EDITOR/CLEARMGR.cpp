@@ -27,7 +27,7 @@ clearManager::clearManager(void) {
     m_lastX = EDIT_NO_CELL;
 }
 
-VA(0x00401033, 0x136)
+VA(0x00401033, 0x138)
 i32 clearManager::Open(i32 priority) {
     i32 brush;
 
@@ -72,16 +72,16 @@ void clearManager::Close(void) {
 
 VA(0x00401223, 0xa0)
 void clearManager::UpdateBrushButtons(void) {
+    tag_message msg;
     i32 brush;
-    tag_message message;
 
     for (brush = 0; brush < CLEAR_BRUSH_COUNT; brush++) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        message.payload.widget.id = CLEAR_BRUSH_BUTTON_ID_FIRST + brush;
-        message.payload.widget.data.value
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+        msg.payload.widget.id = CLEAR_BRUSH_BUTTON_ID_FIRST + brush;
+        msg.payload.widget.data.value
             = CLEAR_BRUSH_FRAME_FIRST + brush * 2 + (brush == gClearBrush);
-        gEditManager->m_window->BroadcastMessage(message);
+        gEditManager->m_window->BroadcastMessage(msg);
     }
     gEditManager->m_window->DrawWindow(0);
     gpWindowManager->UpdateScreenRegion(
@@ -89,7 +89,7 @@ void clearManager::UpdateBrushButtons(void) {
         CLEAR_PANEL_REGION_WIDTH, CLEAR_PANEL_REGION_HEIGHT);
 }
 
-VA(0x004012c3, 0x510)
+VA(0x004012c3, 0x520)
 MessageDispatchResult clearManager::Main(tag_message& message) {
     i32 help;
     i32 anchorY;
@@ -225,36 +225,36 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
 
 VA(0x004017e3, 0x167)
 void clearManager::TrackCursor(void) {
-    i32 x;
-    i32 y;
-    tag_message event;
+    i32 mapX;
+    tag_message pending;
+    i32 mapY;
 
-    gpMouseManager->MouseCoords(x, y);
-    gEditManager->ScreenToCell(x, y);
-    x += gEditManager->m_viewX;
-    y += gEditManager->m_viewY;
-    if (gEditManager->m_cursorX == x && gEditManager->m_cursorY == y
-        && gEditManager->m_cursorSize == gClearBrush && !gClearCursorMoves)
-        return;
-    SelectBrush(gClearBrush, x, y);
-    event = gpInputManager->PeekEvent();
-    if (event.type == MESSAGE_MOUSE_MOVE) {
-        gClearCursorMoves++;
-        if (gClearCursorMoves < CLEAR_CURSOR_REDRAW_INTERVAL)
-            return;
+    gpMouseManager->MouseCoords(mapX, mapY);
+    gEditManager->ScreenToCell(mapX, mapY);
+    mapX += gEditManager->m_viewX;
+    mapY += gEditManager->m_viewY;
+    if (gEditManager->m_cursorX != mapX || gEditManager->m_cursorY != mapY
+        || gEditManager->m_cursorSize != gClearBrush || gClearCursorMoves) {
+        SelectBrush(gClearBrush, mapX, mapY);
+        pending = gpInputManager->PeekEvent();
+        if (pending.type == MESSAGE_MOUSE_MOVE) {
+            gClearCursorMoves++;
+            if (gClearCursorMoves < CLEAR_CURSOR_REDRAW_INTERVAL)
+                return;
+        }
+        gClearCursorMoves = 0;
+        gEditManager->DrawMap();
+        gEditManager->UpdateMapView();
+        if (gEditManager->m_cursorX != mapX || gEditManager->m_cursorY != mapY) {
+            gEditManager->m_cursorX = mapX;
+            gEditManager->m_cursorY = mapY;
+            gEditManager->UpdateCursor();
+        }
+        gEditManager->m_cursorSize = gClearBrush;
     }
-    gClearCursorMoves = 0;
-    gEditManager->DrawMap();
-    gEditManager->UpdateMapView();
-    if (gEditManager->m_cursorX != x || gEditManager->m_cursorY != y) {
-        gEditManager->m_cursorX = x;
-        gEditManager->m_cursorY = y;
-        gEditManager->UpdateCursor();
-    }
-    gEditManager->m_cursorSize = gClearBrush;
 }
 
-VA(0x0040194a, 0xa7)
+VA(0x0040194a, 0xa9)
 void clearManager::SelectBrush(i32 brush, i32 x, i32 y) {
     if (brush == CLEAR_BRUSH_SINGLE) {
         gSelectionX = x;
