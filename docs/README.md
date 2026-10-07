@@ -10,7 +10,7 @@
 - [Other builds](builds.md), [retail-exact linking](retail-exact-link.md),
   [playing the build](play.md), [generated source branches](clean-source.md),
   [localization](localization.md).
-- [Score tracking](match-status.md), [compiler patterns](patterns/),
+- [Score tracking](match-status.md), [compiler patterns](patterns/INDEX.md),
   [matching attempts](matching/), [jump tables](jump-tables.md),
   [constants](constants-audit.md), [enum and constant reuse](enum-reuse.md), a
   [negative experiment matrix](iconf2bc-experiment-matrix.md).
