@@ -32,4 +32,4 @@ Earlier spellings stay as aliases: `redelink` (`delink`), `status`
 (`verify status`), `relocs` (`verify relocs`), `constants`,
 `strict-allocations`, `od-frames`, `data-relocs`, `data-topology` (`verify
 <gate>`), `model-drift` (`model`), `clangd` (`lsp compdb`), `format`
-(`workflow format`).
+(`workflow format`), `audit enums` (`verify enum-reuse`).

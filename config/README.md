@@ -11,6 +11,8 @@ in `build/`.
 - `match_baseline.tsv`: the hash-scoped MAX ledger (`homm2 status update`).
 - `link_diff.tsv`: the linked image's per-region ceiling against retail
   (`python3 -m homm2.verify.link_diff --update`); every region is 0.
+- `constants.tsv`: numeric constants kept on purpose and the `#floor` of open
+  ones (`homm2 verify constants`, [docs/constants-audit.md](../docs/constants-audit.md)).
 
 ## Retail facts (`retail/`)
 
@@ -42,3 +44,7 @@ for `EDT2PL.exe`). Addresses are image RVAs.
 - `bool_exceptions.tsv`, `cast_exceptions.tsv`: reviewed exceptions of the
   Boolean-field and cast audits (`homm2 audit bool-fields`, `homm2 audit
   casts`).
+- `constants.tsv`: the per-file numeric-literal checklist (`pending`,
+  `reviewed`, `third-party`) of `homm2 verify constants`.
+- `enum-reuse.tsv`: the enum and constant reuse review ledger
+  (`homm2 verify enum-reuse`, [docs/enum-reuse.md](../docs/enum-reuse.md)).

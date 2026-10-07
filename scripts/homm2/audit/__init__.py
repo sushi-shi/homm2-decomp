@@ -56,7 +56,8 @@ TOOLS = {
     "usage": ("usage", "check that every tooling entry point keeps usage logging"),
     "census": ("census", "structural census of an image: starts and absolute fields"),
     "placements": ("placements", "game identities placed in another image by retail bytes"),
-    "enums": ("enums", "group evaluated enum members by value for semantic reuse review"),
+    "enums": ("homm2.verify.enum_reuse",
+              "alias of `homm2 verify enum-reuse` (enum and constant values)"),
     "ledger": ("ledger",
                "match_baseline rows banked against source that changed"),
     "historical-losses": ("historical_exact_losses",
@@ -107,7 +108,8 @@ def main(argv=None) -> int:
         print(f"homm2 audit: unknown tool {name!r}\n", file=sys.stderr)
         usage()
         return 1
-    module = f"homm2.audit.{TOOLS[name][0]}"
+    target = TOOLS[name][0]
+    module = target if "." in target else f"homm2.audit.{target}"
     saved = sys.argv
     sys.argv = [f"homm2 audit {name}", *argv[1:]]
     try:

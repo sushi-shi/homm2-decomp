@@ -12,7 +12,7 @@
   [localization](localization.md).
 - [Score tracking](match-status.md), [compiler patterns](patterns/),
   [matching attempts](matching/), [jump tables](jump-tables.md),
-  [constants](constants-audit.md), a
+  [constants](constants-audit.md), [enum and constant reuse](enum-reuse.md), a
   [negative experiment matrix](iconf2bc-experiment-matrix.md).
 - [Relocation manifest](reloc-manifest-sweep.md),
   [class hierarchy](class-hierarchy.md), [vendor middleware](vendor-middleware.md),
