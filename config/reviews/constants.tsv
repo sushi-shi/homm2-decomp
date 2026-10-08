@@ -102,8 +102,6 @@ include/SOURCE/FINDPATH.h	reviewed
 include/SOURCE/GAME.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/HERO.h	reviewed	
 include/SOURCE/KB.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/KBDeclarations.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/KBForward.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/kbTypes.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/Modem.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/NOOPT.h	reviewed	literals named or kept with a reason in config/constants.tsv

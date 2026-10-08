@@ -1,8 +1,708 @@
 #ifndef HOMM2_KB_H
 #define HOMM2_KB_H
 
-#include <SOURCE/KBForward.h>
+#include <Domains.h>
+#include <windows.h>
+#include <SOURCE/armyGroup.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/remoteTypes.h>
+
+H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
+
+struct SSpellInfo;
+struct SWinSetup;
+class advManager;
+class armyGroup;
+class combatManager;
+struct configStruct;
+class executive;
+class font;
+class game;
+class hero;
+class heroWindow;
+class heroWindowManager;
+class icon;
+class inputManager;
+class mouseManager;
+class palette;
+class philAI;
+class resourceManager;
+class searchArray;
+struct tag_message;
+struct tag_monsterInfo;
+struct tag_tilePoint;
+struct mapEventExtra;
+class town;
+class townManager;
+
+#include <SOURCE/kbTypes.h>
+#include <BASE/message.h>
 #include <BASE/soundManager.h>
-#include <SOURCE/KBDeclarations.h>
+#include <BASE/WINMGR.h>
+#include <BASE/dialog.h>
+#include <SOURCE/GAME.h>
+#include <SOURCE/town.h>
+
+H2_ENUM_BEGIN(GlobalTimerConstant)
+    GLOBAL_TIMER_COUNT               = 10,
+    GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
+    HIGH_SCORE_TIMER_SLOT            = 0,
+    COMBAT_EFFECT_TIMER_SLOT         = 1,
+    GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
+    GLOBAL_MUSIC_FADE_TIMER_SLOT     = 4,
+    GLOBAL_POLL_SOUND_TIMER_SLOT     = 5,
+    GLOBAL_MOUSE_TIMER_SLOT          = 6,
+    GLOBAL_COLOR_CYCLE_TIMER_SLOT    = 7,
+    GLOBAL_COMBAT_CYCLE_TIMER_SLOT   = 8
+H2_ENUM_END(GlobalTimerConstant)
+
+H2_ENUM_BEGIN(CombatHeroTableConstant)
+    KB_COMBAT_HERO_VARIANT_COUNT = 2,
+    KB_COMBAT_HERO_SPRITE_COUNT  = IDX(FACTION_COUNT) * KB_COMBAT_HERO_VARIANT_COUNT
+H2_ENUM_END(CombatHeroTableConstant)
+
+H2_ENUM_CLASS_BEGIN_SPLIT(CampaignSide, u8)
+    CAMPAIGN_ROLAND     = 0,
+    CAMPAIGN_ARCHIBALD  = 1,
+    CAMPAIGN_SIDE_COUNT = 2
+H2_ENUM_CLASS_END_SPLIT(CampaignSide, u8)
+
+inline CampaignSide OppositeCampaignSide(CampaignSide side) {
+#if H2_STRICT_ENUMS
+    return side == CAMPAIGN_ROLAND ? CAMPAIGN_ARCHIBALD : CAMPAIGN_ROLAND;
+#else
+    return 1 - side;
+#endif
+}
+
+H2_ENUM_CLASS_BEGIN(MonsterScoreField)
+    MONSTER_SCORE_THRESHOLD   = 0,
+    MONSTER_SCORE_TYPE        = 1,
+    MONSTER_SCORE_FIELD_COUNT = 2
+H2_ENUM_CLASS_END(MonsterScoreField)
+
+H2_ENUM_CLASS_BEGIN_T(CampaignChoiceType, u8)
+    CAMPAIGN_CHOICE_RESOURCE        = 0,
+    CAMPAIGN_CHOICE_ARTIFACT        = 1,
+    CAMPAIGN_CHOICE_SPELL           = 2,
+    CAMPAIGN_CHOICE_SECONDARY_SKILL = 3,
+    CAMPAIGN_CHOICE_CREATURES       = 4,
+    CAMPAIGN_CHOICE_PUZZLE_PIECES   = 5,
+    CAMPAIGN_CHOICE_EXPERIENCE      = 6,
+    CAMPAIGN_CHOICE_NONE            = 7,
+    CAMPAIGN_CHOICE_ALIGNMENT       = 8,
+    CAMPAIGN_CHOICE_PRIMARY_SKILL   = 9,
+    CAMPAIGN_CHOICE_SPELL_SCROLL    = 10,
+    CAMPAIGN_CHOICE_INVALID         = 255
+H2_ENUM_CLASS_END_T(CampaignChoiceType, u8)
+
+H2_ENUM_BEGIN(CampaignConstant)
+    CAMPAIGN_MAP_COUNT                = 12,
+    CAMPAIGN_REGULAR_MAP_COUNT        = 11,
+    CAMPAIGN_TRACK_POINT_COUNT        = 13,
+    CAMPAIGN_BONUS_CHOICE_COUNT       = 3,
+    CAMPAIGN_AWARD_COUNT              = 12,
+    CAMPAIGN_SWITCHING_MAP            = 11,
+    CAMPAIGN_SWITCHING_SCENARIO       = 4,
+    CAMPAIGN_NO_SCENARIO              = -1,
+    CAMPAIGN_CHOICE_NO_VALUE          = -1,
+    CAMPAIGN_CHOICE_NO_AMOUNT         = -1,
+    CAMPAIGN_ROLAND_FINAL_SCENARIO    = 9,
+    CAMPAIGN_ARCHIBALD_FINAL_SCENARIO = 10,
+    CAMPAIGN_STATE_RESET_SIZE         = 0x147,
+    CAMPAIGN_SETUP_RESET_SIZE         = 0x41,
+    CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
+    CAMPAIGN_CARRYOVER_PLAYER         = 3,
+    CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
+    CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
+    CAMPAIGN_NORMAL_SCENARIO_LIMIT    = 5,
+    CAMPAIGN_HERO_PRIORITY_HIGH       = 100,
+    CAMPAIGN_HERO_PRIORITY_NORMAL     = 90,
+    CAMPAIGN_EXPERIENCE_BONUS         = 5000,
+    CAMPAIGN_SWITCH_VICTORY_VALUE     = 99,
+    CAMPAIGN_ROLAND_TIME_LIMIT        = 90
+H2_ENUM_END(CampaignConstant)
+
+#pragma pack(push, 1)
+struct SCampaignChoice {
+    CampaignChoiceType type;
+    union {
+        i16 value;
+        H2_ENUM_STORAGE(ResourceType, i16) resource;
+        H2_ENUM_STORAGE(ArtifactType, i16) artifact;
+        H2_ENUM_STORAGE(SpellType, i16) spell;
+        H2_ENUM_STORAGE(CreatureType, i16) creature;
+        H2_ENUM_STORAGE(FactionType, i16) faction;
+    };
+    i16 amount;
+};
+#pragma pack(pop)
+SIZE(SCampaignChoice, 5);
+
+extern SCampaignChoice campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT]
+                                      [CAMPAIGN_BONUS_CHOICE_COUNT];
+extern H2_CONST char* cCampaignName[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+extern H2_CONST char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+
+struct SPlayerExit {
+    i8 netPosition;
+    i8 gamePosition;
+    b8 updateNetworkControl;
+    b8 timedOut;
+    b8 eliminated;
+    b8 hostReported;
+    b8 continueGame;
+};
+SIZE(SPlayerExit, 7);
+
+H2_ENUM_BEGIN(KbBuildingConstant)
+    KB_BUILDING_NEUTRAL_LIMIT  = 16,
+    KB_MAGE_GUILD_LEVEL_COUNT  = TOWN_MAGE_GUILD_LEVEL_COUNT + 1,
+H2_ENUM_END(KbBuildingConstant)
+
+H2_ENUM_BEGIN(NormalDialogResourceType)
+    NORMAL_DIALOG_NO_RESOURCE      = -1,
+    NORMAL_DIALOG_RESOURCE_WOOD    = IDX(RES_WOOD),
+    NORMAL_DIALOG_RESOURCE_FIRST   = NORMAL_DIALOG_RESOURCE_WOOD,
+    NORMAL_DIALOG_RESOURCE_MERCURY = IDX(RES_MERCURY),
+    NORMAL_DIALOG_RESOURCE_ORE     = IDX(RES_ORE),
+    NORMAL_DIALOG_RESOURCE_SULFUR  = IDX(RES_SULFUR),
+    NORMAL_DIALOG_RESOURCE_CRYSTAL = IDX(RES_CRYSTAL),
+    NORMAL_DIALOG_RESOURCE_GEMS    = IDX(RES_GEMS),
+    NORMAL_DIALOG_RESOURCE_GOLD    = IDX(RES_GOLD),
+    NORMAL_DIALOG_RESOURCE_LAST    = NORMAL_DIALOG_RESOURCE_GOLD,
+    NORMAL_DIALOG_ARTIFACT         = 7,
+    NORMAL_DIALOG_SPELL            = 8,
+    NORMAL_DIALOG_CREST            = 9,
+    NORMAL_DIALOG_LUCK_BONUS       = 10,
+    NORMAL_DIALOG_LUCK_PENALTY     = 11,
+    NORMAL_DIALOG_MORALE_BONUS     = 12,
+    NORMAL_DIALOG_MORALE_PENALTY   = 13,
+    NORMAL_DIALOG_EXPERIENCE       = 14,
+    NORMAL_DIALOG_EXPMRL_FIRST     = NORMAL_DIALOG_LUCK_BONUS,
+    NORMAL_DIALOG_EXPMRL_LAST      = NORMAL_DIALOG_EXPERIENCE,
+    NORMAL_DIALOG_HERO             = 15,
+    NORMAL_DIALOG_SECONDARY_SKILL  = 17,
+    NORMAL_DIALOG_MONSTER          = 18,
+    NORMAL_DIALOG_PRIMARY_SKILL    = 25
+H2_ENUM_END(NormalDialogResourceType)
+
+// Results of the standard Yes/No confirmation layout, not monster-specific actions.
+H2_ENUM_BEGIN(NormalDialogAnswer)
+    NORMAL_DIALOG_YES = DIALOG_BUTTON_5,
+    NORMAL_DIALOG_NO  = DIALOG_BUTTON_6,
+H2_ENUM_END(NormalDialogAnswer)
+
+H2_ENUM_BEGIN(NormalDialogConstant)
+    NORMAL_DIALOG_INFO                     = 1,
+    NORMAL_DIALOG_CONFIRM                  = 2,
+    NORMAL_DIALOG_BUTTON_PAIR              = 3,
+    NORMAL_DIALOG_QUICK_VIEW               = 4,
+    NORMAL_DIALOG_WAIT_FIRST               = 5,
+    NORMAL_DIALOG_WAIT_LAST                = 6,
+    NORMAL_DIALOG_SHOW_BUTTONS_7_8         = 7,
+    NORMAL_DIALOG_SHOW_BUTTON_7            = 8,
+    NORMAL_DIALOG_RESOURCE_COUNT           = 2,
+    NORMAL_DIALOG_PRIMARY_BONUS_OFFSET     = 100,
+    NORMAL_DIALOG_DAILY_RESOURCE_OFFSET    = 100000,
+    NORMAL_DIALOG_SHOW_OR_TEXT             = 1,
+    NORMAL_DIALOG_NO_VALUE                 = -1,
+    NORMAL_DIALOG_TEXT_LENGTH              = 80,
+    NORMAL_DIALOG_FILENAME_LENGTH          = 16,
+    NORMAL_DIALOG_WINDOW_WIDTH             = 306,
+    NORMAL_DIALOG_WINDOW_BASE_HEIGHT       = 180,
+    NORMAL_DIALOG_WINDOW_ROW_HEIGHT        = 45,
+    NORMAL_DIALOG_MAX_ROWS                 = 6,
+    NORMAL_DIALOG_TEXT_LINE_WIDTH          = 244,
+    NORMAL_DIALOG_TEXT_LINE_HEIGHT         = 16,
+    NORMAL_DIALOG_MAX_TOP                  = 28,
+    NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID     = 100,
+    NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID = 0x1e14,
+    NORMAL_DIALOG_TIMEOUT_MIN              = 1,
+    NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
+    NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
+    NORMAL_DIALOG_DEFAULT_X                = 159,
+H2_ENUM_END(NormalDialogConstant)
+
+H2_ENUM_BEGIN(EventWindowConstant)
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
+    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID + 1
+H2_ENUM_END(EventWindowConstant)
+
+H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
+    END_GAME_FORCE_NONE    = 0,
+    END_GAME_FORCE_VICTORY = 1,
+    END_GAME_FORCE_DEFEAT  = 2
+H2_ENUM_CLASS_END(CheckEndGameForcedResult)
+
+H2_ENUM_BEGIN(HighScoreConstant)
+    HIGH_SCORE_ENTRY_COUNT        = 10,
+    HIGH_SCORE_NAME_LENGTH        = 16,
+    HIGH_SCORE_PLAYER_NAME_SIZE   = HIGH_SCORE_NAME_LENGTH + 1,
+    HIGH_SCORE_SCENARIO_NAME_SIZE = 41,
+    HIGH_SCORE_RESERVED_SIZE      = 29,
+    HIGH_SCORE_EMPTY              = -1,
+    HIGH_SCORE_FILE_READ_FLAGS    = 0x8000,
+    HIGH_SCORE_FILE_WRITE_FLAGS   = 0x8301,
+    HIGH_SCORE_FILE_PERMISSIONS   = 0x80
+H2_ENUM_END(HighScoreConstant)
+
+#pragma pack(push, 1)
+struct HighScoreEntry {
+    char playerName[HIGH_SCORE_PLAYER_NAME_SIZE];
+    char scenarioName[HIGH_SCORE_SCENARIO_NAME_SIZE];
+    i32 score;
+    i32 days;
+    i32 scenario;
+    char cheated;
+    char reserved[HIGH_SCORE_RESERVED_SIZE];
+};
+#pragma pack(pop)
+SIZE(HighScoreEntry, 100);
+
+H2_ENUM_BEGIN(AppMenuCommand)
+    APP_MENU_NONE            = 0,
+    APP_MENU_VIEW_WORLD      = 0x9c4c,
+    APP_MENU_VIEW_PUZZLE     = 0x9c4d,
+    APP_MENU_CAST_SPELL      = 0x9c4e,
+    APP_MENU_SEARCH          = 0x9c4f,
+    APP_MENU_MUSIC_FIRST     = 0x9c50,
+    APP_MENU_MUSIC_LAST      = 0x9c5a,
+    APP_MENU_SOUND_FIRST     = 0x9c5c,
+    APP_MENU_SOUND_LAST      = 0x9c66,
+    APP_MENU_SPEED_FIRST     = 0x9c68,
+    APP_MENU_SPEED_LAST      = 0x9c6c,
+    APP_MENU_UNKNOWN_9C6D    = 0x9c6d,
+    APP_MENU_TOGGLE_ROUTE    = 0x9c6e,
+    APP_MENU_TOGGLE_BLACKOUT = 0x9c6f,
+    APP_MENU_RESTART_0       = 0x9ca6,
+    APP_MENU_RESTART_1       = 0x9ca8,
+    APP_MENU_RESTART_2       = 0x9ca9,
+    APP_MENU_RESTART_3       = 0x9caa,
+    APP_MENU_RESTART_4       = 0x9cab,
+    APP_MENU_UNKNOWN_9CAD    = 0x9cad,
+    APP_MENU_RESTART_5       = 0x9cae,
+    APP_MENU_RESTART_6       = 0x9caf,
+    APP_MENU_RESTART_7       = 0x9cb0,
+    APP_MENU_RESTART_8       = 0x9cb2,
+    APP_MENU_RESTART_9       = 0x9cb3,
+    APP_MENU_RESTART_10      = 0x9cb5,
+    APP_MENU_RESTART_11      = 0x9cb6,
+    APP_MENU_RESTART_12      = 0x9cb8,
+    APP_MENU_RESTART_13      = 0x9cb9,
+    APP_MENU_LOAD_0          = 0x9cbb,
+    APP_MENU_LOAD_1          = 0x9cbc,
+    APP_MENU_LOAD_2          = 0x9cbf,
+    APP_MENU_LOAD_3          = 0x9cc0,
+    APP_MENU_LOAD_4          = 0x9cc1,
+    APP_MENU_LOAD_5          = 0x9cc3,
+    APP_MENU_LOAD_6          = 0x9cc4,
+    APP_MENU_LOAD_7          = 0x9cc6,
+    APP_MENU_LOAD_8          = 0x9cc7,
+    APP_MENU_LOAD_9          = 0x9cc9,
+    APP_MENU_LOAD_10         = 0x9cca,
+    APP_MENU_SAVE            = 0x9ccb,
+    APP_MENU_EXIT            = 0x9ccc,
+    APP_MENU_CHEAT_REVEAL    = 0x9ccd,
+    APP_MENU_CHEAT_MOVEMENT  = 0x9cce,
+    APP_MENU_CHEAT_SPELLS    = 0x9ccf,
+    APP_MENU_CHEAT_RESOURCES = 0x9cd0
+H2_ENUM_END(AppMenuCommand)
+
+H2_ENUM_CLASS_BEGIN(DialogWaitType)
+    DIALOG_WAIT_OTHER_PLAYER           = 0,
+    DIALOG_WAIT_NETBIOS_GUEST          = 1,
+    DIALOG_WAIT_NETBIOS_HOST           = 2,
+    DIALOG_WAIT_NETBIOS_INIT_GUEST     = 3,
+    DIALOG_WAIT_NETBIOS_INIT_HOST      = 4,
+    DIALOG_WAIT_MODEM_COMMAND          = 5,
+    DIALOG_WAIT_MODEM_RESPONSE         = 6,
+    DIALOG_WAIT_DIRECT_CONNECT         = 7,
+    DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST = 8,
+    DIALOG_WAIT_DIRECTPLAY_GUESTS      = 9,
+    DIALOG_WAIT_DIRECTPLAY_HOST        = 10,
+    DIALOG_WAIT_WINSOCK_FIRST_GUEST    = 11,
+    DIALOG_WAIT_WINSOCK_GUESTS         = 12,
+    DIALOG_WAIT_WINSOCK_HOST           = 13
+H2_ENUM_CLASS_END(DialogWaitType)
+
+H2_ENUM_BEGIN(OldMainConstant)
+    OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
+    OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
+    OLD_MAIN_NEW_GAME                         = 0x65,
+    OLD_MAIN_LOAD_GAME                        = 0x66,
+    OLD_MAIN_HIGH_SCORES                      = 0x67,
+    OLD_MAIN_CREDITS                          = 0x68,
+    OLD_MAIN_EXIT                             = 0x69,
+    OLD_MAIN_SETUP_NEW                        = 0,
+    OLD_MAIN_SETUP_LOAD                       = 1,
+    OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 6000,
+    OLD_MAIN_NET_BUFFER_SIZE                  = 256,
+    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1,
+    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = CAMPAIGN_ROLAND_FINAL_SCENARIO + 1,
+H2_ENUM_END(OldMainConstant)
+
+#pragma pack(push, 1)
+struct OldMainNetSetup {
+    i8 gamePosToNetPos[GAME_PLAYER_COUNT];
+    b8 useRegularCompression;
+    b8 useDiffCompression;
+    SNetPlayerInfo players[GAME_PLAYER_COUNT];
+};
+#pragma pack(pop)
+SIZE(OldMainNetSetup, 0xd4);
+
+union OldMainNetBuffer {
+    OldMainNetSetup setup;
+    char bytes[OLD_MAIN_NET_BUFFER_SIZE];
+};
+SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
+
+#pragma pack(push, 1)
+struct KbRemotePacket {
+    i8 sender;
+    i32 id;
+    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
+    i8 command;
+    i16 payloadSize;
+    union {
+        OldMainNetSetup setup;
+        RemoteSaveInitialization save;
+        char data[REMOTE_MESSAGE_PAYLOAD_SIZE];
+    } payload;
+};
+#pragma pack(pop)
+SIZE(KbRemotePacket, REMOTE_MESSAGE_SIZE);
+
+H2_ENUM_BEGIN(AppMenuConstant)
+    APP_MENU_REVEAL_SIZE         = 0x1e,
+    APP_MENU_REVEAL_RADIUS       = 0xb4,
+    APP_MENU_SPELL_COUNT         = 10,
+    APP_MENU_RESOURCE_BONUS      = 10,
+    APP_MENU_GOLD_BONUS          = 1000,
+    APP_MENU_MOVEMENT_BONUS      = 299999,
+    APP_MENU_CHEAT_SPELL_POINTS  = 999,
+    APP_MENU_CHEAT_ARMY_QUANTITY = 5,
+    APP_MENU_ARMY_FIRST          = 41000,
+    APP_MENU_ARMY_LAST           = 41066,
+    APP_MENU_SECONDARY_FIRST     = 42000,
+    APP_MENU_SECONDARY_LAST      = 42056,
+    APP_MENU_BUILDING_FIRST      = 43000,
+    APP_MENU_BUILDING_LAST       = 43101,
+    APP_MENU_COMBAT_FIRST        = 44000,
+    APP_MENU_COMBAT_LAST         = 44200,
+H2_ENUM_END(AppMenuConstant)
+
+H2_ENUM_BEGIN(NetBoxConstant)
+    NET_BOX_LINE_SIZE = 140
+H2_ENUM_END(NetBoxConstant)
+
+extern "C" void PollSound(void);
+void ForcePollSound(void);
+void InitMainClasses(void);
+void DeleteMainClasses(void);
+void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text);
+void SetupCDRom(void);
+i32 EarlySetup(void);
+i32 oldmain(void);
+char toupper(char character);
+H2_ENUM_BEGIN(Cp1251CaseConstant)
+    CYRILLIC_CASE_OFFSET = 0x20,
+    CYRILLIC_CAPITAL_YO = 0xa8,
+    CYRILLIC_SMALL_YO = 0xb8,
+    CYRILLIC_CAPITAL_A = 0xc0,
+    CYRILLIC_CAPITAL_YA = 0xdf,
+    CYRILLIC_SMALL_A = 0xe0,
+    CYRILLIC_SMALL_YA = 0xff
+H2_ENUM_END(Cp1251CaseConstant)
+
+// Codepage-1251 uppercase folding, expanded at its call sites; the out-of-line
+// toupper above carries the same ranges for the command-line parser.
+inline char CyrillicToUpper(char c) {
+    if (static_cast<u8>(c) >= 'a' && static_cast<u8>(c) <= 'z')
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_SMALL_A && static_cast<u8>(c) <= CYRILLIC_SMALL_YA)
+        return static_cast<u8>(c) - CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_SMALL_YO)
+        return static_cast<char>(CYRILLIC_CAPITAL_YO);
+    return c;
+}
+
+inline char CyrillicToLower(char c) {
+    if (static_cast<u8>(c) >= 'A' && static_cast<u8>(c) <= 'Z')
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) >= CYRILLIC_CAPITAL_A && static_cast<u8>(c) <= CYRILLIC_CAPITAL_YA)
+        return static_cast<u8>(c) + CYRILLIC_CASE_OFFSET;
+    if (static_cast<u8>(c) == CYRILLIC_CAPITAL_YO)
+        return static_cast<char>(CYRILLIC_SMALL_YO);
+    return c;
+}
+i32 InterpretCommandLine(void);
+MessageDispatchResult InitMenuHandler(struct tag_message& message);
+MessageDispatchResult NullHandler(struct tag_message& message);
+MessageDispatchResult RecruitHeroHandler(tag_message& message);
+H2_CONST char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
+H2_CONST char* GetBuildingName(FactionType race, BuildingSlotType building);
+void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
+H2_CONST char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster);
+H2_CONST char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster);
+void GetMonsterCost(CreatureType monster, i32* const cost);
+i32 CanBuild(town* townPointer, BuildingSlotType building);
+i32 CanBuy(town* townPointer, BuildingSlotType type);
+i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
+MessageDispatchResult WaitHandler(tag_message& message);
+MessageDispatchResult EventWindowHandler(struct tag_message& message);
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& message);
+void PlayerDead(i32 player);
+void CheckEndGame(H2_ENUM_PARAM(CheckEndGameForcedResult, i32) forcedResult, b32 dragonCityCaptured);
+void QuickViewWait(void);
+void InitVars(void);
+void ClearMapExtra(void);
+i32 GetMonType(i32 score, HighScoreType highScoreType);
+i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, H2_CONST char* scenarioName);
+void BVResMsg(H2_CONST char* text, H2_ENUM_PARAM(ResourceType, i32) resourceType, i32 quantity);
+void GOut(H2_CONST char* text);
+i32 NetPosToGamePos(i32 netPosition);
+i32 WaitForOtherPlayer(void);
+void PopNetBox(H2_CONST char* text, i32 netPlayer);
+void AddNetBoxLine(H2_CONST char* text, char color);
+void ShutDown(H2_CONST char* message);
+void FileError(H2_CONST char* filename);
+void SmackFade(u8* source, u8* destination);
+void ShowCongrats(HighScoreType highScoreType);
+void CongratsWait(void);
+SAMPLE2 LoadPlaySample(H2_CONST char* name);
+void WaitEndSample(SAMPLE2* sample, i32 waitTime = -1);
+void MemError(void);
+H2_CONST char* GetTownName(i32 i);
+void LoadSystemwideIcons(void);
+void UnloadSystemwideIcons(void);
+void EarlyShutDownSystem(void);
+i32 GameUnsaved(void);
+i32 HandleAppSpecificMenuCommands(i32 command);
+void UpdateSystemOptionsMenu(void);
+void CleanUpMenus(void);
+void UpdateAppSpecificMenus(void* hMenu);
+void EarlyResizeWindow(i32 x, i32 y, i32 width, i32 height);
+i32 InMapArea(i32 x, i32 y);
+void SetupDynamicWindow(
+    i32 x,
+    i32 y,
+    i32 centered,
+    i32 boundsWidth,
+    i32 boundsHeight,
+    i32 contentWidth,
+    i32 contentHeight,
+    i32* windowWidth,
+    i32* windowHeight,
+    i32* contentLeft,
+    i32* contentTop,
+    i32* contentRight,
+    i32* contentBottom,
+    class heroWindow** window,
+    i32 windowType
+);
+void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles);
+void HandleRemoteDeadPlayerExit(i32 position);
+void HandleRemoteSuddenExit(void);
+void DropDownToOnePlayer(void);
+void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, i32 forwardedReport);
+void ReceiveRemotePlayerExit(struct SPlayerExit exitInfo);
+i32 CheckMem(void);
+i32 GetManaCost(SpellType spell, hero* heroPointer);
+void SetWinText(heroWindow* window, i32 id);
+void CheckShingleUpdate(void);
+void NormalDialog(
+    H2_CONST char* text,
+    i32 dialogType,
+    i32 windowX = -1,
+    i32 windowY = -1,
+    i32 firstResourceType = -1,
+    i32 firstResourceValue = 0,
+    i32 secondResourceType = -1,
+    i32 secondResourceValue = 0,
+    i32 showOrText = -1,
+    i32 timeout = 0
+);
+void UpdateNormalDialog(H2_CONST char* text);
+
+extern b32 bDoColorCycle;
+extern b32 gbDrawWindowBackground;
+extern i32 bEarlySetupDone;
+extern font* bigFont;
+extern b32 bInShutDown;
+extern b32 bShowIt;
+extern b32 bSpecialHideCursor;
+extern H2_CONST char* cBuildingInfoNeutral[];
+extern char cNetBoxColor[];
+extern char cNetBoxLine[][NET_BOX_LINE_SIZE];
+extern H2_CONST char* cOutOfMemory;
+extern H2_CONST char* gArmyNames[IDX(CREATURE_COUNT)];
+extern H2_CONST char* gArmyNamesPlural[IDX(CREATURE_COUNT)];
+// The <= 1 rule deliberately includes zero/negative quantities; only one table is read.
+#define CREATURE_DISPLAY_NAME(type, count)                                                         \
+    ((count) <= 1 ? gArmyNames[IDX(type)] : gArmyNamesPlural[IDX(type)])
+extern H2_CONST char* cMonFilename[IDX(CREATURE_COUNT)];
+extern H2_CONST char* cArmyFrameFileNames[IDX(CREATURE_COUNT)];
+extern H2_CONST char* gArmyShortNames[IDX(CREATURE_COUNT)];
+extern i32 gArtifactBaseRV[];
+extern b32 gbAllBlack;
+extern b32 gbCheatMenus;
+extern b32 gbClosingApp;
+extern b8 gbCombatSurrender;
+extern i8 captainStats[IDX(FACTION_COUNT)][HERO_PRIMARY_STAT_COUNT];
+extern b32 gbDrawSavedCursor;
+extern b32 gbForegroundApp;
+extern b32 gbFunctionComplete;
+extern b32 gbGameInitialized;
+extern i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
+extern b32 gbHeroMoving;
+extern b32 gbHumanPlayer[];
+extern b32 gbLoadingMonoIcon;
+extern u8 gColorTableYellow[];
+extern u8 gColorTableScenWin[];
+extern u8 gColorTableDarkGray[];
+extern b32 gbInMemError;
+extern b32 gbInNewGameSetup;
+extern b32 gbInPollSound;
+extern b32 gbNoCDRom;
+extern i32 gbPutzingWithMouseCtr;
+extern b32 gbRemoteOn;
+extern b8 gbRetreatWin;
+extern b32 gbTextEntryEscaped;
+extern b32 gbThisNetGotAdventureControl;
+extern b8 gbThisNetHumanPlayer[];
+extern u8 bStopOnTrigger[];
+extern H2_CONST char* gBuildingInfoSpecial[];
+extern icon* gBuyBuildIcons;
+extern char gcBottomViewText[];
+extern configStruct gConfig;
+// An lvalue selected afresh, including across callbacks that change executables.
+#define CURRENT_GRAPHICS_CONFIG (gConfig.gfx[IDX(giCurExe)])
+extern SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT];
+extern i32 gDwellingBaseResourceValues[][DWELLING_TYPE_COUNT];
+extern i32 gDwellingCosts[][DWELLING_TYPE_COUNT][IDX(RES_COUNT)];
+extern H2_CONST char* gDwellingNames[][DWELLING_TYPE_COUNT];
+extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][DWELLING_TYPE_COUNT];
+extern i32 gGameCommand;
+extern i32 gHeroGoldCost;
+extern u32l gHierarchyMask[][DWELLING_TYPE_COUNT];
+extern H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
+extern i32 giBottomViewOverrideEndTime;
+extern H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
+extern i32 giBottomViewResourceQty;
+extern WindowColorCycleMode giCycleType;
+// giDebugLevel thresholds: each role is enabled from its level up.
+H2_ENUM_BEGIN(DebugLevel)
+    MEMORY_LEAK_DEBUG_LEVEL                    = 1,
+    CELL_WINDOW_DEBUG_LEVEL                    = 1,
+    FILE_DEBUG_LEVEL                           = 2,
+    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
+    AI_PURCHASE_DEBUG_LEVEL                    = 3,
+    DEBUGGER_OUTPUT_LEVEL                      = 4,
+    COMBAT_AUTO_RESOLVE_DEBUG_LEVEL            = 4,
+    AI_PURCHASE_VALUE_DEBUG_LEVEL              = 5,
+    POSITION_DEBUG_LEVEL                       = 5,
+    FORCED_DEBUG_LEVEL                         = 9,
+    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9,
+    AI_BATTLE_DEBUG_LEVEL                      = 9
+H2_ENUM_END(DebugLevel)
+extern i32 giDebugLevel;
+extern i32 giDialogTimeout;
+extern H2_ENUM_STORAGE(TerrainType, u8) giGroundToTerrain[];
+#define CELL_TERRAIN(cell) (giGroundToTerrain[(cell)->m_terrainImageIndex])
+extern i32 giHighMemBuffer;
+extern i32 giMainVideoModeColorDepth;
+extern i32 giNumHumanPlayers;
+extern i16 giScoreCampaignMon[][IDX(MONSTER_SCORE_FIELD_COUNT)];
+extern i16 giScoreMon[][IDX(MONSTER_SCORE_FIELD_COUNT)];
+extern i32 giTCPHostStatus;
+extern i32 giThisGamePos;
+extern i32 giThisNetPos;
+extern i32 giTotalHighMem;
+extern DialogWaitType giWaitType;
+extern i32 glTimers[GLOBAL_TIMER_COUNT];
+extern i32 gMageBaseResourceValues[];
+extern i32 gMageBuildingCosts[][IDX(RES_COUNT)];
+extern tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)];
+extern SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT];
+extern i32 gNeutralBaseResourceValues[];
+extern i32 gNeutralBuildingCosts[][IDX(RES_COUNT)];
+extern H2_CONST char* gNeutralBuildingNames[];
+extern advManager* gpAdvManager;
+extern palette* gPalette;
+extern combatManager* gpCombatManager;
+extern executive* gpExec;
+extern game* gpGame;
+extern inputManager* gpInputManager;
+extern armyGroup* gpMonGroup;
+extern class mouseManager* gpMouseManager;
+extern philAI* gpPhilAI;
+extern resourceManager* gpResourceManager;
+extern searchArray* gpSearchArray;
+extern class soundManager* gpSoundManager;
+extern townManager* gpTownManager;
+extern class heroWindowManager* gpWindowManager;
+extern i32 gResourceBaseValue[];
+extern icon* gShingleAnim;
+extern i32 gSpecialBuildingBaseResourceValues[];
+extern i32 gSpecialBuildingCosts[][IDX(RES_COUNT)];
+extern H2_CONST char* gSpecialBuildingNames[];
+extern SSpellInfo gsSpellInfo[IDX(SPELL_COUNT)];
+extern icon* gSystemIcons;
+extern char gText[];
+extern H2_CONST char* gWellExtraNames[];
+extern SWinSetup gWinSetup[];
+extern HMENU hmnuAdv;
+extern HMENU hmnuCmbt;
+extern HMENU hmnuDflt;
+extern HMENU hmnuTown;
+extern H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr;
+extern i32 iMaxMapExtra;
+extern i32 iNextShingleAnim;
+extern i32 iShingleAnimFrame;
+extern i32 MAP_HEIGHT;
+extern i32 MAP_WIDTH;
+H2_ENUM_CLASS_BEGIN(MapExtraFlag)
+    MAP_EXTRA_ADJACENT_MONSTER    = 0x80,
+    MAP_EXTRA_ADJACENT_CLEAR_MASK = 0x7f
+H2_ENUM_CLASS_END(MapExtraFlag)
+extern u8* mapExtra;
+// The per-cell visibility/adjacency byte at (column, row).
+//
+// The inner grouping is load-bearing, not decoration. Retail's address
+// arithmetic is `(mapExtra + column) + row * MAP_WIDTH`, and /Od emits it in
+// exactly that order, so the base and the column term must be added as a unit.
+// Writing the natural mapExtra[column + row * MAP_WIDTH] regroups it into
+// `mapExtra + (column + row * MAP_WIDTH)`, which emits a different address
+// computation. See docs/patterns/flat-index-grouping-is-not-a-trick.md.
+//
+// `column` is therefore spliced DELIBERATELY UNPARENTHESISED, so that
+// MAP_EXTRA_AT(x + 1, y) keeps retail's `((mapExtra + x) + 1)` chain. Do not
+// "fix" it: wrapping it as `(mapExtra + (column))` groups the column term as a
+// unit instead, which changes the emitted chain. Pass only additive column
+// expressions. `row` stays parenthesised for `*` precedence, which is free
+// because the row term is already a factor.
+//
+// An inline accessor cannot replace this macro: the inline boundary never
+// folds into the address computation, whatever its arity.
+//
+// The two spellings below index the same cell and differ ONLY in which side
+// of the row multiply MAP_WIDTH sits on. That is byte-visible: /Od emits the
+// multiply operands in source order, so the two are NOT interchangeable and
+// each name spells the operand order it emits. Match the
+// site you are converting; never pick one for tidiness.
+#define MAP_EXTRA_AT(column, row)        (*(mapExtra + column + (row) * MAP_WIDTH))
+#define MAP_EXTRA_AT_WFIRST(column, row) (*(mapExtra + column + MAP_WIDTH * (row)))
+extern tag_tilePoint normalDirTable[];
+extern u8 giSetupGameType;
+#ifdef HOMM2_EDITOR
+#define pNormalDialogWindow pNormalDialogWindowShared // spelling fixes .bss order
+#endif
+extern heroWindow* pNormalDialogWindow;
+extern void** ppMapExtra;
+extern i16* pwSizeOfMapExtra;
+extern font* smallFont;
+extern u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)];
 
 #endif

@@ -190,7 +190,7 @@ class heroWindow;
 struct tag_message;
 
 // The game's KB.cpp functions the editor keeps its own copies of (the game
-// declares them in KBDeclarations.h and NOOPT.h).
+// declares them in KB.h and NOOPT.h).
 extern "C" void PollSound(void);
 i32 oldmain(void);
 void DelayTil(i32* endTime);

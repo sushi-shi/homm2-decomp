@@ -6,7 +6,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <BASE/baseManager.h>
-#include <SOURCE/KBDeclarations.h>
+#include <SOURCE/KB.h>
 
 struct tag_message;
 class heroWindow;

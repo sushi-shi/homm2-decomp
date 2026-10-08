@@ -838,7 +838,7 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
     static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 // The route-overlay byte at (column, row), read through this->m_visibilityMap.
-// Same grouping rule as MAP_EXTRA_AT in <SOURCE/KBDeclarations.h>: retail adds the base and
+// Same grouping rule as MAP_EXTRA_AT in <SOURCE/KB.h>: retail adds the base and
 // the column term as a unit, so `column` splices unparenthesised on purpose.
 #define ADVMGR_VISIBILITY_AT(column, row) (*(m_visibilityMap + column + (row) * MAP_WIDTH))
 
