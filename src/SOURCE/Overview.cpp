@@ -72,26 +72,26 @@ typedef enum OverviewControlId {
     TOWN_SELECT_WIDGET          = 4,
     TOWN_ARMY_FIRST             = 5,
     TOWN_ARMY_LAST              = 9,
-    TOWN_ARMY_ALT_FIRST         = 10,
-    TOWN_ARMY_ALT_LAST          = 14,
-    TOWN_RECRUIT_FIRST          = 15,
-    TOWN_RECRUIT_LAST           = 26,
-    TOWN_RECRUIT_ALT_FIRST      = 27,
-    TOWN_RECRUIT_ALT_LAST       = 38,
+    TOWN_ARMY_COUNT_FIRST         = 10,
+    TOWN_ARMY_COUNT_LAST          = 14,
+    TOWN_DWELLING_FIRST          = 15,
+    TOWN_DWELLING_LAST           = 26,
+    TOWN_DWELLING_AVAILABLE_FIRST      = 27,
+    TOWN_DWELLING_AVAILABLE_LAST       = 38,
     TOWN_HERO_FIRST             = 39,
     TOWN_HERO_PORTRAIT_CONTROL  = 40,
     TOWN_HERO_MANA_CONTROL      = 41,
     TOWN_HERO_MOBILITY_CONTROL  = 43,
     TOWN_HERO_LAST              = TOWN_HERO_MOBILITY_CONTROL,
-    TOWN_LOCATOR_CONTROL        = 44,
+    TOWN_BUILT_TODAY_CONTROL        = 44,
     HERO_SELECT_FIRST           = 100,
     HERO_PORTRAIT_CONTROL       = 101,
     HERO_MOBILITY_CONTROL       = 103,
     HERO_SELECT_LAST            = HERO_MOBILITY_CONTROL,
     HERO_ARMY_FIRST             = 104,
     HERO_ARMY_LAST              = 108,
-    HERO_ARMY_ALT_FIRST         = 109,
-    HERO_ARMY_ALT_LAST          = 113,
+    HERO_ARMY_COUNT_FIRST         = 109,
+    HERO_ARMY_COUNT_LAST          = 113,
     HERO_ARTIFACT_FIRST         = 114,
     HERO_ARTIFACT_LAST          = 127,
     HERO_ARTIFACT_FRAME_FIRST   = 128,
@@ -405,7 +405,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     "locators.icn",
                     TOWN_LOCATOR_FRAME,
                     ICON_DRAW_NORMAL,
-                    rowWidgetId + TOWN_LOCATOR_CONTROL,
+                    rowWidgetId + TOWN_BUILT_TODAY_CONTROL,
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
@@ -518,7 +518,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(record->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + TOWN_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
@@ -541,7 +541,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + i + TOWN_ARMY_ALT_FIRST,
+                            rowWidgetId + i + TOWN_ARMY_COUNT_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -605,8 +605,8 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             "mons32.icn",
                             static_cast<i16>(gDwellingType[(record->m_type)][building]),
                             ICON_DRAW_NORMAL,
-                            rowWidgetId + building + TOWN_RECRUIT_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            rowWidgetId + building + TOWN_DWELLING_FIRST,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
@@ -625,7 +625,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + building + TOWN_RECRUIT_ALT_FIRST,
+                            rowWidgetId + building + TOWN_DWELLING_AVAILABLE_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -768,7 +768,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(curHero->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + HERO_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
@@ -791,7 +791,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + i + HERO_ARMY_ALT_FIRST,
+                            rowWidgetId + i + HERO_ARMY_COUNT_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -1354,8 +1354,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     gpCurPlayer->m_heroIds[giOverviewTop[(giOverviewType)] + rowIndex];
                 return 1;
             }
-            if (widgetId >= HERO_ARMY_ALT_FIRST
-                && widgetId <= HERO_ARMY_ALT_LAST) {
+            if (widgetId >= HERO_ARMY_COUNT_FIRST
+                && widgetId <= HERO_ARMY_COUNT_LAST) {
                 widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
@@ -1395,7 +1395,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     curHero->ViewArtifact(
                         selectedArtifact,
                         quickView,
-                        curHero->m_artifactExtra[widgetId - HERO_ARTIFACT_FIRST]
+                        curHero->m_artifactSpells[widgetId - HERO_ARTIFACT_FIRST]
                     );
                 }
             }
@@ -1422,8 +1422,8 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                 giOverviewReturnActionExtra = selectedTown->m_occupyingHeroId;
                 return 1;
             }
-            if (widgetId >= TOWN_ARMY_ALT_FIRST
-                && widgetId <= TOWN_ARMY_ALT_LAST) {
+            if (widgetId >= TOWN_ARMY_COUNT_FIRST
+                && widgetId <= TOWN_ARMY_COUNT_LAST) {
                 widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
@@ -1446,12 +1446,12 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     SetupDynamicStuff(1, 1, 1);
                 }
             }
-            if (widgetId >= TOWN_RECRUIT_ALT_FIRST
-                && widgetId <= TOWN_RECRUIT_ALT_LAST) {
+            if (widgetId >= TOWN_DWELLING_AVAILABLE_FIRST
+                && widgetId <= TOWN_DWELLING_AVAILABLE_LAST) {
                 widgetId -= DWELLING_TYPE_COUNT;
             }
-            if (widgetId >= TOWN_RECRUIT_FIRST && widgetId <= TOWN_RECRUIT_LAST) {
-                item = widgetId - TOWN_RECRUIT_FIRST;
+            if (widgetId >= TOWN_DWELLING_FIRST && widgetId <= TOWN_DWELLING_LAST) {
+                item = widgetId - TOWN_DWELLING_FIRST;
                 if (quickView != 0) {
                     QuickViewRecruit(selectedTown, item);
                 } else {

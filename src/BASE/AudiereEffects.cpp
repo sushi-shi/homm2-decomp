@@ -53,7 +53,7 @@ AudiereSampleNode* FindAudiereSample(class sample* sampleResource) {
 void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr device) {
     if (device == NULL)
         return;
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
 
     AudiereSampleNode* node = FindAudiereSample(sampleResource);
@@ -115,7 +115,7 @@ bool AudiereSamplePlaying(class sample* sampleResource) {
 }
 
 void StopAudiereSample(class sample* sampleResource) {
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
     AudiereSampleNode* node = FindAudiereSample(sampleResource);
     if (node != NULL) {
@@ -126,7 +126,7 @@ void StopAudiereSample(class sample* sampleResource) {
 }
 
 void SetAudiereSampleVolume(class sample* sampleResource, i32 volume) {
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
     float sampleVolume =
         gpSoundManager->ConvertVolumeFloat(volume, SOUND_VOLUME_EFFECT);
@@ -136,7 +136,7 @@ void SetAudiereSampleVolume(class sample* sampleResource, i32 volume) {
 }
 
 void WaitForAudiereSample(class sample* sampleResource) {
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
     AudiereSampleNode* node = FindAudiereSample(sampleResource);
     if (node != NULL) {
@@ -147,7 +147,7 @@ void WaitForAudiereSample(class sample* sampleResource) {
 }
 
 void StopAllAudiereSamples(void) {
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
     for (AudiereSampleNode* node = gAudiereEffects.sampleList; node != NULL;
          node = node->next) {
@@ -158,7 +158,7 @@ void StopAllAudiereSamples(void) {
 }
 
 void SetAllAudiereSampleVolumes(i32 volume) {
-    if (AudiereSampleIterationActive())
+    if (AudiereSamplesLocked())
         return;
     float sampleVolume =
         gpSoundManager->ConvertVolumeFloat(volume, SOUND_VOLUME_EFFECT);
@@ -167,14 +167,14 @@ void SetAllAudiereSampleVolumes(i32 volume) {
         sampleNode->stream->setVolume(sampleVolume);
 }
 
-void BeginAudiereSampleIteration(void) {
-    ++gAudiereEffects.sampleIterationDepth;
+void LockAudiereSamples(void) {
+    ++gAudiereEffects.lockDepth;
 }
 
-void EndAudiereSampleIteration(void) {
-    --gAudiereEffects.sampleIterationDepth;
+void UnlockAudiereSamples(void) {
+    --gAudiereEffects.lockDepth;
 }
 
-bool AudiereSampleIterationActive(void) {
-    return gAudiereEffects.sampleIterationDepth > 0;
+bool AudiereSamplesLocked(void) {
+    return gAudiereEffects.lockDepth > 0;
 }

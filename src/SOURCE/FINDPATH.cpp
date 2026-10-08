@@ -104,16 +104,16 @@ void searchArray::PushPoint(
     i32 y,
     MapDirection direction,
     i32 cost,
-    i32 mobility,
-    i32 unknownFlag,
-    i32 rvFlag1,
-    i32 valueX,
-    i32 valueY,
-    i32 rvFlag2,
-    i32 previousX,
-    i32 previousY
+    i32 maximumCost,
+    i32 occupied,
+    i32 hasAdjacentMonster,
+    i32 adjacentMonsterX,
+    i32 adjacentMonsterY,
+    i32 beyondTurnMobility,
+    i32 turnEndX,
+    i32 turnEndY
 ) {
-    if (cost > mobility && mobility > 0)
+    if (cost > maximumCost && maximumCost > 0)
         return;
     if (x < 0 || x > MAP_WIDTH - 1 || y < 0 || y > MAP_HEIGHT - 1)
         return;
@@ -124,9 +124,9 @@ void searchArray::PushPoint(
     gSearchLow = 0;
     gSearchCell = &GetNode(x, y);
     if (gSearchCell->visited) {
-        if (!gSearchCell->rvFlag1 && rvFlag1)
+        if (!gSearchCell->hasAdjacentMonster && hasAdjacentMonster)
             return;
-        if (gSearchCell->distance <= cost && (!gSearchCell->rvFlag1 || rvFlag1))
+        if (gSearchCell->distance <= cost && (!gSearchCell->hasAdjacentMonster || hasAdjacentMonster))
             return;
     }
 
@@ -150,23 +150,23 @@ void searchArray::PushPoint(
     }
     m_queueCount++;
 
-    if (cost > giCurTempMobility && rvFlag2 == 0) {
-        gSearchQueueNode->rvFlag2 = 1;
-        gSearchQueueNode->previousX = static_cast<i8>(x - normalDirTable[(direction)].x);
-        gSearchQueueNode->previousY = static_cast<i8>(y - normalDirTable[(direction)].y);
+    if (cost > giCurTempMobility && beyondTurnMobility == 0) {
+        gSearchQueueNode->beyondTurnMobility = 1;
+        gSearchQueueNode->signedTurnEndX = static_cast<i8>(x - normalDirTable[(direction)].x);
+        gSearchQueueNode->signedTurnEndY = static_cast<i8>(y - normalDirTable[(direction)].y);
     } else {
-        gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
-        gSearchQueueNode->previousX = static_cast<i8>(previousX);
-        gSearchQueueNode->previousY = static_cast<i8>(previousY);
+        gSearchQueueNode->beyondTurnMobility = static_cast<u8>(beyondTurnMobility);
+        gSearchQueueNode->signedTurnEndX = static_cast<i8>(turnEndX);
+        gSearchQueueNode->signedTurnEndY = static_cast<i8>(turnEndY);
     }
     gSearchQueueNode->x = static_cast<u8>(x);
     gSearchQueueNode->y = static_cast<u8>(y);
     gSearchQueueNode->direction = static_cast<u8>((direction));
     gSearchQueueNode->distance = static_cast<u16>(cost);
-    gSearchQueueNode->unknownFlag = static_cast<u8>(unknownFlag);
-    gSearchQueueNode->rvFlag1 = static_cast<u8>(rvFlag1);
-    gSearchQueueNode->valueX = static_cast<i8>(valueX);
-    gSearchQueueNode->valueY = static_cast<i8>(valueY);
+    gSearchQueueNode->occupied = static_cast<u8>(occupied);
+    gSearchQueueNode->hasAdjacentMonster = static_cast<u8>(hasAdjacentMonster);
+    gSearchQueueNode->signedAdjacentMonsterX = static_cast<i8>(adjacentMonsterX);
+    gSearchQueueNode->signedAdjacentMonsterY = static_cast<i8>(adjacentMonsterY);
     gSearchQueueNode->visited = 1;
     *gSearchCell = *gSearchQueueNode;
 }
@@ -193,7 +193,7 @@ void searchArray::TestPossibleDirections(
         }
 
         gSearchNextCell = gpAdvManager->GetCell(gSearchNextX, gSearchNextY);
-        if ((gSearchNextCell->m_flags & SEARCH_CELL_UNREACHABLE) != 0) {
+        if ((gSearchNextCell->m_flags & (MAP_CELL_OCCUPIED)) != 0) {
             gSearchTerrain = TERRAIN_INVALID;
             goto storeDirection;
         }
@@ -256,7 +256,7 @@ void searchArray::TestPossibleDirections(
                 gSearchTerrain = TERRAIN_INVALID;
                 goto storeDirection;
             }
-            if (gSearchNextCell->m_overlayIndex != SEARCH_NO_OBJECT) {
+            if (gSearchNextCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
                 mapCell* belowNext = gpAdvManager->GetCell(gSearchNextX, gSearchNextY + 1);
 
                 if (CELL_HAS_NON_SHADOW_OBJECT(belowNext)) {
@@ -277,7 +277,7 @@ void searchArray::TestPossibleDirections(
                     goto storeDirection;
                 }
             }
-            if (gSearchCurrentCell->m_overlayIndex != SEARCH_NO_OBJECT) {
+            if (gSearchCurrentCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
                 mapCell* belowCurrent = gpAdvManager->GetCell(x, y + 1);
 
                 if (CELL_HAS_NON_SHADOW_OBJECT(belowCurrent)) {
@@ -359,7 +359,7 @@ i32 searchArray::FindCombatPath(
     i32 targetHex,
     class army* unit,
     ArmyPathTarget attackPath,
-    i32 ignoreTargetMoat
+    i32 slowTargetMoat
 ) {
     i32 moveMask;
     i32 distance;
@@ -378,7 +378,7 @@ i32 searchArray::FindCombatPath(
 
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
-    if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
+    if (gpCombatManager->m_hasMoat != 0) {
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
 
@@ -395,7 +395,7 @@ i32 searchArray::FindCombatPath(
                 && gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED)
                 continue;
             if ((moatCell[moatIndex] == targetHex || moatCell[moatIndex] == targetWideHex)
-                && ignoreTargetMoat == 0)
+                && slowTargetMoat == 0)
                 continue;
             if (moatCell[moatIndex] == unit->m_hex || moatCell[moatIndex] == sourceWideHex)
                 continue;
@@ -508,7 +508,7 @@ i32 searchArray::FindCombatPath(
 restoreMoatFailure:
     result = 0;
 restoreMoat:
-    if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
+    if (gpCombatManager->m_hasMoat != 0) {
         for (moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++)
             gpCombatManager->m_hexCells[moatCell[moatIndex]].m_blocked =
                 savedMoatState[moatIndex];

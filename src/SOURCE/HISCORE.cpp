@@ -246,7 +246,7 @@ void highScoreManager::Update(void) {
         );
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                         + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                         + HIGH_SCORE_TEXT_DAYS_OFFSET;
         if (highScore.score != HIGH_SCORE_EMPTY) {
             if (m_showCampaignScores == 0)
                 sprintf(gText, "%d", highScore.days);
@@ -281,11 +281,11 @@ void highScoreManager::Update(void) {
         m_window->BroadcastMessage(hsMessage);
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                         + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                         + HIGH_SCORE_TEXT_DAYS_OFFSET;
         if (m_showCampaignScores)
-            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_RATING_X;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_DAYS_X;
         else
-            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_RATING_X;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_DAYS_X;
         m_window->BroadcastMessage(hsMessage);
 
         if (giHighScoreRank == rank) {
@@ -306,7 +306,7 @@ void highScoreManager::Update(void) {
             m_window->BroadcastMessage(hsMessage);
             hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                              + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                             + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                             + HIGH_SCORE_TEXT_DAYS_OFFSET;
             m_window->BroadcastMessage(hsMessage);
             hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                              + HIGH_SCORE_FIRST_TEXT_WIDGET

@@ -19,7 +19,7 @@ town::town(void) {
     m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     m_buildings = (TOWN_BUILDING_TENT);
     m_mageGuildLevel = 0;
-    m_unknown1d = 0;
+    m_unused1d = 0;
 }
 
 i32 town::HasGarrison(void) {
@@ -154,11 +154,11 @@ void town::BuildBuilding(BuildingSlotType building) {
         m_buildings &= ~(TOWN_BUILDING_DWELLING_3);
     if (building == BUILDING_SLOT_UPGRADE_THIRD)
         m_buildings &= ~(TOWN_BUILDING_DWELLING_4);
-    if (building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE)
+    if (building == BUILDING_SLOT_UPGRADE_FOURTH)
         m_buildings &= ~(TOWN_BUILDING_DWELLING_5);
-    if (building == BUILDING_SLOT_SPECIAL_TWENTY_NINE)
+    if (building == BUILDING_SLOT_UPGRADE_FIFTH)
         m_buildings &= ~(TOWN_BUILDING_DWELLING_6);
-    if (building == BUILDING_SLOT_SPECIAL_THIRTY)
+    if (building == BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE)
         m_buildings &= ~((TOWN_BUILDING_DWELLING_6) | (TOWN_BUILDING_UPGRADED_DWELLING_6));
 
     if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_SIXTH) {
@@ -167,11 +167,11 @@ void town::BuildBuilding(BuildingSlotType building) {
                 .growth;
     }
     if (building >= BUILDING_SLOT_UPGRADE_FIRST
-        && building <= BUILDING_SLOT_SPECIAL_TWENTY_NINE) {
+        && building <= BUILDING_SLOT_UPGRADE_FIFTH) {
         m_dwellingAvailable[(building) - (TOWN_OBJECT_DWELLING_1)] =
             m_dwellingAvailable[(building) - (TOWN_OBJECT_DWELLING_6)];
     }
-    if (building == BUILDING_SLOT_SPECIAL_THIRTY) {
+    if (building == BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE) {
         m_dwellingAvailable[(building) - (TOWN_OBJECT_DWELLING_1)] =
             m_dwellingAvailable[(building) - (TOWN_OBJECT_DWELLING_2)];
     }
@@ -191,7 +191,7 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     *mageGuildLevel = m_mageGuildLevel;
     *numArchers = 0;
     BuildingSlotType building;
-    for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_SPECIAL_THIRTY;
+    for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE;
          ++building) {
         if ((((m_buildings) & ((1 << (building))))))
             ++*numArchers;

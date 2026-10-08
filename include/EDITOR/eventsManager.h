@@ -75,8 +75,8 @@ typedef enum NewMapWindowConstant {
     NEW_MAP_FIRST_DENSITY_INCREASE = 700,
     NEW_MAP_FIRST_DENSITY_TRACK    = 900,
     NEW_MAP_FIRST_DENSITY_KNOB     = 1000,
-    NEW_MAP_SCATTER_TOWNS          = 1100,
-    NEW_MAP_CENTRE_TOWNS           = 1101,
+    NEW_MAP_SCATTER_TERRAIN          = 1100,
+    NEW_MAP_CENTRE_TERRAIN           = 1101,
     NEW_MAP_GENERATE_UNSEEN        = 1300,
 
     NEW_MAP_PLAYERS_BASE           = 1498,

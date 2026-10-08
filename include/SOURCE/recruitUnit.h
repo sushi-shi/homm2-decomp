@@ -28,7 +28,7 @@ public:
     i32 m_resourceCost;
     i32 m_refreshTown;
     heroWindow* m_window;
-    char m_padding56[4];
+    char m_unused56[4];
     armyGroup* m_army;
     char m_padding5e[4];
     b32 m_recruited;

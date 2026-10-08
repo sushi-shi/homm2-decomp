@@ -158,7 +158,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     } else {
         drawFrame = m_cursorFrame + m_cursorFrameCount;
@@ -215,7 +215,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     }
 
@@ -520,7 +520,7 @@ mapCell* advManager::MoveHero(
         boat->savedTriggerType = boatCell->m_triggerType;
         boat->savedEventData = static_cast<u8>(boatCell->m_objectMetadata);
         boat->direction = m_cursorDirection;
-        boat->heroId |= BOAT_OCCUPIED_FLAG;
+        boat->heroId |= BOAT_VACATED_FLAG;
         boatCell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         boatCell->m_objectMetadata = static_cast<u16>(step);
         boat->x = static_cast<i8>(movingHero->m_x);
@@ -608,11 +608,11 @@ mapCell* advManager::MoveHero(
         goto movementDone;
 
     if (movingHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-        town* occupiedTown = gpGame->GetTown(movingHero->m_occupiedTown);
+        town* occupiedTown = gpGame->GetTown(movingHero->m_locationMetadata);
         occupiedTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
-    if (m_visibilityMapValid) {
-        *(m_visibilityMap + (movingHero->m_x + directionX)
+    if (m_routeShown) {
+        *(m_routeMap + (movingHero->m_x + directionX)
           + (movingHero->m_y + directionY) * MAP_WIDTH) = 0;
     }
     m_scrollOffsetY = 0;
@@ -727,7 +727,7 @@ mapCell* advManager::MoveHero(
         switch (cursorCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_NOTHING_SPECIAL:
             case MAP_OBJECT_MOSSY_ROCK:
-            case MAP_OBJECT_REEFS:
+            case MAP_OBJECT_STREAM:
             case MAP_OBJECT_TREES:
             case MAP_OBJECT_MOUNTAINS:
             case MAP_OBJECT_VOLCANO:
@@ -743,8 +743,8 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_DUNE:
             case MAP_OBJECT_LAVA_POOL:
             case MAP_OBJECT_SHRUB:
-            case MAP_OBJECT_ARENA:
-            case MAP_OBJECT_BARROW_MOUNDS:
+            case MAP_OBJECT_HOLE:
+            case MAP_OBJECT_OUTCROPPING:
                 eventCell = NULL;
         }
         goto movementDone;
@@ -885,7 +885,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
         if (removeMonster) {
             EraseObj(monsterCell, monsterX, monsterY);
             if (gbThisNetHumanPlayer[giCurPlayer])
-                FizzleCenter(EVENT_FIZZLE_HERO_LOSS);
+                FizzleCenter(EVENT_FIZZLE_KILL);
         }
         *adjacentMonster = 1;
     }
@@ -1165,7 +1165,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero->m_direction = MAP_DIRECTION_EAST;
             mapHero->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
-            mapHero->m_occupiedTown =
+            mapHero->m_locationMetadata =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero->m_owner = change.player;
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =

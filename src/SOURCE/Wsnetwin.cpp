@@ -93,7 +93,7 @@ i16 wsnet_init(void) {
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         } else {
             sprintf(
                 cWSTextBuffer,
@@ -102,7 +102,7 @@ i16 wsnet_init(void) {
                 "Открытие игры на %s\n\nОжидание гостя(ей).\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.",
                 inet_ntoa(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -119,7 +119,7 @@ i16 wsnet_init(void) {
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
             }
         } else {
             sprintf(
@@ -130,7 +130,7 @@ i16 wsnet_init(void) {
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = giNumHumanPlayers;
@@ -169,7 +169,7 @@ i16 wsnet_init(void) {
             NormalDialog(
 
                 "Неправильный IP адрес. Попробуйте еще раз.",
-                NORMAL_DIALOG_WAIT_FIRST
+                NORMAL_DIALOG_WAIT_OK
             );
             goto retryAddress;
         }
@@ -178,7 +178,7 @@ i16 wsnet_init(void) {
             cWSTextBuffer,
              "Поиск сервера."
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -238,7 +238,7 @@ void wsSendMessage(
                     goto sendPacket;
                 }
                 sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
                 return;
             }
         }
@@ -254,7 +254,7 @@ void wsSendMessage(
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
             return;
         }
     }
@@ -328,7 +328,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_DATA:
             ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
@@ -446,7 +446,7 @@ i32 wsWaitForHost(void) {
             }
             wsSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                NETWORK_PACKET_HERE_I_AM,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

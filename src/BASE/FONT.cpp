@@ -21,7 +21,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    i32 fileDescriptor [[maybe_unused]] = gpResourceManager->ReadWord();
+    i32 glyphOffsetY [[maybe_unused]] = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = true;
     else
@@ -69,11 +69,11 @@ void font::DrawStringExecute(
             goto next;
         }
         if (character == '{') {
-            m_suppressDraw = true;
+            m_highlight = true;
             goto next;
         }
         if (character == '}') {
-            m_suppressDraw = false;
+            m_highlight = false;
             goto next;
         }
 
@@ -87,7 +87,7 @@ void font::DrawStringExecute(
         }
         character -= ' ';
         if (character != 0) {
-            if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
+            if (mode == FONT_DRAW_DEFAULT && m_highlight == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -102,7 +102,7 @@ void font::DrawStringExecute(
                     0
                 );
             else if (mode == FONT_DRAW_YELLOW
-                     || (mode == FONT_DRAW_DEFAULT && m_suppressDraw != 0))
+                     || (mode == FONT_DRAW_DEFAULT && m_highlight != 0))
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -158,7 +158,7 @@ void font::DrawStringExecute(
 }
 
 void font::DrawString(const char* text, i32 x, i32 y, FontDrawMode mode) {
-    m_suppressDraw = false;
+    m_highlight = false;
     DrawStringExecute(text, x, y, mode, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
@@ -345,7 +345,7 @@ void font::DrawBoundedString(
         if (totalH < height)
             yPosition = (height - totalH) / CENTER_DIVISOR;
     }
-    m_suppressDraw = false;
+    m_highlight = false;
     while (position < length && line[position] != 0 && (yPosition + m_height <= height || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > height)
             ExtractLine(text, line, &position, width, &lineWidth, 1);
@@ -391,14 +391,15 @@ i32 font::LineLength(const char* text, i32 maxW) {
 }
 
 i32 font::LineWidth(const char* text) {
-    i32 width = strlen(text);
-    i32 index = 0, characterWidth = 0;
-    const char* character = text;
-    while (index < width && character[index] != 0) {
-        while (character[index] != 0 && character[index] != '\n') {
-            characterWidth += GetCharacterWidth(character[index]);
+    i32 length = strlen(text);
+    i32 index = 0, lineWidth = 0;
+    const char* cursor = text;
+
+    while (index < length && cursor[index] != 0) {
+        while (cursor[index] != 0 && cursor[index] != '\n') {
+            lineWidth += GetCharacterWidth(cursor[index]);
             index++;
         }
     }
-    return characterWidth;
+    return lineWidth;
 }

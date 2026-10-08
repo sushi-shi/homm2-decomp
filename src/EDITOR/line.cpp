@@ -205,18 +205,18 @@ void AddLineCell(i32 x, i32 y) {
     DrawLines(x - LINE_DRAW_MARGIN, y - LINE_DRAW_MARGIN, x + LINE_DRAW_MARGIN, y + LINE_DRAW_MARGIN);
 }
 
-b32 IsLineTile(TilesetId tileset, i32 index, b32 alternate) {
+b32 IsLineTile(TilesetId tileset, i32 index, b32 forRoadFlag) {
     switch (gLineType) {
         case LINE_ROAD:
             return tileset == TILESET_ROAD
-                   && ((alternate && gRoadTileJoinsAlt[index]) || (!alternate && gRoadTileJoins[index]));
+                   && ((forRoadFlag && gRoadTileIsRoad[index]) || (!forRoadFlag && gRoadTileOnLine[index]));
         case LINE_STREAM:
             return tileset == TILESET_STREAM;
     }
     return false;
 }
 
-void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate) {
+void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 forRoadFlag) {
     mapCell* cell;
     i32 y;
     i32 unusedIndex [[maybe_unused]];
@@ -240,7 +240,7 @@ void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate) {
         for (y = fromY; y <= toY; y++) {
             cell = gMap.GetCell(x, y);
             if (cell->m_objectIndex != MAPCELL_SPRITE_NONE) {
-                if (IsLineTile(cell->m_objectTileset, cell->m_objectIndex, alternate)) {
+                if (IsLineTile(cell->m_objectTileset, cell->m_objectIndex, forRoadFlag)) {
                     LINE_MAP_AT(x, y)++;
                     goto nextCell;
                 }
@@ -328,9 +328,9 @@ void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY) {
                          && !LINE_MAP_AT(x, y - 2))
                     SetLineTile(x, y, gLineTileset, ROAD_TILE_FORK_RIGHT, LINE_NO_VARIANT);
                 else
-                    SetLineTile(x, y, gLineTileset, gLineEdgeTiles[mask], LINE_NO_VARIANT);
+                    SetLineTile(x, y, gLineTileset, gRoadTiles[mask], LINE_NO_VARIANT);
             } else {
-                SetLineTile(x, y, gLineTileset, gLineTiles[mask], LINE_NO_VARIANT);
+                SetLineTile(x, y, gLineTileset, gRoadSideTiles[mask], LINE_NO_VARIANT);
             }
         }
     }
@@ -367,11 +367,11 @@ void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY) {
                 if (x < MAP_WIDTH - 1 && LINE_MAP_AT(x + 1, y))
                     mask |= STREAM_RIGHT;
                 variant = LINE_NO_VARIANT;
-                if (gLineEndTiles[mask] == STREAM_TILE_STRAIGHT)
+                if (gStreamTiles[mask] == STREAM_TILE_STRAIGHT)
                     variant = STREAM_TILE_STRAIGHT_ALT;
-                if (gLineEndTiles[mask] == STREAM_TILE_BEND)
+                if (gStreamTiles[mask] == STREAM_TILE_BEND)
                     variant = STREAM_TILE_BEND_ALT;
-                SetLineTile(x, y, gLineTileset, gLineEndTiles[mask], variant);
+                SetLineTile(x, y, gLineTileset, gStreamTiles[mask], variant);
             } else {
                 SetLineTile(x, y, gLineTileset, LINE_NO_TILE, LINE_NO_VARIANT);
             }

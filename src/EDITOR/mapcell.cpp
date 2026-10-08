@@ -70,7 +70,7 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = TILESET_NONE;
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
-    extras[index].objectHighLayer = 0;
+    extras[index].objectGroundLayer = 0;
     extras[index].objectShadow = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].overlayTileset = TILESET_NONE;
@@ -190,7 +190,7 @@ void fullMap::RemoveExtraObject(i32 index) {
         extra->objectTileset = next->objectTileset;
         extra->objectIndex = next->objectIndex;
         extra->animatedObject = next->animatedObject;
-        extra->objectHighLayer = next->objectHighLayer;
+        extra->objectGroundLayer = next->objectGroundLayer;
         extra->objectShadow = next->objectShadow;
         extra->objectDrawnAsOverlay = next->objectDrawnAsOverlay;
         RemoveExtraObject(nextExtraIndex);
@@ -203,7 +203,7 @@ void fullMap::RemoveExtraObject(i32 index) {
         extra->objectTileset = TILESET_NONE;
         extra->objectIndex = MAPCELL_SPRITE_NONE;
         extra->animatedObject = 0;
-        extra->objectHighLayer = 0;
+        extra->objectGroundLayer = 0;
         extra->objectShadow = 0;
         extra->objectDrawnAsOverlay = 0;
     }
@@ -223,7 +223,7 @@ void fullMap::RemoveCellObject(i32 x, i32 y) {
         cell->m_objectTileset = extra->objectTileset;
         cell->m_objectIndex = extra->objectIndex;
         cell->m_animatedObject = extra->animatedObject;
-        cell->m_objectHighLayer = extra->objectHighLayer;
+        cell->m_objectGroundLayer = extra->objectGroundLayer;
         cell->m_objectShadow = extra->objectShadow;
         cell->m_objectDrawnAsOverlay = extra->objectDrawnAsOverlay;
         cell->m_triggerType = MAP_OBJECT_NONE;
@@ -238,7 +238,7 @@ void fullMap::RemoveCellObject(i32 x, i32 y) {
         cell->m_objectTileset = TILESET_NONE;
         cell->m_objectIndex = MAPCELL_SPRITE_NONE;
         cell->m_animatedObject = 0;
-        cell->m_objectHighLayer = 0;
+        cell->m_objectGroundLayer = 0;
         cell->m_objectShadow = 0;
         cell->m_objectDrawnAsOverlay = 0;
         cell->m_objectMetadata = 0;
@@ -256,14 +256,14 @@ void fullMap::PushCellObject(i32 x, i32 y) {
     extra->animatedObject = cell->m_animatedObject;
     extra->objectTileset = cell->m_objectTileset;
     extra->objectIndex = cell->m_objectIndex;
-    extra->objectHighLayer = cell->m_objectHighLayer;
+    extra->objectGroundLayer = cell->m_objectGroundLayer;
     extra->objectShadow = cell->m_objectShadow;
     extra->objectDrawnAsOverlay = cell->m_objectDrawnAsOverlay;
     extra->objectLink = cell->m_objectLink;
     cell->m_animatedObject = 0;
     cell->m_objectTileset = TILESET_NONE;
     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
-    cell->m_objectHighLayer = 0;
+    cell->m_objectGroundLayer = 0;
     cell->m_objectShadow = 0;
     cell->m_objectDrawnAsOverlay = 0;
     cell->m_objectLink = 0;
@@ -463,7 +463,7 @@ void fullMap::ChangeTilesetIndex(
                     extraIndex = extra->nextIndex;
                 } else {
                     extra->animatedObject = 0;
-                    extra->objectHighLayer = 0;
+                    extra->objectGroundLayer = 0;
                     extra->objectShadow = 0;
                     extra->objectDrawnAsOverlay = 0;
                     extra->objectTileset = newTileset;
@@ -484,7 +484,7 @@ void fullMap::ChangeTilesetIndex(
             }
         } else {
             cell->m_animatedObject = 0;
-            cell->m_objectHighLayer = 0;
+            cell->m_objectGroundLayer = 0;
             cell->m_objectShadow = 0;
             cell->m_objectDrawnAsOverlay = 0;
             cell->m_objectTileset = newTileset;

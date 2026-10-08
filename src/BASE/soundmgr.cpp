@@ -39,7 +39,7 @@ static PCMWAVEFORMAT gWaveFormat = {};
 #define NORMALIZED_VOLUME_MAX 127.0f
 
 bool gSoundDisabled = false;
-bool gSoundBackendsReady = false;
+bool gbSoundEnabled = false;
 
 void soundManager::ShutdownSoundBackends(void) {
     if (IsMilesBackend(this)) {
@@ -107,7 +107,7 @@ bool soundManager::StartupMilesBackend(void) {
     }
 
     StartupMilesSamples(m_digitalDriver);
-    gSoundBackendsReady = true;
+    gbSoundEnabled = true;
     return MIDIStartup();
 }
 
@@ -162,7 +162,7 @@ soundManager::soundManager(void) : baseManager() {
     m_backend = SOUND_BACKEND_NONE;
     m_savedBackend = SOUND_BACKEND_NONE;
     m_active = false;
-    gSoundBackendsReady = false;
+    gbSoundEnabled = false;
     m_digitalDriver = NULL;
     m_audiereDevice = NULL;
     m_musicFadeTargetTrack = MIDI_NO_TRACK;
@@ -225,7 +225,7 @@ i32 soundManager::Open(i32) {
     if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         if (!CDStartup()) {
             StartupMilesBackend();
-            if (MusicFlagsActive()) {
+            if (MidiUnavailable()) {
                 gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
             } else {
@@ -235,7 +235,7 @@ i32 soundManager::Open(i32) {
         }
     } else {
         StartupMilesBackend();
-        if (MusicFlagsActive()) {
+        if (MidiUnavailable()) {
             if (CDStartup()) {
                 gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
                 WritePrefs();
@@ -270,7 +270,7 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
 }
 
 void soundManager::StopAllSamples(i32 stopMusic) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
 
     if (IsAudiereBackend(this)) {
@@ -300,7 +300,7 @@ void soundManager::ModifySample(
     class sample* sampleResource,
     i32 volume
 ) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (IsAudiereBackend(this)) {
         SetAudiereSampleVolume(sampleResource, volume);
@@ -319,14 +319,14 @@ bool soundManager::DigitalReport(class sample* sampleResource) {
 }
 
 void soundManager::AdjustSoundVolumes(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (IsMilesBackend(this))
         AdjustMilesSampleVolumes();
 }
 
 void soundManager::AdjustMusicVolumes(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (m_musicTrack < 0)
         return;
@@ -360,7 +360,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
 }
 
 void soundManager::PlayAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (m_musicTrack == track)
         return;
@@ -440,7 +440,7 @@ void soundManager::PollSound(void) {
 }
 
 void soundManager::SwitchAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_musicTrack = track;
@@ -470,7 +470,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
 void soundManager::MemorySample(class sample* sampleResource) {
     if (sampleResource == NULL)
         return;
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
         return;
@@ -490,7 +490,7 @@ i32 soundManager::MusicPlaying(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return AudiereMusicPlaying();
     if (m_backend == SOUND_BACKEND_MILES) {
-        if (MusicFlagsActive())
+        if (MidiUnavailable())
             return false;
         return MIDIIsPlaying();
     }

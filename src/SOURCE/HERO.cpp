@@ -106,7 +106,7 @@ typedef enum HeroUiConstant {
     UI_VIEW_SPELLS_SPECIAL        = 1,
     UI_CASTLE_DIALOG_ACTIVE       = 1,
     UI_ARMY_EMPTY_FRAME           = 2,
-    UI_ARTIFACT_DIALOG_ICON       = 0x1c,
+    UI_ARTIFACT_DIALOG_Y       = 0x1c,
     UI_STATUS_REGION_Y            = 459,
     UI_STATUS_REGION_HEIGHT       = 20,
     UI_FADE_STEPS                 = 8,
@@ -167,7 +167,7 @@ typedef enum HeroMobilityConstant {
     NOMAD_BOOTS_MOBILITY_BONUS = 600,
     TRAVELER_BOOTS_MOBILITY_BONUS = 300,
     AI_DIFFICULTY_MOBILITY_BONUS = 75,
-    AI_STATE_MOBILITY_BONUS = 50
+    AI_EXPLORER_MOBILITY_BONUS = 50
 } HeroMobilityConstant;
 
 typedef enum HeroSkillProbabilityBand {
@@ -267,7 +267,7 @@ i32 hero::CalcMobility(void) {
         && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
         if (gpGame->m_players[(m_owner)].m_aiPersonality == PLAYER_PERSONALITY_EXPLORER)
-            movePoints += AI_STATE_MOBILITY_BONUS;
+            movePoints += AI_EXPLORER_MOBILITY_BONUS;
     }
     return movePoints;
 }
@@ -281,7 +281,7 @@ i32 hero::HasSpell(SpellType spell) {
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
-            && m_artifactExtra[artifactIndex] == (spell)) {
+            && m_artifactSpells[artifactIndex] == (spell)) {
             return 1;
         }
     }
@@ -440,14 +440,14 @@ void hero::ViewStat(i32 stat, i32 quickView) {
     NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
-void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
+void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        sprintf(gText, gArtifactDesc[(artifact)], gSpellNames[extra]);
+        sprintf(gText, gArtifactDesc[(artifact)], gSpellNames[scrollSpell]);
         NormalDialog(
             gText,
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
             -1,
-            UI_ARTIFACT_DIALOG_ICON,
+            UI_ARTIFACT_DIALOG_Y,
             -1,
             0,
             -1,
@@ -460,7 +460,7 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
             gArtifactDesc[(artifact)],
             quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
             -1,
-            UI_ARTIFACT_DIALOG_ICON,
+            UI_ARTIFACT_DIALOG_Y,
             -1,
             0,
             -1,
@@ -488,7 +488,7 @@ void hero::Deallocate(i32 updateMap) {
     i32 oldOwner;
     i32 i;
     playerData* playerPointer;
-    i32 heroNum;
+    i32 heroSlot;
     town* curTown;
     i32 availSlot;
     fullMap* map;
@@ -523,13 +523,13 @@ void hero::Deallocate(i32 updateMap) {
 
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         DebugCheck();
-        curTown = &gpGame->m_castleRecs[m_occupiedTown];
+        curTown = &gpGame->m_castleRecs[m_locationMetadata];
         curTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
 
     if (giCurPlayer != m_owner || gpGame->m_players[(m_owner)].m_currentHero != m_id
-        || gpAdvManager->m_heroContextLocked == 0) {
-        gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, NULL, 1);
+        || gpAdvManager->m_heroMobilized == 0) {
+        gpGame->RestoreCell(m_x, m_y, m_locationType, m_locationMetadata, NULL, 1);
     }
 
     if (!gbCombatSurrender) {
@@ -537,12 +537,12 @@ void hero::Deallocate(i32 updateMap) {
             m_army.Dismiss(i);
     }
 
-    heroNum = -1;
+    heroSlot = -1;
     for (i = 0; i < playerPointer->m_heroCount; i++) {
         if (playerPointer->m_heroIds[i] == m_id)
-            heroNum = i;
+            heroSlot = i;
     }
-    for (i = heroNum; i < playerPointer->m_heroCount - 1; i++)
+    for (i = heroSlot; i < playerPointer->m_heroCount - 1; i++)
         playerPointer->m_heroIds[i] = playerPointer->m_heroIds[i + 1];
     playerPointer->m_heroIds[playerPointer->m_heroCount - 1] = -1;
 
@@ -555,12 +555,12 @@ void hero::Deallocate(i32 updateMap) {
             map->GetCell(m_x, m_y)->m_flags &= ~(MAP_CELL_HERO);
         }
         if (oldOwner == giCurPlayer)
-            gpAdvManager->m_heroContextLocked = false;
+            gpAdvManager->m_heroMobilized = false;
     }
 
     playerPointer->m_heroCount--;
     playerPointer->m_heroLocatorPage = 0;
-    gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
+    gpGame->m_heroOwners[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
 
     if (gbRetreatWin) {
         availSlot = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
@@ -568,13 +568,13 @@ void hero::Deallocate(i32 updateMap) {
                     .m_eventFlags) & (HERO_EVENT_RESERVED_FOR_RECRUITMENT)))) {
             availSlot = 1 - availSlot;
         }
-        if (gpGame->m_availableHeroes[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]]
+        if (gpGame->m_heroOwners[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]]
             == HERO_AVAILABILITY_FOR_HIRE) {
-            gpGame->m_availableHeroes[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]] =
+            gpGame->m_heroOwners[gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
         gpGame->m_players[(m_owner)].m_availableHeroIds[availSlot] = m_id;
-        gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_FOR_HIRE;
+        gpGame->m_heroOwners[m_id] = HERO_AVAILABILITY_FOR_HIRE;
         m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | (HERO_EVENT_RESERVED_FOR_RECRUITMENT));
     }
 
@@ -711,7 +711,7 @@ void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
     i32 levelsGained [[maybe_unused]];
-    HeroSkillProbabilityBand highIndex;
+    HeroSkillProbabilityBand probabilityBand;
     i32 slot;
     SAMPLE2 samp;
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
@@ -737,25 +737,25 @@ void hero::CheckLevel(void) {
         statBonuses[(HERO_PRIMARY_SPELL_POWER)] = 0;
         statBonuses[(HERO_PRIMARY_KNOWLEDGE)] = 0;
         if (nLevel <= HERO_LEVEL_HIGH_THRESHOLD)
-            highIndex = HERO_SKILL_PROBABILITY_LOW;
+            probabilityBand = HERO_SKILL_PROBABILITY_LOW;
         else
-            highIndex = HERO_SKILL_PROBABILITY_HIGH;
+            probabilityBand = HERO_SKILL_PROBABILITY_HIGH;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
         if (randomValue
-            < gHeroSkillBonus[(m_faction)][highIndex][(HERO_PRIMARY_ATTACK)]) {
+            < gHeroSkillBonus[(m_faction)][probabilityBand][(HERO_PRIMARY_ATTACK)]) {
             statBonuses[(HERO_PRIMARY_ATTACK)]++;
         } else {
             randomValue -=
-                gHeroSkillBonus[(m_faction)][highIndex][(HERO_PRIMARY_ATTACK)];
-            if (randomValue < gHeroSkillBonus[(m_faction)][highIndex]
+                gHeroSkillBonus[(m_faction)][probabilityBand][(HERO_PRIMARY_ATTACK)];
+            if (randomValue < gHeroSkillBonus[(m_faction)][probabilityBand]
                                              [(HERO_PRIMARY_DEFENSE)]) {
                 statBonuses[(HERO_PRIMARY_DEFENSE)]++;
             } else {
-                randomValue -= gHeroSkillBonus[(m_faction)][highIndex]
+                randomValue -= gHeroSkillBonus[(m_faction)][probabilityBand]
                                               [(HERO_PRIMARY_DEFENSE)];
-                if (randomValue < gHeroSkillBonus[(m_faction)][highIndex]
+                if (randomValue < gHeroSkillBonus[(m_faction)][probabilityBand]
                                                  [(HERO_PRIMARY_SPELL_POWER)]) {
                     statBonuses[(HERO_PRIMARY_SPELL_POWER)]++;
                 } else {
@@ -849,7 +849,7 @@ void hero::CheckLevel(void) {
                 strcat(gText, text);
                 NormalDialog(
                     gText,
-                    NORMAL_DIALOG_SHOW_BUTTONS_7_8,
+                    NORMAL_DIALOG_CHOOSE_ONE_OF_TWO,
                     -1,
                     -1,
                     NORMAL_DIALOG_SECONDARY_SKILL,
@@ -1393,7 +1393,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->m_artifacts
                                         [message.payload.widget.id - UI_ARTIFACT_FIRST],
                                     quickView,
-                                    gpHVHero->m_artifactExtra
+                                    gpHVHero->m_artifactSpells
                                         [message.payload.widget.id - UI_ARTIFACT_FIRST]
                                 );
                             }
@@ -1465,7 +1465,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
         heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
         if (heroCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
             gpHVHero->m_locationType = heroCell->m_triggerType;
-            gpHVHero->m_occupiedTown = heroCell->m_objectMetadata;
+            gpHVHero->m_locationMetadata = heroCell->m_objectMetadata;
         }
     }
 
@@ -1868,7 +1868,7 @@ HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
 
 class town* hero::GetOccupiedTown(void) {
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-        return gpGame->GetTown(m_occupiedTown);
+        return gpGame->GetTown(m_locationMetadata);
     return NULL;
 }
 
@@ -1935,7 +1935,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     );
 }
 
-void hero::CheckAnduranPieces(b32 showDialog) {
+void hero::CheckAnduranPieces(b32 checkEndGame) {
     i32 artifactSlot;
 
     if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)
@@ -1948,7 +1948,7 @@ void hero::CheckAnduranPieces(b32 showDialog) {
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog);
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, checkEndGame);
         if (gbThisNetHumanPlayer[(m_owner)]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(

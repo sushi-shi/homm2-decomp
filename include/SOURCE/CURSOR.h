@@ -42,7 +42,7 @@ typedef enum CursorConstant {
 } CursorConstant;
 
 typedef enum BoatHeroConstant {
-    BOAT_OCCUPIED_FLAG = 0x80
+    BOAT_VACATED_FLAG = 0x80
 } BoatHeroConstant;
 
 typedef enum MapChangeConstant {

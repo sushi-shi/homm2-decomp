@@ -139,7 +139,7 @@ namespace {
 
     typedef enum EarthquakeConstant {
         EARTHQUAKE_CHANCE_ROLL_MAX = 100,
-        EARTHQUAKE_KEEP_IMPACT_COUNT = 2,
+        EARTHQUAKE_GATE_IMPACT_COUNT = 2,
         EARTHQUAKE_MAX_IMPACT_DELAY = 2
     } EarthquakeConstant;
 
@@ -630,15 +630,15 @@ void combatManager::CastSpell(
     }
 
     spellSample = NULL;
-    if (m_limitCreature != 0) {
+    if (m_selectorVisible != 0) {
         ResetLimitCreature();
-        if (ValidHex(m_limitCreatureHex)
-            && m_hexCells[m_limitCreatureHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
-            m_limitCreatureCount[(m_hexCells[m_limitCreatureHex].m_occupantSide)]
-                                [m_hexCells[m_limitCreatureHex].m_occupantIndex]++;
+        if (ValidHex(m_selectorHex)
+            && m_hexCells[m_selectorHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
+            m_limitCreatureCount[(m_hexCells[m_selectorHex].m_occupantSide)]
+                                [m_hexCells[m_selectorHex].m_occupantIndex]++;
         }
-        m_limitCreature = false;
-        m_limitCreatureHex = ARMY_HEX_INVALID;
+        m_selectorVisible = false;
+        m_selectorHex = ARMY_HEX_INVALID;
         gpCombatManager->DrawFrame(1, 1, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
 
@@ -711,7 +711,7 @@ void combatManager::CastSpell(
             }
             if (targetY - castY
                 > (targetX - castX) * (m_currentSide == COMBAT_ATTACKER_SIDE ? 1 : -1)) {
-                m_heroAnimationState[(m_currentSide)] = COMBAT_HERO_CAST_HIGH;
+                m_heroAnimationState[(m_currentSide)] = COMBAT_HERO_CAST_DOWN;
                 if (m_currentSide == COMBAT_ATTACKER_SIDE) {
                     castX = sCmbtHero[m_heroSpriteIndex[(m_currentSide)]].x[1]
                             + COMBAT_HERO_LEFT_X;
@@ -724,7 +724,7 @@ void combatManager::CastSpell(
                             + COMBAT_HERO_RIGHT_Y;
                 }
             } else {
-                m_heroAnimationState[(m_currentSide)] = COMBAT_HERO_CAST_LOW;
+                m_heroAnimationState[(m_currentSide)] = COMBAT_HERO_CAST_FORWARD;
             }
         } else {
             m_heroAnimationState[(m_currentSide)] = COMBAT_HERO_CAST_NO_TARGET;
@@ -1128,7 +1128,7 @@ cast_done:
             combatArmy.m_deathPending = false;
             combatArmy.m_damagePending = false;
             combatArmy.m_drawState = ARMY_DRAW_NORMAL;
-            combatArmy.m_animationState = false;
+            combatArmy.m_attackPending = false;
             combatArmy.m_displayQuantityOverride = ARMY_QUANTITY_OVERRIDE_NONE;
         }
     }
@@ -1509,7 +1509,7 @@ void combatManager::Armageddon(void) {
         i32 pass;
         i32 color;
 
-        gpWindowManager->m_updateFlags = 0;
+        gpWindowManager->m_colorCycling = 0;
         originalPalette = gpResourceManager->GetPalette("kb.pal");
         effectPalette = new palette;
         if (!effectPalette)
@@ -1666,7 +1666,7 @@ void combatManager::Armageddon(void) {
         );
     }
     SetPalette(originalPalette->Data(), 1);
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     gpResourceManager->Dispose(originalPalette);
     delete effectPalette;
     gpMouseManager->ShowColorPointer();
@@ -2088,7 +2088,7 @@ void combatManager::DoBolt(
     drawPassCount = (angleDistance - 1) / drawDistance + 1;
     branchChance = branchDistance * BOLT_ANGLE_PERCENT_SCALE / angleDistance;
     deadline = KBTickCount();
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
 
     originalPalette = NULL;
     effectPalette = NULL;
@@ -2289,7 +2289,7 @@ boltsDone:
         gpResourceManager->Dispose(originalPalette);
         delete effectPalette;
     }
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
@@ -2347,7 +2347,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 targetDamage;
     i32 deadline;
     i32 unusedValue3 [[maybe_unused]];
-    i32 branchDistance;
+    i32 angleDistance;
 
     firstBolt = true;
     damage = spellPower * CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
@@ -2377,12 +2377,12 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         deltaX = abs(targetX - startX);
         deltaY = abs(targetY - startY);
         distance = INTEGER_VECTOR_LENGTH(deltaX, deltaY);
-        branchDistance = distance / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
-        if (branchDistance > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
-            branchDistance = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
-        if (branchDistance < CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE)
-            branchDistance = CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE;
-        if (branchDistance > CHAIN_LIGHTNING_SHORT_BRANCH_MAX)
+        angleDistance = distance / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
+        if (angleDistance > CHAIN_LIGHTNING_MAX_ANGLE_DISTANCE)
+            angleDistance = CHAIN_LIGHTNING_MAX_ANGLE_DISTANCE;
+        if (angleDistance < CHAIN_LIGHTNING_MIN_ANGLE_DISTANCE)
+            angleDistance = CHAIN_LIGHTNING_MIN_ANGLE_DISTANCE;
+        if (angleDistance > CHAIN_LIGHTNING_SHORT_ANGLE_DISTANCE_MAX)
             forceAngle = CHAIN_LIGHTNING_LONG_FORCE_ANGLE;
         else
             forceAngle = CHAIN_LIGHTNING_SHORT_FORCE_ANGLE;
@@ -2399,7 +2399,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
             BOLT_COLOR_LIGHTNING,
             firstBolt ? CHAIN_LIGHTNING_FIRST_MIN_ANGLE : CHAIN_LIGHTNING_MIN_ANGLE,
             firstBolt ? CHAIN_LIGHTNING_FIRST_MAX_ANGLE : CHAIN_LIGHTNING_MAX_ANGLE,
-            branchDistance,
+            angleDistance,
             forceAngle,
             0,
             0,
@@ -2443,7 +2443,7 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
     gyModify = static_cast<i8*>(H2_ALLOC(LOGICAL_SCREEN_HEIGHT));
     memset(gyModify, 0, LOGICAL_SCREEN_HEIGHT);
     height = giMaxExtentY - giMinExtentY + 1;
-    target->m_palette = gyModify;
+    target->m_yModify = gyModify;
     target->m_showQuantity = false;
 
     firstY = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
@@ -2474,7 +2474,7 @@ void combatManager::VaporizeCreature(CombatSide side, i32 armyIndex) {
         }
     }
     DelayMilli(static_cast<i32l>(SPELL_VANISH_END_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]));
-    target->m_palette = NULL;
+    target->m_yModify = NULL;
     target->m_showQuantity = true;
     H2_FREE(gyModify);
     gyModify = NULL;
@@ -2546,7 +2546,7 @@ void combatManager::RippleCreature(
             * RIPPLE_WAVE_RANGE
         );
     }
-    target->m_palette = gyModify;
+    target->m_yModify = gyModify;
     target->m_showQuantity = false;
     giMinExtentX -= RIPPLE_MARGIN;
     giMaxExtentX += RIPPLE_MARGIN;
@@ -2605,7 +2605,7 @@ void combatManager::RippleCreature(
         gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
     }
     DelayMilli(static_cast<i32l>(SPELL_VANISH_END_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]));
-    target->m_palette = NULL;
+    target->m_yModify = NULL;
     target->m_showQuantity = true;
     H2_FREE(gyModify);
     delete[] wave;
@@ -2757,7 +2757,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     target = NULL;
     effect = gsSpellInfo[(spell)].combatEffect;
     animateCreatures = false;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     ShowSpellMessage(0, spell, NULL);
     memset(affected, 0, sizeof(affected));
 
@@ -2907,7 +2907,7 @@ applySpellInfluence:
         }
     }
     DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 
 void combatManager::MirrorImage(i32 targetHex) {
@@ -3447,7 +3447,7 @@ void combatManager::Earthquake(void) {
     i32 impactPositions[EARTHQUAKE_MAX_IMPACTS][(COORDINATE_AXIS_COUNT)];
     i32 impactCount;
     i32 index;
-    CombatDrawbridgeState newKeepState;
+    CombatDrawbridgeState newGateState;
     i32 impactDelay[EARTHQUAKE_MAX_IMPACTS];
     icon* cloudIcon;
     i32 impact;
@@ -3561,10 +3561,10 @@ void combatManager::Earthquake(void) {
         }
     }
 
-    newKeepState = m_drawbridgeState;
+    newGateState = m_drawbridgeState;
     if (m_drawbridgeState != COMBAT_CASTLE_GATE_DESTROYED
-        && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_KEEP_HIT_CHANCE) {
-        newKeepState = COMBAT_CASTLE_GATE_DESTROYED;
+        && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_GATE_HIT_CHANCE) {
+        newGateState = COMBAT_CASTLE_GATE_DESTROYED;
         impactPositions[impactCount][(COORDINATE_AXIS_X)] = towerPos[0][(COORDINATE_AXIS_X)];
         impactPositions[impactCount][(COORDINATE_AXIS_Y)] =
             towerPos[0][(COORDINATE_AXIS_Y)] + EARTHQUAKE_CLOUD_Y_OFFSET;
@@ -3615,7 +3615,7 @@ void combatManager::Earthquake(void) {
                         newWallStates[impact];
                     m_wallStates[impact] = newTowerStates[impact];
                 }
-                m_drawbridgeState = newKeepState;
+                m_drawbridgeState = newGateState;
             }
         }
         gpResourceManager->Dispose(cloudIcon);

@@ -38,7 +38,7 @@ public:
     char m_unused04[STRIP_RUNTIME_GAP_SIZE];
     i32 m_x;
     i32 m_y;
-    i32 m_stripType;
+    i32 m_unusedStripType;
     i32 m_selectedSlot;
     border* m_borders[STRIP_BORDER_COUNT];
     icon* m_stripIcon;

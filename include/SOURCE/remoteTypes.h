@@ -28,7 +28,7 @@ typedef enum NetPlayerInfoConstant {
 
 enum {
     NETWORK_PACKET_DATA           = 1,
-    NETWORK_PACKET_GUEST_ARRIVED  = 2,
+    NETWORK_PACKET_HERE_I_AM  = 2,
     NETWORK_PACKET_STARTUP        = 3,
     NETWORK_PACKET_GUEST_ACCEPTED = 4,
     NETWORK_PACKET_GUEST_REJECTED = 5

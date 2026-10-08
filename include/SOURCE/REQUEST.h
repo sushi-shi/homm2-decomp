@@ -66,8 +66,8 @@ struct SMapHeader {
 
     u8 noStartingHero;
     i8 playerRace[GAME_PLAYER_COUNT];
-    u16 victoryTownY;
-    u16 lossTownY;
+    u16 victoryConditionY;
+    u16 lossConditionY;
     u16 victorySideThreshold;
 
     u8 reserved32[MAP_HEADER_RESERVED_SIZE];

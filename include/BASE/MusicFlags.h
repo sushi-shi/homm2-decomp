@@ -4,12 +4,12 @@
 #include <H2/Ints.h>
 
 
-extern u8 gMusicFlagA;
-extern u8 gMusicFlagB;
-extern u8 gMusicFeatureEnabled;
+extern u8 gMidiReady;
+extern u8 gMidiStarted;
+extern u8 gMidiOpenFailed;
 
-u8 GetMusicFlagA(void);
-u8 GetMusicFlagB(void);
-u8 MusicFlagsActive(void);
+u8 MidiReady(void);
+u8 MidiStarted(void);
+u8 MidiUnavailable(void);
 
 #endif

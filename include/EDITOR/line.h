@@ -35,8 +35,8 @@ void SetLineType(i32 type);
 void AddLineCell(i32 x, i32 y);
 
 
-b32 IsLineTile(TilesetId tileset, i32 index, b32 alternate);
-void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate);
+b32 IsLineTile(TilesetId tileset, i32 index, b32 forRoadFlag);
+void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 forRoadFlag);
 void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY);

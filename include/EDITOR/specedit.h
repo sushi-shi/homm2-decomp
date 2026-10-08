@@ -10,6 +10,7 @@ class heroWindow;
 
 extern heroWindow* gSpecWindow;
 
+
 extern i32 gLandPercent;
 
 

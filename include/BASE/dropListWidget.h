@@ -49,8 +49,8 @@ public:
     i16 m_dropButtonY;
     i16 m_dropButtonWidth;
     i16 m_dropButtonHeight;
-    i16 m_iconX;
-    i16 m_iconY;
+    i16 m_closedContentX;
+    i16 m_closedContentY;
     i16 m_closedContentWidth;
     i16 m_closedContentHeight;
     i16 m_firstRowHeight;

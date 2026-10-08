@@ -28,7 +28,7 @@ enum {
     WIDGET_RECORD_DIMMER                = 0x40,
     WIDGET_RECORD_TEXT_ENTRY            = 0x100,
     WIDGET_RECORD_TEXT_ENTRY_RECT       = 0x201,
-    WIDGET_RECORD_TEXT_ENTRY_MULTILINE  = 0x202,
+    WIDGET_RECORD_TEXT_ENTRY_SCROLLING  = 0x202,
     WIDGET_RECORD_DROP_LIST             = 0x203,
     WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE = 0x204,
     WIDGET_RECORD_LIST_BOX              = 0x205,
@@ -139,9 +139,9 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
                 pTextEnt->Read(TEXT_ENTRY_READ_RECT);
                 pWidget = pTextEnt;
                 break;
-            case WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
+            case WIDGET_RECORD_TEXT_ENTRY_SCROLLING:
                 pTextEnt = new textEntryWidget();
-                pTextEnt->Read(TEXT_ENTRY_READ_MULTILINE);
+                pTextEnt->Read(TEXT_ENTRY_READ_SCROLLING);
                 pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
@@ -338,10 +338,10 @@ void heroWindow::RestoreBackground(void) {
 }
 
 void heroWindow::MoveWindow(i32 dx, i32 dy) {
-    i32 x = m_posX;
-    i32 yPrev = m_posY;
-    i32 oldWidth = m_winWidth;
-    i32 oldHgt = m_winHeight;
+    i32 dirtyX = m_posX;
+    i32 dirtyY = m_posY;
+    i32 dirtyWidth = m_winWidth;
+    i32 dirtyHeight = m_winHeight;
     i32 destinationX = m_posX + dx;
     i32 destinationY = m_posY + dy;
     if (destinationX < 0)
@@ -357,11 +357,11 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
     m_posY = destinationY;
     m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
     DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
-    oldWidth = oldWidth + abs(m_posX - x);
-    oldHgt = oldHgt + abs(m_posY - yPrev);
-    if (m_posX < x)
-        x = m_posX;
-    if (m_posY < yPrev)
-        yPrev = m_posY;
-    gpWindowManager->UpdateScreenRegion(x, yPrev, oldWidth, oldHgt);
+    dirtyWidth = dirtyWidth + abs(m_posX - dirtyX);
+    dirtyHeight = dirtyHeight + abs(m_posY - dirtyY);
+    if (m_posX < dirtyX)
+        dirtyX = m_posX;
+    if (m_posY < dirtyY)
+        dirtyY = m_posY;
+    gpWindowManager->UpdateScreenRegion(dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 }

@@ -99,7 +99,7 @@ struct mapHeroExtra {
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
     i8 skillLevels[HERO_SECONDARY_SKILL_CAPACITY];
-    char unknown2c;
+    char unused2c;
     u8 hasCustomName;
     char name[EVENT_RECORD_HERO_NAME_SIZE];
     u8 hasPatrol;
@@ -266,7 +266,7 @@ typedef enum MapEventSpatialConstant {
 } MapEventSpatialConstant;
 
 typedef enum MapEventDisplayConstant {
-    MINE_RESOURCE_ICON_OFFSET = 59,
+    EVENT_TEXT_MINE_CAPTURED_BASE = 59,
     BOAT_RESTORE_MODE         = 2,
     ORACLE_WINDOW_TEXT_ID     = 14,
 } MapEventDisplayConstant;
@@ -286,7 +286,6 @@ enum {
 };
 typedef i32 FlotsamReward;
 typedef enum MonsterInteractionConstant {
-    MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,
     MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR    = 4,
@@ -304,8 +303,8 @@ typedef enum EventEffectConstant {
     EVENT_WHIRLPOOL_TRIGGER_ROLL     = 1,
     EVENT_WHIRLPOOL_TRIGGER_MAX      = 3,
     EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT = 99999999,
-    EVENT_FIZZLE_HERO_LOSS           = 0,
-    EVENT_FIZZLE_ARTIFACT            = 1,
+    EVENT_FIZZLE_KILL           = 0,
+    EVENT_FIZZLE_PICKUP            = 1,
     EVENT_FIZZLE_X                   = 168,
     EVENT_FIZZLE_Y                   = 160,
     EVENT_FIZZLE_WIDTH               = 132,
@@ -331,7 +330,7 @@ typedef enum ArtifactEventMode {
     ARTIFACT_EVENT_MODE_RESOURCE_3 = 6,
     ARTIFACT_EVENT_MODE_RESOURCE_5 = 7,
 
-    ARTIFACT_EVENT_MODE_UNKNOWN_2  = 2,
+    ARTIFACT_EVENT_MODE_UNUSED_2  = 2,
 } ArtifactEventMode;
 
 #endif

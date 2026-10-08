@@ -38,7 +38,7 @@ typedef enum CastleControl {
     CONTROL_CAPTAIN_STATS                      = 1104,
     CONTROL_CAPTAIN_VALUES                     = 1105,
     CONTROL_CAPTAIN_FLAG                       = 1106,
-    CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE  = 213,
+    CONTROL_CAPTAIN_FORMATION_SPREAD_SELECTED  = 213,
     CONTROL_CAPTAIN_FORMATION_SPREAD           = 214,
     CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE = 215,
     CONTROL_CAPTAIN_FORMATION_GROUPED          = 216,
@@ -105,7 +105,7 @@ namespace {
     inline i32 CannotRecruitHero(void) {
         b32 cannot;
 
-        if (!(gpTownManager->m_recruitResult != 0
+        if (!(gpTownManager->m_heroRecruited != 0
               || gpCurPlayer->m_resources[(RES_GOLD)] < gHeroGoldCost
               || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
               || gpTownManager->m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE))
@@ -319,7 +319,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         message.payload.widget.command = m_town->m_formation != TOWN_FORMATION_SPREAD
                                               ? WIDGET_COMMAND_CLEAR_FLAGS
                                               : WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE;
+        message.payload.widget.id = CONTROL_CAPTAIN_FORMATION_SPREAD_SELECTED;
         message.payload.widget.data.value = (WIDGET_FLAG_DRAW);
         casWin->BroadcastMessage(message);
         message.payload.widget.command = m_town->m_formation == TOWN_FORMATION_SPREAD
@@ -354,7 +354,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         stateFrame = FRAME_CANNOT_AFFORD;
     else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY || m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         stateFrame = FRAME_CANNOT_BUILD;
-    else if (m_recruitResult != 0)
+    else if (m_heroRecruited != 0)
         stateFrame = FRAME_BUILT;
     else
         stateFrame = FRAME_NONE;
@@ -547,7 +547,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case (BUILDING_SLOT_NECROMANCER_SHRINE):
             case (BUILDING_SLOT_DOCK):
             case (BUILDING_SLOT_SPECIAL_FOUR):
-            case (BUILDING_SLOT_SPECIAL_SEVEN):
+            case (BUILDING_SLOT_STATUE):
             case (BUILDING_SLOT_SPECIAL_EIGHT):
             case (BUILDING_SLOT_SPECIAL_NINE):
             case (BUILDING_SLOT_SPECIAL_TEN):
@@ -564,9 +564,9 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case (BUILDING_SLOT_UPGRADE_FIRST):
             case (BUILDING_SLOT_UPGRADE_SECOND):
             case (BUILDING_SLOT_UPGRADE_THIRD):
-            case (BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
-            case (BUILDING_SLOT_SPECIAL_TWENTY_NINE):
-            case (BUILDING_SLOT_SPECIAL_THIRTY):
+            case (BUILDING_SLOT_UPGRADE_FOURTH):
+            case (BUILDING_SLOT_UPGRADE_FIFTH):
+            case (BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE):
                 if (H2BitTest(gpGame->m_townBuiltToday, gpTownManager->m_town->m_id)) {
                     sprintf(
                         gText,
@@ -720,7 +720,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case (BUILDING_SLOT_NECROMANCER_SHRINE):
                     case (BUILDING_SLOT_DOCK):
                     case (BUILDING_SLOT_SPECIAL_FOUR):
-                    case (BUILDING_SLOT_SPECIAL_SEVEN):
+                    case (BUILDING_SLOT_STATUE):
                     case (BUILDING_SLOT_SPECIAL_EIGHT):
                     case (BUILDING_SLOT_SPECIAL_NINE):
                     case (BUILDING_SLOT_SPECIAL_TEN):
@@ -737,9 +737,9 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case (BUILDING_SLOT_UPGRADE_FIRST):
                     case (BUILDING_SLOT_UPGRADE_SECOND):
                     case (BUILDING_SLOT_UPGRADE_THIRD):
-                    case (BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE):
-                    case (BUILDING_SLOT_SPECIAL_TWENTY_NINE):
-                    case (BUILDING_SLOT_SPECIAL_THIRTY):
+                    case (BUILDING_SLOT_UPGRADE_FOURTH):
+                    case (BUILDING_SLOT_UPGRADE_FIFTH):
+                    case (BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE):
                         if (!quickFlag) {
                             if ((((gpTownManager->m_town->m_buildings) & ((1 << (whichBuilding)))))
                                 || !(gpTownManager->m_buildableBuildings & (1 << (whichBuilding))))

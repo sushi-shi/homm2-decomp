@@ -170,8 +170,7 @@ typedef enum NetBoxLocalConstant {
     BOX_KEY_F1 = 0x3b00,
     BOX_CURSOR_GLYPH = 0x1f,
     BOX_FIRST_PRINTABLE = 0x20,
-    BOX_LAST_PRINTABLE = 0x7f,
-    BOX_REMOTE_SETUP = 0x20
+    BOX_LAST_PRINTABLE = 0x7f
 } NetBoxLocalConstant;
 
 typedef enum PollSoundConstant {
@@ -193,8 +192,8 @@ typedef enum CommandLineConstant {
     LINE_HUMAN_PLAYER_SLOTS = 4,
     LINE_TCP_MIN_PLAYERS = 2,
     LINE_FRAME_STEP = 6,
-    LINE_TCP_TYPE_DEFAULT = 0,
-    LINE_TCP_TYPE_L = 1,
+    LINE_TCP_NEW_GAME = 0,
+    LINE_TCP_LOAD_GAME = 1,
     LINE_TCP_CLIENT = 0,
     LINE_TCP_HOST = 1,
     LINE_SINGLE_PLAYER = 1
@@ -203,7 +202,7 @@ typedef enum CommandLineConstant {
 typedef enum InitMenuConstant {
     MENU_FIRST_COMMAND = OLD_MAIN_NEW_GAME,
     MENU_LAST_ACTION = 0x6b,
-    MENU_MOVIE = 0x6b,
+    MENU_MM6_TRAILER = 0x6b,
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
@@ -425,7 +424,7 @@ i32 oldmain(void) {
     b32 quit;
     b32 mainScreenLoaded;
     b32 firstMainScreen;
-    i32 savedUpdateFlags;
+    i32 savedColorCycling;
     i32 player;
     i32 unusedMainState [[maybe_unused]];
     i32 unusedMenuState [[maybe_unused]];
@@ -449,7 +448,7 @@ i32 oldmain(void) {
     LogStr("OM3");
     KBChangeMenu(hmnuDflt);
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
     gpMouseManager->SetPointer(
@@ -486,13 +485,13 @@ i32 oldmain(void) {
             0
         );
         if (!gbSkipIntro) {
-            savedUpdateFlags = gpWindowManager->m_updateFlags;
-            gpWindowManager->m_updateFlags = 0;
+            savedColorCycling = gpWindowManager->m_colorCycling;
+            gpWindowManager->m_colorCycling = 0;
             if (PlaySmacker(OLD_MAIN_INTRO_PUBLISHER_VIDEO)
-                && PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO)
-                && PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO))
-                PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
-            gpWindowManager->m_updateFlags = savedUpdateFlags;
+                && PlaySmacker(CYBERLORE_LOGO_VIDEO)
+                && PlaySmacker(NWC_LOGO_VIDEO))
+                PlaySmacker(EXPANSION_INTRO_VIDEO);
+            gpWindowManager->m_colorCycling = savedColorCycling;
         }
     }
 
@@ -535,7 +534,7 @@ i32 oldmain(void) {
         }
         mainScreenLoaded = true;
         if (gGameCommand != OLD_MAIN_EXIT)
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
 
         if (giTCPHostStatus != -1 && gbTCPFirstTime) {
             gbTCPFirstTime = false;
@@ -568,34 +567,34 @@ i32 oldmain(void) {
             if (giMenuCommand != -1) {
             process_menu_command:
                 switch (giMenuCommand) {
-                    case APP_MENU_LOAD_0:
-                    case APP_MENU_LOAD_1:
-                    case APP_MENU_LOAD_2:
-                    case APP_MENU_LOAD_3:
-                    case APP_MENU_LOAD_4:
-                    case APP_MENU_LOAD_5:
-                    case APP_MENU_LOAD_6:
-                    case APP_MENU_LOAD_7:
-                    case APP_MENU_LOAD_8:
-                    case APP_MENU_LOAD_9:
-                    case APP_MENU_LOAD_10:
+                    case APP_MENU_LOAD_STANDARD_GAME:
+                    case APP_MENU_LOAD_CAMPAIGN_GAME:
+                    case APP_MENU_LOAD_HOT_SEAT_2:
+                    case APP_MENU_LOAD_HOT_SEAT_3:
+                    case APP_MENU_LOAD_HOT_SEAT_4:
+                    case APP_MENU_LOAD_NETWORK_HOST:
+                    case APP_MENU_LOAD_NETWORK_GUEST:
+                    case APP_MENU_LOAD_MODEM_HOST:
+                    case APP_MENU_LOAD_MODEM_GUEST:
+                    case APP_MENU_LOAD_DIRECT_HOST:
+                    case APP_MENU_LOAD_DIRECT_GUEST:
                         if (!gpGame->PickLoadGame())
                             goto main_menu;
                         break;
-                    case APP_MENU_RESTART_0:
-                    case APP_MENU_RESTART_1:
-                    case APP_MENU_RESTART_2:
-                    case APP_MENU_RESTART_3:
-                    case APP_MENU_RESTART_4:
-                    case APP_MENU_RESTART_5:
-                    case APP_MENU_RESTART_6:
-                    case APP_MENU_RESTART_7:
-                    case APP_MENU_RESTART_8:
-                    case APP_MENU_RESTART_9:
-                    case APP_MENU_RESTART_10:
-                    case APP_MENU_RESTART_11:
-                    case APP_MENU_RESTART_12:
-                    case APP_MENU_RESTART_13:
+                    case APP_MENU_NEW_STANDARD_GAME:
+                    case APP_MENU_NEW_CAMPAIGN_1:
+                    case APP_MENU_NEW_CAMPAIGN_2:
+                    case APP_MENU_NEW_CAMPAIGN_3:
+                    case APP_MENU_NEW_CAMPAIGN_4:
+                    case APP_MENU_NEW_HOT_SEAT_2:
+                    case APP_MENU_NEW_HOT_SEAT_3:
+                    case APP_MENU_NEW_HOT_SEAT_4:
+                    case APP_MENU_NEW_NETWORK_HOST:
+                    case APP_MENU_NEW_NETWORK_GUEST:
+                    case APP_MENU_NEW_MODEM_HOST:
+                    case APP_MENU_NEW_MODEM_GUEST:
+                    case APP_MENU_NEW_DIRECT_HOST:
+                    case APP_MENU_NEW_DIRECT_GUEST:
                         if (!gpGame->NewGame())
                             goto main_menu;
                         break;
@@ -740,6 +739,8 @@ i32 oldmain(void) {
                     if (matchedNetPlayers[netPlayer])
                         continue;
                     if (gbHumanPlayer[netPlayer]) {
+
+
                         gbGamePosToNetPos[netPlayer] = static_cast<i8>(gamePlayer);
                         strcpy(
                             &gpGame->m_defaultPlayerNames
@@ -799,7 +800,7 @@ i32 oldmain(void) {
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
                 NormalDialog(
                     "Ожидаю получения игровых данных.",
-                    NORMAL_DIALOG_WAIT_LAST
+                    NORMAL_DIALOG_WAIT_CANCEL
                 );
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
@@ -813,7 +814,7 @@ i32 oldmain(void) {
             }
 
         initialize_game:
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
             if (gShingleAnim)
                 gpResourceManager->Dispose(gShingleAnim);
             gShingleAnim = NULL;
@@ -889,7 +890,7 @@ i32 oldmain(void) {
             );
 
             if (giEndSequence != 1) {
-                gpWindowManager->m_updateFlags = 0;
+                gpWindowManager->m_colorCycling = 0;
                 if (xIsExpansionMap)
                     PlaySmacker(EXPANSION_DEFEAT_VIDEO);
                 else
@@ -903,7 +904,7 @@ i32 oldmain(void) {
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-                gpWindowManager->m_updateFlags = 1;
+                gpWindowManager->m_colorCycling = 1;
                 mainScreenLoaded = true;
                 gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
             } else {
@@ -921,8 +922,8 @@ i32 oldmain(void) {
                         gbShowHighScore = true;
                         ShowCongrats(HIGH_SCORE_CAMPAIGN);
                         AddScoreToHighScore(
-                            gpGame->m_campaignScore,
-                            gpGame->m_campaignScore,
+                            gpGame->m_campaignTotalDays,
+                            gpGame->m_campaignTotalDays,
                             0,
                             HIGH_SCORE_CAMPAIGN,
                             const_cast<char*>(gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
@@ -981,7 +982,7 @@ i32 oldmain(void) {
                             LOGICAL_SCREEN_HEIGHT
                         );
                         gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-                        gpWindowManager->m_updateFlags = 1;
+                        gpWindowManager->m_colorCycling = 1;
                         mainScreenLoaded = true;
                         gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                     } else {
@@ -1093,9 +1094,9 @@ i32 InterpretCommandLine(void) {
                         switch (toupper(gcCommandLine[i + 2])) {
                             case 'T':
                                 if (i + 3 < size && toupper(gcCommandLine[i + 3]) == 'L') {
-                                    giTCPType = LINE_TCP_TYPE_L;
+                                    giTCPType = LINE_TCP_LOAD_GAME;
                                 } else {
-                                    giTCPType = LINE_TCP_TYPE_DEFAULT;
+                                    giTCPType = LINE_TCP_NEW_GAME;
                                 }
                                 break;
                             case 'S':
@@ -1254,7 +1255,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
             switch (message.payload.widget.command) {
                 case WIDGET_NOTIFY_SELECT:
-                    if (message.payload.widget.id == MENU_MOVIE)
+                    if (message.payload.widget.id == MENU_MM6_TRAILER)
                         break;
                     menu = message.payload.widget.id - MENU_FIRST_COMMAND;
                     index = menu + MENU_WIDGET_OFFSET;
@@ -1272,8 +1273,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                     );
                     break;
                 case WIDGET_NOTIFY_DESELECT:
-                    if (message.payload.widget.id == MENU_MOVIE) {
-                        PlaySmacker(MENU_MOVIE_SMACKER);
+                    if (message.payload.widget.id == MENU_MM6_TRAILER) {
+                        PlaySmacker(MM6_TRAILER_VIDEO);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
                             gpWindowManager->m_screen,
@@ -1404,11 +1405,11 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case DIALOG_BUTTON_1:
-                        gpTownManager->m_recruitState = -1;
+                        gpTownManager->m_recruitSlot = -1;
                         shouldClose = true;
                         break;
                     case DIALOG_BUTTON_2:
-                        gpTownManager->m_recruitState = 0;
+                        gpTownManager->m_recruitSlot = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
                         break;
@@ -1426,7 +1427,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading) {
     char buffer[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         sprintf(buffer, xNecromancerShrineDesc);
@@ -1451,7 +1452,7 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
         );
         return gText;
     }
-    if (mode) {
+    if (withHeading) {
         sprintf(
             gText,
             "{%s}\n\n%s",
@@ -1563,7 +1564,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
     }
     if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
-    if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
+    if (building == BUILDING_SLOT_TENT || building == BUILDING_SLOT_BOAT
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
         || building == BUILDING_SLOT_DISABLED_FOURTH || building == BUILDING_SLOT_DISABLED_LAST)
         return 0;
@@ -1599,7 +1600,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         curMask |= (TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_mageGuildLevel <= 1)
+            && building == BUILDING_SLOT_UPGRADE_FOURTH && townPointer->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1619,7 +1620,7 @@ i32 CanBuy(town* townPointer, BuildingSlotType type) {
 }
 
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
-    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_TENT)
         return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
         if (building > BUILDING_SLOT_NEUTRAL_LAST)
@@ -1850,8 +1851,8 @@ void PlayerDead(i32 player) {
         GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
     }
     for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
-        if (gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
-            gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] = -1;
+        if (gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] == HERO_AVAILABILITY_FOR_HIRE)
+            gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] = -1;
     }
     if (gbRemoteOn) {
         if (gbHumanPlayer[player])
@@ -1899,7 +1900,7 @@ void CheckEndGame(
     hero* artifactHeroPointer;
     i32 artifactWinnerPerson;
     hero* lossHero;
-    hero* winningHeroEntry;
+    hero* victoryHero;
     i32 winnerPlayer;
     char campaignSaveName[END_GAME_CAMPAIGN_SAVE_NAME_SIZE];
     i32 campaignHeroIndex;
@@ -2078,7 +2079,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
         victoryTownData = gpGame->GetTown(gpGame->GetTownId(
             gpGame->m_mapHeader.victoryConditionValue,
-            gpGame->m_mapHeader.victoryTownY
+            gpGame->m_mapHeader.victoryConditionY
         ));
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
             && (gbHumanPlayer[(victoryTownData->m_owner)] || gpGame->m_mapHeader.computerAlsoWins)) {
@@ -2109,7 +2110,7 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
         lossTown = gpGame->GetTown(
-            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
+            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossConditionY)
         );
         if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[(lossTown->m_owner)]) {
             defeated = true;
@@ -2160,16 +2161,16 @@ void CheckEndGame(
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
-        winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
-        if (winningHeroEntry->m_owner < 0 || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
-            || gbHumanPlayer[(winningHeroEntry->m_owner)]) {
+        victoryHero = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
+        if (victoryHero->m_owner < 0 || victoryHero->m_owner >= GAME_PLAYER_COUNT
+            || gbHumanPlayer[(victoryHero->m_owner)]) {
             winFlag = true;
             if (!showedDialog) {
                 showedDialog = true;
                 sprintf(
                     gText,
                     "%s - вражеский герой, у вас в плену! Ваше задание завершено.",
-                    winningHeroEntry->m_name
+                    victoryHero->m_name
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
@@ -2390,8 +2391,8 @@ void CheckEndGame(
             1;
         gpGame->m_campaignScenarioDays[(gpGame->m_campaignType)][gpGame->m_campaignScenario] =
             currentDayIndex;
-        gpGame->m_campaignScore =
-            gpGame->m_campaignScenarioBonus[(gpGame->m_campaignType)][gpGame->m_campaignScenario]
+        gpGame->m_campaignTotalDays =
+            gpGame->m_campaignDaysBeforeScenario[(gpGame->m_campaignType)][gpGame->m_campaignScenario]
             + gpGame->m_campaignScenarioDays[(gpGame->m_campaignType)]
                                             [gpGame->m_campaignScenario];
 
@@ -2715,11 +2716,11 @@ i32 GetMonType(i32 score, HighScoreType highScoreType) {
 i32 AddScoreToHighScore(
     i32 score,
     i32 days,
-    i32 scenario,
+    i32 difficultyRating,
     HighScoreType highScoreType,
     const char* scenarioName
 ) {
-    i32 destinationIndex;
+    i32 shiftIndex;
     HighScoreEntry entries[HIGH_SCORE_ENTRY_COUNT];
     i32 file;
     i32 entry;
@@ -2751,6 +2752,7 @@ i32 AddScoreToHighScore(
         }
     } else {
         for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
+
             read(file, &entries[entry], sizeof(entries));
         close(file);
     }
@@ -2770,8 +2772,8 @@ i32 AddScoreToHighScore(
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destinationIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; destinationIndex >= entry; destinationIndex--)
-            entries[destinationIndex + 1] = entries[destinationIndex];
+        for (shiftIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; shiftIndex >= entry; shiftIndex--)
+            entries[shiftIndex + 1] = entries[shiftIndex];
 
         GetDataEntry(
             "Пожалуйста, введите свое имя для таблицы рекордов.",
@@ -2786,7 +2788,7 @@ i32 AddScoreToHighScore(
         strcpy(entries[entry].scenarioName, scenarioName);
         entries[entry].score = score;
         entries[entry].days = days;
-        entries[entry].scenario = scenario;
+        entries[entry].difficultyRating = difficultyRating;
         entries[entry].cheated = gpGame->m_cheated;
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
             entries[entry].cheated = 1;
@@ -2831,7 +2833,7 @@ i32 WaitForOtherPlayer(void) {
     data = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
     if (data && data->type == REMOTE_MESSAGE_RELIABLE) {
         switch (data->command) {
-            case BOX_REMOTE_SETUP:
+            case REMOTE_COMMAND_NET_SETUP:
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
@@ -3306,7 +3308,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 
     gpMouseManager->HideColorPointer();
     memcpy(palette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
     realScore = baseScore * gpGame->m_difficultyRating / CONGRATS_DIFFICULTY_SCALE;
@@ -3317,7 +3319,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     } else if (highScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN) {
         sprintf(ratingText, gArmyNames[GetMonType(xCampaign.Days(), highScoreType)]);
     } else {
-        sprintf(ratingText, gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]);
+        sprintf(ratingText, gArmyNames[GetMonType(gpGame->m_campaignTotalDays, highScoreType)]);
     }
     ratingText[0] = CyrillicToUpper(ratingText[0]);
     if (gpGame->m_cheated)
@@ -3344,7 +3346,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         sprintf(
             congratsText,
             "Поздравляем!\n\nДней: %d\n\nРейтинг:\n%s\n",
-            gpGame->m_campaignScore,
+            gpGame->m_campaignTotalDays,
             ratingText
         );
     }
@@ -3364,7 +3366,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     );
     H2_FREE(congratsText);
     congratsText = NULL;
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
 }
 
@@ -3470,7 +3472,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 loopIndex;
     HeroSecondarySkill secondarySkillIndex;
     HeroSkillLevel ssLevel;
-    i32 formationHexIndex;
+    i32 overlayHex;
 
     menuChanged = false;
     currentHeroRec = NULL;
@@ -3478,34 +3480,34 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         currentHeroRec = &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()];
 
     switch (command) {
-        case APP_MENU_RESTART_0:
-        case APP_MENU_RESTART_1:
-        case APP_MENU_RESTART_2:
-        case APP_MENU_RESTART_3:
-        case APP_MENU_RESTART_4:
-        case APP_MENU_RESTART_5:
-        case APP_MENU_RESTART_6:
-        case APP_MENU_RESTART_7:
-        case APP_MENU_RESTART_8:
-        case APP_MENU_RESTART_9:
-        case APP_MENU_RESTART_10:
-        case APP_MENU_RESTART_11:
-        case APP_MENU_RESTART_12:
-        case APP_MENU_RESTART_13:
+        case APP_MENU_NEW_STANDARD_GAME:
+        case APP_MENU_NEW_CAMPAIGN_1:
+        case APP_MENU_NEW_CAMPAIGN_2:
+        case APP_MENU_NEW_CAMPAIGN_3:
+        case APP_MENU_NEW_CAMPAIGN_4:
+        case APP_MENU_NEW_HOT_SEAT_2:
+        case APP_MENU_NEW_HOT_SEAT_3:
+        case APP_MENU_NEW_HOT_SEAT_4:
+        case APP_MENU_NEW_NETWORK_HOST:
+        case APP_MENU_NEW_NETWORK_GUEST:
+        case APP_MENU_NEW_MODEM_HOST:
+        case APP_MENU_NEW_MODEM_GUEST:
+        case APP_MENU_NEW_DIRECT_HOST:
+        case APP_MENU_NEW_DIRECT_GUEST:
             strcpy(gText, "Вы действительно хотите начать сначала?  (Эта игра будет потеряна)");
             goto confirmMenuCommand;
 
-        case APP_MENU_LOAD_0:
-        case APP_MENU_LOAD_1:
-        case APP_MENU_LOAD_2:
-        case APP_MENU_LOAD_3:
-        case APP_MENU_LOAD_4:
-        case APP_MENU_LOAD_5:
-        case APP_MENU_LOAD_6:
-        case APP_MENU_LOAD_7:
-        case APP_MENU_LOAD_8:
-        case APP_MENU_LOAD_9:
-        case APP_MENU_LOAD_10:
+        case APP_MENU_LOAD_STANDARD_GAME:
+        case APP_MENU_LOAD_CAMPAIGN_GAME:
+        case APP_MENU_LOAD_HOT_SEAT_2:
+        case APP_MENU_LOAD_HOT_SEAT_3:
+        case APP_MENU_LOAD_HOT_SEAT_4:
+        case APP_MENU_LOAD_NETWORK_HOST:
+        case APP_MENU_LOAD_NETWORK_GUEST:
+        case APP_MENU_LOAD_MODEM_HOST:
+        case APP_MENU_LOAD_MODEM_GUEST:
+        case APP_MENU_LOAD_DIRECT_HOST:
+        case APP_MENU_LOAD_DIRECT_GUEST:
             strcpy(
                 gText,
                 "Вы действительно хотите загрузить новую игру? (Эта игра будет потеряна)"
@@ -3606,7 +3608,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gConfig.showRoute = 1 - gConfig.showRoute;
             menuChanged = true;
             break;
-        case APP_MENU_TOGGLE_BLACKOUT:
+        case APP_MENU_VIEW_ENEMY_MOVES:
             gConfig.blackoutComputer = 1 - gConfig.blackoutComputer;
             menuChanged = true;
             break;
@@ -3718,10 +3720,10 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;
                 }
                 for (loopIndex = 0; loopIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT; loopIndex++) {
-                    formationHexIndex =
+                    overlayHex =
                         sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
-                    if (formationHexIndex != -1)
-                        gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
+                    if (overlayHex != -1)
+                        gpCombatManager->m_hexCells[overlayHex].m_blocked = 1;
                 }
                 gpCombatManager->SetupGridForArmy(
                     &gpCombatManager->m_armies[(gpCombatManager->m_currentArmySide)]
@@ -3835,7 +3837,7 @@ void UpdateSystemOptionsMenu(void) {
     );
     CheckMenuItem(
         hmnuApp,
-        APP_MENU_TOGGLE_BLACKOUT,
+        APP_MENU_VIEW_ENEMY_MOVES,
         1 - gConfig.blackoutComputer ? MF_CHECKED : MF_UNCHECKED
     );
 }
@@ -3882,8 +3884,8 @@ typedef enum DynamicWindowConstant {
     CONTENT_LEFT = 32,
     CONTENT_TOP = 16,
     CORNER_SIZE = 72,
-    CORNER_LEFT = 40,
-    CORNER_RIGHT = 23,
+    CORNER_TOP_LEFT_INSET = 40,
+    CORNER_BOTTOM_RIGHT_INSET = 23,
     EDGE_OFFSET = 24,
     CORNER_FRAME_TOP_LEFT = 0,
     CORNER_FRAME_TOP_RIGHT = 1,
@@ -3921,10 +3923,10 @@ void SetupDynamicWindow(
     i32 bottomCornerPaddingNum [[maybe_unused]];
     i32 numRows;
     widget* newWidgetTemp;
-    i32 columnsSize;
+    i32 columnCount;
     i32 topOffsetNum;
     i32 contentXPaddingCount [[maybe_unused]];
-    i32 centeredHeightCount;
+    i32 centeredHeight;
     i32 centeredPadding [[maybe_unused]];
     i32 topCornerPaddingCount [[maybe_unused]];
     i32 bottomOffsetLocal;
@@ -3955,19 +3957,19 @@ void SetupDynamicWindow(
     centeredPadding = CONTENT_LEFT;
     stoneWidgetColorSize = CONTENT_TOP;
     newWidgetTemp = NULL;
-    columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
+    columnCount = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
-    *windowWidth = columnsSize * TILE_SIZE + WINDOW_PADDING;
+    *windowWidth = columnCount * TILE_SIZE + WINDOW_PADDING;
     *windowHeight = numRows * TILE_SIZE + WINDOW_PADDING;
-    centeredWidthValue = columnsSize * TILE_SIZE + CONTENT_LEFT;
-    centeredHeightCount = numRows * TILE_SIZE + CONTENT_LEFT;
+    centeredWidthValue = columnCount * TILE_SIZE + CONTENT_LEFT;
+    centeredHeight = numRows * TILE_SIZE + CONTENT_LEFT;
     if (centered) {
         x += ((boundsWidth - centeredWidthValue) >> 1) - CONTENT_TOP;
-        y += (boundsHeight - centeredHeightCount) >> 1;
+        y += (boundsHeight - centeredHeight) >> 1;
     }
     *contentLeft = x + CONTENT_LEFT;
     *contentTop = y + CONTENT_TOP;
-    *contentRight = *contentLeft + columnsSize * TILE_SIZE - 1;
+    *contentRight = *contentLeft + columnCount * TILE_SIZE - 1;
     *contentBottom = *contentTop + numRows * TILE_SIZE - 1;
 
     if (windowType != DYNAMIC_WINDOW_STONE)
@@ -3985,7 +3987,7 @@ void SetupDynamicWindow(
     bottomOffsetLocal = *contentBottom - y;
 
     for (tileRowPosition = 0; tileRowPosition < numRows; tileRowPosition++) {
-        for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
+        for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             newWidgetTemp = new iconWidget(
                 leftOffset + columnIndex * TILE_SIZE,
                 topOffsetNum + tileRowPosition * TILE_SIZE,
@@ -4005,8 +4007,8 @@ void SetupDynamicWindow(
     }
 
     newWidgetTemp = new iconWidget(
-        leftOffset - CORNER_LEFT,
-        topOffsetNum - CORNER_LEFT,
+        leftOffset - CORNER_TOP_LEFT_INSET,
+        topOffsetNum - CORNER_TOP_LEFT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4021,8 +4023,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - CORNER_RIGHT,
-        topOffsetNum - CORNER_LEFT,
+        rightOffset - CORNER_BOTTOM_RIGHT_INSET,
+        topOffsetNum - CORNER_TOP_LEFT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4037,8 +4039,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - CORNER_RIGHT,
-        bottomOffsetLocal - CORNER_RIGHT,
+        rightOffset - CORNER_BOTTOM_RIGHT_INSET,
+        bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4053,8 +4055,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        leftOffset - CORNER_LEFT,
-        bottomOffsetLocal - CORNER_RIGHT,
+        leftOffset - CORNER_TOP_LEFT_INSET,
+        bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -4068,10 +4070,10 @@ void SetupDynamicWindow(
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; edge < columnsSize; edge++) {
+    for (edge = 0; edge < columnCount; edge++) {
         newWidgetTemp = new iconWidget(
             leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
-            topOffsetNum - CORNER_LEFT,
+            topOffsetNum - CORNER_TOP_LEFT_INSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4087,7 +4089,7 @@ void SetupDynamicWindow(
 
         newWidgetTemp = new iconWidget(
             leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
-            bottomOffsetLocal - CORNER_RIGHT,
+            bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -4104,7 +4106,7 @@ void SetupDynamicWindow(
 
     for (edge = 0; edge < numRows; edge++) {
         newWidgetTemp = new iconWidget(
-            leftOffset - CORNER_LEFT,
+            leftOffset - CORNER_TOP_LEFT_INSET,
             topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
@@ -4120,7 +4122,7 @@ void SetupDynamicWindow(
         (*window)->AddWidget(newWidgetTemp, -1);
 
         newWidgetTemp = new iconWidget(
-            rightOffset - CORNER_RIGHT,
+            rightOffset - CORNER_BOTTOM_RIGHT_INSET,
             topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
@@ -4790,20 +4792,20 @@ void NormalDialog(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = (WIDGET_FLAG_ENABLED) | (WIDGET_FLAG_DRAW);
-    if (dialogType != NORMAL_DIALOG_SHOW_BUTTONS_7_8 && dialogType != NORMAL_DIALOG_SHOW_BUTTON_7) {
+    if (dialogType != NORMAL_DIALOG_CHOOSE_ONE_OF_TWO && dialogType != NORMAL_DIALOG_SHOW_BUTTON_7) {
         message.payload.widget.id = DIALOG_BUTTON_7;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_SHOW_BUTTONS_7_8) {
+    if (dialogType != NORMAL_DIALOG_CHOOSE_ONE_OF_TWO) {
         message.payload.widget.id = DIALOG_BUTTON_8;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_CANCEL && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_1;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
-        && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_OK && dialogType != NORMAL_DIALOG_INFO
+        && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_2;
         pNormalDialogWindow->BroadcastMessage(message);
     }
@@ -5018,7 +5020,7 @@ void NormalDialog(
             resourceFrame,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_BOTTOM_CENTERED
                                                                   : WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -5285,7 +5287,7 @@ void NormalDialog(
         MOUSE_AUTO_CURSOR_TYPE
     );
 
-    if (dialogType == NORMAL_DIALOG_WAIT_LAST || dialogType == NORMAL_DIALOG_WAIT_FIRST) {
+    if (dialogType == NORMAL_DIALOG_WAIT_CANCEL || dialogType == NORMAL_DIALOG_WAIT_OK) {
         gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, 0);
     } else if (dialogType == NORMAL_DIALOG_QUICK_VIEW) {
         gpWindowManager->AddWindow(pNormalDialogWindow, -1, 1);
@@ -6655,37 +6657,37 @@ struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_SPEED_FIRST + 2, 0, 0, 0},
     {APP_MENU_SPEED_FIRST + 3, 0, 0, 0},
     {APP_MENU_SPEED_LAST, 0, 0, 0},
-    {APP_MENU_UNKNOWN_9C6D, 0, 0, 0},
+    {APP_MENU_CD_STEREO, 0, 0, 0},
     {APP_MENU_TOGGLE_ROUTE, 0, 0, 0},
-    {APP_MENU_TOGGLE_BLACKOUT, 0, 0, 0},
+    {APP_MENU_VIEW_ENEMY_MOVES, 0, 0, 0},
     {(KBWIN_MENU_HELP), 1, 1, 0},
     {(KBWIN_MENU_ABOUT), 1, 1, 0},
-    {APP_MENU_RESTART_0, 0, 1, 0},
-    {APP_MENU_RESTART_1, 0, 1, 0},
-    {APP_MENU_RESTART_2, 0, 1, 0},
-    {APP_MENU_RESTART_3, 0, 1, 0},
-    {APP_MENU_RESTART_4, 0, 1, 0},
-    {APP_MENU_UNKNOWN_9CAD, 0, 1, 0},
-    {APP_MENU_RESTART_5, 0, 1, 0},
-    {APP_MENU_RESTART_6, 0, 1, 0},
-    {APP_MENU_RESTART_7, 0, 1, 0},
-    {APP_MENU_RESTART_8, 0, 1, 0},
-    {APP_MENU_RESTART_9, 0, 1, 0},
-    {APP_MENU_RESTART_10, 0, 1, 0},
-    {APP_MENU_RESTART_11, 0, 1, 0},
-    {APP_MENU_RESTART_12, 0, 1, 0},
-    {APP_MENU_RESTART_13, 0, 1, 0},
-    {APP_MENU_LOAD_0, 0, 1, 0},
-    {APP_MENU_LOAD_1, 0, 1, 0},
-    {APP_MENU_LOAD_2, 0, 1, 0},
-    {APP_MENU_LOAD_3, 0, 1, 0},
-    {APP_MENU_LOAD_4, 0, 1, 0},
-    {APP_MENU_LOAD_5, 0, 1, 0},
-    {APP_MENU_LOAD_6, 0, 1, 0},
-    {APP_MENU_LOAD_7, 0, 1, 0},
-    {APP_MENU_LOAD_8, 0, 1, 0},
-    {APP_MENU_LOAD_9, 0, 1, 0},
-    {APP_MENU_LOAD_10, 0, 1, 0},
+    {APP_MENU_NEW_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_1, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_2, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_3, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_4, 0, 1, 0},
+    {APP_MENU_UNUSED_9CAD, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_CAMPAIGN_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_GUEST, 0, 1, 0},
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };

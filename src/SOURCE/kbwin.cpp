@@ -113,7 +113,7 @@ i32 AppInit(
     bProcessMessage[WM_DESTROY] = 1;
     bProcessMessage[WM_QUIT] = 1;
     bProcessMessage[WM_CLOSE] = 1;
-    bProcessMessage[KBWIN_CUSTOM_CD_MESSAGE] = 1;
+    bProcessMessage[KBWIN_MCI_NOTIFY_MESSAGE] = 1;
 
     if (previousInstance == NULL) {
         appClass.hCursor = NULL;

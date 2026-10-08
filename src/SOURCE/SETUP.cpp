@@ -27,7 +27,6 @@ typedef enum SetupConstant {
     FILE_PATTERN_CAPACITY        = 12,
     FILE_REQUESTER_X             = 200,
     FILE_REQUESTER_Y             = 58,
-    DISABLED_WIDGET_ID           = 1,
     DIALOG_RESULT_MAX            = 1000,
 } SetupConstant;
 
@@ -189,7 +188,7 @@ i32 game::SetupNetworkGame(void) {
         MemError();
 
     if (gbNoCDRom != 0) {
-        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, CHOICE_ONE);
         message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -290,7 +289,7 @@ i32 game::SetupModemGame(void) {
 
     LogStr("SMC 2");
     if (gbNoCDRom != 0) {
-        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, CHOICE_ONE);
         message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -347,7 +346,7 @@ i32 game::SetupMultiPlayerGame(void) {
         MemError();
 
     if (gbNoCDRom != 0) {
-        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, DISABLED_WIDGET_ID);
+        SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FLAGS, CHOICE_ONE);
         message.payload.widget.data.value = (WIDGET_FLAGS_ARGUMENT_DIMMED);
         window->BroadcastMessage(message);
     }
@@ -418,54 +417,54 @@ i32 game::SetupGame(void) {
 
     if (giMenuCommand != -1) {
         switch (giMenuCommand) {
-            case APP_MENU_RESTART_0:
-            case APP_MENU_LOAD_0:
+            case APP_MENU_NEW_STANDARD_GAME:
+            case APP_MENU_LOAD_STANDARD_GAME:
                 break;
 
-            case APP_MENU_RESTART_5:
-            case APP_MENU_LOAD_2:
+            case APP_MENU_NEW_HOT_SEAT_2:
+            case APP_MENU_LOAD_HOT_SEAT_2:
                 giNumHumanPlayers = TWO_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
-            case APP_MENU_RESTART_6:
-            case APP_MENU_LOAD_3:
+            case APP_MENU_NEW_HOT_SEAT_3:
+            case APP_MENU_LOAD_HOT_SEAT_3:
                 giNumHumanPlayers = THREE_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
-            case APP_MENU_RESTART_7:
-            case APP_MENU_LOAD_4:
+            case APP_MENU_NEW_HOT_SEAT_4:
+            case APP_MENU_LOAD_HOT_SEAT_4:
                 giNumHumanPlayers = FOUR_PLAYERS;
                 iMPBaseType = MULTIPLAYER_BASE_HOT_SEAT;
                 break;
 
-            case APP_MENU_RESTART_8:
-            case APP_MENU_LOAD_5:
+            case APP_MENU_NEW_NETWORK_HOST:
+            case APP_MENU_LOAD_NETWORK_HOST:
                 iMPBaseType = MULTIPLAYER_BASE_NETWORK;
                 iMPExtendedType = REMOTE_GAME_NETWORK_HOST;
                 goto remoteSetup;
-            case APP_MENU_RESTART_9:
-            case APP_MENU_LOAD_6:
+            case APP_MENU_NEW_NETWORK_GUEST:
+            case APP_MENU_LOAD_NETWORK_GUEST:
                 iMPBaseType = MULTIPLAYER_BASE_NETWORK;
                 iMPExtendedType = REMOTE_GAME_NETWORK_GUEST;
                 goto remoteSetup;
-            case APP_MENU_RESTART_10:
-            case APP_MENU_LOAD_7:
+            case APP_MENU_NEW_MODEM_HOST:
+            case APP_MENU_LOAD_MODEM_HOST:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = REMOTE_GAME_MODEM_HOST;
                 goto remoteSetup;
-            case APP_MENU_RESTART_11:
-            case APP_MENU_LOAD_8:
+            case APP_MENU_NEW_MODEM_GUEST:
+            case APP_MENU_LOAD_MODEM_GUEST:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = REMOTE_GAME_MODEM_GUEST;
                 goto remoteSetup;
-            case APP_MENU_RESTART_12:
-            case APP_MENU_LOAD_9:
+            case APP_MENU_NEW_DIRECT_HOST:
+            case APP_MENU_LOAD_DIRECT_HOST:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = REMOTE_GAME_MODEM_HOST;
                 gbDirectConnect = true;
                 goto remoteSetup;
-            case APP_MENU_RESTART_13:
-            case APP_MENU_LOAD_10:
+            case APP_MENU_NEW_DIRECT_GUEST:
+            case APP_MENU_LOAD_DIRECT_GUEST:
                 iMPBaseType = MULTIPLAYER_BASE_MODEM;
                 iMPExtendedType = REMOTE_GAME_MODEM_GUEST;
                 gbDirectConnect = true;

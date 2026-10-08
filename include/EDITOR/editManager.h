@@ -229,7 +229,9 @@ public:
     iconWidget* m_verticalKnob;
     i32 m_zoomLevel;
 
+
     b32 m_mapChanged;
+
 
     i32 m_placedX;
     i32 m_placedY;
@@ -240,7 +242,7 @@ public:
     i32 m_cursorSize;
 
 
-    i32 m_animationFrame;
+    i32 m_unusedAnimationFrame;
     i32 m_animationCounter;
 
     baseManager* m_toolManager;
@@ -335,7 +337,7 @@ public:
     i32 CountNearbyObstacles(i32 x, i32 y);
     void PlaceObstacleChains(i32 density, b32 mountains);
     b32 PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset);
-    void PlaceTowns(void);
+    void PlaceCastles(void);
     b32 PlaceResourceSite(i32 x, i32 y, i32 resource);
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
@@ -379,6 +381,7 @@ extern SMapHeader gEditMapHeader;
 
 extern char* gTextFileName;
 
+
 extern b32 gVaryTiles;
 
 extern b32 gLinesRemoved;
@@ -404,6 +407,7 @@ void ShowStatusWarning(const char* text);
 
 
 i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
+
 
 i32 InMapArea(i32 x, i32 y);
 

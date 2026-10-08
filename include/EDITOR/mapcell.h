@@ -92,7 +92,7 @@ struct mapCellExtra {
     u8 objectIndex;
 
 
-    u8 objectHighLayer : 1;
+    u8 objectGroundLayer : 1;
     u8 objectShadow : 1;
     u8 objectDrawnAsOverlay : 1;
     u8 objectMetadata : 5;
@@ -116,7 +116,7 @@ class mapCell {
 public:
     u16 m_terrainImageIndex;
     union {
-        char m_objType;
+        char m_objectBits;
         u8 m_objTypeBits;
         struct {
             u8 m_animatedObject : 1;
@@ -129,14 +129,14 @@ public:
         u16 m_objectData;
         struct {
 
-            u16 m_objectHighLayer : 1;
+            u16 m_objectGroundLayer : 1;
             u16 m_objectShadow : 1;
             u16 m_objectDrawnAsOverlay : 1;
             u16 m_objectMetadata : 13;
         };
         struct {
-            u16 m_tentFlags : 3;
-            u16 m_tentColor : 13;
+            u16 m_siteFlags : 3;
+            u16 m_siteMetadata : 13;
         };
     };
     u8 m_animatedOverlay : 1;

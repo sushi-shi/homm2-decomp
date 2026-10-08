@@ -91,6 +91,8 @@ typedef enum InputManagerScanCode {
     INPUT_SCAN_F10             = 0x44,
     INPUT_SCAN_NUM_LOCK        = 0x45,
     INPUT_SCAN_SCROLL_LOCK     = 0x46,
+
+
     INPUT_SCAN_NUMPAD_7        = 0x47,
     INPUT_SCAN_NUMPAD_8        = 0x48,
     INPUT_SCAN_NUMPAD_9        = 0x49,
@@ -134,17 +136,17 @@ public:
     i32 m_readIndex;
     i32 m_writeIndex;
     b32 m_mouseMessageActive;
-    i32 field_0x742;
-    i32 field_0x746;
-    i32 field_0x74a;
-    i16 m_keyState[(INPUT_SCAN_CODE_CAPACITY)];
-    i32 field_0x84e;
+    i32 m_mouseDriverReady;
+    i32 m_relativeMouse;
+    i32 m_mouseSpeedDivisor;
+    i16 m_scanCodeTable[(INPUT_SCAN_CODE_CAPACITY)];
+    i32 m_keyboardHookInstalled;
     i32 m_requestedPriority;
     InputManagerKeyCodeType m_keyCodeType;
-    i32 m_field_0x85a;
+    i32 m_keyPrefixPending;
     MessageModifier m_modifiers;
-    i32 field_0x862;
-    i32 field_0x866;
+    i32 m_recordFile;
+    i32 m_unused866;
     inputManager(void);
     virtual i32 Open(i32 priority) override;
     virtual void Close(void) override;

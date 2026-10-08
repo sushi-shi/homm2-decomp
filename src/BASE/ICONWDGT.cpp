@@ -183,7 +183,7 @@ void iconWidget::Draw(void) {
             m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;
 
-        case WIDGET_KIND_ICON_CENTERED: {
+        case WIDGET_KIND_ICON_BOTTOM_CENTERED: {
             IconEntry* entry = GetIconEntry(m_icon, m_frame);
             x -= entry->x;
             y -= entry->y;

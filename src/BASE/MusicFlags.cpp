@@ -1,21 +1,21 @@
 #include <H2/Ints.h>
 #include <BASE/MusicFlags.h>
 
-u8 gMusicFeatureEnabled = 1;
+u8 gMidiOpenFailed = 1;
 
-u8 GetMusicFlagA(void) {
-    return gMusicFlagA;
+u8 MidiReady(void) {
+    return gMidiReady;
 }
 
-u8 MusicFlagsActive(void) {
+u8 MidiUnavailable(void) {
     b32 active;
-    if (gMusicFeatureEnabled && gMusicFlagB)
+    if (gMidiOpenFailed && gMidiStarted)
         active = true;
     else
         active = false;
     return active;
 }
 
-u8 GetMusicFlagB(void) {
-    return gMusicFlagB;
+u8 MidiStarted(void) {
+    return gMidiStarted;
 }

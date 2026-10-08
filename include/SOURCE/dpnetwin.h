@@ -54,7 +54,7 @@ enum {
     HOST_WAIT_FOR_ACCEPT    = 4,
     HOST_WAIT_FOR_STARTUP   = 5
 };
-typedef i32 DirectPlayHostState;
+typedef i32 DirectPlayJoinState;
 
 #pragma pack(pop)
 

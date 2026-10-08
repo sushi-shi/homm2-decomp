@@ -23,6 +23,7 @@ typedef enum EditorStatusBar {
 typedef enum EditorFileConstant {
     EDITOR_MAP_FILE_NAME_SIZE   = 16,
 
+
     EDITOR_CLEAR_FLAGS_DEFAULT  = 0x3fff
 } EditorFileConstant;
 
@@ -45,8 +46,8 @@ typedef enum EditorTableCount {
 
     EDIT_ZOOM_COUNT = 3,
 
-    LINE_NEIGHBOUR_MASKS = 256,
-    LINE_END_MASKS = 16,
+    ROAD_NEIGHBOUR_MASKS = 256,
+    STREAM_NEIGHBOUR_MASKS = 16,
     LINE_ROAD_TILES = 32,
     EDITOR_TERRAIN_HELP_COUNT = 14,
     EDIT_PANEL_HELP_COUNT = 16,
@@ -103,7 +104,7 @@ extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];
 
 extern b32 gScatterTerrain;
 extern b32 gGenerateUnseen;
-extern b32 gGeneratingMap;
+extern b32 gGeneratingUnseen;
 extern i32 gObjectClass;
 extern i32 gNextObjectLink;
 
@@ -112,11 +113,11 @@ extern i32 gZoomScale[EDIT_ZOOM_COUNT];
 extern i32 gZoomCellSize[EDIT_ZOOM_COUNT];
 extern i32 gZoomViewCells[EDIT_ZOOM_COUNT];
 extern i32 gZoomTileSize[EDIT_ZOOM_COUNT];
-extern u8 gLineTiles[LINE_NEIGHBOUR_MASKS];
-extern u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS];
-extern u8 gLineEndTiles[LINE_END_MASKS];
-extern u8 gRoadTileJoins[LINE_ROAD_TILES];
-extern u8 gRoadTileJoinsAlt[LINE_ROAD_TILES];
+extern u8 gRoadSideTiles[ROAD_NEIGHBOUR_MASKS];
+extern u8 gRoadTiles[ROAD_NEIGHBOUR_MASKS];
+extern u8 gStreamTiles[STREAM_NEIGHBOUR_MASKS];
+extern u8 gRoadTileOnLine[LINE_ROAD_TILES];
+extern u8 gRoadTileIsRoad[LINE_ROAD_TILES];
 extern const char* gTerrainHelp[EDITOR_TERRAIN_HELP_COUNT];
 extern const char* gEditPanelHelp[EDIT_PANEL_HELP_COUNT];
 extern const char* gEditTerrainNames[EDITOR_TERRAIN_NAME_COUNT];
@@ -131,7 +132,7 @@ extern const char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT];
 extern const char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT];
 extern const char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 
-extern const char* gClearHelp[CLEAR_HELP_COUNT];
+extern const char* gObjectPanelHelp[CLEAR_HELP_COUNT];
 
 
 class editManager;
