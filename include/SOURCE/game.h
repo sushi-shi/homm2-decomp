@@ -134,7 +134,7 @@ public:
     i8 m_townOwners[IDX(GAME_TOWN_COUNT)];
     u8 m_townBuiltToday[GAME_TOWN_BUILD_FLAG_BYTE_COUNT];
     hero m_heroRecs[IDX(GAME_HERO_COUNT)];
-    i8 m_availableHeroes[IDX(GAME_HERO_COUNT)];
+    i8 m_heroOwners[IDX(GAME_HERO_COUNT)];
     mineRecord m_mines[IDX(GAME_MINE_COUNT)];
     i8 m_mineOwners[IDX(GAME_MINE_COUNT)];
     char m_randomArtifacts[IDX(ARTIFACT_COUNT)];

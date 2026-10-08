@@ -72,7 +72,7 @@ H2_ENUM_END(CampaignDisplayConstant)
 
 // Called after the caller's map initialization, with live receivers across callbacks.
 #define PRESENT_RESTARTED_CAMPAIGN_MAP() \
-    (gpAdvManager->m_visibilityMapValid = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
+    (gpAdvManager->m_routeShown = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
      gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette), \
      gpAdvManager->SetInitialMapOrigin(), gpAdvManager->RedrawAdvScreen(1, 0), \
      gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette))

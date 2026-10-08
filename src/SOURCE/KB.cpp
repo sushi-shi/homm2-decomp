@@ -1961,8 +1961,8 @@ void PlayerDead(i32 player) {
         GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
     }
     for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
-        if (gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
-            gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] = -1;
+        if (gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
+            gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] = -1;
     }
     if (gbRemoteOn) {
         if (gbHumanPlayer[player])

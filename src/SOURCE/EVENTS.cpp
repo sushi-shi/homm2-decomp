@@ -2754,7 +2754,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 occupiedTown = NULL;
                 if (otherHero->m_locationType
                     == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-                    occupiedTown = gpGame->GetTown(otherHero->m_occupiedTown);
+                    occupiedTown = gpGame->GetTown(otherHero->m_locationMetadata);
                     occupiedTown->m_occupyingHeroId = otherHero->m_id;
                 }
                 heroCombatResult = DoCombat(
@@ -4083,7 +4083,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* freedHero;
 
     heroId = cell->m_objectMetadata;
-    if (gpGame->m_availableHeroes[heroId] != HERO_AVAILABILITY_JAILED) {
+    if (gpGame->m_heroOwners[heroId] != HERO_AVAILABILITY_JAILED) {
         NormalDialog(
             localization::Tr("event.inline.dd448d43b4794460"),
             NORMAL_DIALOG_INFO
@@ -4106,7 +4106,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         NORMAL_DIALOG_INFO
     );
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
-    gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
+    gpGame->m_heroOwners[heroId] = eventHero->m_owner;
     freedHero = &gpGame->m_heroRecs[heroId];
     EraseObj(cell, x, y);
     gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = heroId;
@@ -4118,7 +4118,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     freedHero->m_remainingMobility = freedHero->CalcMobility();
     freedHero->m_mobility = freedHero->m_remainingMobility;
     freedHero->m_locationType = cell->m_triggerType;
-    freedHero->m_occupiedTown = cell->m_objectMetadata;
+    freedHero->m_locationMetadata = cell->m_objectMetadata;
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroId;
     SendMapChange(
@@ -4462,7 +4462,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     }
 
     eventHero->m_artifacts[artifactSlot] = artifact;
-    eventHero->m_artifactExtra[artifactSlot] = artifactExtra;
+    eventHero->m_artifactSpells[artifactSlot] = artifactExtra;
     GiveTakeArtifactStat(eventHero, artifact, false);
     eventHero->CheckAnduranPieces(false);
     if (checkEndGame)
@@ -5148,12 +5148,12 @@ CombatResult advManager::CombatMonsterEvent(
         combatX = mapX;
         combatY = mapY;
     } else {
-        m_lastQuickViewX = combatX;
-        m_lastQuickViewY = combatY;
-        m_mineGuardianFacingLeft = eventHero->m_x < combatX;
+        m_combatMonsterX = combatX;
+        m_combatMonsterY = combatY;
+        m_combatMonsterFacingLeft = eventHero->m_x < combatX;
         if (ComboDraw(0))
             UpdateScreen(0, 0);
-        m_lastQuickViewX = -1;
+        m_combatMonsterX = -1;
     }
 
     CLEAR_ARMY_GROUP(*gpMonGroup);
@@ -5619,8 +5619,8 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                         );
                         destinationHero->m_artifacts[targetSlot] =
                             sourceHero->m_artifacts[sourceArtifactSlot];
-                        destinationHero->m_artifactExtra[targetSlot] =
-                            sourceHero->m_artifactExtra[sourceArtifactSlot];
+                        destinationHero->m_artifactSpells[targetSlot] =
+                            sourceHero->m_artifactSpells[sourceArtifactSlot];
                     }
                     GiveTakeArtifactStat(
                         sourceHero,
@@ -5628,7 +5628,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                         true
                     );
                     sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
-                    sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
+                    sourceHero->m_artifactSpells[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
                     break;
                 }
             }
@@ -6532,7 +6532,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             if (otherHero->m_locationType
                 == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                occupiedTown = gpGame->GetTown(otherHero->m_occupiedTown);
+                occupiedTown = gpGame->GetTown(otherHero->m_locationMetadata);
 
             if (gbHumanPlayer[IDX(otherHero->m_owner)] == 0) {
                 combatResult = gpPhilAI->QuickCombat(
@@ -7150,14 +7150,14 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     hero* releasedHero;
 
     heroId = cell->m_objectMetadata;
-    if (gpGame->m_availableHeroes[heroId] != HERO_AVAILABILITY_JAILED) {
+    if (gpGame->m_heroOwners[heroId] != HERO_AVAILABILITY_JAILED) {
         EraseObj(cell, x, y);
         return;
     }
     if (gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY)
         return;
     gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
-    gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
+    gpGame->m_heroOwners[heroId] = eventHero->m_owner;
     releasedHero = &gpGame->m_heroRecs[heroId];
     EraseObj(cell, x, y);
     gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = heroId;
@@ -7169,7 +7169,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     releasedHero->m_remainingMobility = releasedHero->CalcMobility();
     releasedHero->m_mobility = releasedHero->m_remainingMobility;
     releasedHero->m_locationType = cell->m_triggerType;
-    releasedHero->m_occupiedTown = cell->m_objectMetadata;
+    releasedHero->m_locationMetadata = cell->m_objectMetadata;
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroId;
     SendMapChange(

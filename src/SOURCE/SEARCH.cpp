@@ -61,9 +61,9 @@ i32 searchArray::BuildPath(
 #define s_directionOpen s_directionBlocked_i
 #define s_neighborY sg_neighborY
 #define s_targetCell s1_targetCell
-#define s_directionCosts s2_directionCosts
+#define s_directionOccupied s2_directionCosts
 #define s_currentCost sr_currentCost
-#define s_candidateY s_candidateY_q
+#define s_adjacentY s_candidateY_q
 #define s_mapX s_mapX_o
 #define s_adjacentMonsterX s_adjacentMonsterX_g
 #define s_targetStepCost s_targetStepCost_9
@@ -71,9 +71,11 @@ i32 searchArray::BuildPath(
 #define s_processedPointCount s_processedPointCount_m
 #define s_neighborNode sq_neighborNode
 #define s_bestTargetCost s_bestTargetCost_g
-#define s_adjacentY s_adjacentY_b
+#define s_adjacentMonsterY s_adjacentY_b
 #define s_terrain s_terrain_3
 #define s_currentHero s_currentHero_4
+#define s_directionTerrain s_possibleDirections
+#define seedMonsterCells scanMap
 #endif
 VA(0x004917d6, 0xcc2)
 void searchArray::SeedPosition(
@@ -88,11 +90,11 @@ void searchArray::SeedPosition(
     i32 targetX,
     i32 targetY,
     i32 continueSeed,
-    i32 scanMap
+    i32 seedMonsterCells
 ) {
     DATA(0x00533da0) static b32 s_hasTarget;
     DATA(0x00533da4) static b32 s_hasAdjacentMonster;
-    DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[IDX(MAP_DIRECTION_COUNT)];
+    DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_directionTerrain[IDX(MAP_DIRECTION_COUNT)];
     DATA(0x00533db0) static i32 s_neighborX;
     DATA(0x00533db4) static i32 s_remainingMobility;
     // Retail 0x00533db8: no code reads this cell. VC6 allocates an unreferenced
@@ -107,10 +109,10 @@ void searchArray::SeedPosition(
     DATA(0x00533de0) static b32 s_directionOpen;
     DATA(0x00533de4) static i32 s_neighborY;
     DATA(0x00533de8) static mapCell* s_targetCell;
-    DATA(0x00533dec) static i8 s_directionCosts[IDX(MAP_DIRECTION_COUNT)];
+    DATA(0x00533dec) static i8 s_directionOccupied[IDX(MAP_DIRECTION_COUNT)];
     DATA(0x00533df4) static i32 s_currentCost;
     DATA(0x00533df8) static mapCell* s_neighborCell;
-    DATA(0x00533dfc) static i32 s_candidateY;
+    DATA(0x00533dfc) static i32 s_adjacentY;
     DATA(0x00533e00) static i32 s_mapX;
     DATA(0x00533e04) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
     DATA(0x00533e08) static i32 s_adjacentMonsterX;
@@ -119,7 +121,7 @@ void searchArray::SeedPosition(
     DATA(0x00533e14) static i32 H2_UNUSED(s_processedPointCount);
     DATA(0x00533e18) static searchNode* s_neighborNode;
     DATA(0x00533e1c) static i32 s_bestTargetCost;
-    DATA(0x00533e20) static i32 s_adjacentY;
+    DATA(0x00533e20) static i32 s_adjacentMonsterY;
     DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
     DATA(0x00533e28) static hero* H2_UNUSED(s_currentHero);
 
@@ -193,28 +195,28 @@ void searchArray::SeedPosition(
             goto point_complete;
 
         {
-            if (s_currentNode.rvFlag1) {
+            if (s_currentNode.hasAdjacentMonster) {
                 s_hasAdjacentMonster = true;
                 s_adjacentMonsterX = s_currentNode.adjacentMonsterX;
-                s_adjacentY = s_currentNode.adjacentMonsterY;
+                s_adjacentMonsterY = s_currentNode.adjacentMonsterY;
             } else {
                 s_hasAdjacentMonster = false;
             }
 
-            if (s_currentNode.unknownFlag) {
+            if (s_currentNode.occupied) {
                 s_triggerType = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
                                     ->m_triggerType
                     & MAP_TRIGGER_TYPE_MASK;
                 if (s_triggerType == MAP_OBJECT_MONSTER
                     || s_triggerType == MAP_OBJECT_HERO_INTERACTION
                     || s_triggerType == MAP_OBJECT_BOAT) {
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                    if (!findAdjacentMonster || s_currentNode.hasAdjacentMonster)
                         goto point_complete;
                     s_hasAdjacentMonster = true;
                     s_adjacentMonsterX = s_currentNode.x;
-                    s_adjacentY = s_currentNode.y;
+                    s_adjacentMonsterY = s_currentNode.y;
                     if (s_triggerType == MAP_OBJECT_HERO_INTERACTION
-                        && gpGame->m_availableHeroes
+                        && gpGame->m_heroOwners
                                [gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
                                     ->m_objectMetadata]
                             == giCurPlayer)
@@ -223,7 +225,7 @@ void searchArray::SeedPosition(
                     if (s_triggerType == MAP_OBJECT_STONE_LITHS
                         || s_triggerType == MAP_OBJECT_WHIRLPOOL)
                         goto point_complete;
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                    if (!findAdjacentMonster || s_currentNode.hasAdjacentMonster)
                         goto point_complete;
                     if (StopOnTrigger(gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)))
                         goto point_complete;
@@ -237,16 +239,16 @@ void searchArray::SeedPosition(
                     goto point_complete;
             } else {
                 if ((*(mapExtra + s_currentNode.x + s_currentNode.y * MAP_WIDTH)
-                     & SEARCH_MAP_BLOCKED)
+                     & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                     && (s_currentNode.x != seedX || s_currentNode.y != seedY)) {
-                    if (!findAdjacentMonster || s_currentNode.rvFlag1)
+                    if (!findAdjacentMonster || s_currentNode.hasAdjacentMonster)
                         goto point_complete;
-                    if (s_currentNode.rvFlag1) {
+                    if (s_currentNode.hasAdjacentMonster) {
                         if (gpAdvManager->FindAdjacentMonster(
                                 s_currentNode.x,
                                 s_currentNode.y,
                                 &s_adjacentMonsterX,
-                                &s_adjacentY,
+                                &s_adjacentMonsterY,
                                 s_currentNode.adjacentMonsterX,
                                 s_currentNode.adjacentMonsterY
                             ))
@@ -255,7 +257,7 @@ void searchArray::SeedPosition(
                                    s_currentNode.x,
                                    s_currentNode.y,
                                    &s_adjacentMonsterX,
-                                   &s_adjacentY,
+                                   &s_adjacentMonsterY,
                                    SEARCH_INVALID_COORDINATE,
                                    SEARCH_INVALID_COORDINATE
                                )) {
@@ -267,8 +269,8 @@ void searchArray::SeedPosition(
             TestPossibleDirections(
                 s_currentNode.x,
                 s_currentNode.y,
-                s_possibleDirections,
-                s_directionCosts,
+                s_directionTerrain,
+                s_directionOccupied,
                 1,
                 waterMode
             );
@@ -277,28 +279,28 @@ void searchArray::SeedPosition(
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             for (s_direction = MAP_DIRECTION_NORTH; s_direction < MAP_DIRECTION_COUNT;
                  ++s_direction) {
-                if (s_possibleDirections[IDX(s_direction)] == TERRAIN_INVALID)
+                if (s_directionTerrain[IDX(s_direction)] == TERRAIN_INVALID)
                     continue;
                 {
                     s_neighborX = s_currentNode.x + normalDirTable[IDX(s_direction)].x;
                     s_neighborY = s_currentNode.y + normalDirTable[IDX(s_direction)].y;
                     s_neighborNode = &GetColumn(s_neighborX)[MAP_WIDTH * s_neighborY];
-                    if (!(!findAdjacentMonster || s_currentNode.rvFlag1
+                    if (!(!findAdjacentMonster || s_currentNode.hasAdjacentMonster
                           || !(MAP_EXTRA_AT(s_neighborX, s_neighborY)
-                               & SEARCH_MAP_BLOCKED)
-                          || !s_neighborNode->visited || !s_neighborNode->rvFlag1
+                               & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+                          || !s_neighborNode->visited || !s_neighborNode->hasAdjacentMonster
                           || s_neighborNode->distance
                                  >= s_currentNode.distance + SEARCH_MONSTER_RESEED_WINDOW
                           || !gpAdvManager->FindAdjacentMonster(
                               s_neighborX,
                               s_neighborY,
                               &s_adjacentMonsterX,
-                              &s_adjacentY,
+                              &s_adjacentMonsterY,
                               SEARCH_INVALID_COORDINATE,
                               SEARCH_INVALID_COORDINATE
                           )
                           || s_neighborNode->adjacentMonsterX != s_adjacentMonsterX
-                          || s_neighborNode->adjacentMonsterY != s_adjacentY))
+                          || s_neighborNode->adjacentMonsterY != s_adjacentMonsterY))
                         continue;
                     {
                         PushPoint(
@@ -315,19 +317,19 @@ void searchArray::SeedPosition(
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
-                            s_directionCosts[IDX(s_direction)],
+                            s_directionOccupied[IDX(s_direction)],
                             s_hasAdjacentMonster,
                             s_adjacentMonsterX,
-                            s_adjacentY,
-                            s_currentNode.rvFlag2,
-                            s_currentNode.previousFlags,
-                            s_currentNode.terrain
+                            s_adjacentMonsterY,
+                            s_currentNode.beyondTurnMobility,
+                            s_currentNode.turnEndX,
+                            s_currentNode.turnEndY
                         );
 
                         if (s_hasTarget && s_neighborX == targetX && s_neighborY == targetY
-                            && !s_currentNode.rvFlag1) {
+                            && !s_currentNode.hasAdjacentMonster) {
                             s_targetStepCost = CalcTerrainCost(
-                                s_possibleDirections[IDX(s_direction)],
+                                s_directionTerrain[IDX(s_direction)],
                                 IDX(s_direction),
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
@@ -346,7 +348,7 @@ void searchArray::SeedPosition(
         s_processedPointCount++;
     }
 
-    if (scanMap) {
+    if (seedMonsterCells) {
         for (s_mapX = 0; s_mapX < MAP_WIDTH; ++s_mapX) {
             {
                 for (s_mapY = 0; s_mapY < MAP_WIDTH; ++s_mapY) {
@@ -359,13 +361,13 @@ void searchArray::SeedPosition(
                                  s_direction < MAP_DIRECTION_COUNT;
                                  ++s_direction) {
                                 s_adjacentX = s_mapX + normalDirTable[IDX(s_direction)].x;
-                                s_candidateY = s_mapY + normalDirTable[IDX(s_direction)].y;
+                                s_adjacentY = s_mapY + normalDirTable[IDX(s_direction)].y;
                                 if (!(s_adjacentX >= 0 && s_adjacentX < MAP_WIDTH
-                                      && s_candidateY >= 0 && s_candidateY < MAP_HEIGHT))
+                                      && s_adjacentY >= 0 && s_adjacentY < MAP_HEIGHT))
                                     continue;
                                 {
                                     s_neighborCell =
-                                        gpAdvManager->GetCell(s_adjacentX, s_candidateY);
+                                        gpAdvManager->GetCell(s_adjacentX, s_adjacentY);
                                     s_directionOpen = true;
                                     if (((1 << IDX(s_direction)) & MAP_DIRECTIONS_SOUTHWARD) != 0
                                         && CELL_HAS_NON_SHADOW_OBJECT(s_neighborCell)) {
@@ -373,14 +375,14 @@ void searchArray::SeedPosition(
                                     }
 
                                     if (s_directionOpen
-                                        && GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
+                                        && GetColumn(s_adjacentX)[MAP_WIDTH * s_adjacentY]
                                                .visited
                                         && !(s_neighborCell->m_triggerType
                                              & MAP_TRIGGER_ACTION_FLAG)) {
                                         s_terrain =
                                             CELL_TERRAIN(s_neighborCell);
                                         s_adjacentCost =
-                                            GetColumn(s_adjacentX)[MAP_WIDTH * s_candidateY]
+                                            GetColumn(s_adjacentX)[MAP_WIDTH * s_adjacentY]
                                                 .distance;
                                         PushPoint(
                                             s_mapX,
@@ -427,9 +429,9 @@ void searchArray::SeedPosition(
 #undef s_directionOpen
 #undef s_neighborY
 #undef s_targetCell
-#undef s_directionCosts
+#undef s_directionOccupied
 #undef s_currentCost
-#undef s_candidateY
+#undef s_adjacentY
 #undef s_mapX
 #undef s_adjacentMonsterX
 #undef s_targetStepCost
@@ -437,7 +439,9 @@ void searchArray::SeedPosition(
 #undef s_processedPointCount
 #undef s_neighborNode
 #undef s_bestTargetCost
-#undef s_adjacentY
+#undef s_adjacentMonsterY
 #undef s_terrain
 #undef s_currentHero
+#undef s_directionTerrain
+#undef seedMonsterCells
 #endif

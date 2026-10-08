@@ -42,7 +42,7 @@ H2_ENUM_BEGIN(CursorConstant)
 H2_ENUM_END(CursorConstant)
 
 H2_ENUM_BEGIN(BoatHeroConstant)
-    BOAT_OCCUPIED_FLAG = 0x80
+    BOAT_VACATED_FLAG = 0x80
 H2_ENUM_END(BoatHeroConstant)
 
 H2_ENUM_BEGIN(MapChangeConstant)

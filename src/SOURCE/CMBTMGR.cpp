@@ -553,8 +553,8 @@ void combatManager::Close(void) {
         == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
         if (combatHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))
-            && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != CREATURE_NONE)
-            gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = total;
+            && gpGame->m_mines[combatHero->m_locationMetadata].guardianType != CREATURE_NONE)
+            gpGame->m_mines[combatHero->m_locationMetadata].guardianCount = total;
     }
 
     gpWindowManager->RemoveWindow(m_combatWindow);

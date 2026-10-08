@@ -32,7 +32,6 @@ struct BHC {
 H2_ENUM_BEGIN(AIPurchaseConstant)
     AI_RANDOM_MINE_TYPE_COUNT      = 8,
     AI_PURCHASE_DEBUG_DELAY        = 1500,
-    AI_HERO_BUILD_COORDINATE_UNSET = -99,
 H2_ENUM_END(AIPurchaseConstant)
 
 H2_ENUM_BEGIN(AIBattleConstant)
@@ -109,13 +108,13 @@ public:
     void ValueOfBuyingHero(class town* townPointer, class hero* heroPointer, i32& resourceValue, float& benefitCost);
     void GetBestHero(class town* townPointer, struct BHC& best, float& bestValue);
     void
-    LikelihoodOfEnemyAttacking(class town*, class hero*, float& chanceA, float& chanceB, i32& nAttack, i32& nValue, i32& nWeeks, float& fOut);
+    LikelihoodOfEnemyAttacking(class town*, class hero*, float& attackChance, float& lossRisk, i32& attackStrength, i32& weightedAttack, i32& attackWeeks, float& dangerRating);
     i32 MeanRVOfUnexploredTerritory(i32);
     void GetGameAttentionValue(i32 player);
     void GetTurnAttentionValue(i32 player);
     i32 RVConversion(i32* const resources);
     float TurnsToBuy(i32* const resources);
-    i32 RVOfPosition(i32 x, i32 y, i32 hasEvent, i32 eventX, i32 eventY, i32 hasStrategicEvent, i32 strategicX, i32 strategicY, i32 eventMode, i32 extraDistance);
+    i32 RVOfPosition(i32 x, i32 y, i32 hasAdjacentMonster, i32 adjacentMonsterX, i32 adjacentMonsterY, i32 beyondTurnMobility, i32 turnEndX, i32 turnEndY, i32 eventMode, i32 extraDistance);
     i32 StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate, i32 checkEnemies, i32* liveChance, i32 extraDistance);
     i32 ValueOfTown(class town* townPointer);
     void TurnCostResource(i32 player);
@@ -129,7 +128,7 @@ public:
         i32 townId = 0,
         i32 applySiegeAttackerModifiers = 0
     );
-    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 useAvailableCount, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
+    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 isFree, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
     i32 QuickCombat(
         class armyGroup* attacker,
         class hero* attackerHero,
@@ -141,7 +140,7 @@ public:
         float& defenderCasualtyFraction
     );
     void HeroInteractionAtHero(class hero* firstHero, class hero* secondHero, i32 evaluateOnly, i32* value);
-    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 doInteraction, i32* value);
+    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 evaluateOnly, i32* value);
     void RedistributeTroops(class armyGroup* sourceArmy, class armyGroup* destinationArmy, i32 preserveOne, i32 preferFast, i32 sourceStrength, i32 destinationStrength, i32 transferBudget);
     i32 ChooseGoldOrExperience(i32, i32);
     void ChooseEvaluateBattle(
@@ -152,8 +151,8 @@ public:
         i32 isCastle,
         i32 castleId,
         i32 rewardValue,
-        i32& outFlag,
-        i32& outValue
+        i32& worthFighting,
+        i32& battleValue
     );
     i32 ChooseToFightForArtifact(ArtifactType artifact, H2_ENUM_PARAM(CreatureType, i32) monster, i32 quantity);
     i32 NetValueOfArtifact(i32 artifact, i32 goldCost, i32 resourceType, i32 resourceCost);
@@ -176,8 +175,8 @@ public:
         H2_ENUM_PARAM(HeroSkillLevel, i32) level
     );
     i32 ComputeValueOfFreeSS(class hero* heroPointer, H2_ENUM_PARAM(HeroSecondarySkill, i32) skill);
-    i32 ManaRefreshValue(class hero* heroPointer, i32 level);
-    i32 ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance);
+    i32 ManaRefreshValue(class hero* heroPointer, i32 manaMultiplier);
+    i32 ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance);
     i32 EvaluateGenericSite(class mapCell* cell);
     i32 EvaluateBarrier(class mapCell* cell);
     i32 EvaluatePassword(class mapCell* cell);

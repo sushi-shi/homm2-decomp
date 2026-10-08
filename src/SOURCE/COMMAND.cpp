@@ -2203,7 +2203,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                                         ->m_artifacts[loop];
                                 iTransferArtifactsInfo[iMaxTransferArtifacts] =
                                     m_heroes[IDX(OppositeCombatResult(winningSide))]
-                                        ->m_artifactExtra[loop];
+                                        ->m_artifactSpells[loop];
                                 ++iMaxTransferArtifacts;
                             }
                         }

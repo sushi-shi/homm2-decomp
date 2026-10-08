@@ -2891,7 +2891,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
         m_recruitHero->m_locationType =
             gpGame->m_worldMap.GetCell(townXh, townYWork)->m_triggerType;
-        m_recruitHero->m_occupiedTown =
+        m_recruitHero->m_locationMetadata =
             gpGame->m_worldMap.GetCell(townXh, townYWork)->m_objectMetadata;
         gpGame->m_worldMap.GetCell(townXh, townYWork)->m_triggerType =
             (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
@@ -2908,7 +2908,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         );
         m_recruitResult = true;
         m_town->m_occupyingHeroId = m_recruitHero->m_id;
-        gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
+        gpGame->m_heroOwners[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             giCurPlayer;
         CheckValidAvailableHeroes();
         if (m_town->m_buildings & 1)
@@ -2920,7 +2920,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         newHeroClass = (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0);
-        gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
+        gpGame->m_heroOwners[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             HERO_AVAILABILITY_FOR_HIRE;
     } else {
         if (m_castleDialogActive != 0)

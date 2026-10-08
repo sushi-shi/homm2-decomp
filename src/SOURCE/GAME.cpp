@@ -980,10 +980,10 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
         heroIndex = Random(0, IDX(GAME_HERO_COUNT) - 1);
-        if (m_availableHeroes[heroIndex] != HERO_AVAILABILITY_UNAVAILABLE
-            && m_availableHeroes[heroIndex] != WEEKLY_AVAILABLE_HERO)
+        if (m_heroOwners[heroIndex] != HERO_AVAILABILITY_UNAVAILABLE
+            && m_heroOwners[heroIndex] != WEEKLY_AVAILABLE_HERO)
             continue;
-        if (m_availableHeroes[heroIndex] == WEEKLY_AVAILABLE_HERO
+        if (m_heroOwners[heroIndex] == WEEKLY_AVAILABLE_HERO
             && attempts < HERO_SELECTION_REUSE_RETRY_LIMIT)
             continue;
         if (heroClass >= FACTION_KNIGHT && heroClass <= FACTION_NECROMANCER
@@ -1219,7 +1219,7 @@ i32 game::SaveGame(H2_CONST char* filename, i32 generateName, i8 baseFormat) {
     WRITE_FILE_VALUE(outFile, m_obeliskCount);
     for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
         m_heroRecs[iFile].Write(outFile, !baseFormat);
-    write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
+    write(outFile, m_heroOwners, sizeof(m_heroOwners));
     write(outFile, m_castleRecs, sizeof(m_castleRecs));
     write(outFile, m_townOwners, sizeof(m_townOwners));
     write(outFile, m_townBuiltToday, sizeof(m_townBuiltToday));
@@ -1325,8 +1325,8 @@ void game::SetupOrigData(void) {
     }
 
     m_obeliskCount = 0;
-    gpAdvManager->m_heroContextLocked = false;
-    memset(m_availableHeroes, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_availableHeroes));
+    gpAdvManager->m_heroMobilized = false;
+    memset(m_heroOwners, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_heroOwners));
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
@@ -1532,7 +1532,7 @@ void game::LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32) {
     READ_FILE_VALUE(fileDescriptor, m_obeliskCount);
     for (index = 0; index < GAME_HERO_COUNT; index++)
         m_heroRecs[index].Read(fileDescriptor, expTag);
-    read(fileDescriptor, m_availableHeroes, sizeof(m_availableHeroes));
+    read(fileDescriptor, m_heroOwners, sizeof(m_heroOwners));
     read(fileDescriptor, m_castleRecs, sizeof(m_castleRecs));
     read(fileDescriptor, m_townOwners, sizeof(m_townOwners));
     read(fileDescriptor, m_townBuiltToday, sizeof(m_townBuiltToday));
@@ -1585,7 +1585,7 @@ void game::LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32) {
     read(fileDescriptor, chunkTag, sizeof(i32));
     close(fileDescriptor);
 
-    gpAdvManager->m_heroContextLocked = false;
+    gpAdvManager->m_heroMobilized = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = 1 << giCurPlayer;
     giCurWatchPlayer = giCurPlayer;
@@ -1892,7 +1892,7 @@ void game::NewMap(char* filename) {
                     m_castleRecs[m_players[player].m_townIds[selectedTown]].m_type,
                     0
                 );
-            m_availableHeroes[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
+            m_heroOwners[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
                 player;
             m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_owner =
                 player;
@@ -1922,7 +1922,7 @@ void game::NewMap(char* filename) {
                                   : FACTION_NECROMANCER;
             for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
                 if (m_heroRecs[awardHero].m_faction == specClass
-                    && m_availableHeroes[awardHero] == -1)
+                    && m_heroOwners[awardHero] == -1)
                     break;
             }
             if (awardHero < GAME_HERO_COUNT) {
@@ -1948,7 +1948,7 @@ void game::NewMap(char* filename) {
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player].m_availableHeroIds[0] = awardHero;
-                m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
+                m_heroOwners[m_players[player].m_availableHeroIds[0]] =
                     WEEKLY_AVAILABLE_HERO;
                 startClass = m_heroRecs[awardHero].m_faction;
                 goto secondHero;
@@ -1969,7 +1969,7 @@ void game::NewMap(char* filename) {
                 if (specClass != FACTION_ANY) {
                     for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
                         if (m_heroRecs[awardHero].m_faction == specClass
-                            && m_availableHeroes[awardHero] == -1)
+                            && m_heroOwners[awardHero] == -1)
                             break;
                     }
                     if (awardHero < GAME_HERO_COUNT) {
@@ -1979,7 +1979,7 @@ void game::NewMap(char* filename) {
                         m_heroRecs[awardHero].m_portrait = curPic;
                         m_players[player].m_availableHeroIds[0] =
                             awardHero;
-                        m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
+                        m_heroOwners[m_players[player].m_availableHeroIds[0]] =
                             WEEKLY_AVAILABLE_HERO;
                         startClass = m_heroRecs[awardHero].m_faction;
                         goto secondHero;
@@ -1992,13 +1992,13 @@ void game::NewMap(char* filename) {
                 startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
             m_players[player].m_availableHeroIds[0] =
                 GetNewHeroId(player, startClass, 0);
-            m_availableHeroes[m_players[player].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
+            m_heroOwners[m_players[player].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
         }
     secondHero:
         startClass = (startClass + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
         m_players[player].m_availableHeroIds[1] =
             GetNewHeroId(player, startClass, 0);
-        m_availableHeroes[m_players[player].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
+        m_heroOwners[m_players[player].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
     }
 
     for (player = 0; player < m_playerCount; player++) {
@@ -2008,7 +2008,7 @@ void game::NewMap(char* filename) {
             yPosition = m_heroRecs[m_players[player].m_heroIds[nTown]].m_y;
             m_heroRecs[m_players[player].m_heroIds[nTown]].m_locationType =
                 m_worldMap.GetCell(xPosition, yPosition)->m_triggerType;
-            m_heroRecs[m_players[player].m_heroIds[nTown]].m_occupiedTown =
+            m_heroRecs[m_players[player].m_heroIds[nTown]].m_locationMetadata =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
             m_worldMap.GetCell(xPosition, yPosition)->m_triggerType =
                 MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
@@ -4675,7 +4675,7 @@ void game::PerWeek(void) {
                     m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]];
             }
 
-            if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
+            if (gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                 == WEEKLY_AVAILABLE_HERO) {
                 if (HAS(gpGame
                             ->m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
@@ -4684,9 +4684,9 @@ void game::PerWeek(void) {
                     continue;
             }
             {
-                if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
+                if (gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                     == WEEKLY_AVAILABLE_HERO)
-                    gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = -1;
+                    gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = -1;
                 if (innerIndex == 1 && !gbHumanPlayer[outerIndex])
                     desiredClass = FACTION_ANY;
                 gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex] =
@@ -4695,7 +4695,7 @@ void game::PerWeek(void) {
                         desiredClass,
                         !gbHumanPlayer[outerIndex] && gpGame->m_difficulty > DIFFICULTY_EASY
                     );
-                m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = WEEKLY_AVAILABLE_HERO;
+                m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = WEEKLY_AVAILABLE_HERO;
             }
         }
     }
@@ -6590,10 +6590,10 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (isJail) {
                             mapHero->m_owner = -1;
-                            m_availableHeroes[extra->heroId] = HERO_AVAILABILITY_JAILED;
+                            m_heroOwners[extra->heroId] = HERO_AVAILABILITY_JAILED;
                         } else {
                             mapHero->m_owner = extra->owner;
-                            m_availableHeroes[extra->heroId] = mapHero->m_owner;
+                            m_heroOwners[extra->heroId] = mapHero->m_owner;
                             m_players[IDX(mapHero->m_owner)]
                                 .m_heroIds[m_players[IDX(mapHero->m_owner)].m_heroCount] =
                                 mapHero->m_id;
@@ -6710,14 +6710,14 @@ void game::CheckHeroConsistency(void) {
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] == 0) {
             for (slot = 0; slot < HERO_AVAILABLE_SLOT_COUNT; slot++) {
-                if ((m_availableHeroes[m_players[player].m_availableHeroIds[slot]] >= 0
-                     && m_availableHeroes[m_players[player].m_availableHeroIds[slot]]
+                if ((m_heroOwners[m_players[player].m_availableHeroIds[slot]] >= 0
+                     && m_heroOwners[m_players[player].m_availableHeroIds[slot]]
                             <= IDX(FACTION_NECROMANCER))
                     || (totalHeroes < HERO_CONSISTENCY_POOL_THRESHOLD
-                        && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
+                        && m_heroOwners[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
                         GetNewHeroId(player, FACTION_ANY, 0);
-                    m_availableHeroes[m_players[player].m_availableHeroIds[slot]] =
+                    m_heroOwners[m_players[player].m_availableHeroIds[slot]] =
                         WEEKLY_AVAILABLE_HERO;
                 }
             }
@@ -6737,7 +6737,7 @@ void game::CheckHeroConsistency(void) {
                     if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
                         if (boardHro->m_locationType
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-                            townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
+                            townOccupied = gpGame->GetTown(boardHro->m_locationMetadata);
                             townOccupied->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
                         }
                         if (boardHro->m_x == mapX && boardHro->m_y == mapY) {
@@ -6745,7 +6745,7 @@ void game::CheckHeroConsistency(void) {
                                 boardHro->m_x,
                                 boardHro->m_y,
                                 boardHro->m_locationType,
-                                boardHro->m_occupiedTown,
+                                boardHro->m_locationMetadata,
                                 NULL,
                                 1
                             );
@@ -8306,7 +8306,7 @@ i32 game::CountShrines(i32 player) {
                 occupier = gpGame->GetHero(cell->m_objectMetadata);
                 if (occupier->m_locationType
                     == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                    castle = GetCastle(occupier->m_occupiedTown);
+                    castle = GetCastle(occupier->m_locationMetadata);
             }
             if (castle != NULL && castle->m_owner == player
                 && HAS(castle->m_buildings, IDX(TOWN_BUILDING_TAVERN))

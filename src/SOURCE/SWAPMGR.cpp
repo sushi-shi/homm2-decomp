@@ -447,7 +447,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[IDX(SWAP_SIDE_LEFT)]->ViewArtifact(
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -472,7 +472,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_LEFT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -515,7 +515,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[IDX(SWAP_SIDE_RIGHT)]->ViewArtifact(
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -540,7 +540,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[IDX(SWAP_SIDE_RIGHT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -761,10 +761,10 @@ void swapManager::SwapArtifacts(void) {
     m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact;
     m_heroes[IDX(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
-    i8 extra = m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
-    m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot] =
-        m_heroes[IDX(m_targetSide)]->m_artifactExtra[m_targetSlot];
-    m_heroes[IDX(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
+    i8 extra = m_heroes[IDX(m_selectedSide)]->m_artifactSpells[m_selectedSlot];
+    m_heroes[IDX(m_selectedSide)]->m_artifactSpells[m_selectedSlot] =
+        m_heroes[IDX(m_targetSide)]->m_artifactSpells[m_targetSlot];
+    m_heroes[IDX(m_targetSide)]->m_artifactSpells[m_targetSlot] = extra;
 
     GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], targetArtifact, false);
     GiveTakeArtifactStat(m_heroes[IDX(m_targetSide)], selectedArtifact, false);

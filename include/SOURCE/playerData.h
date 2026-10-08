@@ -43,8 +43,8 @@ public:
     i32 m_totalObeliskValue;
     i32 m_unexploredValue;
     float m_fightValueResourceWeight;
-    float m_artifactValue;
-    float m_artifactPoolShare;
+    float m_meanArtifactValue;
+    float m_unusedPlayerShare;
 };
 SIZE(playerAIData, 0x68);
 

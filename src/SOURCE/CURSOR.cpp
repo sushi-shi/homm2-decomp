@@ -167,7 +167,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     } else {
         drawFrame = m_cursorFrame + m_cursorFrameCount;
@@ -224,7 +224,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     }
 
@@ -553,7 +553,7 @@ mapCell* advManager::MoveHero(
         boat->savedTriggerType = boatCell->m_triggerType;
         boat->savedEventData = static_cast<u8>(boatCell->m_objectMetadata);
         boat->direction = m_cursorDirection;
-        boat->heroId |= BOAT_OCCUPIED_FLAG;
+        boat->heroId |= BOAT_VACATED_FLAG;
         boatCell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         boatCell->m_objectMetadata = static_cast<u16>(step);
         boat->x = static_cast<i8>(movingHero->m_x);
@@ -641,11 +641,11 @@ mapCell* advManager::MoveHero(
         goto movementDone;
 
     if (movingHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-        town* occupiedTown = gpGame->GetTown(movingHero->m_occupiedTown);
+        town* occupiedTown = gpGame->GetTown(movingHero->m_locationMetadata);
         occupiedTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
-    if (m_visibilityMapValid) {
-        *(m_visibilityMap + (movingHero->m_x + directionX)
+    if (m_routeShown) {
+        *(m_routeMap + (movingHero->m_x + directionX)
           + (movingHero->m_y + directionY) * MAP_WIDTH) = 0;
     }
     m_scrollOffsetY = 0;
@@ -1257,7 +1257,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero->m_direction = MAP_DIRECTION_EAST;
             mapHero->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
-            mapHero->m_occupiedTown =
+            mapHero->m_locationMetadata =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero->m_owner = change.player;
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =
