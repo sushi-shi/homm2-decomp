@@ -142,7 +142,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         while (haveMore) {
             // The editor has no scenario requester: it filters maps by size only.
 #ifndef HOMM2_EDITOR
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
+            if (m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
                     || header.maxHumanPlayers < giNumHumanPlayers
@@ -180,7 +180,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     if (m_extensions == NULL) {
         MemError();
     }
-    if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+    if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
         m_mapHeaders = new SMapHeader[m_fileCount];
         if (m_mapHeaders == NULL) {
             MemError();
@@ -207,7 +207,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         haveMore = 1;
         while (haveMore) {
 #ifndef HOMM2_EDITOR
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
+            if (m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
                 GetMapHeader(findFileData.cFileName, &header);
                 if (header.minHumanPlayers > giNumHumanPlayers
                     || header.maxHumanPlayers < giNumHumanPlayers
@@ -253,7 +253,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         FindClose(findHandleWork);
     }
 
-    if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
+    if (m_mode == FILE_REQUESTER_NEW_GAME_MAP || m_mode == FILE_REQUESTER_MAP) {
         for (indexData = 0; indexData < insertCount; ++indexData) {
             sprintf(fullPath, "%s%s", m_fileNames[indexData].text, m_extensions[indexData].text);
             GetMapHeader(fullPath, &m_mapHeaders[indexData]);
@@ -287,7 +287,7 @@ fileRequester::fileRequester(
     m_y = y;
     m_mode = mode;
     strcpy(m_defaultExtension, defaultExtension);
-    if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
+    if (mode == FILE_REQUESTER_NEW_GAME_MAP || mode == FILE_REQUESTER_MAP) {
         fGutterTravelLength = MAP_LIST_GUTTER_TRAVEL;
         fGutterMinY = GUTTER_MIN_Y;
         iMaxListSize = MAP_LIST_VISIBLE_COUNT;
@@ -366,7 +366,7 @@ i32 fileRequester::Open(i32 id) {
         m_x,
         m_y,
         const_cast<char*>(
-            m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
+            m_mode == FILE_REQUESTER_NEW_GAME_MAP || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
                                                                               : "request.bin"
         )
     );
@@ -430,7 +430,7 @@ i32 fileRequester::Open(i32 id) {
         }
     } else {
         enabled = 0;
-        if (m_mode == FILE_REQUESTER_MAP_GAME) {
+        if (m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
             char mapName[CURRENT_MAP_NAME_CLEAR_SIZE];
             fileSlot = 0;
             memset(mapName, 0, CURRENT_MAP_NAME_CLEAR_SIZE);
@@ -499,13 +499,14 @@ void fileRequester::SetOK(i32 enabled) {
     m_window->BroadcastMessage(message);
 }
 
+#define closeRequested acceptStep // frame-slot spelling
 VA(0x0048f737, 0x1124)
 VA_AT(editor, 0x00423129, 0xf6a)
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     u8 newNameData[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 screenY;
     i32 H2_UNUSED(mouseX);
-    b32 acceptStep = false;
+    b32 closeRequested = false;
     i32 iResult;
     i32 lengthIndex;
     FileRequesterHelpIndex helpIndexMouse;
@@ -594,11 +595,11 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 break;
                             }
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = true;
+                            closeRequested = true;
                             break;
                         case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = true;
+                            closeRequested = true;
                             break;
                     }
                     break;
@@ -873,7 +874,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (iResult + m_topIndex == m_selectedIndex) {
                                     message.payload.widget.data.value = FILE_REQUESTER_OK;
                                     message.payload.widget.id = FILE_REQUESTER_OK;
-                                    acceptStep = true;
+                                    closeRequested = true;
                                     break;
                                 }
                                 if (iResult + m_topIndex >= m_fileCount)
@@ -890,7 +891,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             break;
     }
 
-    if (acceptStep == 1) {
+    if (closeRequested == 1) {
 #ifndef HOMM2_EDITOR
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
@@ -910,7 +911,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     giNumHumanPlayers
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO);
-                acceptStep = false;
+                closeRequested = false;
             }
             if (iResult > giNumHumanPlayers) {
                 sprintf(
@@ -924,12 +925,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES) {
-                    acceptStep = false;
+                    closeRequested = false;
                 }
             }
         }
 #endif
-        if (acceptStep != 0) {
+        if (closeRequested != 0) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
@@ -937,6 +938,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#undef closeRequested
 
 #if H2_RETAIL_COMPILER
 #define gutterStep gutterStep7
@@ -1024,7 +1026,7 @@ void fileRequester::Update(i32 drawWindow) {
     message.type = MESSAGE_WIDGET;
     localState = 0;
 
-    if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
+    if (m_mode == FILE_REQUESTER_NEW_GAME_MAP || m_mode == FILE_REQUESTER_MAP) {
         for (i = 0; i < IDX(FILE_REQUESTER_MAP_SIZE_COUNT); ++i) {
             message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
             message.payload.widget.id = FILE_REQUESTER_FILTER_SMALL + i;
@@ -1086,7 +1088,7 @@ void fileRequester::Update(i32 drawWindow) {
             message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             message.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(message);
-            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 m_window->BroadcastMessage(message);
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
@@ -1102,7 +1104,7 @@ void fileRequester::Update(i32 drawWindow) {
             message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(message);
 
-            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                 m_window->BroadcastMessage(message);
                 message.payload.widget.id = i + FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
@@ -1142,7 +1144,7 @@ void fileRequester::Update(i32 drawWindow) {
             }
 
             message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
+            if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
                 sprintf(gText, "%s", m_mapHeaders[m_topIndex + i].name);
             } else {
                 sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
@@ -1168,7 +1170,7 @@ void fileRequester::Update(i32 drawWindow) {
     m_window->BroadcastMessage(message);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
+        if (m_mode == FILE_REQUESTER_NEW_GAME_MAP || m_mode == FILE_REQUESTER_MAP) {
             sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
         } else {
             sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
@@ -1176,7 +1178,7 @@ void fileRequester::Update(i32 drawWindow) {
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
-    if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME
+    if (m_mode == FILE_REQUESTER_NEW_GAME_MAP || m_mode == FILE_REQUESTER_LOAD_GAME
         || m_mode == FILE_REQUESTER_MAP) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
@@ -1210,7 +1212,7 @@ H2_CONST char* fileRequester::GetFilename(void) {
     if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
         sprintf(gText, "%s%s", m_filename, m_defaultExtension);
     } else if (m_mode == FILE_REQUESTER_LOAD_GAME || m_mode == FILE_REQUESTER_MAP
-               || m_mode == FILE_REQUESTER_MAP_GAME) {
+               || m_mode == FILE_REQUESTER_NEW_GAME_MAP) {
         sprintf(
             gText,
             "%s%s",

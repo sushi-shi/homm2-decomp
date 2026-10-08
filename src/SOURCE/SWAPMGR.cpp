@@ -204,13 +204,13 @@ void swapManager::Close(void) {
 #define leftArtifactX leftArtifactX_7
 #define rightArmyX rightArmyX_3
 #define rightArtifactX rightArtifactX_6
-#define selectorFrame selectorFrame_6
+#define selectorColor selectorFrame_6
 #define selectorX selectorX_2
 #define selectorY selectorY_11
 #endif
 VA(0x004a286f, 0x185)
 void swapManager::DrawSelector(void) {
-    const char selectorFrame = 10;
+    const char selectorColor = 10;
     const i16 leftArmyX = 37;
     const i16 rightArmyX = 382;
     const i16 armyY = 268;
@@ -264,7 +264,7 @@ void swapManager::DrawSelector(void) {
             selectorX,
             selectorY,
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
-            selectorFrame,
+            selectorColor,
             ICON_DRAW_NORMAL,
             NULL
         );
@@ -285,7 +285,7 @@ void swapManager::DrawSelector(void) {
 #undef leftArtifactX
 #undef rightArmyX
 #undef rightArtifactX
-#undef selectorFrame
+#undef selectorColor
 #undef selectorX
 #undef selectorY
 #endif

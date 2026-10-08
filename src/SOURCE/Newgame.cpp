@@ -222,7 +222,7 @@ void game::GetMap(void) {
     requesterResult = new fileRequester(
         MAP_REQUESTER_X,
         MAP_REQUESTER_Y,
-        FILE_REQUESTER_MAP_GAME,
+        FILE_REQUESTER_NEW_GAME_MAP,
         fileMask,
         gcMapPath,
         fileMask

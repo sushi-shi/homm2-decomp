@@ -431,7 +431,7 @@ i32 searchArray::FindCombatPath(
 
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
-    if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
+    if (gpCombatManager->m_hasMoat != 0) {
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
 
@@ -561,7 +561,7 @@ i32 searchArray::FindCombatPath(
 restoreMoatFailure:
     result = 0;
 restoreMoat:
-    if (gpCombatManager->m_drawbridgeBackgroundVisible != 0) {
+    if (gpCombatManager->m_hasMoat != 0) {
         for (moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++)
             gpCombatManager->m_hexCells[moatCell[moatIndex]].m_blocked =
                 savedMoatState[moatIndex];

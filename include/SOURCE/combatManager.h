@@ -273,9 +273,9 @@ H2_ENUM_END(CombatHeroPlacementConstant)
 H2_ENUM_BEGIN(CombatSiegeDrawingConstant)
     COMBAT_CATAPULT_X                       = 22,
     COMBAT_CATAPULT_Y                       = 390,
-    COMBAT_CASTLE_TOP_LAYER_FRAME           = 0x19,
-    COMBAT_CASTLE_GATE_FRAME                = 0x1a,
-    COMBAT_CASTLE_GATE_CLOSED_FRAME         = 0x14,
+    COMBAT_DRAWBRIDGE_LOWERED_FRONT_FRAME           = 0x19,
+    COMBAT_CASTLE_KEEP_DESTROYED_FRAME                = 0x1a,
+    COMBAT_CASTLE_KEEP_FRAME         = 0x14,
     COMBAT_CASTLE_WALL_BASE_FRAME           = 0x11,
     COMBAT_DOOR_EXTENT_MIN_X                = 304,
     COMBAT_DOOR_EXTENT_MIN_Y                = 218,
@@ -321,9 +321,9 @@ H2_ENUM_BEGIN(CombatSmallViewConstant)
     COMBAT_SMALL_VIEW_LEFT_X           = 5,
     COMBAT_SMALL_VIEW_RIGHT_X          = 555,
     COMBAT_SMALL_VIEW_FULL_Y           = 299,
-    COMBAT_SMALL_VIEW_FULL_RIGHT_Y     = 154,
+    COMBAT_SMALL_VIEW_FULL_STACKED_Y     = 154,
     COMBAT_SMALL_VIEW_COMPACT_Y        = 366,
-    COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y  = 288,
+    COMBAT_SMALL_VIEW_COMPACT_STACKED_Y  = 288,
     COMBAT_SMALL_VIEW_WIDTH            = 83,
     COMBAT_SMALL_VIEW_FULL_HEIGHT      = 141,
     COMBAT_SMALL_VIEW_COMPACT_HEIGHT   = 74,
@@ -403,8 +403,8 @@ H2_ENUM_CLASS_BEGIN(CombatIconIndex)
     COMBAT_ICON_SMALL_VIEW_BACKGROUND = 10,
     COMBAT_ICON_SMALL_VIEW_MODIFIER   = 11,
     COMBAT_ICON_SMALL_VIEW_SPELL      = 12,
-    COMBAT_ICON_MOAT                  = 13,
-    COMBAT_ICON_DRAWBRIDGE            = 14
+    COMBAT_ICON_MOAT_PART                  = 13,
+    COMBAT_ICON_MOAT_WHOLE            = 14
 H2_ENUM_CLASS_END(CombatIconIndex)
 
 H2_ENUM_BEGIN(CombatRuntimeConstant)
@@ -412,7 +412,7 @@ H2_ENUM_BEGIN(CombatRuntimeConstant)
     COMBAT_CAPTAIN_SPRITE_OFFSET          = IDX(FACTION_COUNT),
     COMBAT_NEUTRAL_HERO_COLOR             = IDX(FACTION_COUNT),
     COMBAT_POINTER_DEFAULT                = 6,
-    COMBAT_HERO_OVERLAY_FRAME_COUNT       = 5,
+    COMBAT_HERO_FLAG_FRAME_COUNT       = 5,
     COMBAT_HERO_ANIMATION_TRACK_COUNT     = COMBAT_SIDE_COUNT + 1,
     COMBAT_INITIAL_SPEED                  = 15
 H2_ENUM_END(CombatRuntimeConstant)
@@ -488,8 +488,8 @@ H2_ENUM_CLASS_END(CombatMessageCommand)
 
 H2_ENUM_CLASS_BEGIN_T(CombatGridShade, u8)
     GRID_SHADE_NONE          = 0,
-    GRID_SHADE_REACHABLE     = 1,
-    GRID_SHADE_EMPTY_BLOCKED = 3
+    GRID_SHADE_OCCUPIED     = 1,
+    GRID_SHADE_MOVE = 3
 H2_ENUM_CLASS_END_T(CombatGridShade, u8)
 
 #pragma pack(push, 1)
@@ -504,7 +504,7 @@ public:
     hexcell m_hexCells[COMBAT_HEX_COUNT];
     H2_ENUM_STORAGE(TerrainType, i32) m_terrainType;
     BattlefieldFringeFrame m_battlefieldFringe;
-    class town* m_originalCombatTown;
+    class town* m_originalCombatTown; // written by SetupCombat; never read
     WindowColorCycleMode m_colorCycleType;
     char _pad_0x31ee[COMBAT_RUNTIME_ALIGNMENT_SIZE];
     i32 m_elevationOverlayIndex;
@@ -513,7 +513,7 @@ public:
     i32 m_obstacleCount;
     H2_ENUM_STORAGE(SpellType, i16) m_eagleEyeSpell[COMBAT_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
-    b32 m_drawbridgeBackgroundVisible;
+    b32 m_hasMoat;
     H2_ENUM_STORAGE_STEPPED(CombatCastleWallState, u8)
     m_wallStates[IDX(COMBAT_WALL_SLOT_COUNT)];
     class bitmap* m_combatBuffer;
@@ -536,10 +536,10 @@ public:
     i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
     i32l m_heroCycleTimer[COMBAT_SIDE_COUNT];
     class icon* m_heroIcons[COMBAT_SIDE_COUNT];
-    class icon* m_heroOverlayIcons[COMBAT_SIDE_COUNT];
-    i32 m_heroOverlayFrame[COMBAT_SIDE_COUNT];
+    class icon* m_heroFlagIcons[COMBAT_SIDE_COUNT];
+    i32 m_heroFlagFrame[COMBAT_SIDE_COUNT];
     struct SLimitData m_heroLimits[COMBAT_SIDE_COUNT];
-    struct SLimitData m_heroOverlayLimits[COMBAT_SIDE_COUNT];
+    struct SLimitData m_heroFlagLimits[COMBAT_SIDE_COUNT];
     struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)];
     i32l m_previousCombatMessageExpiration;
     i32l m_combatMessageExpiration;
@@ -557,44 +557,44 @@ public:
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
     H2_ENUM_STORAGE(CombatSide, i32) m_currentSide;
-    b32 m_gridSelectionDisabled;
-    b32 m_limitCreature;
-    i32 m_limitCreatureHex;
+    b32 m_autoCombat;
+    b32 m_selectorVisible;
+    i32 m_selectorHex;
     i32 m_showArmyQuantities;
     i32 m_selectedHex;
     i32 m_directionTargetHex;
     CombatMessageCommand m_previousCommand;
     CombatMessageCommand m_currentCommand;
     struct SLimitData m_catapultLimits;
-    struct SLimitData m_gateLimits;
-    struct SLimitData m_upperWallLimits;
-    struct SLimitData m_middleWallLimits;
+    struct SLimitData m_keepLimits;
+    struct SLimitData m_drawbridgeLimits;
+    struct SLimitData m_drawbridgeFrontLimits;
     i32 m_catapultFrame[COMBAT_SIDE_COUNT];
     i32 m_catapultAttackCount[COMBAT_SIDE_COUNT];
     i32 m_catapultAttacksRemaining[COMBAT_SIDE_COUNT];
     i32 m_keepAttacksRemaining[COMBAT_SIDE_COUNT];
     b32 m_inCastleCombat;
-    i32 m_unknownF337[COMBAT_SIDE_COUNT];
-    b32 m_visitingHeroPresent[COMBAT_SIDE_COUNT];
+    i32 m_unusedF337[COMBAT_SIDE_COUNT];
+    b32 m_visitingHeroPresent[COMBAT_SIDE_COUNT]; // written by SetupCombat; never read
     char _pad_0xf347[COMBAT_RUNTIME_ALIGNMENT_SIZE];
-    i32 m_unknownF34B;
-    i32 m_unknownF34F;
-    i32 m_unknownF353;
-    b32 m_nonVisualCombat;
-    i32 m_unknownF35B;
+    i32 m_unusedF34B;
+    i32 m_unusedF34F;
+    i32 m_unusedF353;
+    b32 m_combatFinished;
+    i32 m_unusedF35B;
     i32 m_killBenefit[COMBAT_SIDE_COUNT];
     class heroWindow* m_combatWindow;
     char _pad_0xf36b[COMBAT_RUNTIME_DOUBLE_PAD_SIZE];
-    i32 m_unknownF373;
+    i32 m_unusedF373;
     b32 m_sideRetreated[COMBAT_SIDE_COUNT];
     i32 m_limitCreatureCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     b32 m_drawHero[COMBAT_SIDE_COUNT];
-    i32 m_drawHeroOverlay[COMBAT_SIDE_COUNT];
+    i32 m_drawHeroFlag[COMBAT_SIDE_COUNT];
     b32 m_combatWindowOpen;
     class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     class widget* m_winLoseBottomTextWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
-    i32 m_combatX;
-    i32 m_combatY;
+    i32 m_battleSiteX;
+    i32 m_battleSiteY;
     i8 m_directionMap[COMBAT_DIRECTION_MAP_COUNT];
     i32 m_mouseDirection;
     i32 m_validDirectionCount;

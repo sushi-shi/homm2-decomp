@@ -1469,11 +1469,11 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case DIALOG_BUTTON_1:
-                        gpTownManager->m_recruitState = -1;
+                        gpTownManager->m_recruitSlot = -1;
                         shouldClose = true;
                         break;
                     case DIALOG_BUTTON_2:
-                        gpTownManager->m_recruitState = 0;
+                        gpTownManager->m_recruitSlot = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
                         break;
@@ -1650,7 +1650,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
     }
     if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
-    if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
+    if (building == BUILDING_SLOT_TENT || building == BUILDING_SLOT_BOAT
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
         || building == BUILDING_SLOT_DISABLED_FOURTH || building == BUILDING_SLOT_DISABLED_LAST)
         return 0;
@@ -1686,7 +1686,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         curMask |= IDX(TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_mageGuildLevel <= 1)
+            && building == BUILDING_SLOT_UPGRADE_FOURTH && townPointer->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1723,7 +1723,7 @@ i32 CanBuy(town* townPointer, BuildingSlotType type) {
 
 VA(0x00469105, 0x7b)
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
-    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_TENT)
         return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
         if (building > BUILDING_SLOT_NEUTRAL_LAST)

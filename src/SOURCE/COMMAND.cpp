@@ -97,13 +97,13 @@ namespace {
     H2_ENUM_CLASS_BEGIN(CombatControlId)
         CONTROL_DEFER_TURN = 1,
         CONTROL_SKIP_TURN = 2,
-        CONTROL_DISABLE_SELECTION = 3,
+        CONTROL_AUTO_COMBAT = 3,
         CONTROL_SYSTEM_OPTIONS = 4,
-        CONTROL_HELP_FIRST = 10,
+        CONTROL_MESSAGE_BAR_FIRST = 10,
         CONTROL_HELP_SECOND = 11,
         CONTROL_HELP_THIRD = 12,
         CONTROL_HELP_FOURTH = 13,
-        CONTROL_MAIN_BUTTON = 0x40
+        CONTROL_BATTLEFIELD = 0x40
     H2_ENUM_CLASS_END(CombatControlId)
 
     H2_ENUM_BEGIN(CombatRemoteConstant)
@@ -276,9 +276,9 @@ namespace {
     H2_ENUM_CLASS_BEGIN(CombatLongHelpIndex)
         LONG_HELP_DEFER_TURN = 0,
         LONG_HELP_SKIP_TURN = 1,
-        LONG_HELP_DISABLE_SELECTION = 2,
+        LONG_HELP_AUTO_COMBAT = 2,
         LONG_HELP_SYSTEM_OPTIONS = 3,
-        LONG_HELP_CONTROLS = 4
+        LONG_HELP_MESSAGE_BAR = 4
     H2_ENUM_CLASS_END(CombatLongHelpIndex)
 
     H2_ENUM_BEGIN(CombatStorageConstant)
@@ -347,13 +347,13 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     }
 
     if (gbNoShowCombat == 0) {
-        if (m_gridSelectionDisabled != 0) {
+        if (m_autoCombat != 0) {
             while (message.type != MESSAGE_KEY_DOWN && message.type != MESSAGE_LEFT_BUTTON_DOWN
                    && message.type != MESSAGE_RIGHT_BUTTON_DOWN && message.type != MESSAGE_NONE) {
                 message = gpInputManager->GetEvent();
             }
             if (message.type != MESSAGE_NONE)
-                m_gridSelectionDisabled = false;
+                m_autoCombat = false;
         }
         CheckChangeSelector();
     }
@@ -362,7 +362,7 @@ ProcessAction:
     if (giNextAction == ACTION_NONE) {
         if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
             || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
-            || m_gridSelectionDisabled != 0) {
+            || m_autoCombat != 0) {
             CheckGetAIMove();
         } else {
             result = ProcessCombatMsg(message);
@@ -378,6 +378,8 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
 
+    // Retail compares the combat column with the adventure map's MAP_WIDTH, so
+    // the grid's right edge column is not rejected here.
     if (!(hexIndex == ARMY_HEX_INVALID || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
           || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
           || (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex))
@@ -407,7 +409,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
 #endif
 VA(0x0042bc31, 0x758)
 void combatManager::SetCombatDirections(i32 targetHex) {
-    if (m_gridSelectionDisabled != 0)
+    if (m_autoCombat != 0)
         return;
 
     bchar standable[COMBAT_DIRECTION_COUNT];
@@ -426,21 +428,21 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 
     i32 direction;
     for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
-        if (direction == IDX(COMBAT_DIRECTION_WIDE_WEST)
-            || direction == IDX(COMBAT_DIRECTION_WIDE_EAST)) {
+        if (direction == IDX(COMBAT_DIRECTION_WIDE_NORTH)
+            || direction == IDX(COMBAT_DIRECTION_WIDE_SOUTH)) {
             if (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
                 if (currentArmy->m_facing == ARMY_FACING_RIGHT) {
-                    if (direction == IDX(COMBAT_DIRECTION_WIDE_WEST))
+                    if (direction == IDX(COMBAT_DIRECTION_WIDE_NORTH))
                         directionHexes[direction] =
                             m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHWEST)];
-                    if (direction == IDX(COMBAT_DIRECTION_WIDE_EAST))
+                    if (direction == IDX(COMBAT_DIRECTION_WIDE_SOUTH))
                         directionHexes[direction] =
                             m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHWEST)];
                 } else {
-                    if (direction == IDX(COMBAT_DIRECTION_WIDE_WEST))
+                    if (direction == IDX(COMBAT_DIRECTION_WIDE_NORTH))
                         directionHexes[direction] =
                             m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHEAST)];
-                    if (direction == IDX(COMBAT_DIRECTION_WIDE_EAST))
+                    if (direction == IDX(COMBAT_DIRECTION_WIDE_SOUTH))
                         directionHexes[direction] =
                             m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHEAST)];
                 }
@@ -522,7 +524,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             m_validDirectionCount++;
     }
     if (m_validDirectionCount == 0)
-        pathValid[IDX(COMBAT_DIRECTION_WIDE_WEST)] = true;
+        pathValid[IDX(COMBAT_DIRECTION_WIDE_NORTH)] = true;
 
     memset(m_directionMap, -1, sizeof(m_directionMap));
     for (direction = 0; direction < COMBAT_DIRECTION_COUNT; direction++) {
@@ -531,36 +533,36 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             mappedDirection =
                 (direction + COMBAT_DIRECTION_OPPOSITE_OFFSET) % COMBAT_DIRECTION_ADJACENT_COUNT;
         else
-            mappedDirection = direction == IDX(COMBAT_DIRECTION_WIDE_WEST)
-                ? IDX(COMBAT_DIRECTION_WIDE_EAST)
-                : IDX(COMBAT_DIRECTION_WIDE_WEST);
+            mappedDirection = direction == IDX(COMBAT_DIRECTION_WIDE_NORTH)
+                ? IDX(COMBAT_DIRECTION_WIDE_SOUTH)
+                : IDX(COMBAT_DIRECTION_WIDE_NORTH);
 
         if (pathValid[mappedDirection] != 0) {
             if (HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
                 if (direction == IDX(COMBAT_DIRECTION_NORTHEAST)
                     && HEX_HAS_OCCUPANT(m_hexCells[targetHex - 1], targetSide, targetIndex)) {
-                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_WEST);
+                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_NORTH);
                 } else if (direction == IDX(COMBAT_DIRECTION_NORTHWEST)
                            && HEX_HAS_OCCUPANT(
                                m_hexCells[targetHex + 1],
                                targetSide,
                                targetIndex
                            )) {
-                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_WEST);
+                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_NORTH);
                 } else if (direction == IDX(COMBAT_DIRECTION_SOUTHEAST)
                            && HEX_HAS_OCCUPANT(
                                m_hexCells[targetHex - 1],
                                targetSide,
                                targetIndex
                            )) {
-                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_EAST);
+                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_SOUTH);
                 } else if (direction == IDX(COMBAT_DIRECTION_SOUTHWEST)
                            && HEX_HAS_OCCUPANT(
                                m_hexCells[targetHex + 1],
                                targetSide,
                                targetIndex
                            )) {
-                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_EAST);
+                    outputDirection = IDX(COMBAT_DIRECTION_WIDE_SOUTH);
                 }
             }
 
@@ -570,7 +572,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     outputDirection,
                     DIRECTION_SECTORS_PER_ADJACENT
                 );
-            } else if (direction == IDX(COMBAT_DIRECTION_WIDE_WEST)) {
+            } else if (direction == IDX(COMBAT_DIRECTION_WIDE_NORTH)) {
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_START] =
                     outputDirection;
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_CENTER] =
@@ -596,11 +598,11 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                 previous =
                     (direction + COMBAT_DIRECTION_MAP_COUNT - 1) % COMBAT_DIRECTION_MAP_COUNT;
                 if (m_directionMap[next] >= 0
-                    && m_directionMap[next] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
+                    && m_directionMap[next] <= IDX(COMBAT_DIRECTION_WIDE_SOUTH)) {
                     m_directionMap[direction] =
                         m_directionMap[next] + DIRECTION_PENDING_OFFSET;
                 } else if (m_directionMap[previous] >= 0
-                           && m_directionMap[previous] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
+                           && m_directionMap[previous] <= IDX(COMBAT_DIRECTION_WIDE_SOUTH)) {
                     m_directionMap[direction] =
                         m_directionMap[previous] + DIRECTION_PENDING_OFFSET;
                 }
@@ -647,7 +649,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 #endif
 VA(0x0042c389, 0x575)
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
-    if (m_gridSelectionDisabled != 0)
+    if (m_autoCombat != 0)
         return;
     if (m_validDirectionCount <= 1 && m_mouseDirection >= 0)
         return;
@@ -718,18 +720,18 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     army* H2_UNUSED(targetArmy) =
         &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
 
-    if (direction == COMBAT_DIRECTION_WIDE_WEST || direction == COMBAT_DIRECTION_WIDE_EAST) {
+    if (direction == COMBAT_DIRECTION_WIDE_NORTH || direction == COMBAT_DIRECTION_WIDE_SOUTH) {
         if (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
             if (currentArmy->m_facing == ARMY_FACING_RIGHT
-                && direction == COMBAT_DIRECTION_WIDE_WEST) {
+                && direction == COMBAT_DIRECTION_WIDE_NORTH) {
                 direction = COMBAT_DIRECTION_NORTHWEST;
                 alternateDirection = COMBAT_DIRECTION_NORTHEAST;
             } else if (currentArmy->m_facing == ARMY_FACING_RIGHT
-                       && direction == COMBAT_DIRECTION_WIDE_EAST) {
+                       && direction == COMBAT_DIRECTION_WIDE_SOUTH) {
                 direction = COMBAT_DIRECTION_SOUTHWEST;
                 alternateDirection = COMBAT_DIRECTION_SOUTHEAST;
             } else if (currentArmy->m_facing == ARMY_FACING_LEFT
-                       && direction == COMBAT_DIRECTION_WIDE_WEST) {
+                       && direction == COMBAT_DIRECTION_WIDE_NORTH) {
                 direction = COMBAT_DIRECTION_NORTHEAST;
                 alternateDirection = COMBAT_DIRECTION_NORTHWEST;
             } else {
@@ -744,7 +746,7 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
                 )) {
                 targetHex--;
             }
-            if (direction == COMBAT_DIRECTION_WIDE_WEST)
+            if (direction == COMBAT_DIRECTION_WIDE_NORTH)
                 direction = COMBAT_DIRECTION_NORTHEAST;
             else
                 direction = COMBAT_DIRECTION_SOUTHEAST;
@@ -776,8 +778,8 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     }
     if (ValidHexToStandOn(m_directionTargetHex) == 0 || ValidHexToStandOn(rearHex) == 0) {
         if (HAS(currentArmy->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0
-            && (directionCopy == COMBAT_DIRECTION_WIDE_WEST
-                || directionCopy == COMBAT_DIRECTION_WIDE_EAST)) {
+            && (directionCopy == COMBAT_DIRECTION_WIDE_NORTH
+                || directionCopy == COMBAT_DIRECTION_WIDE_SOUTH)) {
             if (currentArmy->m_facing == ARMY_FACING_RIGHT)
                 m_directionTargetHex++;
             else
@@ -843,7 +845,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     i32 helpIndex = -1;
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
-                        case CONTROL_MAIN_BUTTON:
+                        case CONTROL_BATTLEFIELD:
                             RightClick(m_selectedHex);
                             break;
                         case CONTROL_DEFER_TURN:
@@ -852,17 +854,17 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         case CONTROL_SKIP_TURN:
                             helpIndex = IDX(LONG_HELP_SKIP_TURN);
                             break;
-                        case CONTROL_DISABLE_SELECTION:
-                            helpIndex = IDX(LONG_HELP_DISABLE_SELECTION);
+                        case CONTROL_AUTO_COMBAT:
+                            helpIndex = IDX(LONG_HELP_AUTO_COMBAT);
                             break;
                         case CONTROL_SYSTEM_OPTIONS:
                             helpIndex = IDX(LONG_HELP_SYSTEM_OPTIONS);
                             break;
-                        case CONTROL_HELP_FIRST:
+                        case CONTROL_MESSAGE_BAR_FIRST:
                         case CONTROL_HELP_SECOND:
                         case CONTROL_HELP_THIRD:
                         case CONTROL_HELP_FOURTH:
-                            helpIndex = IDX(LONG_HELP_CONTROLS);
+                            helpIndex = IDX(LONG_HELP_MESSAGE_BAR);
                             break;
                     }
                     if (helpIndex != -1) {
@@ -874,15 +876,15 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_NOTIFY_SELECT:
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
-                        case CONTROL_MAIN_BUTTON:
+                        case CONTROL_BATTLEFIELD:
                             DoCommand(m_currentCommand);
                             break;
                     }
                     break;
                 case WIDGET_NOTIFY_DESELECT:
                     switch (static_cast<CombatControlId>(message.payload.widget.id)) {
-                        case CONTROL_DISABLE_SELECTION:
-                            m_gridSelectionDisabled = true;
+                        case CONTROL_AUTO_COMBAT:
+                            m_autoCombat = true;
                             break;
                         case CONTROL_SKIP_TURN:
                             giNextAction = ACTION_SKIP_TURN;
@@ -899,7 +901,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             break;
 
         case MESSAGE_MOUSE_MOVE:
-            if (m_gridSelectionDisabled != 0)
+            if (m_autoCombat != 0)
                 break;
             pendingMessage = gpInputManager->PeekEvent();
             if (pendingMessage.type == MESSAGE_MOUSE_MOVE)
@@ -1165,18 +1167,18 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 #endif
 
 #if H2_RETAIL_COMPILER
-#define enemySide enemySide_27
+#define occupantSide enemySide_27
 #define ourArmy ourArmy_13
 #define rowPosition rowPos
-#define showEnemy showEnemy_12
+#define showOccupant showEnemy_12
 #endif
 VA(0x0042d56e, 0x3f6)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 H2_UNUSED(column) = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 H2_UNUSED(rowPosition) = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    b32 showEnemy = false;
-    CombatSide enemySide;
+    b32 showOccupant = false;
+    CombatSide occupantSide;
     i32 targetIndex;
     army* ourArmy;
 
@@ -1217,31 +1219,31 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 break;
             }
 
-            enemySide = m_hexCells[hexIndex].m_occupantSide;
+            occupantSide = m_hexCells[hexIndex].m_occupantSide;
             targetIndex = m_hexCells[hexIndex].m_occupantIndex;
             ourArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
             CLEAR_ARMY_TARGET(*ourArmy);
 
             if (m_hexCells[hexIndex].m_blocked != 0 && !CAN_PASS_CASTLE_GATE(hexIndex)) {
                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-            } else if (enemySide != COMBAT_SIDE_NONE) {
-                if (enemySide != m_currentArmySide || targetIndex != m_currentArmyIndex) {
-                    showEnemy = true;
+            } else if (occupantSide != COMBAT_SIDE_NONE) {
+                if (occupantSide != m_currentArmySide || targetIndex != m_currentArmyIndex) {
+                    showOccupant = true;
                     if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
-                        m_smallViewSide[1] = enemySide;
+                        m_smallViewSide[1] = occupantSide;
                         m_smallViewArmyIndex[1] = targetIndex;
                         DrawSmallView(1, 1);
                     }
                 }
-                switch (enemySide) {
+                switch (occupantSide) {
                     case COMBAT_ATTACKER_SIDE:
                     case COMBAT_DEFENDER_SIDE:
-                        if (enemySide == m_currentSide
-                            || (enemySide == m_currentArmySide
+                        if (occupantSide == m_currentSide
+                            || (occupantSide == m_currentArmySide
                                 && targetIndex == m_currentArmyIndex)) {
                             return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
                         } else {
-                            ourArmy->m_targetSide = enemySide;
+                            ourArmy->m_targetSide = occupantSide;
                             ourArmy->m_targetIndex = targetIndex;
                             if (ourArmy->m_monster.shots > 0
                                 && ourArmy->GetAttackMask(
@@ -1286,17 +1288,17 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     }
 
 smallView:
-    if (showEnemy == 0 && gbProcessingCombatAction == 0) {
+    if (showOccupant == 0 && gbProcessingCombatAction == 0) {
         m_smallViewSide[1] = COMBAT_SIDE_NONE;
         DrawSmallView(1, 1);
     }
     return command;
 }
 #if H2_RETAIL_COMPILER
-#undef enemySide
+#undef occupantSide
 #undef ourArmy
 #undef rowPosition
-#undef showEnemy
+#undef showOccupant
 #endif
 
 #if H2_RETAIL_COMPILER
@@ -1384,7 +1386,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             giNextActionGridIndex = m_selectedHex;
             if (m_playerId[IDX(m_currentSide)] == PLAYER_NONE
                 || gbHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
-                || m_gridSelectionDisabled != 0) {
+                || m_autoCombat != 0) {
                 giNextAction = ACTION_MOVE;
                 giNextActionExtra = -1;
             } else {
@@ -1851,7 +1853,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
 
 #if H2_RETAIL_COMPILER
 #define bottom bottom_4
-#define casualtyQuantity casualtyQuantity_13
+#define casualtyStackCount casualtyQuantity_13
 #define casualtyType casualtyType_1
 #define casualtyY y_7
 #define side side_4
@@ -1882,7 +1884,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     i32 H2_UNUSED(unusedValue5);
     i32 H2_UNUSED(unusedValue6);
     i32 H2_UNUSED(unusedValue7);
-    i32 casualtyQuantity[COMBAT_SIDE_COUNT];
+    i32 casualtyStackCount[COMBAT_SIDE_COUNT];
     i32 armyIndex;
     i32 displayedCount;
     i32 startX;
@@ -1894,17 +1896,17 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         m_winLoseBottomTextWidgets[side] = NULL;
     }
     for (side = 0; side < COMBAT_SIDE_COUNT; ++side) {
-        casualtyQuantity[side] = 0;
+        casualtyStackCount[side] = 0;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; ++armyIndex) {
             if (m_armies[side][armyIndex].m_monsterType != CREATURE_NONE
                 && m_armies[side][armyIndex].m_initialQuantity
                        > m_armies[side][armyIndex].m_quantity) {
-                casualtyType[side][casualtyQuantity[side]] =
+                casualtyType[side][casualtyStackCount[side]] =
                     IDX(m_armies[side][armyIndex].m_monsterType);
-                casualtyCount[side][casualtyQuantity[side]] =
+                casualtyCount[side][casualtyStackCount[side]] =
                     m_armies[side][armyIndex].m_initialQuantity
                     - m_armies[side][armyIndex].m_quantity;
-                ++casualtyQuantity[side];
+                ++casualtyStackCount[side];
             }
         }
     }
@@ -1952,7 +1954,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             MemError();
         window->AddWidget(m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side], -1);
 
-        if (casualtyQuantity[side] <= 0) {
+        if (casualtyStackCount[side] <= 0) {
             text = static_cast<char*>(H2_ALLOC(CASUALTY_NONE_CAPACITY));
             sprintf(text, localization::Tr("common.none"));
             m_winLoseBottomTextWidgets[side * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
@@ -1973,8 +1975,8 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         }
 
         monsterIcons = gpResourceManager->GetIcon("mons32.icn");
-        displayedCount = casualtyQuantity[side] < CASUALTY_DISPLAY_LIMIT
-                                ? casualtyQuantity[side]
+        displayedCount = casualtyStackCount[side] < CASUALTY_DISPLAY_LIMIT
+                                ? casualtyStackCount[side]
                                 : CASUALTY_DISPLAY_LIMIT;
         spacing = CASUALTY_ICON_SPACING;
         startX = (CASUALTY_WINDOW_WIDTH - spacing * displayedCount) / CASUALTY_CENTER_DIVISOR
@@ -2039,7 +2041,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
 }
 #if H2_RETAIL_COMPILER
 #undef bottom
-#undef casualtyQuantity
+#undef casualtyStackCount
 #undef casualtyType
 #undef casualtyY
 #undef side
@@ -2069,7 +2071,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     tag_message message;
     CombatSide combatSide;
     i32 H2_UNUSED(cost);
-    i32 necroEligible;
+    i32 survivingStackCount;
     i32 emptySlots;
     char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
 
@@ -2084,7 +2086,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     iCurTransferArtifact = -1;
     bSkeletonsShown = false;
     bodies = 0;
-    necroEligible = 0;
+    survivingStackCount = 0;
 
     for (combatSide = COMBAT_ATTACKER_SIDE; IDX(combatSide) < COMBAT_SIDE_COUNT; ++combatSide) {
         livingCount = 0;
@@ -2104,7 +2106,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                 && HAS(pTroop->m_monster.attributes, MONSTER_FLAGS_LIGHT_PALETTE) == 0
                 && !IS_ELEMENTAL_CREATURE(pTroop->m_monsterType)
                 && pTroop->m_monsterType != CREATURE_SKELETON) {
-                ++necroEligible;
+                ++survivingStackCount;
             }
             if (OppositeCombatResult(CombatResultForSide(combatSide)) == winningSide) {
                 bodies += pTroop->m_initialQuantity - pTroop->m_quantity;
@@ -2114,7 +2116,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
             m_armies[IDX(combatSide)][lastLivingArmy].m_quantity = 1;
     }
 
-    if (winningSide != COMBAT_RESULT_DRAW && necroEligible < VICTORY_NECROMANCY_STACK_LIMIT
+    if (winningSide != COMBAT_RESULT_DRAW && survivingStackCount < VICTORY_NECROMANCY_STACK_LIMIT
         && m_heroes[IDX(winningSide)] != NULL
         && m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         giSkeletonsCreated = static_cast<i32>(
@@ -2126,7 +2128,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
             giSkeletonsCreated = 1;
     }
 
-    m_nonVisualCombat = true;
+    m_combatFinished = true;
     FreeArmies();
     CombatMessage("", 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
@@ -2451,11 +2453,11 @@ void combatManager::CheckChangeSelector(void) {
     if (gbNoShowCombat != 0)
         return;
     army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    if (m_limitCreature == 0 || m_limitCreatureHex != currentArmy->m_hex) {
+    if (m_selectorVisible == 0 || m_selectorHex != currentArmy->m_hex) {
         UpdateGrid(0, 1);
         giNewMonsterCycleFrame = SELECTOR_INITIAL_FRAME;
-        m_limitCreatureHex = currentArmy->m_hex;
-        m_limitCreature = true;
+        m_selectorHex = currentArmy->m_hex;
+        m_selectorVisible = true;
         DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
     SetupSmallView();
@@ -2804,13 +2806,13 @@ void combatManager::CycleCombatScreen(void) {
     cyclingCount = 0;
     gpCombatManager->ResetLimitCreature();
     for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; ++index) {
-        if (m_heroOverlayIcons[index] == NULL)
+        if (m_heroFlagIcons[index] == NULL)
             continue;
 
         if (m_heroes[index] != NULL)
-            m_heroOverlayFrame[index] =
-                (m_heroOverlayFrame[index] + 1) % COMBAT_HERO_OVERLAY_FRAME_COUNT;
-        ++m_drawHeroOverlay[index];
+            m_heroFlagFrame[index] =
+                (m_heroFlagFrame[index] + 1) % COMBAT_HERO_FLAG_FRAME_COUNT;
+        ++m_drawHeroFlag[index];
     }
 
     memset(cycleArmy, 0, sizeof(cycleArmy));
@@ -2899,8 +2901,8 @@ void combatManager::CycleCombatScreen(void) {
 
     if (cyclingCount == 0 && m_drawHero[IDX(COMBAT_ATTACKER_SIDE)] == 0
         && m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] == 0
-        && m_drawHeroOverlay[IDX(COMBAT_ATTACKER_SIDE)] == 0
-        && m_drawHeroOverlay[IDX(COMBAT_DEFENDER_SIDE)] == 0)
+        && m_drawHeroFlag[IDX(COMBAT_ATTACKER_SIDE)] == 0
+        && m_drawHeroFlag[IDX(COMBAT_DEFENDER_SIDE)] == 0)
         goto setCycleTimer;
     gpCombatManager->DrawFrame(0, 1, 1, 1, COMBAT_FRAME_DELAY, 1, 1);
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {

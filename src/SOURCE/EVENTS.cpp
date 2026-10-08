@@ -8244,8 +8244,8 @@ CombatResult advManager::AutoResolveCombat(
         randomSeed
     );
     gpCombatManager->InitNonVisualVars();
-    gpCombatManager->m_gridSelectionDisabled = true;
-    while (!gpCombatManager->m_nonVisualCombat)
+    gpCombatManager->m_autoCombat = true;
+    while (!gpCombatManager->m_combatFinished)
         gpCombatManager->Main(message);
     gbNoShowCombat = false;
     if (firstHero)

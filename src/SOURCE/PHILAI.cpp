@@ -2688,7 +2688,7 @@ void philAI::ValueOfBuyingBuilding(
             else if (giCurTurn < 21)
                 adjustedValue = 0.0;
             break;
-        case BUILDING_SLOT_SPECIAL_SEVEN:
+        case BUILDING_SLOT_STATUE:
             if (giCurTurn < 3 && !HAS(townPointer->m_buildings, BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 0.0f;
             break;
@@ -2715,7 +2715,7 @@ void philAI::ValueOfBuyingBuilding(
                 goto deferEarlyBuilding;
             }
             break;
-        case BUILDING_SLOT_DISABLED_FIRST:
+        case BUILDING_SLOT_BOAT:
             break;
         case BUILDING_SLOT_DOCK:
             adjustedValue = 0.0f;
@@ -2755,9 +2755,9 @@ void philAI::ValueOfBuyingBuilding(
         case BUILDING_SLOT_UPGRADE_FIRST:
         case BUILDING_SLOT_UPGRADE_SECOND:
         case BUILDING_SLOT_UPGRADE_THIRD:
-        case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
-        case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
-        case BUILDING_SLOT_SPECIAL_THIRTY:
+        case BUILDING_SLOT_UPGRADE_FOURTH:
+        case BUILDING_SLOT_UPGRADE_FIFTH:
+        case BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE:
             if (currentOccupiedSlots == ARMY_GROUP_SLOT_COUNT) {
                 creatureLocated = false;
                 for (indexBuilding = 0; indexBuilding < ARMY_GROUP_SLOT_COUNT; indexBuilding++) {

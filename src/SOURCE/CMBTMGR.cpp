@@ -86,7 +86,7 @@ H2_ENUM_CLASS_END(CombatSystemOptionHelp)
 H2_ENUM_BEGIN(CombatSetupConstant)
     BALLISTA_CATAPULT_ATTACK_COUNT      = 2,
     NECROMANCER_SHRINE_POWER_BONUS      = 2,
-    DEFENDER_HERO_OVERLAY_INITIAL_FRAME = 3
+    DEFENDER_HERO_FLAG_INITIAL_FRAME = 3
 H2_ENUM_END(CombatSetupConstant)
 
 H2_ENUM_BEGIN(CombatMapConstant)
@@ -122,7 +122,7 @@ H2_ENUM_CLASS_BEGIN(BattlefieldBackgroundIndex)
 H2_ENUM_CLASS_END(BattlefieldBackgroundIndex)
 
 H2_ENUM_CLASS_BEGIN_T(NearbyFeature, i8)
-    NEARBY_UNKNOWN  = -1,
+    NEARBY_NONE  = -1,
     NEARBY_MOUNTAIN = 0,
     NEARBY_TREE     = 1
 H2_ENUM_CLASS_END_T(NearbyFeature, i8)
@@ -154,20 +154,20 @@ H2_ENUM_END(CombatMoraleConstant)
 
 VA(0x00425de0, 0x1af)
 combatManager::combatManager(void) {
-    m_unknownF373 = -1;
+    m_unusedF373 = -1;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSide = COMBAT_DEFENDER_SIDE;
-    m_limitCreatureHex = 0;
-    m_limitCreature = false;
+    m_selectorHex = 0;
+    m_selectorVisible = false;
     m_showArmyQuantities = 1;
     m_currentCommand = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    m_unknownF35B = 0;
-    m_unknownF353 = -1;
-    m_unknownF34F = -1;
+    m_unusedF35B = 0;
+    m_unusedF353 = -1;
+    m_unusedF34F = -1;
     m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)] = -1;
     m_catapultFrame[IDX(COMBAT_DEFENDER_SIDE)] = -1;
-    m_unknownF337[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_unknownF337[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_unusedF337[IDX(COMBAT_ATTACKER_SIDE)] = 0;
+    m_unusedF337[IDX(COMBAT_DEFENDER_SIDE)] = 0;
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = false;
@@ -226,8 +226,8 @@ void combatManager::SetupCombat(
 ) {
     giSeed = randomSeed;
     SRand(combatX * COMBAT_RANDOM_X_MULTIPLIER + combatY);
-    m_combatX = combatX;
-    m_combatY = combatY;
+    m_battleSiteX = combatX;
+    m_battleSiteY = combatY;
 
     if (mapX >= 0 && mapY >= 0)
         m_battlefieldCell = gpAdvManager->GetCell(mapX, mapY);
@@ -285,7 +285,7 @@ void combatManager::SetupCombat(
         m_heroCastSpell[index] = false;
     }
 
-    m_drawbridgeBackgroundVisible = false;
+    m_hasMoat = false;
     if (defenderTown != NULL) {
         if (defenderTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             m_armyGroups[IDX(COMBAT_DEFENDER_SIDE)] = &m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_army;
@@ -298,7 +298,7 @@ void combatManager::SetupCombat(
         m_inCastleCombat = HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_CASTLE)) != 0;
 
         if (m_inCastleCombat != 0)
-            m_drawbridgeBackgroundVisible =
+            m_hasMoat =
                 HAS(defenderTown->m_buildings, IDX(TOWN_BUILDING_MOAT)) != 0;
 
         m_drawbridgeState = COMBAT_CASTLE_GATE_CLOSED;
@@ -340,8 +340,8 @@ void combatManager::SetupCombat(
 
 VA(0x004265e7, 0x258)
 void combatManager::InitNonVisualVars(void) {
-    m_gridSelectionDisabled = false;
-    m_nonVisualCombat = false;
+    m_autoCombat = false;
+    m_combatFinished = false;
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         m_spellPower[IDX(side)] = 0;
@@ -353,8 +353,8 @@ void combatManager::InitNonVisualVars(void) {
             m_spellPower[IDX(side)] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
-    m_heroOverlayFrame[IDX(COMBAT_ATTACKER_SIDE)] = 0;
-    m_heroOverlayFrame[IDX(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
+    m_heroFlagFrame[IDX(COMBAT_ATTACKER_SIDE)] = 0;
+    m_heroFlagFrame[IDX(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_FLAG_INITIAL_FRAME;
     m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] = false;
     m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] = false;
     m_combatResult = COMBAT_RESULT_PENDING;
@@ -368,7 +368,7 @@ void combatManager::InitNonVisualVars(void) {
     m_summonedCreatureType[0] = CREATURE_SUMMONED_NONE;
     m_summonedCreatureType[1] = CREATURE_SUMMONED_NONE;
     m_selectedHex = -1;
-    m_limitCreatureHex = -1;
+    m_selectorHex = -1;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
@@ -377,7 +377,7 @@ void combatManager::InitNonVisualVars(void) {
     gbCombatSurrender = false;
     m_sideSurrendered[IDX(COMBAT_ATTACKER_SIDE)] = false;
     m_sideSurrendered[IDX(COMBAT_DEFENDER_SIDE)] = false;
-    m_limitCreature = true;
+    m_selectorVisible = true;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
     GenerateMap();
@@ -741,9 +741,9 @@ i32 combatManager::MoreTreesNear(void) {
     i32 nearbyDirection;
     i32 centerY;
 
-    memset(nearbyTypeTable, IDX(NEARBY_UNKNOWN), sizeof(nearbyTypeTable));
-    combatOriginX = m_combatX;
-    centerY = m_combatY;
+    memset(nearbyTypeTable, IDX(NEARBY_NONE), sizeof(nearbyTypeTable));
+    combatOriginX = m_battleSiteX;
+    centerY = m_battleSiteY;
 
     for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
         for (nearbyDirection = 0; nearbyDirection < IDX(MAP_DIRECTION_COUNT); nearbyDirection++) {
@@ -819,8 +819,8 @@ void combatManager::LoadIcons(void) {
 
     if (m_inCastleCombat) {
         if (HAS(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings, IDX(TOWN_BUILDING_MOAT))) {
-            m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
-            m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
+            m_combatIcons[IDX(COMBAT_ICON_MOAT_PART)] = gpResourceManager->GetIcon("moatpart.icn");
+            m_combatIcons[IDX(COMBAT_ICON_MOAT_WHOLE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
         m_combatIcons[IDX(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon("catapult.icn");
         sprintf(
@@ -834,7 +834,7 @@ void combatManager::LoadIcons(void) {
 
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
         m_heroIcons[index] = NULL;
-        m_heroOverlayIcons[index] = NULL;
+        m_heroFlagIcons[index] = NULL;
         m_heroAnimationState[index] = 0;
         m_heroAnimationFrame[index] = 0;
         m_heroSpriteIndex[index] = -1;
@@ -861,7 +861,7 @@ void combatManager::LoadIcons(void) {
                     ? COMBAT_NEUTRAL_HERO_COLOR
                     : gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color
             );
-            m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
+            m_heroFlagIcons[index] = gpResourceManager->GetIcon(gText);
         }
     }
 }
@@ -882,8 +882,8 @@ void combatManager::FreeIcons(void) {
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
         if (m_heroIcons[index])
             gpResourceManager->Dispose(m_heroIcons[index]);
-        if (m_heroOverlayIcons[index])
-            gpResourceManager->Dispose(m_heroOverlayIcons[index]);
+        if (m_heroFlagIcons[index])
+            gpResourceManager->Dispose(m_heroFlagIcons[index]);
     }
 }
 
@@ -1506,8 +1506,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
 
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     impactSound = LoadPlaySample(gText);
-    m_unknownF34B = 0;
-    m_unknownF34F = 0;
+    m_unusedF34B = 0;
+    m_unusedF34F = 0;
 
     giMinExtentX = impactX - COMBAT_CATAPULT_IMPACT_EXTENT_X;
     giMaxExtentX = impactX + COMBAT_CATAPULT_IMPACT_EXTENT_X;
@@ -1661,7 +1661,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
 #define targetX targetX6
 #define targetY targetY1
 #define towerOrigins towerOrigins7
-#define unknownTowerData unknownTowerData1
+#define unusedTowerScratch unknownTowerData1
 #define value value9
 #endif
 VA(0x00429990, 0x662)
@@ -1727,7 +1727,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    i32 H2_UNUSED(unknownTowerData)[KEEP_TOWER_SCRATCH_COUNT];
+    i32 H2_UNUSED(unusedTowerScratch)[KEEP_TOWER_SCRATCH_COUNT];
     i32 sourceX = towerOrigins[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].x;
     i32 sourceY = towerOrigins[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].y;
     i32 targetX = target->MidX();
@@ -1810,7 +1810,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
 #undef targetX
 #undef targetY
 #undef towerOrigins
-#undef unknownTowerData
+#undef unusedTowerScratch
 #undef value
 #endif
 
@@ -1913,7 +1913,7 @@ void combatManager::SetupAndLoadObstacles(void) {
         m_hexCells[IDX(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_TOWER)].m_blocked = 1;
         m_hexCells[IDX(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
-        m_hexCells[IDX(COMBAT_CASTLE_HEX_MOAT)].m_blocked = 1;
+        m_hexCells[IDX(COMBAT_CASTLE_HEX_CATAPULT)].m_blocked = 1;
     } else {
         obstacleGoal = SRandom(COMBAT_RANDOM_OBSTACLE_MIN, COMBAT_RANDOM_OBSTACLE_MAX);
         placedCells = 0;

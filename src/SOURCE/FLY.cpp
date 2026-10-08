@@ -16,7 +16,7 @@
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 
-#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE \
+#define ARMY_FLIGHT_SLOW_FRAME_DURATION_SCALE \
     1.3
 
 namespace {
@@ -106,7 +106,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
 #endif
 
 #if H2_RETAIL_COMPILER
-#define armyPointer foe
+#define targetArmy foe
 #define currentDirection n
 #define moveDirection moveDir
 #endif
@@ -118,7 +118,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 H2_UNUSED(spare);
     CombatHexDirection direction;
     i32 H2_UNUSED(cost);
-    army* armyPointer;
+    army* targetArmy;
     i32 H2_UNUSED(otherHex);
     i32 attackMask;
     i32 attackHex;
@@ -140,11 +140,11 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    armyPointer = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
+    targetArmy = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
     if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex = destination;
     } else {
-        enemyHex = armyPointer->m_hex;
+        enemyHex = targetArmy->m_hex;
     }
     if (!ValidHex(enemyHex)) {
         return 0;
@@ -169,10 +169,10 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     }
 
     directionMask = 0;
-    if (HAS(armyPointer->m_monster.attributes, MONSTER_FLAGS_WIDE)
+    if (HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
-        directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_WEST)
+        enemyHex += targetArmy->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
+        directionMask = targetArmy->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_WEST)
                                                               : BIT(COMBAT_DIRECTION_EAST);
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
@@ -199,10 +199,10 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    if (HAS(armyPointer->m_monster.attributes, MONSTER_FLAGS_WIDE)
+    if (HAS(targetArmy->m_monster.attributes, MONSTER_FLAGS_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
-        directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_EAST)
+        enemyHex += targetArmy->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
+        directionMask = targetArmy->m_facing == ARMY_FACING_RIGHT ? BIT(COMBAT_DIRECTION_EAST)
                                                            : BIT(COMBAT_DIRECTION_WEST);
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(enemyHex, m_hex, directionMask);
@@ -219,7 +219,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     return 0;
 }
 #if H2_RETAIL_COMPILER
-#undef armyPointer
+#undef targetArmy
 #undef currentDirection
 #undef moveDirection
 #endif
@@ -444,7 +444,7 @@ i32 army::FlyTo(i32 destination) {
                     || (m_animationFrame + 1 >= midCount && IS_VAMPIRE_CREATURE(m_monsterType))) {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount()
-                        + m_frameInfo.walkDuration * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE
+                        + m_frameInfo.walkDuration * ARMY_FLIGHT_SLOW_FRAME_DURATION_SCALE
                               * gfCombatSpeedMod[gConfig.combatSpeed] / frameCount
                     );
                 } else {

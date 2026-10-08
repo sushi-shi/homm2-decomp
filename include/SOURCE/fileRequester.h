@@ -14,7 +14,7 @@ class iconWidget;
 struct SMapHeader;
 
 H2_ENUM_CLASS_BEGIN(FileRequesterMode)
-    FILE_REQUESTER_MAP_GAME  = 1,
+    FILE_REQUESTER_NEW_GAME_MAP  = 1,
     FILE_REQUESTER_LOAD_GAME = 2,
     FILE_REQUESTER_SAVE_GAME = 3,
     FILE_REQUESTER_MAP       = 4
@@ -110,7 +110,7 @@ public:
     i32 m_topIndex;
     i32 m_selectedIndex;
     i32 m_result;
-    char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
+    char m_unusedListState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
     fileRequester(
         i32 x,

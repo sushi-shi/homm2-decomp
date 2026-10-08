@@ -4377,10 +4377,10 @@ i32 game::ComputeDailyGold(i32 player) {
 
     for (index = 0; index < GAME_TOWN_COUNT; index++) {
         if (m_castleRecs[index].m_owner == player) {
-            dailyGold += HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_UPGRADE_CASTLE))
+            dailyGold += HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_TENT))
                              ? DAILY_GOLD_VILLAGE_INCOME
                              : DAILY_GOLD_TOWN_INCOME;
-            if (HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_SPECIAL_SEVEN)))
+            if (HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_STATUE)))
                 dailyGold += DAILY_GOLD_STATUE_INCOME;
             if (m_castleRecs[index].m_type == FACTION_WARLOCK
                 && HAS(m_castleRecs[index].m_buildings, BIT(BUILDING_SLOT_SPECIAL)))

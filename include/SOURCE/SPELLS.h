@@ -47,7 +47,7 @@ H2_ENUM_BEGIN(SpellGameplayConstant)
     EARTHQUAKE_WALL_HIT_CHANCE                     = 75,
     EARTHQUAKE_WALL_SECOND_HIT_CHANCE              = 15,
     EARTHQUAKE_TOWER_HIT_CHANCE                    = 50,
-    EARTHQUAKE_KEEP_HIT_CHANCE                     = 25,
+    EARTHQUAKE_GATE_HIT_CHANCE                     = 25,
     SPELL_EAGLE_EYE_ROLL_MAX                       = 9,
 H2_ENUM_END(SpellGameplayConstant)
 
@@ -102,17 +102,17 @@ H2_ENUM_BEGIN(SpellDrawingConstant)
 H2_ENUM_END(SpellDrawingConstant)
 
 // combatManager::m_heroAnimationState: the hero sprite's animation row.
-H2_ENUM_BEGIN(HeroCastPose)
+H2_ENUM_BEGIN(CombatHeroAnimation)
     HERO_ANIMATION_STAND                  = 0,
     HERO_ANIMATION_LOSS_REACTION          = 1,
     HERO_ANIMATION_OPPONENT_LOSS_REACTION = 2,
     COMBAT_HERO_CAST_NO_TARGET            = 3,
-    COMBAT_HERO_CAST_LOW                  = 5,
-    COMBAT_HERO_CAST_HIGH                 = 7,
+    COMBAT_HERO_CAST_FORWARD                  = 5,
+    COMBAT_HERO_CAST_DOWN                 = 7,
     HERO_ANIMATION_IDLE_FIRST             = 9,
     HERO_ANIMATION_IDLE_SECOND            = 10,
     HERO_ANIMATION_IDLE_LAST              = 11,
-H2_ENUM_END(HeroCastPose)
+H2_ENUM_END(CombatHeroAnimation)
 
 H2_ENUM_BEGIN(SpellAreaConstant)
     SPELL_FIREBALL_AFFECTED_HEX_COUNT = 19,
@@ -147,9 +147,9 @@ H2_ENUM_BEGIN(BoltDrawingConstant)
     BOLT_BRANCH_RANDOM_HIGH             = 80,
     BOLT_BRANCH_PERCENT_LIMIT           = 100,
     BOLT_PALETTE_BRIGHTEN_STEP          = 16,
-    CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE = 8,
-    CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE = 30,
-    CHAIN_LIGHTNING_SHORT_BRANCH_MAX    = 20,
+    CHAIN_LIGHTNING_MIN_ANGLE_DISTANCE = 8,
+    CHAIN_LIGHTNING_MAX_ANGLE_DISTANCE = 30,
+    CHAIN_LIGHTNING_SHORT_ANGLE_DISTANCE_MAX    = 20,
     CHAIN_LIGHTNING_DISTANCE_DIVISOR    = 10,
     CHAIN_LIGHTNING_BOLT_LENGTH         = 80,
     CHAIN_LIGHTNING_START_WIDTH         = 9,
