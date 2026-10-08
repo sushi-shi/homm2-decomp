@@ -8,10 +8,10 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <SOURCE/COMMAND.h>
-#include "army.h"
-#include "hero.h"
-#include "hexcell.h"
-#include "SPELLS.h"
+#include <SOURCE/army.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/hexcell.h>
+#include <SOURCE/SPELLS.h>
 #include <SOURCE/combatTypes.h>
 #include <BASE/palette.h>
 #include <H2/Ints.h>

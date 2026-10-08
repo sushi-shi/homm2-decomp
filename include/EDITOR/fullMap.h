@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include "mapcell.h"
+#include <EDITOR/mapcell.h>
 
 class mapCell;
 struct mapCellExtra;

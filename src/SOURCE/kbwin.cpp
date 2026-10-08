@@ -1,7 +1,7 @@
+#include <match.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <match.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>

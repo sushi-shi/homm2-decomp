@@ -5,7 +5,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <BASE/message.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 H2_ENUM_CLASS_BEGIN(WindowColorCycleMode)
     WINDOW_COLOR_CYCLE_DEFAULT          = 0,

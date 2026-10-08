@@ -5,7 +5,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <stdio.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 H2_ENUM_BEGIN(MidiTrackConstant)
     MIDI_NO_TRACK    = -1,

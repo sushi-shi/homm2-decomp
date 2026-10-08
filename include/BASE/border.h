@@ -4,7 +4,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <H2/Macros.h>
-#include "widget.h"
+#include <BASE/widget.h>
 
 class bitmap;
 class icon;

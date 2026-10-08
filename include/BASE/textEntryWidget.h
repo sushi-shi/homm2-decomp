@@ -5,7 +5,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <BASE/textWidget.h>
-#include "widget.h"
+#include <BASE/widget.h>
 
 struct tag_message;
 

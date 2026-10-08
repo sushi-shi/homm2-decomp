@@ -5,7 +5,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <windows.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 struct tag_message;
 class bitmap;

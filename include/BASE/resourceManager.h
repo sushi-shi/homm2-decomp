@@ -4,7 +4,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <H2/Macros.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 class MIDIWrap;
 class bitmap;

@@ -4,8 +4,8 @@
 #include <match.h>
 #include <Domains.h>
 #include <H2/Macros.h>
-#include "message.h"
-#include "widget.h"
+#include <BASE/message.h>
+#include <BASE/widget.h>
 
 class icon;
 H2_ENUM_CLASS_BEGIN_T(ButtonSelectMode, i16)
