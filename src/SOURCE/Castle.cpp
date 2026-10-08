@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <BASE/BITS.h>
 #include <BASE/heroWindow.h>
@@ -8,10 +8,8 @@
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/Castle.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
-#include <SOURCE/TOWNMGR.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/bankBox.h>
 #include <SOURCE/game.h>
@@ -23,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum CastleControl {
     CONTROL_CLOSE                              = DIALOG_BUTTON_0,

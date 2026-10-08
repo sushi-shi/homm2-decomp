@@ -1,5 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,19 +17,18 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/COMMAND.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <SOURCE/combatTypes.h>
 
 #define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1

@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>
@@ -12,7 +13,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/armyGroup.h>
 
 class army;
@@ -357,5 +358,26 @@ extern char* cNGKPCore;
 extern i32 NGKPcursorIndex;
 extern char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 extern class icon* NGKPBkg;
+
+i32 GetNumObelisks(i32 player);
+void ComputeUALoc(i32 playerIndex);
+void GenerateStandardFileName(char* source, char* destination);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
+MessageDispatchResult ViewArmyHandler(struct tag_message& message);
+i32 IsCursedItem(ArtifactType item);
+i32 CalcBaseScore(i32 days);
+void WriteDiffHeaderInfo(u8 command, i32 length, u8* buffer, i32* position);
+i32 GetSkipCopyLen(u8* buffer, i32* position);
+void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
+void CreateJoinFile(char* oldName, char* diffName, char* joinName);
+EventExtra* GetMapEvent(i32 x, i32 y);
+void CheckValidAvailableHeroes(void);
+i32 CalcFileCRC(char* file);
+void CompressTest2(void);
+void CompressTest(void);
+void CompressTest3(void);
+
+extern bchar bMapInitialized;
 
 #endif

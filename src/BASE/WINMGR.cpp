@@ -1,4 +1,6 @@
-#include <BASE/WINMGR.h>
+#include <H2/Ints.h>
+
+#include <BASE/heroWindowManager.h>
 
 typedef enum WindowColorCycleConstant {
     CYCLE_FRAME_COUNT                    = 8,
@@ -45,10 +47,6 @@ typedef enum WindowFizzleConstant {
     SCREENSHOT_FILENAME_CAPACITY  = 16
 } WindowFizzleConstant;
 
-#ifdef __clang__
-#else
-#endif
-
 i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 i16 memSelector;
 
@@ -57,9 +55,6 @@ static inline u32& FadeSavedUpdate(void) {
     return savedUpdate;
 }
 
-#include <Ints.h>
-
-
 i32 iCombatCycleFrame = 0;
 u8 gbEveryOtherCycle = true;
 i32 iCycle1Count = 0;
@@ -67,7 +62,6 @@ i32 iCycle2Count = 0;
 i32 iCycle3Count = 0;
 i32 iDialogNestCount = 0;
 
-#include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>

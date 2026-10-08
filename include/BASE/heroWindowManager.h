@@ -1,10 +1,21 @@
 #ifndef HOMM2_BASE_HEROWINDOWMANAGER_H
 #define HOMM2_BASE_HEROWINDOWMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <BASE/WINMGR.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
+
+enum {
+    WINDOW_COLOR_CYCLE_DEFAULT          = 0,
+    WINDOW_COLOR_CYCLE_COMBAT           = 1,
+    WINDOW_COLOR_CYCLE_WORLD_VIEW       = 2,
+    WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE = 3
+};
+typedef i32 WindowColorCycleMode;
+typedef enum WindowManagerConstant {
+    WINDOW_CYCLE_PALETTE_BYTES = 0x60
+} WindowManagerConstant;
 
 class heroWindow;
 class palette;
@@ -82,5 +93,10 @@ extern i32 iCycle3Count;
 extern i32 iDialogNestCount;
 extern i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 extern i16 memSelector;
+
+void CycleColors(i32 forceUpdate);
+void CreateFizzleTables(void);
+void CreateColorTables(void);
+void CreateColorLookupTables(void);
 
 #endif

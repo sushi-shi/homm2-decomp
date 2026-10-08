@@ -1,17 +1,18 @@
-#ifndef HOMM2_X_GLOBAL_H
-#define HOMM2_X_GLOBAL_H
+#ifndef HOMM2_SOURCE_X_GLOBAL_H
+#define HOMM2_SOURCE_X_GLOBAL_H
 
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/CONFIG_TYPES.h>
-#include <SOURCE/REMOTE_TYPES.h>
-#include <Ints.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/configTypes.h>
+#include <SOURCE/remoteTypes.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/combatTypes.h>
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/Overview.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <BASE/display.h>
 #include <BASE/soundManager.h>
 

@@ -1,11 +1,10 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/army.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/combatTypes.h>
 
 typedef enum CombatPathConstant {

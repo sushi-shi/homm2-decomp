@@ -1,6 +1,5 @@
-
-#ifndef HOMM2_INTS_H
-#define HOMM2_INTS_H
+#ifndef HOMM2_H2_INTS_H
+#define HOMM2_H2_INTS_H
 
 #include <cstddef>
 #include <cstdint>
@@ -22,8 +21,5 @@ typedef unsigned long u32l;
 typedef i32 b32;
 typedef i8 b8;
 typedef char bchar;
-
-#define H2_FINAL final
-
 
 #endif

@@ -1,8 +1,9 @@
-#ifndef HOMM2_VIEWWRLD_H
-#define HOMM2_VIEWWRLD_H
+#ifndef HOMM2_SOURCE_VIEWWRLD_H
+#define HOMM2_SOURCE_VIEWWRLD_H
 
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 struct tag_message;
 

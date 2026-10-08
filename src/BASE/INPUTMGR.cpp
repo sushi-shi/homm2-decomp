@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <string.h>
 #include <windows.h>
 #include <BASE/mouseManager.h>
@@ -9,7 +9,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/inputManager.h>
-#include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
 #include <BASE/baseManager.h>
 #include <BASE/display.h>

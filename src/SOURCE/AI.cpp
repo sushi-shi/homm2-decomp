@@ -1,10 +1,8 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <string.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/army.h>

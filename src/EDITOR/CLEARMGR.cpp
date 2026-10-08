@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <BASE/heroWindow.h>

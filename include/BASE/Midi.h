@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_MIDI_H
 #define HOMM2_BASE_MIDI_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 
 bool MIDIStartup(void);

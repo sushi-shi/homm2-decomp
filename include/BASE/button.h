@@ -1,9 +1,10 @@
 #ifndef HOMM2_BASE_BUTTON_H
 #define HOMM2_BASE_BUTTON_H
 
-#include <Ints.h>
-#include "message.h"
-#include "widget.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/message.h>
+#include <BASE/widget.h>
 
 class icon;
 enum {

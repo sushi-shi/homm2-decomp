@@ -1,8 +1,9 @@
 #ifndef HOMM2_BASE_BORDER_H
 #define HOMM2_BASE_BORDER_H
 
-#include <Ints.h>
-#include "widget.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/widget.h>
 
 class bitmap;
 class icon;

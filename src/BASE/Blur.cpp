@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Blur.h>
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>

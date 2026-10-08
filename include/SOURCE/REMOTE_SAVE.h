@@ -1,8 +1,9 @@
-#ifndef HOMM2_REMOTE_SAVE_H
-#define HOMM2_REMOTE_SAVE_H
+#ifndef HOMM2_SOURCE_REMOTE_SAVE_H
+#define HOMM2_SOURCE_REMOTE_SAVE_H
 
-#include <Ints.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/remoteTypes.h>
 
 typedef enum RemoteSaveLayoutConstant {
     REMOTE_SAVE_BUFFER_SIZE    = 256,

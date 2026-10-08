@@ -1,9 +1,9 @@
-#ifndef HOMM2_CASTLE_H
-#define HOMM2_CASTLE_H
+#ifndef HOMM2_SOURCE_CASTLE_H
+#define HOMM2_SOURCE_CASTLE_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class heroWindow;
 struct tag_message;

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/bitmap.h>

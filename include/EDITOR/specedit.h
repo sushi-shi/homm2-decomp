@@ -2,8 +2,7 @@
 #define HOMM2_EDITOR_SPECEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 
 class heroWindow;

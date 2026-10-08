@@ -1,7 +1,8 @@
-#ifndef HOMM2_SOURCE_KB_TYPES_H
-#define HOMM2_SOURCE_KB_TYPES_H
+#ifndef HOMM2_SOURCE_KBTYPES_H
+#define HOMM2_SOURCE_KBTYPES_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/combatTypes.h>
 
 class sample;
@@ -765,7 +766,7 @@ struct SMenuEnableStatus {
 };
 #pragma pack(pop)
 
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 struct tag_tilePoint {
     i8 x;
     i8 y;

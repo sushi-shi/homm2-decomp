@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_SEARCHARRAY_H
 #define HOMM2_SOURCE_SEARCHARRAY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/combatTypes.h>
 
 class army;

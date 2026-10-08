@@ -1,8 +1,9 @@
 #ifndef HOMM2_BASE_RESOURCEMANAGER_H
 #define HOMM2_BASE_RESOURCEMANAGER_H
 
-#include <Ints.h>
-#include "baseManager.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/baseManager.h>
 
 class MIDIWrap;
 class bitmap;

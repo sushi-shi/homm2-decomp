@@ -1,9 +1,9 @@
-#ifndef HOMM2_COMMAND_H
-#define HOMM2_COMMAND_H
+#ifndef HOMM2_SOURCE_COMMAND_H
+#define HOMM2_SOURCE_COMMAND_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 struct tag_message;
 

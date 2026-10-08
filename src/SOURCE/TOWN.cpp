@@ -1,10 +1,8 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/BITS.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindowManager.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>

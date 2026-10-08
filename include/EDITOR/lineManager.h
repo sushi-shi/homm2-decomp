@@ -2,7 +2,7 @@
 #define HOMM2_EDITOR_LINEMANAGER_H
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/baseManager.h>
 #include <EDITOR/line.h>
 

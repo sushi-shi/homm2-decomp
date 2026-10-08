@@ -1,11 +1,11 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/EDITOR.h>
 #include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
-#include <EDITOR/EVENTMGR.h>
+#include <EDITOR/eventsManager.h>
 #include <EDITOR/lineManager.h>
 #include <EDITOR/setup.h>
 #include <SOURCE/KB.h>

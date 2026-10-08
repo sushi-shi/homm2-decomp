@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +22,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 enum {

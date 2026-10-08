@@ -2,8 +2,7 @@
 #define HOMM2_EDITOR_SETUP_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/SETUP.h>
 

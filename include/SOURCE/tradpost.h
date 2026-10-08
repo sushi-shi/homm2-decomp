@@ -1,9 +1,9 @@
-#ifndef HOMM2_TRADPOST_H
-#define HOMM2_TRADPOST_H
+#ifndef HOMM2_SOURCE_TRADPOST_H
+#define HOMM2_SOURCE_TRADPOST_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 struct tag_message;
 

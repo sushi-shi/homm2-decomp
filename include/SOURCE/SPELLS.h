@@ -1,9 +1,9 @@
-#ifndef HOMM2_SPELLS_H
-#define HOMM2_SPELLS_H
+#ifndef HOMM2_SOURCE_SPELLS_H
+#define HOMM2_SOURCE_SPELLS_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/combatTypes.h>
 
 enum {

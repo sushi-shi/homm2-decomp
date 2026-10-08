@@ -1,17 +1,16 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
-#include <Ints.h>
 #include <BASE/inputManager.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
 #include <BASE/palette.h>
-#include <BASE/INPUTMGR.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <BASE/display.h>
 
 #ifdef HOMM2_EDITOR

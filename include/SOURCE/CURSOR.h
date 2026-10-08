@@ -1,8 +1,9 @@
-#ifndef HOMM2_CURSOR_H
-#define HOMM2_CURSOR_H
+#ifndef HOMM2_SOURCE_CURSOR_H
+#define HOMM2_SOURCE_CURSOR_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum CursorConstant {
     CURSOR_BOAT_WAKE_TYPE               = 7,

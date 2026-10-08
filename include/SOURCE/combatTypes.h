@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_COMBATTYPES_H
 #define HOMM2_SOURCE_COMBATTYPES_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum {
     COMBAT_SIDE_NONE        = -1,

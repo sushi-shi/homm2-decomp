@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/setup.h>
 #include <EDITOR/EDITOR.h>
 #include <BASE/dialog.h>

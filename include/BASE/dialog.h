@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DIALOG_H
 #define HOMM2_BASE_DIALOG_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 
 typedef enum DialogButtonId {

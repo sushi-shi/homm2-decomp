@@ -2,12 +2,12 @@
 #define HOMM2_EDITOR_TOWNEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum TownEditConstant {
 

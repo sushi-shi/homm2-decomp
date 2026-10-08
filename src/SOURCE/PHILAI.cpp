@@ -1,7 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/ADVMGR.h>
-#include <SOURCE/PHILAI.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/Misc.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
@@ -17,8 +15,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/town.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
-#include <SOURCE/TOWNMGR.h>
+#include <SOURCE/townManager.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/X_GLOBAL.h>

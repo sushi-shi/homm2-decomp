@@ -2,7 +2,7 @@
 #define HOMM2_BASE_ICONENTRY_H
 
 #ifndef HOMM2_BASE_ICONENTRY_NO_SIZE
-#include <Ints.h>
+#include <H2/Ints.h>
 #endif
 
 #pragma pack(push, 1)

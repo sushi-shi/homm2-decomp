@@ -1,10 +1,10 @@
-#ifndef HOMM2_ADVMGR_TYPES_H
-#define HOMM2_ADVMGR_TYPES_H
+#ifndef HOMM2_SOURCE_ADVMANAGERTYPES_H
+#define HOMM2_SOURCE_ADVMANAGERTYPES_H
 
-#include <Ints.h>
-#include <SOURCE/ADVMGR.h>
+#include <H2/Ints.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 #pragma pack(push, 1)
 union AdventureRemotePayload {

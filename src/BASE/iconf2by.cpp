@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/iconf2by.h>
 #include <BASE/IconRle.h>
 #include <SOURCE/KB.h>

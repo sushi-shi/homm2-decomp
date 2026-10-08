@@ -1,8 +1,9 @@
-#ifndef HOMM2_COMWIN_H
-#define HOMM2_COMWIN_H
+#ifndef HOMM2_SOURCE_COMWIN_H
+#define HOMM2_SOURCE_COMWIN_H
 
 #include <windows.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/Misc.h>
 
 typedef enum ComPortConstant {

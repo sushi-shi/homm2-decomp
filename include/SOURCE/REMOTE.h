@@ -1,9 +1,10 @@
-#ifndef HOMM2_REMOTE_H
-#define HOMM2_REMOTE_H
+#ifndef HOMM2_SOURCE_REMOTE_H
+#define HOMM2_SOURCE_REMOTE_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
+#include <SOURCE/remoteTypes.h>
 
 typedef enum RemoteStorageConstant {
     REMOTE_QUEUE_CAPACITY        = 128,

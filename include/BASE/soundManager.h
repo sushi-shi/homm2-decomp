@@ -1,9 +1,10 @@
 #ifndef HOMM2_BASE_SOUNDMANAGER_H
 #define HOMM2_BASE_SOUNDMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <stdio.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 typedef enum MidiTrackConstant {
     MIDI_NO_TRACK    = -1,

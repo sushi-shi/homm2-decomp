@@ -1,10 +1,11 @@
-#ifndef HOMM2_WSNETWIN_H
-#define HOMM2_WSNETWIN_H
+#ifndef HOMM2_SOURCE_WSNETWIN_H
+#define HOMM2_SOURCE_WSNETWIN_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 #include <winsock.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 typedef enum WinsockTransportConstant {
     WS_TRANSPORT_BUFFER_SIZE        = 0x100,

@@ -1,28 +1,23 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
 #include <BASE/MiscEnums.h>
 #include <BASE/MiscGraphicsConstants.h>
-#include <BASE/WINMGR.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/Netbios.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/dpnetwin.h>
 #include <SOURCE/kbwin.h>
@@ -57,11 +52,11 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <SOURCE/combatTypes.h>
 
 typedef enum CampaignChoiceAmount {

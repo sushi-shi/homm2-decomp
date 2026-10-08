@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/terrainManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/clearManager.h>

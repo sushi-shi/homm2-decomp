@@ -1,9 +1,10 @@
 #ifndef HOMM2_SOURCE_TOWN_H
 #define HOMM2_SOURCE_TOWN_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class hero;
 

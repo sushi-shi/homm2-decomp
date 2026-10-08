@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/signedit.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>

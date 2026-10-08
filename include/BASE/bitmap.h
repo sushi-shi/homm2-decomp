@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_BITMAP_H
 #define HOMM2_BASE_BITMAP_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/resource.h>
 
 enum {

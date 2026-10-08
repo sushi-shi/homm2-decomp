@@ -1,5 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,17 +16,15 @@
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/combatManager.h>
@@ -36,7 +34,7 @@
 #include <SOURCE/swapManager.h>
 #include <SOURCE/tradpost.h>
 #include <SOURCE/town.h>
-#include <SOURCE/EVENTS_TYPES.h>
+#include <SOURCE/eventsTypes.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>

@@ -1,7 +1,8 @@
-#ifndef HOMM2_MISC_H
-#define HOMM2_MISC_H
+#ifndef HOMM2_BASE_MISC_H
+#define HOMM2_BASE_MISC_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 
 typedef i32 CDRomSetupResult;

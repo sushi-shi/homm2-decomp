@@ -2,8 +2,7 @@
 #define HOMM2_EDITOR_X_SPEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 
 

@@ -2,10 +2,10 @@
 #define HOMM2_EDITOR_HEROEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/hero.h>
 

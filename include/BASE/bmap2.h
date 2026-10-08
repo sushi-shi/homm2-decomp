@@ -1,7 +1,7 @@
-#ifndef HOMM2_BMAP2_H
-#define HOMM2_BMAP2_H
+#ifndef HOMM2_BASE_BMAP2_H
+#define HOMM2_BASE_BMAP2_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 class bitmap;
 

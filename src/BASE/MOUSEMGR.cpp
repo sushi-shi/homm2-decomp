@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <string.h>
@@ -13,7 +13,6 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
-#include <BASE/INPUTMGR.h>
 #include <BASE/display.h>
 
 #define MOUSE_CURSOR_MASK_SHIFT 3

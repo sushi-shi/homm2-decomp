@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_WIDGET_KIND_H
-#define HOMM2_BASE_WIDGET_KIND_H
+#ifndef HOMM2_BASE_WIDGETKIND_H
+#define HOMM2_BASE_WIDGETKIND_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum {
     WIDGET_KIND_NONE          = 0,

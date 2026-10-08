@@ -1,6 +1,6 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
-#include <Ints.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
@@ -16,11 +16,10 @@
 #include <SOURCE/Netbios.h>
 #include <SOURCE/netwin.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/GAME.h>
 #include <BASE/dialog.h>
 
 typedef enum RemoteImplementationConstant {

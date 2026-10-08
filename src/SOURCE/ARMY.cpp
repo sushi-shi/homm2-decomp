@@ -1,5 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -13,9 +13,7 @@
 #include <BASE/mouseManager.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
-#include <SOURCE/ARMY.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/message.h>
@@ -7,12 +7,11 @@
 #include <BASE/iconWidget.h>
 #include <BASE/mouseManager.h>
 #include <BASE/soundManager.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REQUEST.h>
-#include <SOURCE/SMACKMGR.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
@@ -20,7 +19,6 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
 #include <BASE/dialog.h>
-#include <SOURCE/GAME.h>
 
 typedef enum CampaignScenarioArmyCount {
     BARBARIAN_ORC_CHIEF_COUNT  = 12,

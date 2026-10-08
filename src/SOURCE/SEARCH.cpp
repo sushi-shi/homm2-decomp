@@ -1,16 +1,15 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/FINDPATH.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 i32 searchArray::BuildPath(
     i32 startX,

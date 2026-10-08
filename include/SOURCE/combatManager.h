@@ -1,17 +1,27 @@
 #ifndef HOMM2_SOURCE_COMBATMANAGER_H
 #define HOMM2_SOURCE_COMBATMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
-#include <BASE/WINMGR.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <SOURCE/COMMAND.h>
-#include "army.h"
-#include "hero.h"
-#include "hexcell.h"
-#include "SPELLS.h"
+#include <SOURCE/army.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/hexcell.h>
+#include <SOURCE/SPELLS.h>
 #include <SOURCE/combatTypes.h>
 #include <BASE/palette.h>
+#include <H2/Ints.h>
+#include <BASE/message.h>
+
+struct tag_message;
+
+struct CombatTowerOrigin {
+    u16 x;
+    u16 y;
+};
 
 class armyGroup;
 class hero;
@@ -866,5 +876,9 @@ extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
 extern b32 bCPrefsChanged;
+
+i32 ValidHex(i32 hex);
+void UpdateCombatSystemOptions(i32 initialDraw);
+MessageDispatchResult CombatSystemOptionsHandler(struct tag_message& message);
 
 #endif

@@ -1,7 +1,7 @@
-#ifndef HOMM2_MISC_ENUMS_H
-#define HOMM2_MISC_ENUMS_H
+#ifndef HOMM2_BASE_MISCENUMS_H
+#define HOMM2_BASE_MISCENUMS_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum {
     CD_ROM_READY                  = 0,

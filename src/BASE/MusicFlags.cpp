@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/MusicFlags.h>
 
 u8 gMusicFeatureEnabled = 1;

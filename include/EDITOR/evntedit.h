@@ -2,10 +2,9 @@
 #define HOMM2_EDITOR_EVNTEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 typedef enum EventEditConstant {
 

@@ -1,8 +1,9 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/hero.h>
 
 typedef enum PlayerDataStorageConstant {

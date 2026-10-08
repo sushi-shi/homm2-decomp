@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Icon2b.h>
@@ -8,18 +8,16 @@
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/FINDPATH.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
@@ -27,7 +25,7 @@
 #include <BASE/message.h>
 #include <stdio.h>
 #include <string.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum CursorPrivateConstant {
     SLOW_CURSOR_CYCLE_START  = 2,

@@ -1,10 +1,12 @@
 #ifndef HOMM2_BASE_INPUTMANAGER_H
 #define HOMM2_BASE_INPUTMANAGER_H
 
-#include <Ints.h>
-#include "baseManager.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/baseManager.h>
 #include <BASE/message.h>
 #include <BASE/display.h>
+#include <H2/Ints.h>
 
 struct tag_message;
 
@@ -162,5 +164,11 @@ extern b32 bLastMouseOffscreen;
 extern b32 bLastOnscreenMouseColor;
 extern b32 bInCheckChangeCursor;
 extern i32 iLastBWOnScreenCheck;
+
+i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData);
+i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData);
+void CheckChangeCursor(i32 x, i32 y, i32 force);
+
+void TranslateInputCharacterCp1251(struct tag_message& event);
 
 #endif

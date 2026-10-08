@@ -1,20 +1,18 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/PATH.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/FINDPATH.h>
-#include <SOURCE/CMBTMGR.h>
 #include <EDITOR/mapcell.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 

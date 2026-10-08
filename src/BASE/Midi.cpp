@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/soundManager.h>
 #include <BASE/Midi.h>
 #include <BASE/MusicFlags.h>

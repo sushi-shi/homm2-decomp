@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_BZIP_H
 #define HOMM2_BASE_BZIP_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <stdio.h>
 
 typedef i32 Int32;
