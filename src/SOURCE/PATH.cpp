@@ -1,19 +1,18 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <set>
 #include <vector>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/expansions.h>
 #include <SOURCE/army.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/combatTypes.h>
 
 typedef enum CombatPathConstant {
-    SPECIAL_DIRECTION_MASK = 0xc0,
+    WIDE_DIRECTIONS_MASK = 0xc0,
     IGNORE_SPEED           = 99,
     WIDE_HEX_OFFSET        = 1
 } CombatPathConstant;
@@ -91,7 +90,7 @@ i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     if (!ValidHex(targetHex))
         return 0;
 
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING)))
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_FLYING))))
         return ValidFlight(targetHex, pathMode);
 
     pathResult = FindPath(m_hex, targetHex, m_monster.speed, 0, pathMode);
@@ -114,8 +113,8 @@ i32 army::GetMoveMask(i32 sourceHex) {
             blockedMaskValue |= directionBitFlag;
         directionBitFlag <<= 1;
     }
-    return blockedMaskValue | (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))
-         | (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST));
+    return blockedMaskValue | (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))
+         | (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH));
 }
 
 i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHex) {
@@ -126,7 +125,7 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
     i32 attackHexNext;
 
     blockedMaskValue =
-        (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) ? 0 : SPECIAL_DIRECTION_MASK;
+        (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) ? 0 : WIDE_DIRECTIONS_MASK;
     directionBitFlag = 1;
     directionCountNext = (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
                              ? COMBAT_DIRECTION_COUNT
@@ -168,7 +167,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         frontValid = true;
     }
 
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         rearSquare = ARMY_HEX_INVALID;
         switch (m_facing) {
             case ARMY_FACING_LEFT:
@@ -219,14 +218,14 @@ i32 army::ValidAttack(
         return 0;
 
     adjacentSourceHex = sourceHex;
-    if (H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE))) {
-        if (direction == COMBAT_DIRECTION_WIDE_WEST) {
+    if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
+        if (direction == COMBAT_DIRECTION_WIDE_NORTH) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
                 m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_NORTHWEST
                                              : COMBAT_DIRECTION_NORTHEAST
             );
-        } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
+        } else if (direction == COMBAT_DIRECTION_WIDE_SOUTH) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
                 m_facing == ARMY_FACING_LEFT ? COMBAT_DIRECTION_SOUTHWEST
@@ -282,10 +281,10 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
 
-    if (direction == COMBAT_DIRECTION_WIDE_WEST) {
+    if (direction == COMBAT_DIRECTION_WIDE_NORTH) {
         direction = m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_NORTHWEST
                                                   : COMBAT_DIRECTION_NORTHEAST;
-    } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
+    } else if (direction == COMBAT_DIRECTION_WIDE_SOUTH) {
         direction = m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_SOUTHWEST
                                                   : COMBAT_DIRECTION_SOUTHEAST;
     }
@@ -297,9 +296,9 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
 
-    if (direction == COMBAT_DIRECTION_WIDE_WEST)
+    if (direction == COMBAT_DIRECTION_WIDE_NORTH)
         direction = COMBAT_DIRECTION_NORTHWEST;
-    else if (direction == COMBAT_DIRECTION_WIDE_EAST)
+    else if (direction == COMBAT_DIRECTION_WIDE_SOUTH)
         direction = COMBAT_DIRECTION_SOUTHWEST;
     return gpCombatManager->m_adjacency[sourceHex][H2EnumIndex(direction)];
 }
@@ -313,7 +312,7 @@ i32 army::ValidRange(i32 targetHex) {
 
     m_moveTargetHex = m_hex;
     if (!(m_monster.attributes & MONSTER_FLAGS_WIDE)) {
-        m_attackDirection = GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
+        m_attackDirection = GetBestDirection(m_hex, targetHex, WIDE_DIRECTIONS_MASK);
         adjacentHex = GetAdjacentCellIndex(m_hex, m_attackDirection);
         if (adjacentHex == targetHex)
             return 1;
@@ -324,7 +323,7 @@ i32 army::ValidRange(i32 targetHex) {
         switch (m_facing) {
             case ARMY_FACING_RIGHT:
                 directionResult =
-                    GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
+                    GetBestDirection(m_hex, targetHex, WIDE_DIRECTIONS_MASK);
                 if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
                     m_attackDirection = directionResult;
                     adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
@@ -336,7 +335,7 @@ i32 army::ValidRange(i32 targetHex) {
                 }
 
                 directionResult =
-                    GetBestDirection(m_hex + WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
+                    GetBestDirection(m_hex + WIDE_HEX_OFFSET, targetHex, WIDE_DIRECTIONS_MASK);
                 if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
                     m_attackDirection = directionResult;
                     adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
@@ -349,9 +348,9 @@ i32 army::ValidRange(i32 targetHex) {
                 if (directionResult == COMBAT_DIRECTION_WEST)
                     return 0;
                 if (directionResult == COMBAT_DIRECTION_NORTHWEST)
-                    m_attackDirection = COMBAT_DIRECTION_WIDE_WEST;
+                    m_attackDirection = COMBAT_DIRECTION_WIDE_NORTH;
                 else if (directionResult == COMBAT_DIRECTION_SOUTHWEST)
-                    m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
+                    m_attackDirection = COMBAT_DIRECTION_WIDE_SOUTH;
 
                 adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
                 if (adjacentHex == targetHex)
@@ -363,7 +362,7 @@ i32 army::ValidRange(i32 targetHex) {
 
             case ARMY_FACING_LEFT:
                 directionResult =
-                    GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
+                    GetBestDirection(m_hex, targetHex, WIDE_DIRECTIONS_MASK);
                 if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
                     m_attackDirection = directionResult;
                     adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
@@ -376,7 +375,7 @@ i32 army::ValidRange(i32 targetHex) {
                 }
 
                 directionResult =
-                    GetBestDirection(m_hex - WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
+                    GetBestDirection(m_hex - WIDE_HEX_OFFSET, targetHex, WIDE_DIRECTIONS_MASK);
                 if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
                     m_attackDirection = directionResult;
                     adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
@@ -390,9 +389,9 @@ i32 army::ValidRange(i32 targetHex) {
                 if (directionResult == COMBAT_DIRECTION_EAST)
                     return 0;
                 if (directionResult == COMBAT_DIRECTION_NORTHEAST)
-                    m_attackDirection = COMBAT_DIRECTION_WIDE_WEST;
+                    m_attackDirection = COMBAT_DIRECTION_WIDE_NORTH;
                 else if (directionResult == COMBAT_DIRECTION_SOUTHEAST)
-                    m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
+                    m_attackDirection = COMBAT_DIRECTION_WIDE_SOUTH;
 
                 adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
                 if (adjacentHex == targetHex)
@@ -411,10 +410,10 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
         return (direction + COMBAT_DIRECTION_OPPOSITE_OFFSET)
                % COMBAT_DIRECTION_ADJACENT_COUNT;
     } else {
-        if (direction == COMBAT_DIRECTION_WIDE_WEST)
-            return COMBAT_DIRECTION_WIDE_EAST;
+        if (direction == COMBAT_DIRECTION_WIDE_NORTH)
+            return COMBAT_DIRECTION_WIDE_SOUTH;
         else
-            return COMBAT_DIRECTION_WIDE_WEST;
+            return COMBAT_DIRECTION_WIDE_NORTH;
     }
 }
 
@@ -465,10 +464,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_SOUTHWEST;
                 else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHEAST))))
                     return COMBAT_DIRECTION_SOUTHEAST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                    return COMBAT_DIRECTION_WIDE_WEST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                    return COMBAT_DIRECTION_WIDE_EAST;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                    return COMBAT_DIRECTION_WIDE_NORTH;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                    return COMBAT_DIRECTION_WIDE_SOUTH;
             } else {
                 if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_NORTHEAST))))
                     return COMBAT_DIRECTION_NORTHEAST;
@@ -482,10 +481,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_SOUTHEAST;
                 else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHWEST))))
                     return COMBAT_DIRECTION_SOUTHWEST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                    return COMBAT_DIRECTION_WIDE_WEST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                    return COMBAT_DIRECTION_WIDE_EAST;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                    return COMBAT_DIRECTION_WIDE_NORTH;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                    return COMBAT_DIRECTION_WIDE_SOUTH;
             }
         } else {
             if (sourceRow & 1) {
@@ -501,10 +500,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_NORTHWEST;
                 else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_NORTHEAST))))
                     return COMBAT_DIRECTION_NORTHEAST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                    return COMBAT_DIRECTION_WIDE_EAST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                    return COMBAT_DIRECTION_WIDE_WEST;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                    return COMBAT_DIRECTION_WIDE_SOUTH;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                    return COMBAT_DIRECTION_WIDE_NORTH;
             } else {
                 if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHEAST))))
                     return COMBAT_DIRECTION_SOUTHEAST;
@@ -518,10 +517,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_NORTHEAST;
                 else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_NORTHWEST))))
                     return COMBAT_DIRECTION_NORTHWEST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                    return COMBAT_DIRECTION_WIDE_EAST;
-                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                    return COMBAT_DIRECTION_WIDE_WEST;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                    return COMBAT_DIRECTION_WIDE_SOUTH;
+                else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                    return COMBAT_DIRECTION_WIDE_NORTH;
             }
         }
     }
@@ -540,10 +539,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_EAST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHEAST))))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
         } else if (isMovingDown == 1) {
             if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHWEST))))
                 return COMBAT_DIRECTION_SOUTHWEST;
@@ -557,10 +556,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_EAST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_NORTHEAST))))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
         } else {
             if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))))
                 return COMBAT_DIRECTION_WEST;
@@ -574,10 +573,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_SOUTHEAST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
         }
     } else if (isMovingRight == 1) {
         if (isMovingUp == 1) {
@@ -593,10 +592,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_WEST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHWEST))))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
         } else if (isMovingDown == 1) {
             if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_SOUTHEAST))))
                 return COMBAT_DIRECTION_SOUTHEAST;
@@ -610,10 +609,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_NORTHWEST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
         } else {
             if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))))
                 return COMBAT_DIRECTION_EAST;
@@ -627,10 +626,10 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                 return COMBAT_DIRECTION_SOUTHWEST;
             else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_EAST))))
-                return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_WEST))))
-                return COMBAT_DIRECTION_WIDE_WEST;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_SOUTH))))
+                return COMBAT_DIRECTION_WIDE_SOUTH;
+            else if (!(blockedMask & (1 << H2EnumIndex(COMBAT_DIRECTION_WIDE_NORTH))))
+                return COMBAT_DIRECTION_WIDE_NORTH;
         }
     }
     return COMBAT_DIRECTION_INVALID;

@@ -1,9 +1,11 @@
 #ifndef HOMM2_SOURCE_HERO_H
 #define HOMM2_SOURCE_HERO_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
+#include <BASE/message.h>
 
 class town;
 
@@ -58,7 +60,6 @@ typedef enum HeroConstant {
     HERO_PATROL_NONE                          = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
-    HERO_MAP_CELL_PRESENT                     = 0x40,
     HERO_NAME_SIZE                            = 13,
     HERO_PRIMARY_STAT_COUNT                   = 4,
     HERO_ARTIFACT_SLOT_COUNT                  = 14,
@@ -66,7 +67,7 @@ typedef enum HeroConstant {
     HERO_STARTING_STAT_COUNT                  = 5,
     HERO_AVAILABLE_SLOT_COUNT                 = 2,
     HERO_AVAILABILITY_UNAVAILABLE             = -1,
-    HERO_AVAILABILITY_RETREATED               = 0x40,
+    HERO_AVAILABILITY_FOR_HIRE               = 0x40,
     HERO_AVAILABILITY_JAILED                  = 0x41,
     HERO_EXPERIENCE_LEVEL_TABLE_COUNT         = 12,
     HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL = 13,
@@ -126,9 +127,9 @@ public:
     i16 m_lastHeroInteractionTurn;
     u8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;
-    u8 m_visitedTownId;
+    u8 m_lastInteractionTownId;
     char m_name[HERO_NAME_SIZE];
-    H2EnumStorage<HeroCursorType, u8> m_cursorType;
+    H2EnumStorage<FactionType, u8> m_faction;
     H2EnumStorage<HeroPortrait, u8> m_portrait;
     i32 m_x;
     i32 m_y;
@@ -139,7 +140,7 @@ public:
     i8 m_patrolRadius;
     H2EnumStorage<MapDirection, u8> m_direction;
     H2OpenCodeStorage<MapTriggerCode, i16> m_locationType;
-    i16 m_occupiedTown;
+    i16 m_locationMetadata;
     i32 m_mobility;
     i32 m_remainingMobility;
     i32 m_experience;
@@ -156,7 +157,7 @@ public:
     u32 m_treeKnowledgeVisits;
     u32 m_xanaduVisits;
     u8 m_randomSeed;
-    u8 m_enabled;
+    u8 m_lastWisdomOfferLevel;
     class armyGroup m_army;
     H2SteppedEnumStorage<HeroSkillLevel, i8> m_secondarySkills[H2EnumIndex(HERO_SKILL_COUNT)];
     u8 m_secondarySkillOrder[H2EnumIndex(HERO_SKILL_COUNT)];
@@ -168,7 +169,7 @@ public:
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
     float m_aiFightValue;
-    i8 m_artifactExtra[HERO_ARTIFACT_SLOT_COUNT];
+    i8 m_artifactSpells[HERO_ARTIFACT_SLOT_COUNT];
     i32 IsEmbarked(void) {
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
@@ -186,7 +187,7 @@ public:
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32 stat, i32 quickView);
-    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra);
+    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell);
     i32 Dismiss(void);
     void Deallocate(i32 updateMap);
     i32 GetExperience(i32 level);
@@ -230,5 +231,15 @@ extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
 extern i32 iOrigHeroViewID;
 extern b32 gbNoDismiss;
+
+struct tag_message;
+
+void HeroMessageUpdate(char* text);
+void UpdateHeroScreenStatusBar(struct tag_message& message);
+MessageDispatchResult HeroHandler(struct tag_message& message);
+void RedrawHeroScreen(void);
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut);
+void SetupHeroView(void);
+void DoHeroSplit(i32 destinationSlot, i32 sourceSlot);
 
 #endif

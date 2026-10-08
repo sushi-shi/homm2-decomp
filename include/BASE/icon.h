@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_ICON_H
 #define HOMM2_BASE_ICON_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/IconDraw.h>
 #include <BASE/resource.h>
 
@@ -28,9 +29,9 @@ public:
         i32 frame,
         struct SLimitData* limits,
         IconDrawOrientation orientation,
-        i32 offset = 0,
+        i32 outlineColor = 0,
         u8* colorTable = NULL,
-        i8* yModify = NULL
+        i8* shear = NULL
     );
     void ClipFillToBuffer(
         i32 x,

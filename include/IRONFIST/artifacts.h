@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/X_GLOBAL.h>
 
 /*

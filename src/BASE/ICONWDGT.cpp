@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/iconWidget.h>
@@ -10,7 +10,6 @@
 #include <SOURCE/KB.h>
 
 typedef enum IconWidgetConstant {
-    RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff,
     ORIENTATION_MASK       = 0xff,
     FRAME_INDEX_MASK       = 0xffff,
@@ -69,7 +68,7 @@ iconWidget::iconWidget(
 }
 
 void iconWidget::Read(void) {
-    char iconName[RESOURCE_NAME_CAPACITY];
+    char iconName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     gpResourceManager->Read13(iconName);
     gpResourceManager->SavePosition();
@@ -183,7 +182,7 @@ void iconWidget::Draw(void) {
             m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;
 
-        case WIDGET_KIND_ICON_CENTERED: {
+        case WIDGET_KIND_ICON_BOTTOM_CENTERED: {
             IconEntry* entry = GetIconEntry(m_icon, m_frame);
             x -= entry->x;
             y -= entry->y;

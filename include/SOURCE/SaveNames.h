@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_SAVE_NAMES_H
-#define HOMM2_SOURCE_SAVE_NAMES_H
+#ifndef HOMM2_SOURCE_SAVENAMES_H
+#define HOMM2_SOURCE_SAVENAMES_H
 
 // These names are part of the save/network protocol. They must not change
 // when the display language changes.

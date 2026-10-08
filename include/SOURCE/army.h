@@ -1,12 +1,180 @@
 #ifndef HOMM2_SOURCE_ARMY_H
 #define HOMM2_SOURCE_ARMY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 #include <vector>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/icon.h>
-#include <SOURCE/ARMY.h>
 #include <SOURCE/combatTypes.h>
+
+enum class ArmyAnimationSequence : i8 {
+    ARMY_ANIMATION_NONE                  = -1,
+    ARMY_ANIMATION_WALK_BEGIN            = 0,
+    ARMY_ANIMATION_WALK_BEGIN_STANDING   = 1,
+    ARMY_ANIMATION_WALK_MIDDLE           = 2,
+    ARMY_ANIMATION_WALK_END              = 3,
+    ARMY_ANIMATION_WALK_END_STANDING     = 4,
+    ARMY_ANIMATION_WALK_STAND            = 5,
+    ARMY_ANIMATION_WALK_SOURCE_COUNT     = 6,
+    ARMY_ANIMATION_WALK                  = 6,
+    ARMY_ANIMATION_STAND                 = 7,
+    ARMY_ANIMATION_STANDING_FIRST        = 8,
+    ARMY_ANIMATION_STANDING_LAST         = 12,
+    ARMY_ANIMATION_STANDING_END          = 13,
+    ARMY_ANIMATION_DEATH                 = 13,
+    ARMY_ANIMATION_WINCE                 = 14,
+    ARMY_ANIMATION_WINCE_RETURN          = 15,
+    ARMY_ANIMATION_ATTACK_UP             = 16,
+    ARMY_ANIMATION_ATTACK_UP_RETURN      = 17,
+    ARMY_ANIMATION_BREATH_UP             = 18,
+    ARMY_ANIMATION_BREATH_UP_RETURN      = 19,
+    ARMY_ANIMATION_ATTACK_FORWARD        = 20,
+    ARMY_ANIMATION_ATTACK_FORWARD_RETURN = 21,
+    ARMY_ANIMATION_BREATH_FORWARD        = 22,
+    ARMY_ANIMATION_BREATH_FORWARD_RETURN = 23,
+    ARMY_ANIMATION_ATTACK_DOWN           = 24,
+    ARMY_ANIMATION_ATTACK_DOWN_RETURN    = 25,
+    ARMY_ANIMATION_BREATH_DOWN           = 26,
+    ARMY_ANIMATION_BREATH_DOWN_RETURN    = 27,
+    ARMY_ANIMATION_SHOOT_UP              = 28,
+    ARMY_ANIMATION_SHOOT_UP_RETURN       = 29,
+    ARMY_ANIMATION_SHOOT_FORWARD         = 30,
+    ARMY_ANIMATION_SHOOT_FORWARD_RETURN  = 31,
+    ARMY_ANIMATION_SHOOT_DOWN            = 32,
+    ARMY_ANIMATION_SHOOT_DOWN_RETURN     = 33
+};
+using enum ArmyAnimationSequence;
+ENABLE_ENUM_STEPS(ArmyAnimationSequence)
+
+enum class ArmySampleType : i32 {
+    ARMY_SAMPLE_MOVE,
+    ARMY_SAMPLE_ATTACK,
+    ARMY_SAMPLE_WINCE,
+    ARMY_SAMPLE_SHOT,
+    ARMY_SAMPLE_KILL,
+    ARMY_SAMPLE_EXTRA_ONE,
+    ARMY_SAMPLE_EXTRA_TWO,
+    ARMY_SAMPLE_COUNT
+};
+using enum ArmySampleType;
+
+typedef enum ArmyCombatConstant {
+    ARMY_SAMPLE_VOLUME                   = 64,
+    ARMY_SAMPLE_CHANNEL                  = 3,
+    ARMY_PRIMARY_SAMPLE_COUNT            = H2EnumIndex(ARMY_SAMPLE_KILL) + 1,
+    ARMY_QUANTITY_TEXT_SIZE              = 12,
+    ARMY_SPELL_EFFECT_ANIMATION_DURATION = 275,
+    ARMY_MAGE_BOLT_DELAY                 = 115,
+    ARMY_POW_EFFECT_DELAY                = 120,
+    ARMY_ARCHMAGE_DISPEL_CHANCE          = 20,
+    ARMY_PERCENT_MAX                     = 100
+} ArmyCombatConstant;
+
+enum class ArmySpellInfluence : i32 {
+    ARMY_SPELL_INFLUENCE_NONE          = -1,
+    ARMY_SPELL_INFLUENCE_HASTE         = 0,
+    ARMY_SPELL_INFLUENCE_SLOW          = 1,
+    ARMY_SPELL_INFLUENCE_BLIND         = 2,
+    ARMY_SPELL_INFLUENCE_BLESS         = 3,
+    ARMY_SPELL_INFLUENCE_CURSE         = 4,
+    ARMY_SPELL_INFLUENCE_BERSERK       = 5,
+    ARMY_SPELL_INFLUENCE_PARALYZE      = 6,
+    ARMY_SPELL_INFLUENCE_HYPNOTIZE     = 7,
+    ARMY_SPELL_INFLUENCE_DRAGON_SLAYER = 8,
+    ARMY_SPELL_INFLUENCE_BLOODLUST     = 9,
+    ARMY_SPELL_INFLUENCE_SHIELD        = 10,
+    ARMY_SPELL_INFLUENCE_PETRIFIED     = 11,
+    ARMY_SPELL_INFLUENCE_ANTI_MAGIC    = 12,
+    ARMY_SPELL_INFLUENCE_STONESKIN     = 13,
+    ARMY_SPELL_INFLUENCE_STEELSKIN     = 14,
+    // Retail effect count; anti-magic dispels only these.
+    ARMY_SPELL_INFLUENCE_RETAIL_COUNT  = 15,
+    // Ironfist effects.
+    ARMY_SPELL_INFLUENCE_BURN          = 15,
+    ARMY_SPELL_INFLUENCE_SHADOW_MARK   = 16,
+    ARMY_SPELL_INFLUENCE_DAZE          = 17,
+    ARMY_SPELL_INFLUENCE_FORCE_SHIELD  = 18,
+    ARMY_SPELL_INFLUENCE_COUNT         = 19
+};
+using enum ArmySpellInfluence;
+
+// Which way a charger flies, for the in-air sprite choice.
+enum ChargingDirection {
+    CHARGING_FORWARD,
+    CHARGING_UP,
+    CHARGING_DOWN
+};
+
+enum IronfistArmyConstant {
+    ARMY_CHARGE_SPRITE_OFFSET      = 10,
+    ARMY_STRAIGHT_LINE_UNREACHABLE = 999,
+    ARMY_PLASMA_BLAST_HEX_COUNT    = 18
+};
+
+// The exact angle of the hex grid's diagonals as atan2 computes it.
+#define ARMY_HEX_DIAGONAL_ANGLE 62.354024636261322
+
+enum class ArmySpellCancelType : i32 {
+    ARMY_CANCEL_SPELLS_AFTER_MOVE   = 0,
+    ARMY_CANCEL_SPELLS_AFTER_ATTACK = 1,
+    ARMY_CANCEL_SPELLS_AFTER_DAMAGE = 2,
+    ARMY_CANCEL_SPELLS_UNUSED       = 3
+};
+using enum ArmySpellCancelType;
+
+typedef enum ArmyAttackConstant {
+    ARMY_COMBAT_TEXT_SIZE              = 800,
+    ARMY_LUCK_ROLL_MAX                 = 24,
+    ARMY_ATTACK_EFFECT_CHANCE          = 20,
+    ARMY_ROYAL_MUMMY_EFFECT_CHANCE     = 30,
+    ARMY_BREATH_ATTACK_SEQUENCE_OFFSET = 2,
+    ARMY_NEAREST_DISTANCE_LIMIT        = 999999,
+    ARMY_RETALIATION_DELAY             = 150,
+    ARMY_SECOND_ATTACK_DELAY           = 100,
+    ARMY_BAD_LUCK_EFFECT_DELAY         = 180,
+    ARMY_ASCII_CASE_OFFSET             = 32,
+    ARMY_DAMAGE_STAT_LIMIT             = 20,
+    ARMY_MOAT_ATTACK_BONUS             = 3,
+    ARMY_DRAGON_SLAYER_BONUS           = 5,
+    ARMY_GENIE_HALF_ROLL_MAX           = 5,
+    ARMY_GENIE_HALF_ROLL               = 2,
+    ARMY_PATH_BLOCKED                  = 3
+} ArmyAttackConstant;
+
+typedef enum ArmyFrameConstant {
+    ARMY_MISSILE_OFFSET_COUNT     = 3,
+    ARMY_PROJECTILE_ANGLE_COUNT   = 12,
+    ARMY_ANIMATION_SEQUENCE_COUNT = 34,
+    ARMY_ANIMATION_FRAME_COUNT    = 16,
+    ARMY_STANDING_CHANCE_COUNT    = 10
+} ArmyFrameConstant;
+
+#pragma pack(push, 1)
+struct SMonFrameInfo {
+    struct MissileOffset {
+        i16 x;
+        i16 y;
+    };
+    char unused00;
+    i16 blindEffectX;
+    i16 blindEffectY;
+    i8 animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_SOURCE_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
+    i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
+    i8 standingAnimationCount;
+    float standingAnimationChances[ARMY_STANDING_CHANCE_COUNT];
+    i32 standStillDelay;
+    i32 walkDuration;
+    i32 attackDuration;
+    i32 flightSpeed;
+    struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];
+    u8 projectileDirectionCount;
+    float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];
+    i32 quantityX[H2EnumIndex(ARMY_FACING_COUNT)];
+    i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
+    i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
+};
+#pragma pack(pop)
 
 class sample;
 
@@ -28,10 +196,14 @@ typedef enum ArmyHexConstant {
     ARMY_HEX_INVALID      = -1
 } ArmyHexConstant;
 
+typedef enum ArmyDisplayConstant {
+    ARMY_QUANTITY_OVERRIDE_NONE = -1
+} ArmyDisplayConstant;
+
 #pragma pack(push, 1)
 class army {
 public:
-    u8 m_animationState;
+    u8 m_attackPending;
     u8 m_shootingAnimationActive;
     H2SteppedEnumStorage<ArmyAnimationSequence, char> m_pendingAnimationSequence;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationStart;
@@ -47,7 +219,7 @@ public:
     H2EnumStorage<CombatSide, i32> m_targetSide;
     i32 m_targetIndex;
     CombatHexDirection m_attackDirection;
-    i32 m_unknown5e;
+    i32 m_unused5e;
     i32 m_moveTargetHex;
     b32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
@@ -71,11 +243,11 @@ public:
     i32 m_walkDuration;
     i32 m_luckOutcome;
     struct tag_monsterInfo m_monster;
-    i16 m_unknownD4;
+    i16 m_unusedD4;
     b32 m_damagePending;
     b32 m_killPending;
     b32 m_deathPending;
-    H2EnumStorage<SpellType, i32> m_spellEffect;
+    H2EnumStorage<SpellType, i32> m_pendingAbilitySpell;
     H2EnumStorage<CombatSide, i32> m_side;
     i32 m_index;
     i32 m_lastAnimationTime;
@@ -86,10 +258,10 @@ public:
     i32 m_xOffset;
     i32 m_spellCount;
     u8 m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_COUNT)];
-    b32 m_effectAnimationStarted;
+    b32 m_effectAnimationFinished;
     b32 m_drawEnabled;
     b32 m_hitByCreature;
-    i8* m_palette;
+    i8* m_yModify;
     struct SMonFrameInfo m_frameInfo;
     class icon* m_creatureIcon;
     class icon* m_missileIcon;
@@ -97,7 +269,7 @@ public:
     army(void);
     void WaitSample(ArmySampleType);
     void InitClean(void);
-    void Init(CreatureType monsterType, i32 quantity, CombatSide side, i32 index, i32 hex, i32 unknown);
+    void Init(CreatureType monsterType, i32 quantity, CombatSide side, i32 index, i32 hex, i32 armyGroupSlot);
     void LoadResources(void);
     void FreeResources(void);
     void DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly);
@@ -182,5 +354,17 @@ public:
      || (a).m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_PETRIFIED)])
 extern b32 bSecondAttack;
 extern b32 gbGenieHalf;
+
+extern SMonFrameInfo sViewArmyMonFrameInfo;
+
+void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing);
+void BuildTeleporterTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing, bool closeMove);
+void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType);
+
+// Ironfist movement state threading through the attack path.
+extern bool gCloseMove;
+extern bool gMoveAttack;
+extern bool gChargePathDamage;
+extern bool gCharging;
 
 #endif

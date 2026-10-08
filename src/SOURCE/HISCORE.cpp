@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -22,7 +22,7 @@
 highScoreManager::highScoreManager(void) {
     i32 entry;
 
-    for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++)
+    for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++)
         m_animationFrames[entry] = Random(0, HIGH_SCORE_ANIMATION_FRAME_COUNT - 1);
     m_showCampaignScores = 0;
 }
@@ -31,7 +31,7 @@ i32 highScoreManager::Open(i32 id) {
     m_showCampaignScores = giHighScoreType == HIGH_SCORE_CAMPAIGN
                            || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN;
 
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "hsbkg.icn");
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
     m_window = new heroWindow(0, 0, "hiscore.bin");
@@ -44,13 +44,13 @@ i32 highScoreManager::Open(i32 id) {
     m_active = true;
     strcpy(m_name, "highScoreManager");
     platform::ChangeMenu(hmnuDflt);
-    gpWindowManager->FadeScreen(FADE_IN, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
     glTimers[HIGH_SCORE_TIMER_SLOT] = platform::Ticks() + HIGH_SCORE_ANIMATION_DELAY;
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
 void highScoreManager::Close(void) {
-    gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
     m_active = false;
@@ -67,7 +67,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
 
     if (glTimers[HIGH_SCORE_TIMER_SLOT] < platform::Ticks()) {
         glTimers[HIGH_SCORE_TIMER_SLOT] = platform::Ticks() + HIGH_SCORE_ANIMATION_DELAY;
-        for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++) {
+        for (entry = 0; entry < HIGH_SCORE_ENTRY_COUNT; entry++) {
             m_animationFrames[entry] =
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
             windowMessage.type = MESSAGE_WIDGET;
@@ -167,7 +167,7 @@ void highScoreManager::Update(void) {
     hsMessage.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     m_window->BroadcastMessage(hsMessage);
 
-    for (rank = 0; rank < HIGH_SCORE_DISPLAY_ENTRY_COUNT; rank++) {
+    for (rank = 0; rank < HIGH_SCORE_ENTRY_COUNT; rank++) {
         if (noScoreFile != 0)
             highScore.score = HIGH_SCORE_EMPTY;
         else if (!platform::FileReadExact(inputFile, &highScore, sizeof(highScore))) {
@@ -238,7 +238,7 @@ void highScoreManager::Update(void) {
         gText[0] = 0;
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                         + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                         + HIGH_SCORE_TEXT_DAYS_OFFSET;
         if (highScore.score != HIGH_SCORE_EMPTY) {
             if (m_showCampaignScores == 0)
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", highScore.days);
@@ -267,11 +267,11 @@ void highScoreManager::Update(void) {
         m_window->BroadcastMessage(hsMessage);
         hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                         + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                         + HIGH_SCORE_TEXT_DAYS_OFFSET;
         if (m_showCampaignScores)
-            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_RATING_X;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_CAMPAIGN_DAYS_X;
         else
-            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_RATING_X;
+            hsMessage.payload.widget.data.value = HIGH_SCORE_STANDARD_DAYS_X;
         m_window->BroadcastMessage(hsMessage);
 
         if (giHighScoreRank == rank) {
@@ -292,7 +292,7 @@ void highScoreManager::Update(void) {
             m_window->BroadcastMessage(hsMessage);
             hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                              + HIGH_SCORE_FIRST_TEXT_WIDGET
-                                             + HIGH_SCORE_TEXT_RATING_OFFSET;
+                                             + HIGH_SCORE_TEXT_DAYS_OFFSET;
             m_window->BroadcastMessage(hsMessage);
             hsMessage.payload.widget.id = rank * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                              + HIGH_SCORE_FIRST_TEXT_WIDGET

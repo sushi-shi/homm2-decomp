@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
+#include <Domains.h>
 #include <IRONFIST/creatures.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 /*
  * Ironfist's faction-generalized town data: dwelling creature types, dwelling

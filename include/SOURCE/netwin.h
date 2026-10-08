@@ -1,10 +1,11 @@
 #ifndef HOMM2_SOURCE_NETWIN_H
 #define HOMM2_SOURCE_NETWIN_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 #include <PLATFORM/Sockets.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 typedef enum WinsockTransportConstant {
     WS_TRANSPORT_BUFFER_COUNT       = 200,

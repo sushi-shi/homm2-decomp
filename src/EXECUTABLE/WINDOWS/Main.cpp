@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <PLATFORM/Entry.h>
 #include <SOURCE/KB.h>

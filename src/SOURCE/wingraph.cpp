@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -6,6 +6,7 @@
 #include <SOURCE/X_GLOBAL.h>
 
 #include <SOURCE/wingraph.h>
+#include <SOURCE/advManager.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 
@@ -13,8 +14,7 @@ typedef enum PaletteConstant {
     PALETTE_COMPONENT_COUNT = 3,
     PALETTE_RED_COMPONENT   = 0,
     PALETTE_GREEN_COMPONENT = 1,
-    PALETTE_BLUE_COMPONENT  = 2,
-    PALETTE_VALUE_SHIFT     = 2
+    PALETTE_BLUE_COMPONENT  = 2
 } PaletteConstant;
 
 WingraphGraphicsType giGraphicsType = WINGRAPH_GRAPHICS_WING;

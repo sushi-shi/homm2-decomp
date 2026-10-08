@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <BASE/heroWindow.h>
@@ -128,7 +128,7 @@ i32 combatManager::ViewGeneral(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             "%s - %s",
             m_heroes[H2EnumIndex(side)]->m_name,
-            gAlignmentNames[H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_cursorType)]
+            gAlignmentNames[H2EnumIndex(m_heroes[H2EnumIndex(side)]->m_faction)]
         );
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = GENERAL_NAME_WIDGET;
@@ -191,7 +191,7 @@ i32 combatManager::ViewGeneral(
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
             && m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != NULL)
         || m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[1] != 0 || m_heroes[H2EnumIndex(side)]->m_isCaptain != 0) {
+        || m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] != 0 || m_heroes[H2EnumIndex(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_ACTION_RETREAT;
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);

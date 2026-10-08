@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <PLATFORM/Sockets.h>
 #include <stddef.h>
@@ -69,14 +69,14 @@ i16 wsnet_init(void) {
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         } else {
             utf8::Format(
                 cWSTextBuffer,
                 localization::Tr("network.tcp.host.waiting_guests"),
                 platform::HostText(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -94,7 +94,7 @@ i16 wsnet_init(void) {
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
             }
         } else {
             utf8::Format(
@@ -106,7 +106,7 @@ i16 wsnet_init(void) {
                 platform::HostText(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
@@ -140,7 +140,7 @@ i16 wsnet_init(void) {
             }
             giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
             if (giNetPosToDCOPos[0] == -1) {
-                NormalDialog(localization::Tr("network.tcp.host_address.invalid"), NORMAL_DIALOG_WAIT_FIRST);
+                NormalDialog(localization::Tr("network.tcp.host_address.invalid"), NORMAL_DIALOG_WAIT_OK);
             }
         } while (giNetPosToDCOPos[0] == -1);
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
@@ -150,7 +150,7 @@ i16 wsnet_init(void) {
             "%s",
             localization::Tr("network.tcp.host.searching")
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -214,7 +214,7 @@ void wsSendMessage(
                     localization::Tr("network.tcp.send_command_error"),
                     error
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
                 H2_FREE(packetBuffer);
                 return;
             }
@@ -224,7 +224,7 @@ void wsSendMessage(
         iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
         if (iRc < 0) {
             utf8::Format(cWSTextBuffer, localization::Tr("network.tcp.send_error"), platform::LastSocketError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
             H2_FREE(packetBuffer);
             return;
         }
@@ -289,7 +289,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
@@ -417,7 +417,7 @@ i32 wsWaitForHost(void) {
             }
             wsSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                NETWORK_PACKET_HERE_I_AM,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

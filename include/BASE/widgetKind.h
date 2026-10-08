@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_WIDGET_KIND_H
-#define HOMM2_BASE_WIDGET_KIND_H
+#ifndef HOMM2_BASE_WIDGETKIND_H
+#define HOMM2_BASE_WIDGETKIND_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum class WidgetKind : i16 {
     WIDGET_KIND_NONE          = 0,
@@ -9,7 +9,7 @@ enum class WidgetKind : i16 {
     WIDGET_KIND_DEFAULT       = 2,
     WIDGET_KIND_UNDIMMED      = 8,
     WIDGET_KIND_ICON_DIRECT   = 0x10,
-    WIDGET_KIND_ICON_CENTERED = 0x11,
+    WIDGET_KIND_ICON_BOTTOM_CENTERED = 0x11,
     WIDGET_KIND_ICON_FILL     = 0x80,
     WIDGET_KIND_TEXT          = 0x200,
     WIDGET_KIND_SOLID         = 0x400,

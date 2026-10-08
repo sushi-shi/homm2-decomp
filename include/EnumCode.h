@@ -1,7 +1,7 @@
-#ifndef HOMM2_ENUM_CODE_H
-#define HOMM2_ENUM_CODE_H
+#ifndef HOMM2_ENUMCODE_H
+#define HOMM2_ENUMCODE_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 #include <type_traits>
 

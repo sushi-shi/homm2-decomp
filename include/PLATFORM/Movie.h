@@ -1,9 +1,9 @@
 #ifndef HOMM2_PLATFORM_MOVIE_H
 #define HOMM2_PLATFORM_MOVIE_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
-#include "Types.h"
+#include <PLATFORM/Types.h>
 
 namespace platform {
 

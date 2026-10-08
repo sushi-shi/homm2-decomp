@@ -1,9 +1,10 @@
 #ifndef HOMM2_SOURCE_TOWN_H
 #define HOMM2_SOURCE_TOWN_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class hero;
 
@@ -12,19 +13,23 @@ enum class TownBuilding : i32 {
     TOWN_BUILDING_THIEVES_GUILD                 = 0x2,
     TOWN_BUILDING_TAVERN                        = 0x4,
     TOWN_BUILDING_DOCK                          = 0x8,
+    TOWN_BUILDING_WELL                          = 0x10,
     TOWN_BUILDING_TENT                          = 0x20,
     TOWN_BUILDING_CASTLE                        = 0x40,
-    TOWN_BUILDING_CAPTAIN                       = 0x80,
+    TOWN_BUILDING_STATUE                        = 0x80,
     TOWN_BUILDING_LEFT_TURRET                   = 0x100,
     TOWN_BUILDING_RIGHT_TURRET                  = 0x200,
     TOWN_BUILDING_MARKETPLACE                   = 0x400,
+    TOWN_BUILDING_WELL_EXTRA                    = 0x800,
     TOWN_BUILDING_MOAT                          = 0x1000,
-    TOWN_BUILDING_FORTIFICATIONS                = 0x2000,
-    TOWN_BUILDING_COLISEUM                      = 0x2000,
-    TOWN_BUILDING_RAINBOW                       = 0x2000,
-    TOWN_BUILDING_SHRINE                        = 0x2000,
+
+    TOWN_BUILDING_SPECIAL                       = 0x2000,
+    TOWN_BUILDING_FORTIFICATIONS                = TOWN_BUILDING_SPECIAL,
+    TOWN_BUILDING_COLISEUM                      = TOWN_BUILDING_SPECIAL,
+    TOWN_BUILDING_RAINBOW                       = TOWN_BUILDING_SPECIAL,
+    TOWN_BUILDING_SHRINE                        = TOWN_BUILDING_SPECIAL,
+    TOWN_BUILDING_LIBRARY                       = TOWN_BUILDING_SPECIAL,
     TOWN_BUILDING_CAPTAIN_QUARTERS              = 0x8000,
-    TOWN_BUILDING_LIBRARY                       = 0x2000,
     TOWN_BUILDING_DWELLING_1                    = 0x00080000,
     TOWN_BUILDING_DWELLING_2                    = 0x00100000,
     TOWN_BUILDING_DWELLING_3                    = 0x00200000,
@@ -85,7 +90,7 @@ public:
     i8 m_occupyingHeroId;
     u32l m_buildings;
     i8 m_mageGuildLevel;
-    char m_unknown1d;
+    char m_unused1d;
     i16 m_dwellingAvailable[H2EnumIndex(TOWN_DWELLING_STOCK_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;

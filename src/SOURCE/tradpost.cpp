@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +10,7 @@
 #include <BASE/widget.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
@@ -18,7 +18,7 @@
 #include <BASE/message.h>
 #include <SOURCE/Localization.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum TradingPostWidgetId {
     POST_LEFT_OFFER_ICON  = 0x14,

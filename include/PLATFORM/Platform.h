@@ -1,12 +1,12 @@
 #ifndef HOMM2_PLATFORM_PLATFORM_H
 #define HOMM2_PLATFORM_PLATFORM_H
 
-#include "Audio.h"
-#include "FileSystem.h"
-#include "Host.h"
-#include "Input.h"
-#include "Types.h"
-#include "Video.h"
+#include <PLATFORM/Audio.h>
+#include <PLATFORM/FileSystem.h>
+#include <PLATFORM/Host.h>
+#include <PLATFORM/Input.h>
+#include <PLATFORM/Types.h>
+#include <PLATFORM/Video.h>
 
 namespace platform {
 

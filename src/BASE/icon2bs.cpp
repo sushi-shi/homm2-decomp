@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/icon2bs.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
@@ -22,7 +22,7 @@ void IconToBitmapScale(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 scale
+    i32 cellSize
 ) {
     u8* sourceOrigin;
     u8* destinationOrigin;
@@ -35,12 +35,12 @@ void IconToBitmapScale(
     class bitmap* temp;
     i32 sourceBase;
 
-    if (scale == SCALE_NATIVE_SIZE) {
+    if (cellSize == SCALE_NATIVE_SIZE) {
         IconToBitmap(sourceIcon, destination, destinationX, destinationY, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    increment = SCALE_NATIVE_SIZE / scale;
-    sourceBase = (SCALE_NATIVE_SIZE - (scale - 1) * increment) >> 1;
+    increment = SCALE_NATIVE_SIZE / cellSize;
+    sourceBase = (SCALE_NATIVE_SIZE - (cellSize - 1) * increment) >> 1;
     lineStep = increment * SCALE_WORK_BITMAP_SIZE;
     temp = new bitmap(BITMAP_TYPE_NONE, SCALE_WORK_BITMAP_SIZE, SCALE_WORK_BITMAP_SIZE);
     for (y = 0; y < SCALE_NATIVE_SIZE * SCALE_WORK_BITMAP_SIZE; y += SCALE_NATIVE_SIZE)
@@ -60,10 +60,10 @@ void IconToBitmapScale(
     );
     destinationOrigin = destination->m_pixels + destinationX + destinationY * destination->m_width;
     sourceOrigin = temp->m_pixels + sourceBase + sourceBase * SCALE_WORK_BITMAP_SIZE;
-    for (y = 0; y < scale; y++) {
+    for (y = 0; y < cellSize; y++) {
         source = sourceOrigin;
         destinationPixel = destinationOrigin;
-        for (x = 0; x < scale; x++) {
+        for (x = 0; x < cellSize; x++) {
             if (*source != 0)
                 *destinationPixel = *source;
             destinationPixel++;

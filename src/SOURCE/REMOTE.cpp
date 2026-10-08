@@ -1,6 +1,6 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
-#include <Ints.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
@@ -14,12 +14,11 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/SaveNames.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
-#include <SOURCE/GAME.h>
 #include <BASE/dialog.h>
 
 typedef enum RemoteImplementationConstant {
@@ -34,15 +33,8 @@ typedef enum RemoteImplementationConstant {
     POLL_REMOTE_ALLOC_LINE_OFFSET    = 235
 } RemoteImplementationConstant;
 
-enum class RemoteSetupCommand : i32 {
-    SETUP_PLAYER_INFO   = 0x22,
-    SETUP_STANDARD_GAME = 0x3d,
-    SETUP_CAMPAIGN_GAME = 0x3e
-};
-using enum RemoteSetupCommand;
-
-constexpr RemoteSetupCommand RemoteSetupCommandFromCode(i8 value) {
-    return static_cast<RemoteSetupCommand>(value); // H2_ENUM_CODE_BOUNDARY
+constexpr RemoteCommand RemoteCommandFromCode(i8 value) {
+    return static_cast<RemoteCommand>(value); // H2_ENUM_CODE_BOUNDARY
 }
 
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
@@ -67,7 +59,7 @@ i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 
 void RemoteCleanup(void) {
     LogStr("RC1");
-    if (gbRemoteOn == 0)
+    if (!gbRemoteOn)
         return;
     LogStr("RC2");
     if (gbInRemoteMain != 0)
@@ -79,11 +71,11 @@ void RemoteCleanup(void) {
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
-            UnloadRemoteDriver(1);
+            UnloadRemoteDriver(H2EnumIndex(MULTIPLAYER_BASE_NETWORK));
             break;
         case REMOTE_GAME_MODEM_HOST:
         case REMOTE_GAME_MODEM_GUEST:
-            UnloadRemoteDriver(0);
+            UnloadRemoteDriver(H2EnumIndex(MULTIPLAYER_BASE_MODEM));
             break;
         default:
             break;
@@ -245,8 +237,8 @@ void RemoteMain(RemoteGameMode gameMode) {
                 LogStr("RM 4");
                 if (recvData != NULL
                     && REMOTE_MESSAGE(recvData)->type == REMOTE_MESSAGE_RELIABLE) {
-                    switch (RemoteSetupCommandFromCode(REMOTE_MESSAGE(recvData)->command)) {
-                        case SETUP_PLAYER_INFO:
+                    switch (RemoteCommandFromCode(REMOTE_MESSAGE(recvData)->command)) {
+                        case REMOTE_COMMAND_SETUP_PLAYER_INFO:
                             netPlayer = REMOTE_MESSAGE(recvData)->sender;
                             gsNetPlayerInfo[netPlayer] =
                                 *REMOTE_PLAYER_INFO(REMOTE_MESSAGE(recvData));
@@ -268,7 +260,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
                 sizeof(SNetPlayerInfo),
-                H2EnumIndex(SETUP_PLAYER_INFO),
+                REMOTE_COMMAND_SETUP_PLAYER_INFO,
                 1
             );
             LogStr("RM 6");
@@ -280,7 +272,10 @@ void RemoteMain(RemoteGameMode gameMode) {
             NULL,
             REMOTE_BROADCAST_PLAYER,
             0,
-            static_cast<i8>(giSetupGameType == 1 ? SETUP_CAMPAIGN_GAME : SETUP_STANDARD_GAME),
+            static_cast<i8>(
+                giSetupGameType == OLD_MAIN_SETUP_LOAD ? REMOTE_COMMAND_LOAD_GAME
+                                                       : REMOTE_COMMAND_NEW_GAME
+            ),
             1
         );
     } else {
@@ -289,15 +284,15 @@ void RemoteMain(RemoteGameMode gameMode) {
             gameMessage = GetRemoteData(1);
             if (gameMessage != NULL
                 && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMessage)->command == H2EnumIndex(SETUP_CAMPAIGN_GAME)) {
+                && REMOTE_MESSAGE(gameMessage)->command == REMOTE_COMMAND_LOAD_GAME) {
                 bGotGameType = true;
-                giSetupGameType = 1;
+                giSetupGameType = OLD_MAIN_SETUP_LOAD;
             }
             if (gameMessage != NULL
                 && REMOTE_MESSAGE(gameMessage)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(gameMessage)->command == H2EnumIndex(SETUP_STANDARD_GAME)) {
+                && REMOTE_MESSAGE(gameMessage)->command == REMOTE_COMMAND_NEW_GAME) {
                 bGotGameType = true;
-                giSetupGameType = 0;
+                giSetupGameType = OLD_MAIN_SETUP_NEW;
             }
         }
     }
@@ -307,10 +302,10 @@ void RemoteMain(RemoteGameMode gameMode) {
 
 void UnloadRemoteDriver(i16 networkDriver) {
     switch (networkDriver) {
-        case 0:
+        case H2EnumIndex(MULTIPLAYER_BASE_MODEM):
             com_term(0);
             break;
-        case 1:
+        case H2EnumIndex(MULTIPLAYER_BASE_NETWORK):
             if (bUseDirectPlay != 0)
                 dpnet_term();
             else if (bUseWinsock != 0)
@@ -578,7 +573,7 @@ void PollRemote(void) {
     SPlayerExit guestExit;
     u8 cmdByte;
 
-    if (gbRemoteOn == 0)
+    if (!gbRemoteOn)
         return;
     if (gbInRemoteCleanup != 0)
         return;
@@ -783,7 +778,7 @@ i32 TransmitAndWait(
     clock = platform::Ticks();
     complete = false;
     while (complete == 0) {
-        if (clock + REMOTE_CHAIN_TIMEOUT < platform::Ticks()) {
+        if (clock + REMOTE_WAIT_TIMEOUT < platform::Ticks()) {
             NormalDialog(localization::Tr("network.send.retry"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                 clock = platform::Ticks();

@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_SEARCHARRAY_H
 #define HOMM2_SOURCE_SEARCHARRAY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <SOURCE/combatTypes.h>
 
 class army;
@@ -17,13 +18,7 @@ typedef enum SearchConstant {
     SEARCH_TARGET_COST_WINDOW         = 75,
     SEARCH_MONSTER_RESEED_WINDOW      = 300,
     SEARCH_DIAGONAL_COST_MASK         = 1,
-    SEARCH_CELL_UNREACHABLE           = 0x08,
-    SEARCH_MAP_BLOCKED                = 0x80,
-    SEARCH_CELL_BLOCKED               = 0x80,
-    SEARCH_INVALID_COORDINATE         = -1,
-    SEARCH_NO_OBJECT                  = 0xFF,
-    SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
-    SEARCH_DIRECTION_OBJECT_MASK      = 0x38
+    SEARCH_INVALID_COORDINATE         = -1
 } SearchConstant;
 
 #pragma pack(push, 1)
@@ -49,22 +44,25 @@ struct searchNode {
     u8 y;
     u16 distance;
     u8 visited : SEARCH_FLAG_BIT_COUNT;
-    u8 unknownFlag : SEARCH_FLAG_BIT_COUNT;
-    u8 rvFlag1 : SEARCH_FLAG_BIT_COUNT;
-    u8 rvFlag2 : SEARCH_FLAG_BIT_COUNT;
+    u8 occupied : SEARCH_FLAG_BIT_COUNT;
+
+    u8 hasAdjacentMonster : SEARCH_FLAG_BIT_COUNT;
+
+
+    u8 beyondTurnMobility : SEARCH_FLAG_BIT_COUNT;
     u8 direction : SEARCH_DIRECTION_BIT_COUNT;
     union {
         struct {
             u8 adjacentMonsterX;
             u8 adjacentMonsterY;
-            u8 previousFlags;
-            u8 terrain;
+            u8 turnEndX;
+            u8 turnEndY;
         };
         struct {
-            i8 valueX;
-            i8 valueY;
-            i8 previousX;
-            i8 previousY;
+            i8 signedAdjacentMonsterX;
+            i8 signedAdjacentMonsterY;
+            i8 signedTurnEndX;
+            i8 signedTurnEndY;
         };
     };
 };
@@ -104,7 +102,7 @@ public:
         i32 targetX,
         i32 targetY,
         i32 continueSeed,
-        i32 scanMap
+        i32 seedMonsterCells
     );
     void Init(void);
     void Close(void);
@@ -115,14 +113,14 @@ public:
         i32 y,
         MapDirection direction,
         i32 cost,
-        i32 mobility,
-        i32 unknownFlag,
-        i32 rvFlag1,
-        i32 valueX,
-        i32 valueY,
-        i32 rvFlag2,
-        i32 previousX,
-        i32 previousY
+        i32 maximumCost,
+        i32 occupied,
+        i32 hasAdjacentMonster,
+        i32 adjacentMonsterX,
+        i32 adjacentMonsterY,
+        i32 beyondTurnMobility,
+        i32 turnEndX,
+        i32 turnEndY
     );
     void TestPossibleDirections(
         i32 x,
@@ -133,7 +131,7 @@ public:
         i32 waterMode
     );
     void SeedCombatPosition(class army* unit);
-    i32 FindCombatPath(i32 sourceHex, i32 targetHex, class army* unit, ArmyPathTarget attackPath, i32 ignoreTargetMoat);
+    i32 FindCombatPath(i32 sourceHex, i32 targetHex, class army* unit, ArmyPathTarget attackPath, i32 slowTargetMoat);
     void PushCombatPoint(i32 hex, CombatHexDirection direction, i32 distance, i32 speed);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];

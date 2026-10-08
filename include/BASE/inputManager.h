@@ -1,10 +1,12 @@
 #ifndef HOMM2_BASE_INPUTMANAGER_H
 #define HOMM2_BASE_INPUTMANAGER_H
 
-#include <Ints.h>
-#include "baseManager.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/baseManager.h>
 #include <BASE/message.h>
 #include <BASE/display.h>
+#include <H2/Ints.h>
 
 struct tag_message;
 
@@ -86,6 +88,8 @@ typedef enum InputManagerScanCode {
     INPUT_SCAN_F10             = 0x44,
     INPUT_SCAN_NUM_LOCK        = 0x45,
     INPUT_SCAN_SCROLL_LOCK     = 0x46,
+
+
     INPUT_SCAN_NUMPAD_7        = 0x47,
     INPUT_SCAN_NUMPAD_8        = 0x48,
     INPUT_SCAN_NUMPAD_9        = 0x49,
@@ -115,6 +119,17 @@ typedef enum InputManagerCapacity {
     INPUT_SCAN_CODE_CAPACITY  = 128
 } InputManagerCapacity;
 
+
+typedef enum InputKeyCodeEncoding {
+    INPUT_KEY_CODE_CHARACTER_MASK = 0xff,
+    INPUT_KEY_CODE_SCAN_SHIFT     = 8,
+    INPUT_KEY_CODE_SCAN_MASK      = 0xff00,
+    INPUT_KEY_CODE_FIRST_SCAN     = 0x100,
+    INPUT_KEY_CODE_ENTER          = '\n',
+    INPUT_KEY_CODE_ESCAPE         = 0x1b,
+    INPUT_KEY_CODE_DELETE         = 0x7f
+} InputKeyCodeEncoding;
+
 #pragma pack(push, 1)
 class inputManager : public baseManager {
 public:
@@ -122,17 +137,17 @@ public:
     i32 m_readIndex;
     i32 m_writeIndex;
     b32 m_mouseMessageActive;
-    i32 field_0x742;
-    i32 field_0x746;
-    i32 field_0x74a;
-    i16 m_keyState[H2EnumIndex(INPUT_SCAN_CODE_CAPACITY)];
-    i32 field_0x84e;
+    i32 m_mouseDriverReady;
+    i32 m_relativeMouse;
+    i32 m_mouseSpeedDivisor;
+    i16 m_scanCodeTable[H2EnumIndex(INPUT_SCAN_CODE_CAPACITY)];
+    i32 m_keyboardHookInstalled;
     i32 m_requestedPriority;
     InputManagerKeyCodeType m_keyCodeType;
-    i32 m_field_0x85a;
+    i32 m_keyPrefixPending;
     MessageModifier m_modifiers;
-    i32 field_0x862;
-    i32 field_0x866;
+    i32 m_recordFile;
+    i32 m_unused866;
     inputManager(void);
     virtual i32 Open(i32 priority) override;
     virtual void Close(void) override;
@@ -152,5 +167,11 @@ extern b32 bLastMouseOffscreen;
 extern b32 bLastOnscreenMouseColor;
 extern b32 bInCheckChangeCursor;
 extern i32 iLastBWOnScreenCheck;
+
+i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData);
+i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData);
+void CheckChangeCursor(i32 x, i32 y, i32 force);
+
+void TranslateInputCharacterCp1251(struct tag_message& event);
 
 #endif

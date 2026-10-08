@@ -1,6 +1,7 @@
-#ifndef HOMM2_ICOND2B_H
-#define HOMM2_ICOND2B_H
+#ifndef HOMM2_BASE_ICOND2B_H
+#define HOMM2_BASE_ICOND2B_H
 
+#include <Domains.h>
 #include <BASE/IconDraw.h>
 
 class bitmap;
@@ -12,7 +13,7 @@ void DimIconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 color,
+    i32 dimLevel,
     IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,

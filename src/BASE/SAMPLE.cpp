@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <PLATFORM/Strings.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>
@@ -19,7 +19,7 @@ sample::sample(const char* name)
         RESOURCE_REFERENCE_INITIAL,
         NULL
     ) {
-    m_playbackData.volume = 0x7f;
+    m_playbackData.volume = SOUND_VOLUME_FULL;
     m_playbackData.looping = false;
     m_playbackData.stereo = true;
     m_playbackData.sampleFormat = FORMAT_16_BIT;

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 /*
  * Ironfist kept its preferences in the Windows registry under the retail

@@ -2,8 +2,10 @@
 #define HOMM2_SOURCE_HIGHSCOREMANAGER_H
 
 #include <BASE/dialog.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
+#include <SOURCE/KB.h>
 
 struct tag_message;
 class heroWindow;
@@ -17,7 +19,7 @@ typedef enum HighScoreControlId {
     HIGH_SCORE_FIRST_SHADOW_WIDGET   = 0xdd,
     HIGH_SCORE_FIRST_TEXT_WIDGET     = 0x6a,
     HIGH_SCORE_TEXT_SCENARIO_OFFSET  = 1,
-    HIGH_SCORE_TEXT_RATING_OFFSET    = 2,
+    HIGH_SCORE_TEXT_DAYS_OFFSET    = 2,
     HIGH_SCORE_TEXT_SCORE_OFFSET     = 3,
     HIGH_SCORE_TITLE_WIDGET          = 0x66,
     HIGH_SCORE_ANIMATED_WIDGET_FIRST = 200,
@@ -25,7 +27,6 @@ typedef enum HighScoreControlId {
 } HighScoreControlId;
 
 typedef enum HighScoreManagerConstant {
-    HIGH_SCORE_DISPLAY_ENTRY_COUNT = 10,
     HIGH_SCORE_FILENAME_LENGTH     = 352,
     HIGH_SCORE_MANAGER_OPEN_OK     = 0,
 } HighScoreManagerConstant;
@@ -33,8 +34,6 @@ typedef enum HighScoreManagerConstant {
 typedef enum HighScoreAnimationConstant {
     HIGH_SCORE_ANIMATION_FRAME_COUNT       = 18,
     HIGH_SCORE_ANIMATION_DELAY             = 120,
-    HIGH_SCORE_TIMER_SLOT                  = 0,
-    HIGH_SCORE_FADE_STEPS                  = 8,
     HIGH_SCORE_MONSTER_FRAME_STRIDE        = 9,
     HIGH_SCORE_MONSTER_ACTIVE_FRAME_OFFSET = 1,
     HIGH_SCORE_STANDARD_TITLE_FRAME        = 6,
@@ -44,8 +43,8 @@ typedef enum HighScoreAnimationConstant {
 typedef enum HighScoreLayoutConstant {
     HIGH_SCORE_STANDARD_SCENARIO_X = 0xf1,
     HIGH_SCORE_CAMPAIGN_SCENARIO_X = 0x127,
-    HIGH_SCORE_STANDARD_RATING_X   = 0x190,
-    HIGH_SCORE_CAMPAIGN_RATING_X   = 0x1d3,
+    HIGH_SCORE_STANDARD_DAYS_X   = 0x190,
+    HIGH_SCORE_CAMPAIGN_DAYS_X   = 0x1d3,
     HIGH_SCORE_UPDATE_X            = 512,
     HIGH_SCORE_UPDATE_Y            = 51,
     HIGH_SCORE_UPDATE_WIDTH        = 76,
@@ -55,8 +54,8 @@ typedef enum HighScoreLayoutConstant {
 #pragma pack(push, 1)
 class highScoreManager : public baseManager {
 public:
-    i16 m_animationFrames[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
-    i16 m_monsterTypes[HIGH_SCORE_DISPLAY_ENTRY_COUNT];
+    i16 m_animationFrames[HIGH_SCORE_ENTRY_COUNT];
+    i16 m_monsterTypes[HIGH_SCORE_ENTRY_COUNT];
     char m_showCampaignScores;
     heroWindow* m_window;
     highScoreManager(void);

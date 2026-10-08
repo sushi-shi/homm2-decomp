@@ -1,16 +1,17 @@
 #ifndef HOMM2_BASE_TEXTENTRYWIDGET_H
 #define HOMM2_BASE_TEXTENTRYWIDGET_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/textWidget.h>
-#include "widget.h"
+#include <BASE/widget.h>
 
 struct tag_message;
 
 enum class TextEntryReadMode : i16 {
     TEXT_ENTRY_READ_DEFAULT    = 1,
     TEXT_ENTRY_READ_RECT       = 2,
-    TEXT_ENTRY_READ_MULTILINE  = 3,
+    TEXT_ENTRY_READ_SCROLLING  = 3,
     TEXT_ENTRY_READ_INSET_FIVE = 4,
     TEXT_ENTRY_READ_INSET_FOUR = 5
 };

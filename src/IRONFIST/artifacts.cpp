@@ -9,7 +9,7 @@
 #include <IRONFIST/dialog.h>
 #include <IRONFIST/paths.h>
 
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/Localization.h>
 #include <SOURCE/X_GLOBAL.h>
 

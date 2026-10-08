@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/KB.h>
 

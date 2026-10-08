@@ -23,7 +23,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
 
 // Ironfist kept these as fields it appended to the game object; the port

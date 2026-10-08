@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <PLATFORM/File.h>
 #include <PLATFORM/Platform.h>
 #include <stdio.h>
@@ -16,21 +16,17 @@
 #include <EDITOR/mapcell.h>
 #include <IRONFIST/heroes.h>
 #include <IRONFIST/hooks.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/townManager.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/Localization.h>
 
@@ -117,7 +113,7 @@ typedef enum HeroUiConstant {
     UI_VIEW_SPELLS_SPECIAL        = 1,
     UI_CASTLE_DIALOG_ACTIVE       = 1,
     UI_ARMY_EMPTY_FRAME           = 2,
-    UI_ARTIFACT_DIALOG_ICON       = 0x1c,
+    UI_ARTIFACT_DIALOG_Y       = 0x1c,
     UI_STATUS_REGION_Y            = 459,
     UI_STATUS_REGION_HEIGHT       = 20,
     UI_FADE_STEPS                 = 8,
@@ -180,9 +176,8 @@ typedef enum HeroMobilityConstant {
     COMPASS_MOBILITY_BONUS = 500,
     NOMAD_BOOTS_MOBILITY_BONUS = 600,
     TRAVELER_BOOTS_MOBILITY_BONUS = 300,
-    STABLES_MOBILITY_BONUS = 400,
     AI_DIFFICULTY_MOBILITY_BONUS = 75,
-    AI_STATE_MOBILITY_BONUS = 50
+    AI_EXPLORER_MOBILITY_BONUS = 50
 } HeroMobilityConstant;
 
 typedef enum HeroImplementationConstant {
@@ -190,13 +185,13 @@ typedef enum HeroImplementationConstant {
 } HeroImplementationConstant;
 
 static const char* SecondarySkillName(const hero* heroValue, HeroSecondarySkill skill) {
-    if (heroValue->m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
+    if (heroValue->m_faction == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
         return localization::Tr("hero.skill.cybernetics");
     return gSecondarySkills[H2EnumIndex(skill)];
 }
 
 static i32 SecondarySkillIconRow(const hero* heroValue, HeroSecondarySkill skill) {
-    if (heroValue->m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
+    if (heroValue->m_faction == FACTION_CYBORG && skill == HERO_SKILL_WISDOM)
         return CYBERNETICS_SKILL_ROW;
     return H2EnumIndex(skill);
 }
@@ -206,7 +201,7 @@ hero::hero(void) {
     m_owner = 0;
     m_x = 0;
     m_y = 0;
-    m_cursorType = FACTION_KNIGHT;
+    m_faction = FACTION_KNIGHT;
     m_portrait = 0;
     m_name[0] = 0;
     heroWin = NULL;
@@ -308,7 +303,7 @@ i32 hero::CalcMobility(void) {
             && gpGame->m_difficulty >= DIFFICULTY_HARD) {
             movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
             if (gpGame->m_players[m_owner].m_aiPersonality == PLAYER_PERSONALITY_EXPLORER)
-                movePoints += AI_STATE_MOBILITY_BONUS;
+                movePoints += AI_EXPLORER_MOBILITY_BONUS;
         }
         return Ironfist_CalcMobility(this, movePoints);
     }
@@ -351,7 +346,7 @@ i32 hero::CalcMobility(void) {
         && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         movePoints += AI_DIFFICULTY_MOBILITY_BONUS;
         if (gpGame->m_players[m_owner].m_aiPersonality == PLAYER_PERSONALITY_EXPLORER)
-            movePoints += AI_STATE_MOBILITY_BONUS;
+            movePoints += AI_EXPLORER_MOBILITY_BONUS;
     }
     return Ironfist_CalcMobility(this, movePoints);
 }
@@ -365,7 +360,7 @@ i32 hero::HasSpell(SpellType spell) {
         return 1;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
-            && m_artifactExtra[artifactIndex] == H2EnumIndex(spell)) {
+            && m_artifactSpells[artifactIndex] == H2EnumIndex(spell)) {
             return 1;
         }
     }
@@ -436,9 +431,9 @@ void hero::AddSpell(SpellType spell, i32) {
     // Cybernetics spells belong to Cyborg heroes alone, and a Cyborg hero
     // learns no regular spell above level 2.
     if (H2EnumIndex(spell) >= H2EnumIndex(SPELL_COUNT)) {
-        if (H2EnumIndex(m_cursorType) != 12)
+        if (H2EnumIndex(m_faction) != 12)
             return;
-    } else if (m_cursorType == FACTION_CYBORG
+    } else if (m_faction == FACTION_CYBORG
                && H2EnumIndex(gsSpellInfo[H2EnumIndex(spell)].level) > 2) {
         return;
     }
@@ -533,12 +528,12 @@ void hero::ViewStat(i32 stat, i32 quickView) {
     NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
 }
 
-void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
+void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
-        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[extra]);
-        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_ICON);
+        utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[scrollSpell]);
+        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
     } else {
-        NormalDialog(gArtifactDesc[H2EnumIndex(artifact)], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_ICON);
+        NormalDialog(gArtifactDesc[H2EnumIndex(artifact)], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
     }
 }
 
@@ -555,7 +550,7 @@ void hero::Deallocate(i32 updateMap) {
     i32 oldOwner;
     i32 i;
     playerData* playerPointer;
-    i32 heroNum;
+    i32 heroSlot;
     town* curTown;
     i32 availSlot;
     fullMap* map;
@@ -590,13 +585,13 @@ void hero::Deallocate(i32 updateMap) {
 
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
         DebugCheck();
-        curTown = &gpGame->m_castleRecs[m_occupiedTown];
-        curTown->m_occupyingHeroId = -1;
+        curTown = &gpGame->m_castleRecs[m_locationMetadata];
+        curTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
 
     if (giCurPlayer != m_owner || gpGame->m_players[m_owner].m_currentHero != m_id
-        || gpAdvManager->m_heroContextLocked == 0) {
-        gpGame->RestoreCell(m_x, m_y, m_locationType, m_occupiedTown, NULL, 1);
+        || gpAdvManager->m_heroMobilized == 0) {
+        gpGame->RestoreCell(m_x, m_y, m_locationType, m_locationMetadata, NULL, 1);
     }
 
     if (!gbCombatSurrender) {
@@ -604,12 +599,12 @@ void hero::Deallocate(i32 updateMap) {
             m_army.Dismiss(i);
     }
 
-    heroNum = -1;
+    heroSlot = -1;
     for (i = 0; i < playerPointer->m_heroCount; i++) {
         if (playerPointer->m_heroIds[i] == m_id)
-            heroNum = i;
+            heroSlot = i;
     }
-    for (i = heroNum; i < playerPointer->m_heroCount - 1; i++)
+    for (i = heroSlot; i < playerPointer->m_heroCount - 1; i++)
         playerPointer->m_heroIds[i] = playerPointer->m_heroIds[i + 1];
     playerPointer->m_heroIds[playerPointer->m_heroCount - 1] = -1;
 
@@ -619,15 +614,15 @@ void hero::Deallocate(i32 updateMap) {
             gpAdvManager->m_cursorActive = false;
             map = &gpGame->m_worldMap;
             DebugCheck();
-            map->GetCell(m_x, m_y)->m_flags &= ~HERO_MAP_CELL_PRESENT;
+            map->GetCell(m_x, m_y)->m_flags &= ~H2EnumIndex(MAP_CELL_HERO);
         }
         if (oldOwner == giCurPlayer)
-            gpAdvManager->m_heroContextLocked = false;
+            gpAdvManager->m_heroMobilized = false;
     }
 
     playerPointer->m_heroCount--;
     playerPointer->m_heroLocatorPage = 0;
-    gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
+    gpGame->m_heroOwners[m_id] = HERO_AVAILABILITY_UNAVAILABLE;
 
     if (gbRetreatWin) {
         availSlot = Random(0, HERO_AVAILABLE_SLOT_COUNT - 1);
@@ -635,13 +630,13 @@ void hero::Deallocate(i32 updateMap) {
                     .m_eventFlags) & (HERO_EVENT_RESERVED_FOR_RECRUITMENT)))) {
             availSlot = 1 - availSlot;
         }
-        if (gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
-            == HERO_AVAILABILITY_RETREATED) {
-            gpGame->m_availableHeroes[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]] =
+        if (gpGame->m_heroOwners[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]]
+            == HERO_AVAILABILITY_FOR_HIRE) {
+            gpGame->m_heroOwners[gpGame->m_players[m_owner].m_availableHeroIds[availSlot]] =
                 HERO_AVAILABILITY_UNAVAILABLE;
         }
         gpGame->m_players[m_owner].m_availableHeroIds[availSlot] = m_id;
-        gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
+        gpGame->m_heroOwners[m_id] = HERO_AVAILABILITY_FOR_HIRE;
         m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | H2EnumIndex(HERO_EVENT_RESERVED_FOR_RECRUITMENT));
     }
 
@@ -778,7 +773,7 @@ void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     i32 newLevel;
 
-    b32 highIndex;
+    b32 probabilityBand;
     i32 slot;
     SAMPLE2 samp;
     HeroSecondarySkill choices[HERO_SECONDARY_SKILL_CHOICE_COUNT];
@@ -804,25 +799,25 @@ void hero::CheckLevel(void) {
         statBonuses[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)] = 0;
         statBonuses[H2EnumIndex(HERO_PRIMARY_KNOWLEDGE)] = 0;
         if (nLevel <= HERO_LEVEL_HIGH_THRESHOLD)
-            highIndex = false;
+            probabilityBand = false;
         else
-            highIndex = true;
+            probabilityBand = true;
 
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         fightValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
         if (fightValue
-            < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highIndex][H2EnumIndex(HERO_PRIMARY_ATTACK)]) {
+            < gHeroSkillBonus[H2EnumIndex(m_faction)][probabilityBand][H2EnumIndex(HERO_PRIMARY_ATTACK)]) {
             statBonuses[H2EnumIndex(HERO_PRIMARY_ATTACK)]++;
         } else {
             fightValue -=
-                gHeroSkillBonus[H2EnumIndex(m_cursorType)][highIndex][H2EnumIndex(HERO_PRIMARY_ATTACK)];
-            if (fightValue < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highIndex]
+                gHeroSkillBonus[H2EnumIndex(m_faction)][probabilityBand][H2EnumIndex(HERO_PRIMARY_ATTACK)];
+            if (fightValue < gHeroSkillBonus[H2EnumIndex(m_faction)][probabilityBand]
                                              [H2EnumIndex(HERO_PRIMARY_DEFENSE)]) {
                 statBonuses[H2EnumIndex(HERO_PRIMARY_DEFENSE)]++;
             } else {
-                fightValue -= gHeroSkillBonus[H2EnumIndex(m_cursorType)][highIndex]
+                fightValue -= gHeroSkillBonus[H2EnumIndex(m_faction)][probabilityBand]
                                               [H2EnumIndex(HERO_PRIMARY_DEFENSE)];
-                if (fightValue < gHeroSkillBonus[H2EnumIndex(m_cursorType)][highIndex]
+                if (fightValue < gHeroSkillBonus[H2EnumIndex(m_faction)][probabilityBand]
                                                  [H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]) {
                     statBonuses[H2EnumIndex(HERO_PRIMARY_SPELL_POWER)]++;
                 } else {
@@ -841,10 +836,10 @@ void hero::CheckLevel(void) {
 
         for (slot = 0; slot < HERO_SECONDARY_SKILL_CHOICE_COUNT; slot++) {
             choices[slot] = HERO_SKILL_NONE;
-            if (slot == 0 && m_cursorType != FACTION_BARBARIAN
-                && m_cursorType != FACTION_KNIGHT
+            if (slot == 0 && m_faction != FACTION_BARBARIAN
+                && m_faction != FACTION_KNIGHT
                 && m_secondarySkills[H2EnumIndex(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
-                && nLevel - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
+                && nLevel - m_lastWisdomOfferLevel >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                 choices[slot] = HERO_SKILL_WISDOM;
                 continue;
             }
@@ -858,7 +853,7 @@ void hero::CheckLevel(void) {
                          && m_secondarySkills[H2EnumIndex(skill)] < HERO_SKILL_LEVEL_EXPERT)
                         || (m_secondarySkills[H2EnumIndex(skill)] == HERO_SKILL_LEVEL_NONE
                             && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
-                    weight -= iGetSSByAlignment[H2EnumIndex(skill)][H2EnumIndex(m_cursorType)];
+                    weight -= iGetSSByAlignment[H2EnumIndex(skill)][H2EnumIndex(m_faction)];
                     if (weight <= 0) {
                         choices[slot] = skill;
                         goto nextAttempt;
@@ -872,7 +867,7 @@ void hero::CheckLevel(void) {
 
         if (choices[0] == HERO_SKILL_WISDOM
             || choices[1] == HERO_SKILL_WISDOM) {
-            m_enabled = static_cast<u8>(nLevel);
+            m_lastWisdomOfferLevel = static_cast<u8>(nLevel);
         }
 
         if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
@@ -901,7 +896,7 @@ void hero::CheckLevel(void) {
                     gSecondarySkillLevels[H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])])]
                 );
                 strcat(gText, text);
-                NormalDialog(gText, NORMAL_DIALOG_DISABLE_SEVENTH, -1, -1, NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
+                NormalDialog(gText, NORMAL_DIALOG_CHOOSE_ONE_OF_TWO, -1, -1, NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[0]) * HERO_SECONDARY_SKILL_ICON_STRIDE
                         + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[0])]), NORMAL_DIALOG_SECONDARY_SKILL, SecondarySkillIconRow(this, choices[1]) * HERO_SECONDARY_SKILL_ICON_STRIDE
                         + H2EnumIndex(m_secondarySkills[H2EnumIndex(choices[1])]));
                 if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_7)
@@ -924,7 +919,7 @@ void hero::CheckLevel(void) {
             }
         }
 
-        if (m_cursorType == FACTION_CYBORG && m_owner != -1) {
+        if (m_faction == FACTION_CYBORG && m_owner != -1) {
             SpellType levelSpell = GetCyborgLevelSpell(nLevel);
             if (levelSpell != SPELL_NONE) {
                 AddSpell(levelSpell, 0);
@@ -1112,7 +1107,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 cHeroScreen[H2EnumIndex(TEXT_DISMISS)],
                 gpHVHero->m_name,
-                gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]
+                gAlignmentNames[H2EnumIndex(gpHVHero->m_faction)]
             );
             break;
 
@@ -1436,7 +1431,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->m_artifacts
                                         [message.payload.widget.id - UI_ARTIFACT_FIRST],
                                     quickView,
-                                    gpHVHero->m_artifactExtra
+                                    gpHVHero->m_artifactSpells
                                         [message.payload.widget.id - UI_ARTIFACT_FIRST]
                                 );
                             }
@@ -1508,7 +1503,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
         heroCell = gpAdvManager->GetCell(gpHVHero->m_x, gpHVHero->m_y);
         if (heroCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
             gpHVHero->m_locationType = heroCell->m_triggerType;
-            gpHVHero->m_occupiedTown = heroCell->m_objectMetadata;
+            gpHVHero->m_locationMetadata = heroCell->m_objectMetadata;
         }
     }
 
@@ -1547,7 +1542,7 @@ void SetupHeroView(void) {
         bNoDismiss = true;
 
     message.type = MESSAGE_WIDGET;
-    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s - %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_cursorType)]);
+    utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s - %s", gpHVHero->m_name, gAlignmentNames[H2EnumIndex(gpHVHero->m_faction)]);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = UI_HERO_TITLE;
     message.payload.widget.data.text = gText;
@@ -1783,9 +1778,9 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
 
     tag_message message;
 
-    gpTownManager->m_heroWindow1 =
+    gpTownManager->m_childWindow =
         new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == NULL)
+    if (gpTownManager->m_childWindow == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
@@ -1795,13 +1790,13 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpTownManager->m_childWindow->BroadcastMessage(message);
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
-    delete gpTownManager->m_heroWindow1;
+    gpTownManager->m_childWindow->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
         if (gpHVHero->m_army.m_creatureTypes[destinationSlot]
@@ -1926,7 +1921,7 @@ HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
 
 class town* hero::GetOccupiedTown(void) {
     if (m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-        return gpGame->GetTown(m_occupiedTown);
+        return gpGame->GetTown(m_locationMetadata);
     return NULL;
 }
 
@@ -1948,7 +1943,7 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
         return H2EnumIndex(ssLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         bonus++;
-    if (m_cursorType == FACTION_NECROMANCER)
+    if (m_faction == FACTION_NECROMANCER)
         bonus += gpGame->CountShrines(m_owner);
     if (bonus > HERO_NECROMANCY_BONUS_MAX)
         bonus = HERO_NECROMANCY_BONUS_MAX;
@@ -1963,7 +1958,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     const char* skillText;
 
     // The Cyborg Wisdom slot is Cybernetics, with its own text and icon row.
-    if (m_cursorType == FACTION_CYBORG && skill == HERO_SKILL_WISDOM
+    if (m_faction == FACTION_CYBORG && skill == HERO_SKILL_WISDOM
         && m_secondarySkills[H2EnumIndex(skill)] != HERO_SKILL_LEVEL_NONE) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -1996,7 +1991,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE);
 }
 
-void hero::CheckAnduranPieces(i32 showDialog) {
+void hero::CheckAnduranPieces(i32 checkEndGame) {
     i32 artifactSlot;
 
     if (HasArtifact(ARTIFACT_BREASTPLATE_ANDURAN) && HasArtifact(ARTIFACT_HELMET_ANDURAN)
@@ -2009,7 +2004,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }
-        GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, H2EnumIndex(ARTIFACT_NONE));
+        GiveArtifact(this, ARTIFACT_BATTLE_GARB, checkEndGame, H2EnumIndex(ARTIFACT_NONE));
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(localization::Tr("hero.artifact.anduran_combined"), NORMAL_DIALOG_INFO, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_ARTIFACT, H2EnumIndex(ARTIFACT_BATTLE_GARB));

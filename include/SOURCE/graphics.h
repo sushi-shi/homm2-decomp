@@ -1,7 +1,7 @@
-#ifndef GRAPHICS_H
-#define GRAPHICS_H
+#ifndef HOMM2_SOURCE_GRAPHICS_H
+#define HOMM2_SOURCE_GRAPHICS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 /*
  * Ironfist's tagged rectangle helpers, used by the combat renderer to

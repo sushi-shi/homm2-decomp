@@ -1,7 +1,7 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 const char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Original Campaign}\n\nEither Roland's or Archibald's campaign from the original Heroes of "
@@ -15,7 +15,7 @@ const char* xSetupStandardGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {
     "{Expansion Map}\n\nSelects a game from the Price of Loyalty expansion set.",
     "{Cancel}\n\nCancel back to main menu."
 };
-const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
+const char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     "Elven alliance",
     "Breastplate",
     "Wood bonus",
@@ -29,7 +29,7 @@ const char* xCampaignAwards[X_GLOBAL_EXPANSION_CAMPAIGN_AWARD_COUNT] = {
     "Sphere of Negation"
 };
 const char*
-    xScenarioName[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] = {
+    xScenarioName[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
         {"Uprising",
          "Island of Chaos",
          "Arrow's Flight",
@@ -57,7 +57,7 @@ const char*
         {"Stranded", "Pirate Isles", "King and Country", "Blood is Thicker", "", "", "", ""}
 };
 const char*
-    xScenarioDescription[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT][X_GLOBAL_EXPANSION_CAMPAIGN_MAP_COUNT] =
+    xScenarioDescription[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT] =
         {{"Subdue the unruly local lords in order to provide the Empire with facilities to operate "
           "in this region.",
           "Eliminate all oposition in this area. Then the first piece of the artifact will be "
@@ -119,8 +119,8 @@ const char*
           "",
           "",
           ""}};
-const char* xShortCampaignNames[X_GLOBAL_EXPANSION_CAMPAIGN_COUNT] = {"POL", "DES", "WIZ", "VOY"};
-const char* xHSCampaignNames[EXPANSION_HIGH_SCORE_CAMPAIGN_COUNT] = {"Price of Loyalty", "Descendants", "Wizard's Isle", "Voyage Home"};
+const char* xShortCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)] = {"POL", "DES", "WIZ", "VOY"};
+const char* xHSCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)] = {"Price of Loyalty", "Descendants", "Wizard's Isle", "Voyage Home"};
 const char* xRecruitEmpty[X_GLOBAL_RECRUIT_EMPTY_COUNT] = {
     "This burial site is deathly still.",
     "The pit of mud bubbles for a minute and then lies still.",
@@ -166,7 +166,7 @@ const char* xStableText[X_GLOBAL_STABLE_TEXT_COUNT] = {
 };
 const char* xJosephName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Joseph", "Joseph II", "Joseph III", "Joseph IV", "Joseph V", "Joseph VI"};
 const char* xUncleIvanName[X_GLOBAL_EXPANSION_HERO_NAME_COUNT] = {"Uncle Ivan", "Ivan II", "Ivan III", "Ivan IV", "Ivan V", "Ivan VI"};
-const char* xShortSSLevelNames[X_GLOBAL_SHORT_SKILL_LEVEL_COUNT] = {"Bas.", "Adv.", "Exp."
+const char* xShortSSLevelNames[SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {"Bas.", "Adv.", "Exp."
 };
 const char* xPasswordStrings[X_GLOBAL_PASSWORD_STRING_COUNT] = {
     "Advance",    "Advent",      "Adventure",  "Animate",     "Archer",     "Arena",

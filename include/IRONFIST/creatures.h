@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 /*
  * Ironfist's data-driven creature database: DATA/creatures.xml fills the

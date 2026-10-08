@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
@@ -9,12 +9,8 @@
 #include <BASE/icon.h>
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
@@ -50,16 +46,13 @@ typedef enum SwapManagerConstant {
     SPLIT_CONFIRM             = DIALOG_BUTTON_2,
     CONTROL_CLOSE             = DIALOG_BUTTON_0,
     WINDOW_TEXT_ID            = 0x15,
-    SPLIT_MODIFIER_MASK       = 3,
     TITLE_WIDGET              = 0x4d,
     ADVENTURE_WIDGET_FIRST    = 1,
     ADVENTURE_WIDGET_LAST     = 6,
     MONO_ICON_SKIP            = 2,
     MONO_ICON_DEFAULT         = -1,
-    MANAGER_MESSAGE           = 0x100,
     SLOT_NONE                 = -1,
     ARTIFACT_COLUMN_COUNT     = 7,
-    FADE_STEPS                = 8,
     VIEW_FULL                 = 0,
     VIEW_QUICK                = 1,
     CLOSE_REQUESTED           = 1,
@@ -72,8 +65,6 @@ typedef enum SwapManagerConstant {
     RIGHT_PRIMARY_SKILL_FIRST = 0x48,
     LEFT_ARMY_COUNT_FIRST     = 0x74,
     RIGHT_ARMY_COUNT_FIRST    = 0x79,
-    ARMY_VIEW_X               = 0x77,
-    ARMY_VIEW_Y               = 0x14,
     SPLIT_WINDOW_X            = 0xb1,
     SPLIT_WINDOW_Y            = 0x14,
     SPLIT_TEXT_CONTROL        = 1,
@@ -149,7 +140,7 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.id = H2EnumIndex(swapSide) * HERO_SECONDARY_SKILL_CAPACITY + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
                 // The Cyborg Wisdom slot draws the Cybernetics small icon.
-                if (m_heroes[H2EnumIndex(swapSide)]->m_cursorType == FACTION_CYBORG
+                if (m_heroes[H2EnumIndex(swapSide)]->m_faction == FACTION_CYBORG
                     && m_heroes[H2EnumIndex(swapSide)]->GetNthSS(skillWidget) == HERO_SKILL_WISDOM)
                     message.payload.widget.data.value = CYBERNETICS_MINI_SKILL_FRAME;
                 else
@@ -208,7 +199,7 @@ void swapManager::Close(void) {
 }
 
 void swapManager::DrawSelector(void) {
-    const char selectorFrame = 10;
+    const char selectorColor = 10;
     const i16 leftArmyX = 37;
     const i16 rightArmyX = 382;
     const i16 armyY = 268;
@@ -262,7 +253,7 @@ void swapManager::DrawSelector(void) {
             selectorX,
             selectorY,
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
-            selectorFrame,
+            selectorColor,
             ICON_DRAW_NORMAL,
             NULL
         );
@@ -376,7 +367,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_RIGHT_HERO:
@@ -387,7 +378,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             Update();
                             DrawSwapWin();
                             Reset();
-                            gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, NULL);
+                            gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:
@@ -419,7 +410,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->ViewArtifact(
                                     m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -444,7 +435,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -483,7 +474,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->ViewArtifact(
                                     m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -508,7 +499,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -528,8 +519,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_LEFT_ARMY_FIRST],
@@ -570,7 +561,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & H2EnumIndex(SPLIT_MODIFIER_MASK))
+                                            & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[H2EnumIndex(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -599,8 +590,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         [message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
                                     gpGame->ViewArmy(
-                                        ARMY_VIEW_X,
-                                        ARMY_VIEW_Y,
+                                        VIEW_ARMY_STANDARD_X,
+                                        VIEW_ARMY_STANDARD_Y,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                             [message.payload.widget.id
                                              - CONTROL_RIGHT_ARMY_FIRST],
@@ -641,7 +632,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     ViewMon();
                                     Reset();
                                 } else if ((message.payload.widget.parameter
-                                            & H2EnumIndex(SPLIT_MODIFIER_MASK))
+                                            & H2EnumIndex(MESSAGE_MODIFIER_SHIFT_KEYS))
                                                != 0
                                            && (m_heroes[H2EnumIndex(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
@@ -690,8 +681,8 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
 void swapManager::ViewMon(void) {
     gpGame->ViewArmy(
-        ARMY_VIEW_X,
-        ARMY_VIEW_Y,
+        VIEW_ARMY_STANDARD_X,
+        VIEW_ARMY_STANDARD_Y,
         m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureTypes[m_targetSlot],
         m_heroes[H2EnumIndex(m_selectedSide)]->m_army.m_creatureCounts[m_targetSlot],
         NULL,
@@ -716,10 +707,10 @@ void swapManager::SwapArtifacts(void) {
     m_heroes[H2EnumIndex(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact;
     m_heroes[H2EnumIndex(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
-    i8 extra = m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
-    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactExtra[m_selectedSlot] =
-        m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot];
-    m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
+    i8 extra = m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactSpells[m_selectedSlot];
+    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactSpells[m_selectedSlot] =
+        m_heroes[H2EnumIndex(m_targetSide)]->m_artifactSpells[m_targetSlot];
+    m_heroes[H2EnumIndex(m_targetSide)]->m_artifactSpells[m_targetSlot] = extra;
 
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_selectedSide)], targetArtifact, 0);
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_targetSide)], selectedArtifact, 0);
@@ -893,9 +884,9 @@ void swapManager::SplitMons(void) {
     selectedArmy = &m_heroes[H2EnumIndex(m_selectedSide)]->m_army;
     targetTroops = &m_heroes[H2EnumIndex(m_targetSide)]->m_army;
 
-    gpTownManager->m_heroWindow1 =
+    gpTownManager->m_childWindow =
         new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == NULL)
+    if (gpTownManager->m_childWindow == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = selectedArmy->m_creatureCounts[m_selectedSlot];
@@ -918,13 +909,13 @@ void swapManager::SplitMons(void) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = SPLIT_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpTownManager->m_childWindow->BroadcastMessage(message);
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
-    delete gpTownManager->m_heroWindow1;
+    gpTownManager->m_childWindow->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
         if (targetTroops->m_creatureTypes[m_targetSlot]

@@ -1,7 +1,7 @@
-#ifndef HOMM2_NOOPT_H
-#define HOMM2_NOOPT_H
+#ifndef HOMM2_SOURCE_NOOPT_H
+#define HOMM2_SOURCE_NOOPT_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 void DelayTil(i32* endTime);
 void DelayMilli(i32l delay);

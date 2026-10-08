@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/icon2bc.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
@@ -41,7 +41,7 @@ void IconToBitmapColorTable(
     i32 clipH,
     i32 color,
     u8* colorTable,
-    i32 dimGate
+    i32 drawShadows
 ) {
     s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
     s_src = sourceIcon->m_data + s_entry->srcOffset;
@@ -120,7 +120,7 @@ void IconToBitmapColorTable(
                     if (clip == ICON_DRAW_NO_CLIP) {
                         s_dst = s_row + s_x;
                         for (s_loopCount = 0; s_loopCount < s_dimLen; s_loopCount++) {
-                            if (dimGate != 0)
+                            if (drawShadows != 0)
                                 *s_dst = s_dimPal[*s_dst];
                             s_dst++;
                         }
@@ -138,7 +138,7 @@ void IconToBitmapColorTable(
                             s_dst = s_row + clipX;
                         }
                         for (s_loopCount = 0; s_loopCount < s_dimLen; s_loopCount++) {
-                            if (dimGate != 0)
+                            if (drawShadows != 0)
                                 *s_dst = s_dimPal[*s_dst];
                             s_dst++;
                         }

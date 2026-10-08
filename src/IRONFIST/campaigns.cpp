@@ -11,7 +11,7 @@
 #include <IRONFIST/expansions.h>
 #include <IRONFIST/paths.h>
 #include <IRONFIST/xml_utils.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>

@@ -1,6 +1,7 @@
 #include <SOURCE/Localization.h>
 
 #include <SOURCE/KB.h>
+#include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Platform.h>
 

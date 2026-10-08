@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>
@@ -12,7 +13,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/Overview.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/armyGroup.h>
 
 class army;
@@ -73,11 +74,22 @@ typedef enum GameStateStorageConstant {
     GAME_TIME_EVENT_CAPACITY             = 50,
     GAME_MAP_EVENT_CAPACITY              = 50,
     GAME_CURRENT_MAP_NAME_SIZE           = 16,
-    GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
 } GameStateStorageConstant;
 
+
+typedef enum GameViewArmyPosition {
+    VIEW_ARMY_STANDARD_X = 119,
+    VIEW_ARMY_STANDARD_Y = 20
+} GameViewArmyPosition;
+
 #pragma pack(push, 1)
+template <i32 Capacity>
+struct GameEventList {
+    u16 count;
+    u16 indices[Capacity];
+};
+
 class game {
 public:
     i16 m_difficultyRating;
@@ -85,13 +97,13 @@ public:
     H2EnumStorage<CampaignSide, u8> m_campaignStartingSide;
     i8 m_campaignScenario;
     u8 m_campaignScenarioCompleted[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScenarioBonus[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignDaysBeforeScenario[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioDays[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    char m_unknown7d;
+    char m_unused7d;
     u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
     u8 m_campaignChoice[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScore;
+    i16 m_campaignTotalDays;
     H2EnumStorage<CreatureType, i16> m_campaignCarryoverCreatureTypes[ARMY_GROUP_SLOT_COUNT];
     i16 m_campaignCarryoverCreatureCounts[ARMY_GROUP_SLOT_COUNT];
     u8 m_campaignScenarioWon;
@@ -123,10 +135,10 @@ public:
     i8 m_townOwners[H2EnumIndex(GAME_TOWN_COUNT)];
     u8 m_townBuiltToday[GAME_TOWN_BUILD_FLAG_BYTE_COUNT];
     hero m_heroRecs[H2EnumIndex(GAME_HERO_COUNT)];
-    i8 m_availableHeroes[H2EnumIndex(GAME_HERO_COUNT)];
+    i8 m_heroOwners[H2EnumIndex(GAME_HERO_COUNT)];
     mineRecord m_mines[H2EnumIndex(GAME_MINE_COUNT)];
     i8 m_mineOwners[H2EnumIndex(GAME_MINE_COUNT)];
-    char m_randomArtifacts[H2EnumIndex(ARTIFACT_COUNT)];
+    char m_artifactPlaced[H2EnumIndex(ARTIFACT_COUNT)];
     boatRecord m_boats[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_boatSlots[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
@@ -139,12 +151,9 @@ public:
     b8 m_cheated;
     char m_pad_0x639e[GAME_RUNTIME_PAD_SIZE];
     char m_rumour[GAME_RUMOUR_TEXT_SIZE];
-    u16 m_rumourEventCount;
-    u16 m_rumourEventIndices[GAME_RUMOUR_EVENT_CAPACITY];
-    u16 m_timeEventCount;
-    u16 m_timeEventIndices[GAME_TIME_EVENT_CAPACITY];
-    u16 m_mapEventCount;
-    u16 m_mapEventIndices[GAME_MAP_EVENT_CAPACITY];
+    GameEventList<GAME_RUMOUR_EVENT_CAPACITY> m_rumourEvents;
+    GameEventList<GAME_TIME_EVENT_CAPACITY> m_timeEvents;
+    GameEventList<GAME_MAP_EVENT_CAPACITY> m_mapEvents;
     class heroWindow* m_viewArmyWindow;
     i32 m_dialogAnimationCounter;
     class heroWindow* m_viewSpellsWindow;
@@ -182,7 +191,7 @@ public:
     i32 SetupPuzzlePieces(i32 player, i32 justCount);
     i32 IsMobile(i32 heroId);
     class fullMap* GetWorldMapData(void);
-    i32 CreateBoat(i32 x, i32 y, i32 notify);
+    i32 CreateBoat(i32 x, i32 y, i32 skipNotify);
     i32 Scan(i8* array, i32 start, i32 length);
     i32 RandomScan(i8* array, i32 start, i32 range, i32, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
@@ -205,7 +214,7 @@ public:
     i32 GetMineId(i32 column, i32 row);
     i32 SaveGame(const char* filename, i32 generateName, i8);
     void SetupOrigData(void);
-    void LoadGame(const char* filename, i32 loadFromFile, i32);
+    void LoadGame(const char* filename, i32 originalDataOnly, i32);
     void GiveTroopsToNeutralTown(i32 townId);
     void GiveTroopsToNeutralTowns(void);
     void NewMap(const char* filename);
@@ -224,7 +233,7 @@ public:
         CreatureType monsterType,
         i32 numTroops,
         class town* castle,
-        i32 disableUpgrade,
+        i32 disableDismiss,
         ArmyFacing facing,
         i32 quickView,
         class hero* theHero,
@@ -280,17 +289,17 @@ public:
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
     void CheckHeroConsistency(void);
-    i32 TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave);
+    i32 TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave);
     i32 ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc, i32 remotePlayer);
     void DoNewTurn(void);
     i32 GetBoatsBuilt(void);
-    i32 GetNumThievesGuilds(i32 color);
+    i32 GetNumThievesGuilds(i32 player);
     i32 CalcDifficultyRating(void);
     void RestoreCell(
         i32 x,
         i32 y,
         MapTriggerCode objectType,
-        i32 barrier,
+        i32 objectMetadata,
         class mapCell* passedCell,
         i32
     );
@@ -331,9 +340,8 @@ extern OverviewType iLastDynamicType;
 extern OverviewType giOverviewType;
 extern i32 giOverviewTop[H2EnumIndex(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
-extern b32 gbDoModemConfig;
 extern i16 trackXY[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
-                  [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT];
+                  [H2EnumIndex(COORDINATE_AXIS_COUNT)];
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;
@@ -351,5 +359,20 @@ extern char* cNGKPCore;
 extern i32 NGKPcursorIndex;
 extern char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 extern class icon* NGKPBkg;
+
+i32 GetNumObelisks(i32 player);
+void ComputeUALoc(i32 playerIndex);
+MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
+MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
+MessageDispatchResult ViewArmyHandler(struct tag_message& message);
+i32 IsCursedItem(ArtifactType item);
+i32 CalcBaseScore(i32 days);
+void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
+void CreateJoinFile(char* oldName, char* diffName, char* joinName);
+EventExtra* GetMapEvent(i32 x, i32 y);
+void CheckValidAvailableHeroes(void);
+i32 CalcFileCRC(char* file);
+
+extern bchar bMapInitialized;
 
 #endif

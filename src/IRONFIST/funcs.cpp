@@ -14,7 +14,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/CMBTMGR.h>
+#include <SOURCE/combatManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
@@ -659,14 +659,14 @@ static i32 l_grantSpellScroll(lua_State* L) {
 
 static i32 l_getHeroFaction(lua_State* L) {
     hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 1)));
-    lua_pushinteger(L, hro->m_cursorType.value());
+    lua_pushinteger(L, hro->m_faction.value());
     return 1;
 }
 
 static i32 l_setHeroFaction(lua_State* L) {
     hero* hro = static_cast<hero*>(GetPointerFromLuaClassTable(L, StackIndexOfArg(1, 2)));
     i32 newFaction = static_cast<i32>(luaL_checknumber(L, 2));
-    hro->m_cursorType = FactionTypeFromCode(newFaction);
+    hro->m_faction = FactionTypeFromCode(newFaction);
     return 0;
 }
 
@@ -739,8 +739,8 @@ static i32 l_mapPutArmy(lua_State* L) {
     loc->SetObjectTileset(TILESET_MONS32);
     loc->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
     loc->m_overlayIndex = -1;
-    loc->m_objectLayerBit0 = 0;
-    loc->m_objectLayerBit1 = 0;
+    loc->m_objectGroundLayer = 0;
+    loc->m_objectShadow = 0;
     lua_pushinteger(L, 0);
     return 1;
 }
@@ -766,7 +766,7 @@ static i32 l_mapFizzleObj(lua_State* L) {
     mapCell* cell = gpAdvManager->GetCell(x, y);
     gpAdvManager->CompleteDraw(0);
     gpWindowManager->SaveFizzleSource(
-        CURSOR_FIZZLE_X, CURSOR_FIZZLE_Y, CURSOR_FIZZLE_WIDTH, CURSOR_FIZZLE_HEIGHT
+        ADVENTURE_HERO_FIZZLE_LEFT, ADVENTURE_HERO_FIZZLE_TOP, ADVENTURE_HERO_FIZZLE_SIZE, ADVENTURE_HERO_FIZZLE_SIZE
     );
     if (snd) {
         if (!PlaySoundEffect(
@@ -781,7 +781,7 @@ static i32 l_mapFizzleObj(lua_State* L) {
     gpAdvManager->CompleteDraw(0);
     PollSound();
     gpWindowManager->FizzleForward(
-        CURSOR_FIZZLE_X, CURSOR_FIZZLE_Y, CURSOR_FIZZLE_WIDTH, CURSOR_FIZZLE_HEIGHT, -1, 0, 0
+        ADVENTURE_HERO_FIZZLE_LEFT, ADVENTURE_HERO_FIZZLE_TOP, ADVENTURE_HERO_FIZZLE_SIZE, ADVENTURE_HERO_FIZZLE_SIZE, -1, 0, 0
     );
     if (snd) {
         WaitEndSample(&res);

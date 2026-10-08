@@ -2,7 +2,7 @@
 #include <BASE/message.h>
 #include <BASE/widget.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/searchArray.h>
 #include <cstdlib>
@@ -19,9 +19,6 @@ static_assert(!IS_LICH_CREATURE(CREATURE_SKELETON));
 static_assert(ICON_FITS_CLIP(2, 3, 10, 11, 2, 3, 10, 11));
 static_assert(!ICON_FITS_CLIP(2, 3, 11, 11, 2, 3, 10, 11));
 static_assert(MAPCELL_SPRITE_NONE == 0xff);
-static_assert(SEARCH_NO_OBJECT == MAPCELL_SPRITE_NONE);
-static_assert(CURSOR_OBJECT_PASSABLE_FLAG == H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY));
-static_assert(SEARCH_CELL_BLOCKED == H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY));
 
 static void Check(bool condition) {
     if (!condition)

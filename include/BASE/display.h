@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DISPLAY_H
 #define HOMM2_BASE_DISPLAY_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 
 typedef enum LogicalScreenConstant {
@@ -10,6 +10,11 @@ typedef enum LogicalScreenConstant {
     LOGICAL_SCREEN_MAX_X   = LOGICAL_SCREEN_WIDTH - 1,
     LOGICAL_SCREEN_MAX_Y   = LOGICAL_SCREEN_HEIGHT - 1,
 } LogicalScreenConstant;
+
+
+typedef enum ScreenFillColor {
+    SCREEN_FILL_COLOR = 0x24
+} ScreenFillColor;
 
 
 typedef enum PaletteFormatConstant {

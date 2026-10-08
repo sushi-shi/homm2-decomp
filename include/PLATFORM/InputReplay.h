@@ -1,7 +1,7 @@
-#ifndef HOMM2_PLATFORM_INPUT_REPLAY_H
-#define HOMM2_PLATFORM_INPUT_REPLAY_H
+#ifndef HOMM2_PLATFORM_INPUTREPLAY_H
+#define HOMM2_PLATFORM_INPUTREPLAY_H
 
-#include "Input.h"
+#include <PLATFORM/Input.h>
 
 #include <cstddef>
 #include <cstdint>

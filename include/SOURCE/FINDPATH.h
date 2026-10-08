@@ -1,8 +1,14 @@
-#ifndef HOMM2_FINDPATH_H
-#define HOMM2_FINDPATH_H
+#ifndef HOMM2_SOURCE_FINDPATH_H
+#define HOMM2_SOURCE_FINDPATH_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
+
+
+typedef enum MapDirectionSet {
+    MAP_DIRECTIONS_NORTHWARD = 0x83,
+    MAP_DIRECTIONS_SOUTHWARD = 0x38
+} MapDirectionSet;
 
 i32 CalcTerrainCost(
     TerrainType terrain,

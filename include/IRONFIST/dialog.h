@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 // Ironfist scripting speaks these names; the values are the retail
 // NormalDialog argument and resource-image codes.

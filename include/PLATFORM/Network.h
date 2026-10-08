@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_NETWORK_H
 #define HOMM2_PLATFORM_NETWORK_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 enum class ComBaudRate : i32 {
     COM_BAUD_2400 = 1,

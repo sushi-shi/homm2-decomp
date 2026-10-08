@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_VIDEO_H
 #define HOMM2_PLATFORM_VIDEO_H
 
-#include "Types.h"
+#include <PLATFORM/Types.h>
 
 namespace platform {
 

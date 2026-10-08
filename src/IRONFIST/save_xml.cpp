@@ -28,11 +28,11 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/playerData.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
@@ -70,9 +70,9 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     PushBack(tempDoc, pRoot, "ultimateArtifactLocY", static_cast<i32>(gpGame->m_ultimateArtifactY));
     PushBack(tempDoc, pRoot, "ultimateArtifactIdx", static_cast<i32>(gpGame->m_ultimateArtifactId.value()));
     PushBack(tempDoc, pRoot, "currentRumor", gpGame->m_rumour);
-    PushBack(tempDoc, pRoot, "numRumors", gpGame->m_rumourEventCount);
-    PushBack(tempDoc, pRoot, "numEvents", gpGame->m_timeEventCount);
-    PushBack(tempDoc, pRoot, "numMapEvents", gpGame->m_mapEventCount);
+    PushBack(tempDoc, pRoot, "numRumors", gpGame->m_rumourEvents.count);
+    PushBack(tempDoc, pRoot, "numEvents", gpGame->m_timeEvents.count);
+    PushBack(tempDoc, pRoot, "numMapEvents", gpGame->m_mapEvents.count);
     PushBack(tempDoc, pRoot, "iMaxMapExtra", iMaxMapExtra);
     PushBack(tempDoc, pRoot, "difficulty", static_cast<i32>(gpGame->m_difficulty.value()));
     PushBack(tempDoc, pRoot, "mapFilename", gpGame->m_mapFilename);
@@ -90,8 +90,8 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
             PushBack(tempDoc, pElement, "campID", static_cast<i32>(gpGame->m_campaignType.value()));
             PushBack(tempDoc, pElement, "campIDanother", static_cast<i32>(gpGame->m_campaignStartingSide.value()));
             PushBack(tempDoc, pElement, "campMapID", static_cast<i32>(gpGame->m_campaignScenario));
-            PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(gpGame->m_unknown7d));
-            PushBack(tempDoc, pElement, "campDaysPlayedCurrent", gpGame->m_campaignScore);
+            PushBack(tempDoc, pElement, "campUnknown", static_cast<i32>(gpGame->m_unused7d));
+            PushBack(tempDoc, pElement, "campDaysPlayedCurrent", gpGame->m_campaignTotalDays);
             PushBack(tempDoc, pElement, "campMaybeWon", static_cast<i32>(gpGame->m_campaignScenarioWon));
             PushBack(tempDoc, pElement, "campHasCheated", static_cast<i32>(gpGame->m_campaignCheated));
 
@@ -99,7 +99,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
                 tempDoc, pElement, "campMapsWon", gpGame->m_campaignScenarioCompleted
             );
             WriteCampaignDDArray(
-                tempDoc, pElement, "campDaysPlayed", gpGame->m_campaignScenarioBonus
+                tempDoc, pElement, "campDaysPlayed", gpGame->m_campaignDaysBeforeScenario
             );
             WriteCampaignDDArray(
                 tempDoc, pElement, "campDaysPlayed2", gpGame->m_campaignScenarioDays
@@ -124,9 +124,9 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
             PushBack(tempDoc, pElement, "mightBeScenarioID", H2EnumIndex(xCampaign.m_viewMap));
             PushBack(tempDoc, pElement, "anIntVariable", xCampaign.m_viewOnly);
 
-            WriteArray(tempDoc, pElement, "mapChoice", xCampaign.m_mapChoices);
+            WriteArray(tempDoc, pElement, "mapChoice", xCampaign.m_mapsAvailable);
             WriteArray(tempDoc, pElement, "mapsPlayed", xCampaign.m_mapsPlayed);
-            WriteArray(tempDoc, pElement, "daysPlayed", xCampaign.m_mapDays);
+            WriteArray(tempDoc, pElement, "daysPlayed", xCampaign.m_mapStartDays);
             WriteArray(tempDoc, pElement, "awards", xCampaign.m_awards);
             WriteArray(tempDoc, pElement, "bonusChoices", xCampaign.m_bonusChoices);
 
@@ -166,7 +166,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     SMapHeader* mh = &gpGame->m_mapHeader;
     PushBack(tempDoc, pElement, "field_0", static_cast<i32>(mh->magic));
     PushBack(
-        tempDoc, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->unknown5 << 8)))
+        tempDoc, pElement, "field_4", static_cast<i32>((mh->difficulty.value() | (mh->reserved5 << 8)))
     );
     PushBack(tempDoc, pElement, "width", static_cast<i32>(mh->width));
     PushBack(tempDoc, pElement, "height", static_cast<i32>(mh->height));
@@ -182,9 +182,9 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         tempDoc, pElement, "lossConditionArgumentOrLocX", static_cast<i32>((mh->lossConditionValue & 0xff))
     );
     PushBack(tempDoc, pElement, "field_24", static_cast<i32>((mh->lossConditionValue >> 8)));
-    PushBack(tempDoc, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->unknown25));
-    PushBack(tempDoc, pElement, "winConditionArgumentOrLocY", mh->victoryTownY);
-    PushBack(tempDoc, pElement, "lossConditionArgumentOrLocY", mh->lossTownY);
+    PushBack(tempDoc, pElement, "noStartingHeroInCastle", static_cast<i32>(mh->noStartingHero));
+    PushBack(tempDoc, pElement, "winConditionArgumentOrLocY", mh->victoryConditionY);
+    PushBack(tempDoc, pElement, "lossConditionArgumentOrLocY", mh->lossConditionY);
     PushBack(tempDoc, pElement, "relatedToPlayerColorOrSide", mh->victorySideThreshold);
     PushBack(tempDoc, pElement, "name", mh->name);
     PushBack(tempDoc, pElement, "description", mh->description);
@@ -209,7 +209,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     }
 
     WriteArray(tempDoc, pRoot, "alivePlayers", playerAlive);
-    WriteArray(tempDoc, pRoot, "heroHireStatus", gpGame->m_availableHeroes);
+    WriteArray(tempDoc, pRoot, "heroHireStatus", gpGame->m_heroOwners);
     WriteArray(tempDoc, pRoot, "relatedToPlayerPosAndColor", gpGame->m_setupPlayerColor);
     WriteArray(tempDoc, pRoot, "playerHandicap", gpGame->m_playerHandicap);
     WriteArray(tempDoc, pRoot, "newGameSelectedFaction", gpGame->m_setupPlayerRace);
@@ -225,9 +225,9 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
     WriteArray(tempDoc, pRoot, "boatBuilt", gpGame->m_boatSlots);
     WriteArray(tempDoc, pRoot, "obeliskVisitedMasks", gpGame->m_obeliskVisitors);
     WriteArray(tempDoc, pRoot, "field_637D", gpGame->m_defaultPlayerNames);
-    WriteArray(tempDoc, pRoot, "rumorIndices", gpGame->m_rumourEventIndices);
-    WriteArray(tempDoc, pRoot, "eventIndices", gpGame->m_timeEventIndices);
-    WriteArray(tempDoc, pRoot, "mapEventIndices", gpGame->m_mapEventIndices);
+    WriteArray(tempDoc, pRoot, "rumorIndices", gpGame->m_rumourEvents.indices);
+    WriteArray(tempDoc, pRoot, "eventIndices", gpGame->m_timeEvents.indices);
+    WriteArray(tempDoc, pRoot, "mapEventIndices", gpGame->m_mapEvents.indices);
 
     for (i32 i = 1; i < iMaxMapExtra; i++) {
         tinyxml2::XMLElement* extraElem = tempDoc->NewElement("mapExtra");
@@ -285,7 +285,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         WriteArray(tempDoc, playerElem, "heroesForPurchase", player->m_availableHeroIds);
         WriteArray(tempDoc, playerElem, "castlesOwned", player->m_townIds);
         WriteArray(tempDoc, playerElem, "resources", player->m_resources);
-        WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unknownad);
+        WriteArray(tempDoc, playerElem, "_4_2_1", player->m_unusedAd);
         WriteArray(tempDoc, playerElem, "resourcesIncome", player->m_aiData.m_income);
 
         pRoot->InsertEndChild(playerElem);
@@ -306,7 +306,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         PushBack(tempDoc, townElem, "visitingHeroIdx", static_cast<i32>(twn->m_occupyingHeroId));
         PushBack(tempDoc, townElem, "buildingsBuiltFlags", static_cast<u32>(twn->m_buildings));
         PushBack(tempDoc, townElem, "mageGuildLevel", static_cast<i32>(twn->m_mageGuildLevel));
-        PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unknown1d));
+        PushBack(tempDoc, townElem, "field_1D", static_cast<i32>(twn->m_unused1d));
         PushBack(tempDoc, townElem, "exists", static_cast<i32>(twn->m_onMap));
         PushBack(
             tempDoc, townElem, "mayNotBeUpgradedToCastle", static_cast<i32>(twn->m_mayNotUpgradeToCastle)
@@ -390,8 +390,8 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("isRoad", c->m_isRoad);
         mapElement->SetAttribute("objTileset", H2EnumIndex(c->ObjectTileset()));
         mapElement->SetAttribute("objectIndex", c->m_objectIndex);
-        mapElement->SetAttribute("field_4_1", c->m_objectLayerBit0);
-        mapElement->SetAttribute("isShadow", c->m_objectLayerBit1);
+        mapElement->SetAttribute("field_4_1", c->m_objectGroundLayer);
+        mapElement->SetAttribute("isShadow", c->m_objectShadow);
         mapElement->SetAttribute("field_4_3", c->m_objectDrawnAsOverlay);
         mapElement->SetAttribute("extraInfo", c->m_objectMetadata);
         mapElement->SetAttribute("hasOverlay", c->m_animatedOverlay);
@@ -412,8 +412,8 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         mapElement->SetAttribute("animatedObject", e->animatedObject);
         mapElement->SetAttribute("objTileset", H2EnumIndex(e->ObjectTileset()));
         mapElement->SetAttribute("objectIndex", e->objectIndex);
-        mapElement->SetAttribute("field_4_1", e->objectLayerBit0);
-        mapElement->SetAttribute("field_4_2", e->objectLayerBit1);
+        mapElement->SetAttribute("field_4_1", e->objectGroundLayer);
+        mapElement->SetAttribute("field_4_2", e->objectShadow);
         mapElement->SetAttribute("field_4_3", e->objectDrawnAsOverlay);
         mapElement->SetAttribute("field_4_4", e->objectMetadata);
         mapElement->SetAttribute("animatedLateOverlay", e->animatedOverlay);
@@ -449,10 +449,10 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         PushBack(
             tempDoc, heroElement, "aiLastTownInteractionTurn", hro->m_lastTownInteractionTurn
         );
-        PushBack(tempDoc, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_visitedTownId));
+        PushBack(tempDoc, heroElement, "aiLastTownInteractionIdx", static_cast<i32>(hro->m_lastInteractionTownId));
         PushBack(tempDoc, heroElement, "name", hro->m_name);
         PushBack(tempDoc, heroElement, "experience", hro->m_experience);
-        PushBack(tempDoc, heroElement, "factionID", static_cast<i32>(hro->m_cursorType.value()));
+        PushBack(tempDoc, heroElement, "factionID", static_cast<i32>(hro->m_faction.value()));
         PushBack(tempDoc, heroElement, "heroID", static_cast<i32>(hro->m_portrait.value()));
         PushBack(tempDoc, heroElement, "x", hro->m_x);
         PushBack(tempDoc, heroElement, "y", hro->m_y);
@@ -463,7 +463,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         PushBack(tempDoc, heroElement, "patrolDistance", static_cast<i32>(hro->m_patrolRadius));
         PushBack(tempDoc, heroElement, "directionFacing", static_cast<i32>(hro->m_direction.value()));
         PushBack(tempDoc, heroElement, "occupiedObjType", static_cast<i32>(hro->m_locationType.value()));
-        PushBack(tempDoc, heroElement, "occupiedObjVal", hro->m_occupiedTown);
+        PushBack(tempDoc, heroElement, "occupiedObjVal", hro->m_locationMetadata);
         PushBack(tempDoc, heroElement, "mobility", hro->m_mobility);
         PushBack(tempDoc, heroElement, "remainingMobility", hro->m_remainingMobility);
         PushBack(tempDoc, heroElement, "oldLevel", hro->m_level);
@@ -490,7 +490,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
         );
         PushBack(tempDoc, heroElement, "xanadusVisited", static_cast<i32>(hro->m_xanaduVisits));
         PushBack(tempDoc, heroElement, "randomSeed", static_cast<i32>(hro->m_randomSeed));
-        PushBack(tempDoc, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_enabled));
+        PushBack(tempDoc, heroElement, "wisdomLastOffered", static_cast<i32>(hro->m_lastWisdomOfferLevel));
         PushBack(tempDoc, heroElement, "numSecSkillsKnown", hro->m_secondarySkillCount);
         PushBack(tempDoc, heroElement, "flags", H2EnumIndex(hro->m_eventFlags));
         PushBack(tempDoc, heroElement, "isCaptain", static_cast<i32>(hro->m_isCaptain));
@@ -524,7 +524,7 @@ tinyxml2::XMLError IronfistXML::Save(const char* fileName) {
             tinyxml2::XMLElement* artElem = tempDoc->NewElement("artifact");
             artElem->SetAttribute("index", j);
             artElem->SetAttribute("id", static_cast<i32>(hro->m_artifacts[j].value()));
-            artElem->SetAttribute("spell", static_cast<i32>(hro->m_artifactExtra[j]));
+            artElem->SetAttribute("spell", static_cast<i32>(hro->m_artifactSpells[j]));
             heroElement->InsertEndChild(artElem);
         }
         pRoot->InsertEndChild(heroElement);
@@ -654,12 +654,12 @@ void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
             if (name == "campID") QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignType));
             else if (name == "campIDanother") QueryCharText(elem, reinterpret_cast<u8*>(&gpGame->m_campaignStartingSide));
             else if (name == "campMapID") QueryCharText(elem, &gpGame->m_campaignScenario);
-            else if (name == "campUnknown") QueryCharText(elem, &gpGame->m_unknown7d);
-            else if (name == "campDaysPlayedCurrent") QueryShortText(elem, &gpGame->m_campaignScore);
+            else if (name == "campUnknown") QueryCharText(elem, &gpGame->m_unused7d);
+            else if (name == "campDaysPlayedCurrent") QueryShortText(elem, &gpGame->m_campaignTotalDays);
             else if (name == "campMaybeWon") QueryCharText(elem, &gpGame->m_campaignScenarioWon);
             else if (name == "campHasCheated") QueryCharText(elem, &gpGame->m_campaignCheated);
             else if (name == "campMapsWon") gpGame->m_campaignScenarioCompleted[campId][mapId] = value;
-            else if (name == "campDaysPlayed") gpGame->m_campaignScenarioBonus[campId][mapId] = static_cast<i16>(value);
+            else if (name == "campDaysPlayed") gpGame->m_campaignDaysBeforeScenario[campId][mapId] = static_cast<i16>(value);
             else if (name == "campDaysPlayed2") gpGame->m_campaignScenarioDays[campId][mapId] = static_cast<i16>(value);
             else if (name == "campChoices") gpGame->m_campaignChoice[campId][mapId] = value;
             else if (name == "campMapsPlayed") gpGame->m_campaignMapEnabled[campId][mapId] = value;
@@ -673,9 +673,9 @@ void IronfistXML::ReadCampaign(tinyxml2::XMLNode* root, i32 campaignType) {
             else if (name == "numMaps") elem->QueryIntText(&xCampaign.m_mapCount);
             else if (name == "mightBeScenarioID") { elem->QueryIntText(&intValue); xCampaign.m_viewMap = ExpansionCampaignMapFromCode(intValue); }
             else if (name == "anIntVariable") elem->QueryIntText(&xCampaign.m_viewOnly);
-            else if (name == "mapChoice") xCampaign.m_mapChoices[index] = value;
+            else if (name == "mapChoice") xCampaign.m_mapsAvailable[index] = value;
             else if (name == "mapsPlayed") xCampaign.m_mapsPlayed[index] = value;
-            else if (name == "daysPlayed") xCampaign.m_mapDays[index] = static_cast<i16>(value);
+            else if (name == "daysPlayed") xCampaign.m_mapStartDays[index] = static_cast<i16>(value);
             else if (name == "awards") xCampaign.m_awards[index] = value;
             else if (name == "bonusChoices") xCampaign.m_bonusChoices[index] = value;
             else if (name == "savedHero") ReadCampaignSavedHero(elem);
@@ -718,7 +718,7 @@ void IronfistXML::ReadMapHeader(tinyxml2::XMLNode* root) {
         else if (name == "field_4") {
             elem->QueryIntText(&intValue);
             mh->difficulty = static_cast<u8>(intValue & 0xff);
-            mh->unknown5 = static_cast<u8>((intValue >> 8) & 0xff);
+            mh->reserved5 = static_cast<u8>((intValue >> 8) & 0xff);
         }
         else if (name == "width") QueryCharText(elem, &mh->width);
         else if (name == "height") QueryCharText(elem, &mh->height);
@@ -738,9 +738,9 @@ void IronfistXML::ReadMapHeader(tinyxml2::XMLNode* root) {
             elem->QueryIntText(&intValue);
             lossValueHigh = intValue & 0xff;
         }
-        else if (name == "noStartingHeroInCastle") QueryCharText(elem, &mh->unknown25);
-        else if (name == "winConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryTownY));
-        else if (name == "lossConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->lossTownY));
+        else if (name == "noStartingHeroInCastle") QueryCharText(elem, &mh->noStartingHero);
+        else if (name == "winConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victoryConditionY));
+        else if (name == "lossConditionArgumentOrLocY") QueryShortText(elem, reinterpret_cast<i16*>(&mh->lossConditionY));
         else if (name == "relatedToPlayerColorOrSide") QueryShortText(elem, reinterpret_cast<i16*>(&mh->victorySideThreshold));
         else if (name == "name") QueryText(elem, mh->name);
         else if (name == "description") QueryText(elem, mh->description);
@@ -776,8 +776,8 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             cell->m_isRoad = elem->IntAttribute("isRoad");
             cell->SetObjectTileset(TilesetIdFromCode(elem->IntAttribute("objTileset")));
             cell->m_objectIndex = elem->IntAttribute("objectIndex");
-            cell->m_objectLayerBit0 = elem->IntAttribute("field_4_1");
-            cell->m_objectLayerBit1 = elem->IntAttribute("isShadow");
+            cell->m_objectGroundLayer = elem->IntAttribute("field_4_1");
+            cell->m_objectShadow = elem->IntAttribute("isShadow");
             cell->m_objectDrawnAsOverlay = elem->IntAttribute("field_4_3");
             cell->m_objectMetadata = elem->IntAttribute("extraInfo");
             cell->m_animatedOverlay = elem->IntAttribute("hasOverlay");
@@ -793,8 +793,8 @@ void IronfistXML::ReadMap(tinyxml2::XMLNode* root) {
             ext->animatedObject = elem->IntAttribute("animatedObject");
             ext->SetObjectTileset(TilesetIdFromCode(elem->IntAttribute("objTileset")));
             ext->objectIndex = elem->IntAttribute("objectIndex");
-            ext->objectLayerBit0 = elem->IntAttribute("field_4_1");
-            ext->objectLayerBit1 = elem->IntAttribute("field_4_2");
+            ext->objectGroundLayer = elem->IntAttribute("field_4_1");
+            ext->objectShadow = elem->IntAttribute("field_4_2");
             ext->objectDrawnAsOverlay = elem->IntAttribute("field_4_3");
             ext->objectMetadata = elem->IntAttribute("field_4_4");
             ext->animatedOverlay = elem->IntAttribute("animatedLateOverlay");
@@ -859,7 +859,7 @@ void IronfistXML::ReadPlayerData(tinyxml2::XMLNode* root, i32 dataIndex) {
         else if (name == "castlesOwned") pdata->m_townIds[index] = value;
         else if (name == "resources") pdata->m_resources[index] = value;
         else if (name == "resourcesIncome") pdata->m_aiData.m_income[index] = value;
-        else if (name == "_4_2_1") pdata->m_unknownad[index] = value;
+        else if (name == "_4_2_1") pdata->m_unusedAd[index] = value;
     }
 }
 
@@ -871,7 +871,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
     hro->m_owner = 0;
     hro->m_x = 0;
     hro->m_y = 0;
-    hro->m_cursorType = FactionTypeFromOrdinal(0);
+    hro->m_faction = FactionTypeFromOrdinal(0);
     hro->m_portrait = HeroPortraitFromOrdinal(0);
     hro->m_name[0] = '\0';
     memset(hro->m_spells, 0, sizeof(hro->m_spells));
@@ -885,10 +885,10 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "aiLastHeroInteractionTurn") QueryShortText(elem, &hro->m_lastHeroInteractionTurn);
         else if (name == "aiLastHeroInteractionIdx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_lastInteractionHeroId));
         else if (name == "aiLastTownInteractionTurn") QueryShortText(elem, &hro->m_lastTownInteractionTurn);
-        else if (name == "aiLastTownInteractionIdx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_visitedTownId));
+        else if (name == "aiLastTownInteractionIdx") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_lastInteractionTownId));
         else if (name == "name") QueryText(elem, hro->m_name);
         else if (name == "experience") elem->QueryIntText(&hro->m_experience);
-        else if (name == "factionID") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_cursorType));
+        else if (name == "factionID") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_faction));
         else if (name == "heroID") QueryCharText(elem, reinterpret_cast<u8*>(&hro->m_portrait));
         else if (name == "x") elem->QueryIntText(&hro->m_x);
         else if (name == "y") elem->QueryIntText(&hro->m_y);
@@ -903,7 +903,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
             QueryShortText(elem, &locationType);
             hro->m_locationType = locationType;
         }
-        else if (name == "occupiedObjVal") QueryShortText(elem, &hro->m_occupiedTown);
+        else if (name == "occupiedObjVal") QueryShortText(elem, &hro->m_locationMetadata);
         else if (name == "mobility") elem->QueryIntText(&hro->m_mobility);
         else if (name == "remainingMobility") elem->QueryIntText(&hro->m_remainingMobility);
         else if (name == "oldLevel") QueryShortText(elem, &hro->m_level);
@@ -922,7 +922,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         else if (name == "treesOfKnowledgeVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_treeKnowledgeVisits));
         else if (name == "xanadusVisited") elem->QueryIntText(reinterpret_cast<i32*>(&hro->m_xanaduVisits));
         else if (name == "randomSeed") QueryCharText(elem, &hro->m_randomSeed);
-        else if (name == "wisdomLastOffered") QueryCharText(elem, &hro->m_enabled);
+        else if (name == "wisdomLastOffered") QueryCharText(elem, &hro->m_lastWisdomOfferLevel);
         else if (name == "flags") {
             i32 flags;
             elem->QueryIntText(&flags);
@@ -946,7 +946,7 @@ void IronfistXML::ReadHero(tinyxml2::XMLNode* root, i32 heroIndex) {
         }
         else if (name == "artifact") {
             hro->m_artifacts[index] = static_cast<i8>(elem->IntAttribute("id"));
-            hro->m_artifactExtra[index] = static_cast<i8>(elem->IntAttribute("spell"));
+            hro->m_artifactSpells[index] = static_cast<i8>(elem->IntAttribute("spell"));
         }
     }
 }
@@ -975,7 +975,7 @@ void IronfistXML::ReadTown(tinyxml2::XMLNode* root, i32 townIdx) {
             twn->m_buildings = buildings;
         }
         else if (name == "mageGuildLevel") QueryCharText(elem, &twn->m_mageGuildLevel);
-        else if (name == "field_1D") QueryCharText(elem, &twn->m_unknown1d);
+        else if (name == "field_1D") QueryCharText(elem, &twn->m_unused1d);
         else if (name == "exists") QueryCharText(elem, &twn->m_onMap);
         else if (name == "mayNotBeUpgradedToCastle") QueryCharText(elem, &twn->m_mayNotUpgradeToCastle);
         else if (name == "field_38") QueryCharText(elem, &twn->m_formation);
@@ -1064,15 +1064,13 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "ultimateArtifactLocY") QueryCharText(elem, &gpGame->m_ultimateArtifactY);
         else if (name == "ultimateArtifactIdx") QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_ultimateArtifactId));
         else if (name == "currentRumor") QueryText(elem, gpGame->m_rumour);
-        else if (name == "numRumors") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_rumourEventCount));
-        else if (name == "numEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_timeEventCount));
-        else if (name == "numMapEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_mapEventCount));
+        else if (name == "numRumors") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_rumourEvents.count));
+        else if (name == "numEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_timeEvents.count));
+        else if (name == "numMapEvents") QueryShortText(elem, reinterpret_cast<i16*>(&gpGame->m_mapEvents.count));
         else if (name == "iMaxMapExtra") {
             elem->QueryIntText(&iMaxMapExtra);
-            ppMapExtra = static_cast<void**>(H2_ALLOC(sizeof(void*) * iMaxMapExtra));
-            pwSizeOfMapExtra = static_cast<i16*>(H2_ALLOC(sizeof(i16) * iMaxMapExtra));
-            memset(ppMapExtra, 0, sizeof(void*) * iMaxMapExtra);
-            memset(pwSizeOfMapExtra, 0, sizeof(i16) * iMaxMapExtra);
+            ppMapExtra = new void*[iMaxMapExtra]();
+            pwSizeOfMapExtra = new i16[iMaxMapExtra]();
         }
         else if (name == "difficulty") QueryCharText(elem, reinterpret_cast<i8*>(&gpGame->m_difficulty));
         else if (name == "mapFilename") QueryText(elem, gpGame->m_mapFilename);
@@ -1085,7 +1083,7 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "playerNames") QueryText(elem, cPlayerNames[index]);
         else if (name == "deadPlayers") gpGame->m_playerDead[index] = value;
         else if (name == "alivePlayers") hasPlayer[index] = value;
-        else if (name == "heroHireStatus") gpGame->m_availableHeroes[index] = value;
+        else if (name == "heroHireStatus") gpGame->m_heroOwners[index] = value;
         else if (name == "relatedToPlayerPosAndColor") gpGame->m_setupPlayerColor[index] = value;
         else if (name == "playerHandicap") gpGame->m_playerHandicap[index] = value;
         else if (name == "newGameSelectedFaction") gpGame->m_setupPlayerRace[index] = FactionTypeFromCode(value);
@@ -1099,14 +1097,14 @@ void IronfistXML::ReadRoot(tinyxml2::XMLNode* root) {
         else if (name == "boatBuilt") gpGame->m_boatSlots[index] = value;
         else if (name == "obeliskVisitedMasks") gpGame->m_obeliskVisitors[index] = value;
         else if (name == "field_637D") gpGame->m_defaultPlayerNames[index] = value;
-        else if (name == "rumorIndices") gpGame->m_rumourEventIndices[index] = value;
+        else if (name == "rumorIndices") gpGame->m_rumourEvents.indices[index] = value;
         else if (name == "eventIndices") {
             if (index < GAME_TIME_EVENT_CAPACITY)
-                gpGame->m_timeEventIndices[index] = value;
+                gpGame->m_timeEvents.indices[index] = value;
         }
         else if (name == "mapEventIndices") {
             if (index < GAME_MAP_EVENT_CAPACITY)
-                gpGame->m_mapEventIndices[index] = value;
+                gpGame->m_mapEvents.indices[index] = value;
         }
         else if (name == "mapRevealed") mapExtra[index] = value;
         else if (name == "mine") {
@@ -1295,7 +1293,7 @@ b32 Ironfist_LoadGame(const char* fileName, i32 loadFromFile) {
     if (platform::CompareIgnoringCase(fileName, "RMT", 3))
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), fileName);
 
-    gpAdvManager->m_heroContextLocked = false;
+    gpAdvManager->m_heroMobilized = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     for (giCurWatchPlayer = giCurPlayer; !gbThisNetHumanPlayer[giCurWatchPlayer];

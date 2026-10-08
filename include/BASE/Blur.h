@@ -1,13 +1,13 @@
-#ifndef HOMM2_BLUR_H
-#define HOMM2_BLUR_H
+#ifndef HOMM2_BASE_BLUR_H
+#define HOMM2_BASE_BLUR_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 class bitmap;
 
 void DoBlur(
-    class bitmap* destination,
-    class bitmap* source,
+    class bitmap* scratch,
+    class bitmap* screen,
     i32 height,
     i32 redAdjust,
     i32 greenAdjust,

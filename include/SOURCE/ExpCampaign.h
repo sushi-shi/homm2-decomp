@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_EXPCAMPAIGN_H
 #define HOMM2_SOURCE_EXPCAMPAIGN_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/KB.h>
@@ -73,13 +74,18 @@ typedef enum ExpansionCampaignConstant {
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT      = 8,
     EXPANSION_CAMPAIGN_AWARD_COUNT        = 11,
     EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE   = 4,
-    EXPANSION_CAMPAIGN_MAP_FILENAME_SIZE  = 13,
     EXPANSION_CAMPAIGN_ICON_FRAME_BASE    = 15,
-    EXPANSION_CAMPAIGN_MUSIC              = 24,
     EXPANSION_CAMPAIGN_MAIN_PLAYER        = 0,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X = 5,
     EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y = 0
 } ExpansionCampaignConstant;
+
+extern const char* xCampaignAwards[EXPANSION_CAMPAIGN_AWARD_COUNT];
+extern const char* xScenarioName[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+extern const char* xScenarioDescription[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)]
+                                         [EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+extern const char* xShortCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)];
+extern const char* xHSCampaignNames[H2EnumIndex(EXPANSION_CAMPAIGN_COUNT)];
 
 #pragma pack(push, 1)
 class ExpCampaign {
@@ -87,12 +93,12 @@ public:
     ExpansionCampaignId m_campaignId;
     ExpansionCampaignMap m_currentMap;
     i32 m_mapCount;
-    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    u8 m_mapsAvailable[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
-    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    i16 m_mapStartDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];
     u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
-    char m_pad_0x3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
+    char m_unused3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
     ExpansionCampaignMap m_viewMap;
     class heroWindow* m_window;
     i32 m_viewOnly;
