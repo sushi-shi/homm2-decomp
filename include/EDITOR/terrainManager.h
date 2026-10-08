@@ -9,7 +9,7 @@
 #include <Domains.h>
 #include <H2/Macros.h>
 #include <BASE/baseManager.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <EDITOR/editManager.h>
 
 class border;

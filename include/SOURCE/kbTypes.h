@@ -823,7 +823,7 @@ struct SMenuEnableStatus {
 #pragma pack(pop)
 SIZE(SMenuEnableStatus, 7);
 
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 struct tag_tilePoint {
     i8 x;
     i8 y;

@@ -22,7 +22,7 @@
 #include <SOURCE/Netbios.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/dpnetwin.h>
 #include <SOURCE/kbwin.h>
@@ -57,11 +57,11 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(CampaignChoiceAmount)

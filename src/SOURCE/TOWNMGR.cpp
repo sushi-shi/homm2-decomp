@@ -46,7 +46,7 @@
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 #include <BASE/widget.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 namespace {
 

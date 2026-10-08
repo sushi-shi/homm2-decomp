@@ -4,7 +4,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <H2/Macros.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <windows.h>
 #include <BASE/baseManager.h>
 

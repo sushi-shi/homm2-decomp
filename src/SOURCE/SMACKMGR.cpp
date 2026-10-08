@@ -13,7 +13,7 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>

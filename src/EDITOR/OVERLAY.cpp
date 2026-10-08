@@ -27,7 +27,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>

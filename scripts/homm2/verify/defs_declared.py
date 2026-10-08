@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """assert_defs_declared.py — hard build gate: every free function DEFINED in a .cpp must be
-DECLARED in that TU's owner header include/<TIER>/<TU>.h, and the .cpp must #include it. With
+DECLARED in that TU's owner header (include/<TIER>/<TU>.h, or the header OWNER_HEADERS names),
+and the .cpp must #include it. With
 local declarations already forbidden (assert_decls), this closes the loop: a definition's
 prototype lives in a header, so callers share the one canonical declaration (no drift).
 Member functions are exempt (declared in their class header). Run from repo root; exits 1."""
 import re, os, glob, sys
 
 from homm2.core.usage import logged
+
+#: A unit whose free functions live in a camelCase header named for its class
+#: or role (HoMM1's layout) rather than in include/<TIER>/<TU>.h.
+OWNER_HEADERS = {
+    "SOURCE/SMACKMGR": "SOURCE/smackManager.h",
+}
 
 
 @logged
@@ -28,17 +35,18 @@ def main(argv=None) -> int:
             continue
         tier = re.search(r'src/([A-Za-z]+)/', cpp).group(1)
         base = os.path.basename(cpp)[:-4]
-        hdr = "include/%s/%s.h" % (tier, base)
+        owner = OWNER_HEADERS.get("%s/%s" % (tier, base), "%s/%s.h" % (tier, base))
+        hdr = "include/" + owner
         src = open(cpp).read()
-        if "#include <%s/%s.h>" % (tier, base) not in src:
-            bad.append((cpp, "does not #include its owner header <%s/%s.h>" % (tier, base))); continue
+        if "#include <%s>" % owner not in src:
+            bad.append((cpp, "does not #include its owner header <%s>" % owner)); continue
         if not os.path.exists(hdr):
             bad.append((cpp, "owner header %s missing" % hdr)); continue
         htext = open(hdr).read()
         for d in decls:
             n = fname(d)
             if not re.search(r'\b%s\s*\(' % re.escape(n), htext):
-                bad.append((cpp, "defines %s() but %s/%s.h does not declare it" % (n, tier, base)))
+                bad.append((cpp, "defines %s() but %s does not declare it" % (n, owner)))
 
     for cpp, msg in bad:
         print("  %s: %s" % (cpp, msg))

@@ -27,7 +27,7 @@
 #include <BASE/message.h>
 #include <stdio.h>
 #include <string.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(CursorPrivateConstant)
     SLOW_CURSOR_CYCLE_START  = 2,

@@ -10,7 +10,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 #ifdef HOMM2_EDITOR

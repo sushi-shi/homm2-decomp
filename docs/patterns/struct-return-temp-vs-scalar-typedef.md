@@ -76,7 +76,7 @@ difference is a header claim, not a body claim. Two further retail facts agree:
 ## The fix
 
 Declare the type as the scalar it is, and the consumer as taking its address
-(`include/SOURCE/KB_TYPES.h`, `include/SOURCE/KB.h`):
+(`include/SOURCE/kbTypes.h`, `include/SOURCE/KB.h`):
 
 ```c
 typedef class sample* SAMPLE2;               /* not struct SAMPLE2 { sample* }; */

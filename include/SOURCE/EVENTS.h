@@ -2,7 +2,7 @@
 #define HOMM2_EVENTS_H
 
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>

@@ -4,8 +4,8 @@
 #include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/remoteTypes.h>
 #include <SOURCE/REQUEST.h>
 
 class mapCell;

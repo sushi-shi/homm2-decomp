@@ -1,5 +1,5 @@
 #include <match.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +36,7 @@
 #include <SOURCE/swapManager.h>
 #include <SOURCE/tradpost.h>
 #include <SOURCE/town.h>
-#include <SOURCE/EVENTS_TYPES.h>
+#include <SOURCE/eventsTypes.h>
 #include <SOURCE/townManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>

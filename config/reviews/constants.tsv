@@ -3,7 +3,7 @@ include/BASE/BITS.h	reviewed
 include/BASE/Blur.h	reviewed	
 include/BASE/Bzip.h	third-party	Imported bzip codec interface, retained with its original storage constants and local Heroes II integration declarations.
 include/BASE/DebugCheck.h	reviewed	
-include/BASE/EXEC_TYPES.h	reviewed	
+include/BASE/executiveTypes.h	reviewed	
 include/BASE/INPUTMGR.h	reviewed	
 include/BASE/Icon2b.h	reviewed	
 include/BASE/IconDraw.h	reviewed	
@@ -87,16 +87,16 @@ include/EDITOR/terrainManager.h	reviewed
 include/EDITOR/townedit.h	reviewed	
 include/EDITOR/x_spedit.h	reviewed	
 include/SOURCE/ADVMGR.h	reviewed	
-include/SOURCE/ADVMGR_TYPES.h	reviewed	
+include/SOURCE/advManagerTypes.h	reviewed	
 include/SOURCE/ARMY.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/CMBTMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/COMMAND.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/CONFIG_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/configTypes.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/CURSOR.h	reviewed	
 include/SOURCE/Campaign.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/Castle.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/EVENTS.h	reviewed	
-include/SOURCE/EVENTS_TYPES.h	reviewed	
+include/SOURCE/eventsTypes.h	reviewed	
 include/SOURCE/ExpCampaign.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/FINDPATH.h	reviewed	
 include/SOURCE/GAME.h	reviewed	literals named or kept with a reason in config/constants.tsv
@@ -104,7 +104,7 @@ include/SOURCE/HERO.h	reviewed
 include/SOURCE/KB.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/KBDeclarations.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/KBForward.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/KB_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/kbTypes.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/Modem.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/NOOPT.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/Netbios.h	reviewed	literals named or kept with a reason in config/constants.tsv
@@ -115,10 +115,10 @@ include/SOURCE/PHILAI.h	reviewed
 include/SOURCE/RECRUIT.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/REMOTE.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/REMOTE_SAVE.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/REMOTE_TYPES.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/remoteTypes.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/REQUEST.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/SETUP.h	reviewed	literals named or kept with a reason in config/constants.tsv
-include/SOURCE/SMACKMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
+include/SOURCE/smackManager.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/SPELLS.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/TOWNMGR.h	reviewed	literals named or kept with a reason in config/constants.tsv
 include/SOURCE/VIEW.h	reviewed	

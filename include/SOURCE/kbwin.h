@@ -1,7 +1,7 @@
 #ifndef HOMM2_KBWIN_H
 #define HOMM2_KBWIN_H
 
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <Domains.h>
 #include <windows.h>
 

@@ -5,7 +5,7 @@
 #include <Domains.h>
 #include <SOURCE/GAME.h>
 #include <winsock.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 H2_ENUM_BEGIN(WinsockTransportConstant)
     WS_TRANSPORT_BUFFER_SIZE        = 0x100,

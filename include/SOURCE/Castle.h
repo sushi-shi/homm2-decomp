@@ -3,7 +3,7 @@
 
 #include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class heroWindow;
 struct tag_message;

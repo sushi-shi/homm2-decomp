@@ -2,7 +2,7 @@
 #define HOMM2_FINDPATH_H
 
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 // MapDirection bit sets: a move north (north-west, north, north-east) leaves
 // past the object on its own cell; a move south (south-east, south,

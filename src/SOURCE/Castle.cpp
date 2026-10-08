@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(CastleControl)
     CONTROL_CLOSE                              = DIALOG_BUTTON_0,

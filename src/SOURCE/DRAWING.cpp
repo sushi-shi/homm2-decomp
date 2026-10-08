@@ -22,7 +22,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 H2_ENUM_CLASS_BEGIN(CombatDrawLayer)

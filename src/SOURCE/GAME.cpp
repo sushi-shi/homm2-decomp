@@ -51,7 +51,7 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE                                                 \

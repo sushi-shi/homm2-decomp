@@ -5,7 +5,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(MoraleConstant)
     FIZBIN_MORALE_PENALTY = 2,

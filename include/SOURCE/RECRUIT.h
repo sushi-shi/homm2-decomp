@@ -2,7 +2,7 @@
 #define HOMM2_RECRUIT_H
 
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class heroWindow;
 class town;

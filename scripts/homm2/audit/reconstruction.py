@@ -68,7 +68,7 @@ def ctags_rows(root: Path, paths: list[str], executable: str) -> list[dict]:
         command.extend(("-D", definition))
     command += ["-o", "-"] + paths
     # The C++ parser can suppress an #else macro after an inline body even with
-    # --if0=yes (NextCreatureType in KB_TYPES.h). Index physical macro definitions
+    # --if0=yes (NextCreatureType in kbTypes.h). Index physical macro definitions
     # independently, without the enum expansions used only to expose C++ bodies.
     macro_command = [executable, "--options=NONE", "--output-format=json", "--sort=no",
                      "--fields=+neKSt", "--kinds-CPreProcessor=d",

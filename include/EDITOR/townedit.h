@@ -9,7 +9,7 @@
 #include <BASE/message.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(TownEditConstant)
     // The map file's town record and its unused tail.

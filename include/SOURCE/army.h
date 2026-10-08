@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/icon.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/combatTypes.h>

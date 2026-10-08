@@ -1,6 +1,6 @@
 #include <match.h>
 #include <SOURCE/army.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>

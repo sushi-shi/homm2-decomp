@@ -1,5 +1,5 @@
 #include <match.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

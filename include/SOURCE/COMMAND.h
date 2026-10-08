@@ -3,7 +3,7 @@
 
 #include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 struct tag_message;
 

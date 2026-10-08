@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 H2_ENUM_BEGIN(RemoteSaveLayoutConstant)
     REMOTE_SAVE_BUFFER_SIZE    = 256,

@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(CursorConstant)
     CURSOR_BOAT_WAKE_TYPE               = 7,

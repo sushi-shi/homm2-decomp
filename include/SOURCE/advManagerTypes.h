@@ -4,7 +4,7 @@
 #include <match.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 #pragma pack(push, 1)
 union AdventureRemotePayload {

@@ -19,7 +19,7 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/ADVMGR.h>
 
 H2_ENUM_BEGIN(RecruitConstant)

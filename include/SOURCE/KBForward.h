@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
 
@@ -34,7 +34,7 @@ struct tag_tilePoint;
 struct mapEventExtra;
 class town;
 class townManager;
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/message.h>
 
 #endif

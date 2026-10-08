@@ -1,7 +1,7 @@
 #include <match.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/army.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

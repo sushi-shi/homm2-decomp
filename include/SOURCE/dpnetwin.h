@@ -4,7 +4,7 @@
 #include <Domains.h>
 #include <windows.h>
 #include <dplay.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <BASE/Misc.h>
 #include <string.h>
 

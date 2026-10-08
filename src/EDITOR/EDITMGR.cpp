@@ -27,7 +27,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/kbwin.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 #include <BASE/bitmap.h>
 #include <BASE/font.h>
 #include <BASE/bmap2.h>

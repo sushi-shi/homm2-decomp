@@ -2,7 +2,7 @@
 #define HOMM2_SOURCE_PHILAI_H
 
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/hero.h>
 
 class armyGroup;

@@ -1,7 +1,7 @@
 #include <match.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 
 DATA(0x0051b62c) H2_CONST char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {

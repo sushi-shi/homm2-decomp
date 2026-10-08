@@ -10,7 +10,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 #if H2_RETAIL_COMPILER
 #define backDirection backDir

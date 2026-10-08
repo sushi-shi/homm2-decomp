@@ -1,6 +1,6 @@
 #include <match.h>
 #include <SOURCE/GAME.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

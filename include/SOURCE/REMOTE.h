@@ -4,7 +4,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <SOURCE/GAME.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 H2_ENUM_BEGIN(RemoteStorageConstant)
     REMOTE_QUEUE_CAPACITY        = 128,

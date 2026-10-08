@@ -3,7 +3,7 @@
 
 #include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/combatTypes.h>
 
 H2_ENUM_CLASS_BEGIN(BoltColorMode)

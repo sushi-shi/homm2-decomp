@@ -1,9 +1,9 @@
 #ifndef HOMM2_X_GLOBAL_H
 #define HOMM2_X_GLOBAL_H
 
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/CONFIG_TYPES.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/configTypes.h>
+#include <SOURCE/remoteTypes.h>
 #include <match.h>
 #include <Domains.h>
 #include <SOURCE/CURSOR.h>

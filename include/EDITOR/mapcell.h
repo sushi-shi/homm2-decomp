@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 // mapCell::m_flags: the ground tile's flips, the water cells along a shore
 // (an edge or corner shape) and those at a shore's outer corner, a cell an

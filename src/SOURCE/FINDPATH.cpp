@@ -14,7 +14,7 @@
 #include <EDITOR/mapcell.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 

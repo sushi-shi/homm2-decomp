@@ -5,7 +5,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/combatTypes.h>
 
 H2_ENUM_BEGIN(CombatPathConstant)

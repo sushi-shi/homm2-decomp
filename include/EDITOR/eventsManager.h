@@ -18,7 +18,7 @@
 #include <BASE/message.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/EVENTMGR.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class icon;
 struct mapEventExtra;

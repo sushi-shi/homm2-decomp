@@ -6,7 +6,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 
 H2_ENUM_BEGIN(ComConstant)
     PORT_COUNT           = 2,

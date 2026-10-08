@@ -4,7 +4,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class hero;
 

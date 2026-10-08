@@ -16,7 +16,7 @@
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_LEFT_OFFER_ICON  = 0x14,

@@ -30,7 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 namespace {
 

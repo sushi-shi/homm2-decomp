@@ -1,6 +1,6 @@
 #include <match.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
@@ -43,7 +43,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/ADVMGR.h>
-#include <SOURCE/ADVMGR_TYPES.h>
+#include <SOURCE/advManagerTypes.h>
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>

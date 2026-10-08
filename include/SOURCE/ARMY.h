@@ -2,7 +2,7 @@
 #define HOMM2_ARMY_H
 
 #include <Domains.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)
     ARMY_ANIMATION_NONE                  = -1,
