@@ -112,7 +112,7 @@ struct overlayType {
 
     OverlayGrid entranceRows;
 
-    u8 highLayer;
+    u8 groundLayer;
 
     u8 trigger;
 

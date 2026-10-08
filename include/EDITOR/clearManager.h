@@ -29,7 +29,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message& message) override;
     void UpdateBrushButtons(void);
     void TrackCursor(void);
-    void SelectBrush(i32 brush, i32 x, i32 y);
+    void OutlineBrush(i32 brush, i32 x, i32 y);
 };
 #pragma pack(pop)
 

@@ -132,9 +132,9 @@ struct SMonFrameInfo {
         i16 x;
         i16 y;
     };
-    char unknown00;
-    i16 spellEffectX;
-    i16 spellEffectY;
+    char unused00;
+    i16 blindEffectX;
+    i16 blindEffectY;
     i8 animationXOffsets[H2EnumIndex(ARMY_ANIMATION_WALK_SOURCE_COUNT)][ARMY_ANIMATION_FRAME_COUNT];
     i8 walkXOffsets[ARMY_ANIMATION_FRAME_COUNT];
     i8 standingAnimationCount;
@@ -179,7 +179,7 @@ typedef enum ArmyDisplayConstant {
 #pragma pack(push, 1)
 class army {
 public:
-    u8 m_animationState;
+    u8 m_attackPending;
     u8 m_shootingAnimationActive;
     H2SteppedEnumStorage<ArmyAnimationSequence, char> m_pendingAnimationSequence;
     H2EnumStorage<ArmyAnimationSequence, i8> m_effectAnimationStart;
@@ -195,7 +195,7 @@ public:
     H2EnumStorage<CombatSide, i32> m_targetSide;
     i32 m_targetIndex;
     CombatHexDirection m_attackDirection;
-    i32 m_unknown5e;
+    i32 m_unused5e;
     i32 m_moveTargetHex;
     b32 m_drawSpellEffect;
     i32 m_mirrorSourceIndex;
@@ -219,11 +219,11 @@ public:
     i32 m_walkDuration;
     i32 m_luckOutcome;
     struct tag_monsterInfo m_monster;
-    i16 m_unknownD4;
+    i16 m_unusedD4;
     b32 m_damagePending;
     b32 m_killPending;
     b32 m_deathPending;
-    H2EnumStorage<SpellType, i32> m_spellEffect;
+    H2EnumStorage<SpellType, i32> m_pendingAbilitySpell;
     H2EnumStorage<CombatSide, i32> m_side;
     i32 m_index;
     i32 m_lastAnimationTime;
@@ -234,10 +234,10 @@ public:
     i32 m_xOffset;
     i32 m_spellCount;
     u8 m_spellInfluence[H2EnumIndex(ARMY_SPELL_INFLUENCE_COUNT)];
-    b32 m_effectAnimationStarted;
+    b32 m_effectAnimationFinished;
     b32 m_drawEnabled;
     b32 m_hitByCreature;
-    i8* m_palette;
+    i8* m_yModify;
     struct SMonFrameInfo m_frameInfo;
     class icon* m_creatureIcon;
     class icon* m_missileIcon;
@@ -245,7 +245,7 @@ public:
     army(void);
     void WaitSample(ArmySampleType sampleIndex);
     void InitClean(void);
-    void Init(CreatureType monsterType, i32 quantity, CombatSide side, i32 index, i32 hex, i32 unknown);
+    void Init(CreatureType monsterType, i32 quantity, CombatSide side, i32 index, i32 hex, i32 armyGroupSlot);
     void LoadResources(void);
     void FreeResources(void);
     void DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly);

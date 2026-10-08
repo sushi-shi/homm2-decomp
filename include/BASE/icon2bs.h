@@ -18,7 +18,7 @@ void IconToBitmapScale(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 scale
+    i32 cellSize
 );
 
 #endif

@@ -53,12 +53,12 @@ public:
     heroWindow* m_windowListHead;
     heroWindow* m_windowListTail;
     heroWindow* m_focusWindow;
-    heroWindow* m_activeWindow;
+    heroWindow* m_previousFocusWindow;
     bitmap* m_screen;
     bitmap* m_fizzleSource;
     bitmap* m_fizzleWork;
     i32 m_screenshotIndex;
-    i32 m_updateFlags;
+    i32 m_colorCycling;
     i32 m_dialogResult;
     i32 m_lastHoverId;
     heroWindowManager(void);
@@ -73,7 +73,7 @@ public:
     void UpdateScreen(void);
     void UpdateScreenRegion(i32 x, i32 y, i32 width, i32 height);
     void RedrawScreen(void);
-    void FadeScreen(WindowFadeMode direction, i32 steps, class palette* currentPalette);
+    void FadeScreen(WindowFadeMode direction, i32 increment, class palette* currentPalette);
     void ScreenShot(void);
     void SaveFizzleSource(i32 x, i32 y, i32 width, i32 height);
     void FizzleForward(i32 x, i32 y, i32 width, i32 height, i32 delay, i8* startPalette, i8* endPalette);

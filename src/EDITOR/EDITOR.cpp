@@ -863,37 +863,37 @@ struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_SPEED_FIRST + 2, 0, 0, 0},
     {APP_MENU_SPEED_FIRST + 3, 0, 0, 0},
     {APP_MENU_SPEED_LAST, 0, 0, 0},
-    {APP_MENU_UNKNOWN_9C6D, 0, 0, 0},
+    {APP_MENU_CD_STEREO, 0, 0, 0},
     {APP_MENU_TOGGLE_ROUTE, 0, 0, 0},
-    {APP_MENU_TOGGLE_BLACKOUT, 0, 0, 0},
+    {APP_MENU_VIEW_ENEMY_MOVES, 0, 0, 0},
     {H2EnumIndex(KBWIN_MENU_HELP), 1, 1, 0},
     {H2EnumIndex(KBWIN_MENU_ABOUT), 1, 1, 0},
-    {APP_MENU_RESTART_0, 0, 1, 0},
-    {APP_MENU_RESTART_1, 0, 1, 0},
-    {APP_MENU_RESTART_2, 0, 1, 0},
-    {APP_MENU_RESTART_3, 0, 1, 0},
-    {APP_MENU_RESTART_4, 0, 1, 0},
-    {APP_MENU_UNKNOWN_9CAD, 0, 1, 0},
-    {APP_MENU_RESTART_5, 0, 1, 0},
-    {APP_MENU_RESTART_6, 0, 1, 0},
-    {APP_MENU_RESTART_7, 0, 1, 0},
-    {APP_MENU_RESTART_8, 0, 1, 0},
-    {APP_MENU_RESTART_9, 0, 1, 0},
-    {APP_MENU_RESTART_10, 0, 1, 0},
-    {APP_MENU_RESTART_11, 0, 1, 0},
-    {APP_MENU_RESTART_12, 0, 1, 0},
-    {APP_MENU_RESTART_13, 0, 1, 0},
-    {APP_MENU_LOAD_0, 0, 1, 0},
-    {APP_MENU_LOAD_1, 0, 1, 0},
-    {APP_MENU_LOAD_2, 0, 1, 0},
-    {APP_MENU_LOAD_3, 0, 1, 0},
-    {APP_MENU_LOAD_4, 0, 1, 0},
-    {APP_MENU_LOAD_5, 0, 1, 0},
-    {APP_MENU_LOAD_6, 0, 1, 0},
-    {APP_MENU_LOAD_7, 0, 1, 0},
-    {APP_MENU_LOAD_8, 0, 1, 0},
-    {APP_MENU_LOAD_9, 0, 1, 0},
-    {APP_MENU_LOAD_10, 0, 1, 0},
+    {APP_MENU_NEW_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_1, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_2, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_3, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_4, 0, 1, 0},
+    {APP_MENU_UNUSED_9CAD, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_CAMPAIGN_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_GUEST, 0, 1, 0},
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
@@ -905,7 +905,7 @@ i32 gZoomViewCells[EDIT_ZOOM_COUNT] = {14, 28, 56};
 i32 gZoomTileSize[EDIT_ZOOM_COUNT] = {32, 16, 8};
 
 
-u8 gLineTiles[LINE_NEIGHBOUR_MASKS] = {
+u8 gRoadSideTiles[ROAD_NEIGHBOUR_MASKS] = {
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
@@ -923,7 +923,7 @@ u8 gLineTiles[LINE_NEIGHBOUR_MASKS] = {
     15, 8, 15, 8, 15, 8, 15, 8, 15, 1, 15, 1, 15, 1, 15, 1,
     255, 8, 255, 8, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1
 };
-u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS] = {
+u8 gRoadTiles[ROAD_NEIGHBOUR_MASKS] = {
     0, 18, 17, 10, 18, 18, 18, 10, 17, 18, 17, 10, 11, 11, 11, 10,
     10, 10, 17, 10, 2, 2, 2, 2, 17, 17, 17, 17, 17, 17, 17, 17,
     11, 18, 2, 18, 18, 18, 18, 18, 11, 18, 2, 18, 11, 18, 2, 2,
@@ -941,14 +941,14 @@ u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS] = {
     14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
     3, 21, 3, 21, 3, 21, 3, 21, 21, 21, 21, 21, 21, 21, 21, 21
 };
-u8 gLineEndTiles[LINE_END_MASKS] = {
+u8 gStreamTiles[STREAM_NEIGHBOUR_MASKS] = {
     3, 2, 3, 1, 2, 2, 0, 11, 3, 4, 3, 9, 7, 8, 10, 6
 };
-u8 gRoadTileJoins[LINE_ROAD_TILES] = {
+u8 gRoadTileOnLine[LINE_ROAD_TILES] = {
     1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1
 };
-u8 gRoadTileJoinsAlt[LINE_ROAD_TILES] = {
+u8 gRoadTileIsRoad[LINE_ROAD_TILES] = {
     1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1
 };
@@ -970,7 +970,7 @@ const char* gTerrainHelp[EDITOR_TERRAIN_HELP_COUNT] = {
     localization::Tr("editor.table.gTerrainHelp.13")
 };
 
-const char* gClearHelp[CLEAR_HELP_COUNT] = {
+const char* gObjectPanelHelp[CLEAR_HELP_COUNT] = {
     localization::Tr("editor.table.gClearHelp.0"),
     localization::Tr("editor.table.gClearHelp.1"),
     localization::Tr("editor.table.gClearHelp.2"),
@@ -1011,6 +1011,7 @@ const char* gEditPanelHelp[EDIT_PANEL_HELP_COUNT] = {
     localization::Tr("editor.table.gEditPanelHelp.14"),
     localization::Tr("editor.table.gEditPanelHelp.15")
 };
+
 
 const char* gEditTerrainNames[EDITOR_TERRAIN_NAME_COUNT] = {
     localization::Tr("editor.table.gEditTerrainNames.0"),
@@ -3448,7 +3449,7 @@ b32 gbInSetupDialog = false;
 
 
 b32 gGenerateUnseen = false;
-b32 gGeneratingMap = false;
+b32 gGeneratingUnseen = false;
 i32 gUnusedData4a4a18 = 0;
 b32 gbInSmackMgr = false;
 i32 gStatusTextClearTime = 0;
@@ -3621,7 +3622,7 @@ i32 oldmain(void) {
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-    gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+    gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
     gpExec->MainLoop();
     gpExec->RemoveManager(gEditManager);
     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_FINE, gPalette);
@@ -3905,12 +3906,12 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_8;
     pNormalDialogWindow->BroadcastMessage(message);
-    if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_CANCEL && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_1;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
-        && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_OK && dialogType != NORMAL_DIALOG_INFO
+        && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_2;
         pNormalDialogWindow->BroadcastMessage(message);
     }
@@ -4041,7 +4042,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     switch (command) {
         case EDITOR_MENU_PALETTE_CYCLING:
             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
-            gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+            gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
             WritePrefs();
             break;
         case EDITOR_MENU_SCREEN_ANIMATION:

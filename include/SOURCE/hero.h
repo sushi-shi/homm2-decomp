@@ -127,7 +127,7 @@ public:
     i16 m_lastHeroInteractionTurn;
     u8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;
-    u8 m_visitedTownId;
+    u8 m_lastInteractionTownId;
     char m_name[HERO_NAME_SIZE];
     H2EnumStorage<FactionType, u8> m_faction;
     H2EnumStorage<HeroPortrait, u8> m_portrait;
@@ -140,7 +140,7 @@ public:
     i8 m_patrolRadius;
     H2EnumStorage<MapDirection, u8> m_direction;
     H2OpenCodeStorage<MapTriggerCode, i16> m_locationType;
-    i16 m_occupiedTown;
+    i16 m_locationMetadata;
     i32 m_mobility;
     i32 m_remainingMobility;
     i32 m_experience;
@@ -167,7 +167,7 @@ public:
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
     float m_aiFightValue;
-    i8 m_artifactExtra[HERO_ARTIFACT_SLOT_COUNT];
+    i8 m_artifactSpells[HERO_ARTIFACT_SLOT_COUNT];
     i32 IsEmbarked(void) {
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
@@ -185,7 +185,7 @@ public:
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
     void ViewStat(i32 stat, i32 quickView);
-    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra);
+    void ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell);
     i32 Dismiss(void);
     void Deallocate(i32 updateMap);
     i32 GetExperience(i32 level);

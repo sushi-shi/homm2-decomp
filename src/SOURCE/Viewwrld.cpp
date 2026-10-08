@@ -104,11 +104,11 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     iVWWhatToDraw = whatToDraw;
     iVWDrawAllObjs = drawAllObjects;
     iVWDrawAllTerrains = drawAllTerrains;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     giCycleType = WINDOW_COLOR_CYCLE_WORLD_VIEW;
     VWInit(m_mapOriginX + INITIAL_CENTER_OFFSET, m_mapOriginY + INITIAL_CENTER_OFFSET);
     VWCompleteDraw();
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 
     sprintf(
         gText,
@@ -148,10 +148,10 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     UpdateRadar(1, 0);
     VWCleanup();
     gbInViewWorld = false;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     RedrawAdvScreen(1, 0);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     SetPalette(palette, 1);
 }
 
@@ -341,7 +341,7 @@ void advManager::VWCompleteDraw(void) {
                     );
                 }
 
-                if (cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (cell->m_objectGroundLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[H2EnumIndex(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
@@ -363,7 +363,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (extraCell->objectGroundLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[H2EnumIndex(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[H2EnumIndex(extraCell->objectTileset)],
@@ -387,7 +387,7 @@ void advManager::VWCompleteDraw(void) {
                         extraCell = NULL;
                 }
 
-                if (!cell->m_objectHighLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (!cell->m_objectGroundLayer && cell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && drawTilesets[H2EnumIndex(cell->m_objectTileset)]) {
                     IconToBitmapScale(
                         m_objectIcons[H2EnumIndex(cell->m_objectTileset)],
@@ -409,7 +409,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     extraCell = NULL;
                 while (extraCell != NULL) {
-                    if (!extraCell->objectHighLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
+                    if (!extraCell->objectGroundLayer && extraCell->objectIndex != MAPCELL_SPRITE_NONE
                         && drawTilesets[H2EnumIndex(extraCell->objectTileset)]) {
                         IconToBitmapScale(
                             m_objectIcons[H2EnumIndex(extraCell->objectTileset)],
@@ -526,7 +526,7 @@ void advManager::VWCompleteDraw(void) {
                 else
                     color =
                         gpGame->m_townOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
-                                                   .m_occupiedTown];
+                                                   .m_locationMetadata];
                 if (color < 0)
                     color = WORLD_NO_OWNER_COLOR;
                 else
@@ -578,9 +578,9 @@ void advManager::VWCompleteDraw(void) {
                 && (iVWDrawAllObjs || (MAP_EXTRA_AT_WFIRST(cellX, cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_HEROES)) {
                 if (heroHere)
-                    color = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
+                    color = gpGame->m_heroOwners[gpCurPlayer->m_currentHero];
                 else
-                    color = gpGame->m_availableHeroes[cell->m_objectMetadata];
+                    color = gpGame->m_heroOwners[cell->m_objectMetadata];
                 if (color >= 0) {
                     frame = gpGame->m_players[color].m_color;
                     IconToBitmap(
@@ -684,7 +684,7 @@ void advManager::VWCompleteDraw(void) {
 
 MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale;
-    tag_message oldMessage;
+    tag_message lastMouseMove;
     tag_message eventMessage;
     i32 mapX;
     i32 mapY;
@@ -730,6 +730,8 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         iVWMapOriginX = 0;
                     if (iVWMapOriginY < 0)
                         iVWMapOriginY = 0;
+
+
                     if (iVWMapOriginX + iVWViewableCells >= MAP_WIDTH)
                         iVWMapOriginY = MAP_WIDTH - iVWViewableCells;
                     if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
@@ -741,31 +743,31 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                     while (eventMessage.type != MESSAGE_LEFT_BUTTON_UP) {
                         Process1WindowsMessage();
                         eventMessage = gpInputManager->GetEvent();
-                        oldMessage = eventMessage;
+                        lastMouseMove = eventMessage;
                         while (eventMessage.type != MESSAGE_LEFT_BUTTON_UP
                                && eventMessage.type != MESSAGE_NONE) {
                             if (eventMessage.type == MESSAGE_MOUSE_MOVE)
-                                oldMessage = eventMessage;
+                                lastMouseMove = eventMessage;
                             Process1WindowsMessage();
                             eventMessage = gpInputManager->GetEvent();
                         }
-                        if (oldMessage.type == MESSAGE_MOUSE_MOVE) {
-                            if (oldMessage.payload.mouse.x < ADVENTURE_RADAR_LEFT)
-                                oldMessage.payload.mouse.x = ADVENTURE_RADAR_LEFT;
-                            if (oldMessage.payload.mouse.x >= ADVENTURE_RADAR_RIGHT)
-                                oldMessage.payload.mouse.x =
+                        if (lastMouseMove.type == MESSAGE_MOUSE_MOVE) {
+                            if (lastMouseMove.payload.mouse.x < ADVENTURE_RADAR_LEFT)
+                                lastMouseMove.payload.mouse.x = ADVENTURE_RADAR_LEFT;
+                            if (lastMouseMove.payload.mouse.x >= ADVENTURE_RADAR_RIGHT)
+                                lastMouseMove.payload.mouse.x =
                                     MAP_WIDTH * RADAR_DRAG_MAP_SCALE + ADVENTURE_RADAR_LEFT - 1;
-                            if (oldMessage.payload.mouse.y < ADVENTURE_RADAR_TOP)
-                                oldMessage.payload.mouse.y = ADVENTURE_RADAR_TOP;
-                            if (oldMessage.payload.mouse.y >= ADVENTURE_RADAR_BOTTOM)
-                                oldMessage.payload.mouse.y =
+                            if (lastMouseMove.payload.mouse.y < ADVENTURE_RADAR_TOP)
+                                lastMouseMove.payload.mouse.y = ADVENTURE_RADAR_TOP;
+                            if (lastMouseMove.payload.mouse.y >= ADVENTURE_RADAR_BOTTOM)
+                                lastMouseMove.payload.mouse.y =
                                     MAP_HEIGHT * RADAR_DRAG_MAP_SCALE + ADVENTURE_RADAR_TOP - 1;
-                            gpMouseManager->Main(oldMessage);
+                            gpMouseManager->Main(lastMouseMove);
                             mapX = static_cast<i32>(
-                                (oldMessage.payload.mouse.x - ADVENTURE_RADAR_LEFT) / radarScale
+                                (lastMouseMove.payload.mouse.x - ADVENTURE_RADAR_LEFT) / radarScale
                             );
                             mapY = static_cast<i32>(
-                                (oldMessage.payload.mouse.y - ADVENTURE_RADAR_TOP) / radarScale
+                                (lastMouseMove.payload.mouse.y - ADVENTURE_RADAR_TOP) / radarScale
                             );
                             iVWMapOriginX = mapX - iVWCenterOffset;
                             iVWMapOriginY = mapY - iVWCenterOffset;
@@ -779,7 +781,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                                 iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                             gpAdvManager->UpdateRadar(1, 0);
                             gpAdvManager->VWCompleteDraw();
-                            oldMessage.type = MESSAGE_NONE;
+                            lastMouseMove.type = MESSAGE_NONE;
                         }
                     }
                 }

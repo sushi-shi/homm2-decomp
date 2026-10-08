@@ -87,7 +87,7 @@ using enum CombatSystemOptionHelp;
 typedef enum CombatSetupConstant {
     BALLISTA_CATAPULT_ATTACK_COUNT      = 2,
     NECROMANCER_SHRINE_POWER_BONUS      = 2,
-    DEFENDER_HERO_OVERLAY_INITIAL_FRAME = 3
+    DEFENDER_HERO_FLAG_INITIAL_FRAME = 3
 } CombatSetupConstant;
 
 typedef enum CombatMapConstant {
@@ -124,7 +124,7 @@ enum class BattlefieldBackgroundIndex : i32 {
 using enum BattlefieldBackgroundIndex;
 
 enum class NearbyFeature : i8 {
-    NEARBY_UNKNOWN  = -1,
+    NEARBY_NONE  = -1,
     NEARBY_MOUNTAIN = 0,
     NEARBY_TREE     = 1
 };
@@ -158,20 +158,20 @@ typedef enum CombatMoraleConstant {
 }
 
 combatManager::combatManager(void) {
-    m_unknownF373 = -1;
+    m_unusedF373 = -1;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
     m_currentSide = COMBAT_DEFENDER_SIDE;
-    m_limitCreatureHex = 0;
-    m_limitCreature = false;
+    m_selectorHex = 0;
+    m_selectorVisible = false;
     m_showArmyQuantities = 1;
     m_currentCommand = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    m_unknownF35B = 0;
-    m_unknownF353 = -1;
-    m_unknownF34F = -1;
+    m_unusedF35B = 0;
+    m_unusedF353 = -1;
+    m_unusedF34F = -1;
     m_catapultFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = -1;
     m_catapultFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = -1;
-    m_unknownF337[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
-    m_unknownF337[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
+    m_unusedF337[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_unusedF337[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = 0;
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = false;
@@ -228,8 +228,8 @@ void combatManager::SetupCombat(
 ) {
     giSeed = randomSeed;
     SRand(combatX * COMBAT_RANDOM_X_MULTIPLIER + combatY);
-    m_combatX = combatX;
-    m_combatY = combatY;
+    m_battleSiteX = combatX;
+    m_battleSiteY = combatY;
 
     if (mapX >= 0 && mapY >= 0)
         m_battlefieldCell = gpAdvManager->GetCell(mapX, mapY);
@@ -287,7 +287,7 @@ void combatManager::SetupCombat(
         m_heroCastSpell[index] = false;
     }
 
-    m_drawbridgeBackgroundVisible = false;
+    m_hasMoat = false;
     if (defenderTown != NULL) {
         if (defenderTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             m_armyGroups[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = &m_heroes[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_army;
@@ -300,7 +300,7 @@ void combatManager::SetupCombat(
         m_inCastleCombat = (H2EnumIndex((defenderTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))) != 0;
 
         if (m_inCastleCombat != 0)
-            m_drawbridgeBackgroundVisible =
+            m_hasMoat =
                 (H2EnumIndex((defenderTown->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT)))) != 0;
 
         m_drawbridgeState = COMBAT_CASTLE_GATE_CLOSED;
@@ -341,8 +341,8 @@ void combatManager::SetupCombat(
 }
 
 void combatManager::InitNonVisualVars(void) {
-    m_gridSelectionDisabled = false;
-    m_nonVisualCombat = false;
+    m_autoCombat = false;
+    m_combatFinished = false;
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
         m_spellPower[H2EnumIndex(side)] = 0;
@@ -354,8 +354,8 @@ void combatManager::InitNonVisualVars(void) {
             m_spellPower[H2EnumIndex(side)] += NECROMANCER_SHRINE_POWER_BONUS;
     }
 
-    m_heroOverlayFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
-    m_heroOverlayFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_OVERLAY_INITIAL_FRAME;
+    m_heroFlagFrame[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = 0;
+    m_heroFlagFrame[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = DEFENDER_HERO_FLAG_INITIAL_FRAME;
     m_sideRetreated[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = false;
     m_sideRetreated[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = false;
     m_combatResult = COMBAT_RESULT_PENDING;
@@ -369,7 +369,7 @@ void combatManager::InitNonVisualVars(void) {
     m_summonedCreatureType[0] = CREATURE_SUMMONED_NONE;
     m_summonedCreatureType[1] = CREATURE_SUMMONED_NONE;
     m_selectedHex = -1;
-    m_limitCreatureHex = -1;
+    m_selectorHex = -1;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_currentSide = COMBAT_DEFENDER_SIDE;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
@@ -378,7 +378,7 @@ void combatManager::InitNonVisualVars(void) {
     gbCombatSurrender = false;
     m_sideSurrendered[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = false;
     m_sideSurrendered[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = false;
-    m_limitCreature = true;
+    m_selectorVisible = true;
     m_obstacleCount = 0;
     SetupAdjacencyArray();
     GenerateMap();
@@ -446,7 +446,7 @@ void combatManager::SetupAdjacencyArray(void) {
 i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, PALETTE_DATA_SIZE);
-    gpMouseManager->m_forcePointerUpdate = true;
+    gpMouseManager->m_pointerLocked = true;
     i32 savedMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
@@ -475,7 +475,7 @@ i32 combatManager::Open(i32 openFlags) {
     CycleColors(1);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
-    gpMouseManager->m_forcePointerUpdate = false;
+    gpMouseManager->m_pointerLocked = false;
     gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
@@ -551,8 +551,8 @@ void combatManager::Close(void) {
         == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
         if (combatHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MINE))
-            && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != CREATURE_NONE)
-            gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = total;
+            && gpGame->m_mines[combatHero->m_locationMetadata].guardianType != CREATURE_NONE)
+            gpGame->m_mines[combatHero->m_locationMetadata].guardianCount = total;
     }
 
     gpWindowManager->RemoveWindow(m_combatWindow);
@@ -711,9 +711,9 @@ i32 combatManager::MoreTreesNear(void) {
     i32 nearbyDirection;
     i32 centerY;
 
-    memset(nearbyTypeTable, H2EnumIndex(NEARBY_UNKNOWN), sizeof(nearbyTypeTable));
-    combatOriginX = m_combatX;
-    centerY = m_combatY;
+    memset(nearbyTypeTable, H2EnumIndex(NEARBY_NONE), sizeof(nearbyTypeTable));
+    combatOriginX = m_battleSiteX;
+    centerY = m_battleSiteY;
 
     for (radius = 0; radius < NEARBY_RADIUS_COUNT; radius++) {
         for (nearbyDirection = 0; nearbyDirection < H2EnumIndex(MAP_DIRECTION_COUNT); nearbyDirection++) {
@@ -779,8 +779,8 @@ void combatManager::LoadIcons(void) {
 
     if (m_inCastleCombat) {
         if ((H2EnumIndex((m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_buildings) & (H2EnumIndex(TOWN_BUILDING_MOAT))))) {
-            m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
-            m_combatIcons[H2EnumIndex(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
+            m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT_PART)] = gpResourceManager->GetIcon("moatpart.icn");
+            m_combatIcons[H2EnumIndex(COMBAT_ICON_MOAT_WHOLE)] = gpResourceManager->GetIcon("moatwhol.icn");
         }
         m_combatIcons[H2EnumIndex(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon("catapult.icn");
         sprintf(
@@ -794,7 +794,7 @@ void combatManager::LoadIcons(void) {
 
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
         m_heroIcons[index] = NULL;
-        m_heroOverlayIcons[index] = NULL;
+        m_heroFlagIcons[index] = NULL;
         m_heroAnimationState[index] = 0;
         m_heroAnimationFrame[index] = 0;
         m_heroSpriteIndex[index] = -1;
@@ -821,7 +821,7 @@ void combatManager::LoadIcons(void) {
                     ? COMBAT_NEUTRAL_HERO_COLOR
                     : gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color
             );
-            m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
+            m_heroFlagIcons[index] = gpResourceManager->GetIcon(gText);
         }
     }
 }
@@ -841,8 +841,8 @@ void combatManager::FreeIcons(void) {
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
         if (m_heroIcons[index])
             gpResourceManager->Dispose(m_heroIcons[index]);
-        if (m_heroOverlayIcons[index])
-            gpResourceManager->Dispose(m_heroOverlayIcons[index]);
+        if (m_heroFlagIcons[index])
+            gpResourceManager->Dispose(m_heroFlagIcons[index]);
     }
 }
 
@@ -1423,8 +1423,8 @@ void combatManager::CatAttack(CombatSide side) {
 
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     impactSound = LoadPlaySample(gText);
-    m_unknownF34B = 0;
-    m_unknownF34F = 0;
+    m_unusedF34B = 0;
+    m_unusedF34F = 0;
 
     giMinExtentX = impactX - COMBAT_CATAPULT_IMPACT_EXTENT_X;
     giMaxExtentX = impactX + COMBAT_CATAPULT_IMPACT_EXTENT_X;
@@ -1595,7 +1595,7 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    i32 unknownTowerData [[maybe_unused]][KEEP_TOWER_SCRATCH_COUNT];
+    i32 unusedTowerScratch [[maybe_unused]][KEEP_TOWER_SCRATCH_COUNT];
     i32 sourceX = towerOrigins[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].x;
     i32 sourceY = towerOrigins[H2EnumIndex(m_combatTowns[H2EnumIndex(COMBAT_DEFENDER_SIDE)]->m_type)][H2EnumIndex(tower)].y;
     i32 targetX = target->MidX();
@@ -1746,7 +1746,7 @@ void combatManager::SetupAndLoadObstacles(void) {
         m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_THIRD_WALL)].m_blocked = 1;
         m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_BOTTOM_TOWER)].m_blocked = 1;
         m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_BOTTOM_WALL)].m_blocked = 1;
-        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_MOAT)].m_blocked = 1;
+        m_hexCells[H2EnumIndex(COMBAT_CASTLE_HEX_CATAPULT)].m_blocked = 1;
     } else {
         obstacleGoal = SRandom(COMBAT_RANDOM_OBSTACLE_MIN, COMBAT_RANDOM_OBSTACLE_MAX);
         placedCells = 0;

@@ -175,7 +175,7 @@ struct tag_message;
 
 struct adventureSoundCell {
     AdventureEnvironmentSoundId soundId;
-    i32 volume;
+    i32 distance;
 };
 
 typedef enum AdventureManagerStorageConstant {
@@ -225,23 +225,23 @@ using enum ArmySizeNameVariant;
 class advManager H2_FINAL : public baseManager {
 public:
     AdventureCommand m_pendingCommand;
-    class widget* m_bottomViewPrimaryWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
-    class widget* m_bottomViewSecondaryWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
+    class widget* m_bottomViewIconWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
+    class widget* m_bottomViewTextWidgets[ADVMGR_BOTTOM_VIEW_WIDGET_COUNT];
     class heroWindow* m_adventureWindow;
-    u16* m_visibilityMap;
-    b32 m_visibilityMapValid;
+    u16* m_routeMap;
+    b32 m_routeShown;
     H2EnumStorage<TerrainType, i32> m_currentTerrain;
     char _pad_0xaa[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class fullMap* m_mapData;
-    class iconWidget* m_scrollLeftButton;
-    class iconWidget* m_scrollRightButton;
+    class iconWidget* m_heroScrollKnob;
+    class iconWidget* m_townScrollKnob;
     u8* m_adventureBorder;
     char _pad_0xbe[ADVMGR_RUNTIME_ALIGNMENT_SIZE];
     class tileset* m_groundTiles;
     class tileset* m_cloudTiles;
     class tileset* m_stoneTiles;
     class icon* m_objectIcons[ADVMGR_OBJECT_ICON_COUNT];
-    class icon* m_puzzleIcon;
+    class icon* m_radarIcon;
     class icon* m_cloudOverlayIcon;
     i32 m_mapOriginX;
     i32 m_mapOriginY;
@@ -255,7 +255,7 @@ public:
     i32 m_scrollOffsetY;
     i32 m_animationTick;
     i32 m_animationFrame;
-    i32 m_updatePending;
+    i32 m_flagFrameCounter;
     i32 m_animationPhases[ADVMGR_ANIMATION_PHASE_COUNT];
     class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
     class icon* m_shadowIcon;
@@ -275,12 +275,12 @@ public:
     i32 m_cursorMapY;
     i32 m_previousCursorMapY;
     b32 m_comboHeroDrawn;
-    b32 m_heroContextLocked;
-    i32 m_townContextLocked;
+    b32 m_heroMobilized;
+    i32 m_unusedTownContextLocked;
     b32 m_forceCompleteDraw;
-    i32 m_lastQuickViewX;
-    i32 m_lastQuickViewY;
-    b32 m_mineGuardianFacingLeft;
+    i32 m_combatMonsterX;
+    i32 m_combatMonsterY;
+    b32 m_combatMonsterFacingLeft;
     i32 m_activeSoundMask;
     adventureSoundCell m_activeSounds[ADVMGR_ACTIVE_SOUND_COUNT];
     class sample* m_loopingSamples[H2EnumIndex(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
@@ -322,7 +322,7 @@ public:
     void VWCleanup(void);
     void VWInit(i32 centerX, i32 centerY);
     void VWCompleteDraw(void);
-    void GetCursorSampleSet(ConfigWalkSpeed sampleSet);
+    void GetCursorSampleSet(ConfigWalkSpeed walkSpeed);
     class mapCell* DoAdvCommand(void);
     i32 GetCommandTargetX(void) {
         return m_commandTargetX;
@@ -338,7 +338,7 @@ public:
     MessageDispatchResult ProcessHover(i32 mouseX, i32 mouseY);
     void UpdateScreen(i32, i32 forceUpdate);
     void CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView);
-    void CompleteDraw(i32 update);
+    void CompleteDraw(i32 forceDraw);
     i32 GetCloudLookup(i32 x, i32 y);
     void DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY, AdventureDrawMask drawMask, i32 forceDraw);
     class mapCell* GetCell(i32 x, i32 y);
@@ -369,7 +369,7 @@ public:
     void CastSpell(SpellType spell);
     void CheckCastSpell(void);
     i32 ComboDraw(i32 originX, i32 originY, i32 animate);
-    i32 ComboDraw(i32 update);
+    i32 ComboDraw(i32 animate);
     void SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds);
     void CheckLoadSample(i32 index);
     AdventureEnvironmentSoundId GetSoundId(i32 x, i32 y);
@@ -398,7 +398,7 @@ public:
     void DrawAdventureBorder(void);
     i32 FindAdjacentMonster(i32 originX, i32 originY, i32* monsterX, i32* monsterY, i32 excludedX, i32 excludedY);
     void ViewPuzzle(void);
-    void PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom);
+    void PuzzleDraw(i32 originX, i32 originY, i32 ultimateArtifactX, i32 ultimateArtifactY);
     void AdvPanel(void);
     i32 ControlPanel(void);
     void SystemOptions(void);
@@ -431,7 +431,7 @@ public:
         class mapCell*,
         i32 mapX,
         i32 mapY,
-        i32 defender,
+        i32 monstersAttack,
         i32 combatX,
         i32 combatY,
         CreatureType secondaryType,

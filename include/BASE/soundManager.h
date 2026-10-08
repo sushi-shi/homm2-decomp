@@ -115,7 +115,7 @@ public:
 extern bool gSoundDisabled;
 
 
-extern bool gSoundBackendsReady;
+extern bool gbSoundEnabled;
 
 inline bool IsAudiereBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_AUDIERE && manager->m_audiereDevice != NULL;

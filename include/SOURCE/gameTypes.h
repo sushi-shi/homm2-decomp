@@ -85,15 +85,14 @@ using enum GameMonsterMetadata;
 
 typedef enum GameWeeklyConstant {
     WEEKLY_WATER_WHEEL_EMPTY        = 0xff,
-    WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
+    WEEKLY_TREE_CITY_LIMIT = 0x1fe1,
     WEEKLY_DWELLING_NO_GROWTH_FLAG  = 0x80,
     WEEKLY_GROWTH_LIMIT             = 0x1feb,
-    WEEKLY_DRAGON_CITY_LIMIT        = 220,
+    WEEKLY_GUARDED_DWELLING_LIMIT        = 220,
     WEEKLY_MONSTER_LIMIT            = 4000,
     WEEKLY_RECRUIT_MIN_GROWTH       = 2,
     WEEKLY_RECRUIT_MAX_GROWTH       = 5,
-    WEEKLY_RECRUIT_LIMIT            = 1000,
-    WEEKLY_AVAILABLE_HERO           = 64
+    WEEKLY_RECRUIT_LIMIT            = 1000
 } GameWeeklyConstant;
 
 typedef enum GameRandomTownConstant {

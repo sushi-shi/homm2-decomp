@@ -48,7 +48,7 @@ enum class DirectPlayFirstGuestState : i32 {
 using enum DirectPlayFirstGuestState;
 ENABLE_ENUM_STEPS(DirectPlayFirstGuestState)
 
-enum class DirectPlayHostState : i32 {
+enum class DirectPlayJoinState : i32 {
     HOST_ENUMERATE_SESSIONS = 0,
     HOST_JOIN_SESSION       = 1,
     HOST_CREATE_PLAYER      = 2,
@@ -56,8 +56,8 @@ enum class DirectPlayHostState : i32 {
     HOST_WAIT_FOR_ACCEPT    = 4,
     HOST_WAIT_FOR_STARTUP   = 5
 };
-using enum DirectPlayHostState;
-ENABLE_ENUM_STEPS(DirectPlayHostState)
+using enum DirectPlayJoinState;
+ENABLE_ENUM_STEPS(DirectPlayJoinState)
 #pragma pack(pop)
 
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*);
@@ -89,7 +89,7 @@ extern i32* piDPRcvBufferSize;
 extern b32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
 extern H2SteppedEnumStorage<DirectPlayFirstGuestState, i32> iDPWaitForFirstGuestStatus;
-extern H2SteppedEnumStorage<DirectPlayHostState, i32> iDPWaitForHostStatus;
+extern H2SteppedEnumStorage<DirectPlayJoinState, i32> iDPWaitForHostStatus;
 extern i32 iWaitForHostWaitCount;
 extern i32 iEnumCount;
 extern i32 iLastHereIAmTickCount;

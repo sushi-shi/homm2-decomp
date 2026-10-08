@@ -166,7 +166,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(const char* prompt, char* destination, i32 maximumLength, const char* initialText, i32 showCancel, i32 useImmediateHandler);
+void GetDataEntry(const char* prompt, char* destination, i32 maximumLength, const char* initialText, i32 showCancel, i32 editImmediately);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 enum class DataEntryPhase : i32 {

@@ -96,13 +96,13 @@ public:
     H2EnumStorage<CampaignSide, u8> m_campaignStartingSide;
     i8 m_campaignScenario;
     u8 m_campaignScenarioCompleted[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScenarioBonus[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignDaysBeforeScenario[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioDays[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    char m_unknown7d;
+    char m_unused7d;
     u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
     u8 m_campaignChoice[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScore;
+    i16 m_campaignTotalDays;
     H2EnumStorage<CreatureType, i16> m_campaignCarryoverCreatureTypes[ARMY_GROUP_SLOT_COUNT];
     i16 m_campaignCarryoverCreatureCounts[ARMY_GROUP_SLOT_COUNT];
     u8 m_campaignScenarioWon;
@@ -134,10 +134,10 @@ public:
     i8 m_townOwners[H2EnumIndex(GAME_TOWN_COUNT)];
     u8 m_townBuiltToday[GAME_TOWN_BUILD_FLAG_BYTE_COUNT];
     hero m_heroRecs[H2EnumIndex(GAME_HERO_COUNT)];
-    i8 m_availableHeroes[H2EnumIndex(GAME_HERO_COUNT)];
+    i8 m_heroOwners[H2EnumIndex(GAME_HERO_COUNT)];
     mineRecord m_mines[H2EnumIndex(GAME_MINE_COUNT)];
     i8 m_mineOwners[H2EnumIndex(GAME_MINE_COUNT)];
-    char m_randomArtifacts[H2EnumIndex(ARTIFACT_COUNT)];
+    char m_artifactPlaced[H2EnumIndex(ARTIFACT_COUNT)];
     boatRecord m_boats[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_boatSlots[H2EnumIndex(GAME_BOAT_COUNT)];
     i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
@@ -192,7 +192,7 @@ public:
     class fullMap* GetWorldMapData(void);
     i32 CreateBoat(i32 x, i32 y, i32 skipNotify);
     i32 Scan(i8* array, i32 start, i32 length);
-    i32 RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target);
+    i32 RandomScan(i8* array, i32 start, i32 range, i32 retryLimit, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
     i32 GetTownId(i32 column, i32 row);
     hero* GetHero(i32 id) {

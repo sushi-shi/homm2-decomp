@@ -194,7 +194,7 @@ void swapManager::Close(void) {
 }
 
 void swapManager::DrawSelector(void) {
-    const char selectorFrame = 10;
+    const char selectorColor = 10;
     const i16 leftArmyX = 37;
     const i16 rightArmyX = 382;
     const i16 armyY = 268;
@@ -248,7 +248,7 @@ void swapManager::DrawSelector(void) {
             selectorX,
             selectorY,
             m_itemType == SWAP_ITEM_ARMY ? ARMY_SELECTOR_FRAME : ARTIFACT_SELECTOR_FRAME,
-            selectorFrame,
+            selectorColor,
             ICON_DRAW_NORMAL,
             NULL
         );
@@ -409,7 +409,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->ViewArtifact(
                                     m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -434,7 +434,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -477,7 +477,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->ViewArtifact(
                                     m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot],
                                     VIEW_QUICK,
-                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot]
+                                    m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_artifactSpells[artifactSlot]
                                 );
                                 break;
                             }
@@ -502,7 +502,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             ->m_artifacts[artifactSlot],
                                         VIEW_FULL,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]
-                                            ->m_artifactExtra[artifactSlot]
+                                            ->m_artifactSpells[artifactSlot]
                                     );
                                     Reset();
                                 } else {
@@ -710,10 +710,10 @@ void swapManager::SwapArtifacts(void) {
     m_heroes[H2EnumIndex(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact;
     m_heroes[H2EnumIndex(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
-    i8 extra = m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
-    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactExtra[m_selectedSlot] =
-        m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot];
-    m_heroes[H2EnumIndex(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
+    i8 extra = m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactSpells[m_selectedSlot];
+    m_heroes[H2EnumIndex(m_selectedSide)]->m_artifactSpells[m_selectedSlot] =
+        m_heroes[H2EnumIndex(m_targetSide)]->m_artifactSpells[m_targetSlot];
+    m_heroes[H2EnumIndex(m_targetSide)]->m_artifactSpells[m_targetSlot] = extra;
 
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_selectedSide)], targetArtifact, false);
     GiveTakeArtifactStat(m_heroes[H2EnumIndex(m_targetSide)], selectedArtifact, false);

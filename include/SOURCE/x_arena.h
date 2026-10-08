@@ -7,7 +7,7 @@
 struct tag_message;
 
 i32 DoArenaDialog(void);
-MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1);
+MessageDispatchResult ArenaWindowHandler(struct tag_message& message);
 void UpdateArenaIcons(void);
 
 extern i32 choice;

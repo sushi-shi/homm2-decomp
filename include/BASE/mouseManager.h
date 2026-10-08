@@ -27,9 +27,9 @@ public:
     i32 m_cursorFrame;
     icon* m_cursorIcon;
     MouseCursorType m_cursorType;
-    i32 m_cursorSizeIndex;
-    i32 m_drawnCursorSizeIndex;
-    char _pad_0x4e[0x8];
+    i32 m_cursorIndex;
+    i32 m_drawnCursorIndex;
+    char m_unused4e[0x8];
     i32 m_mouseX;
     i32 m_mouseY;
     i32 m_savedLeft;
@@ -40,7 +40,7 @@ public:
     i32 m_cursorBottom;
     i32 m_savedWidth;
     i32 m_savedHeight;
-    b32 m_forcePointerUpdate;
+    b32 m_pointerLocked;
     b32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);

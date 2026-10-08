@@ -100,7 +100,7 @@ mouseManager::mouseManager(void) : baseManager() {
 }
 
 i32 mouseManager::Open(i32 priority) {
-    m_forcePointerUpdate = false;
+    m_pointerLocked = false;
     m_savedUnderlying =
         new bitmap(BITMAP_TYPE_MEMORY, MOUSE_SAVED_BITMAP_WIDTH, MOUSE_SAVED_BITMAP_HEIGHT);
     m_savedLeft = MOUSE_SCREEN_CENTER_X - 1;
@@ -111,8 +111,8 @@ i32 mouseManager::Open(i32 priority) {
     m_cursorTop = MOUSE_SCREEN_CENTER_Y - 1;
     m_mouseX = MOUSE_SCREEN_CENTER_X;
     m_mouseY = MOUSE_SCREEN_CENTER_Y;
-    m_cursorSizeIndex = 0;
-    m_drawnCursorSizeIndex = 0;
+    m_cursorIndex = 0;
+    m_drawnCursorIndex = 0;
     if (gbColorMice != 0)
         ShowCursor(0);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
@@ -155,7 +155,7 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
 
 void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
-    if (m_forcePointerUpdate != 0)
+    if (m_pointerLocked != 0)
         return;
     {
         gbPutzingWithMouseCtr++;
@@ -203,7 +203,7 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
 }
 
 void mouseManager::SetPointer(i32 frame) {
-    if (m_forcePointerUpdate != 0)
+    if (m_pointerLocked != 0)
         return;
     if (frame < 0)
         return;
@@ -223,16 +223,16 @@ void mouseManager::SetPointer(i32 frame) {
         frame = m_cursorFrame;
     else
         m_cursorFrame = frame;
-    m_cursorSizeIndex = frame + iMouseOffset[H2EnumIndex(m_cursorType)];
-    H2_ASSERT(m_cursorSizeIndex >= 0 && m_cursorSizeIndex < MOUSE_CURSOR_COUNT);
+    m_cursorIndex = frame + iMouseOffset[H2EnumIndex(m_cursorType)];
+    H2_ASSERT(m_cursorIndex >= 0 && m_cursorIndex < MOUSE_CURSOR_COUNT);
 
     if (gbColorMice != 0) {
         NewUpdate(1);
         goto done;
     }
-    if (hMouseCursor[m_cursorSizeIndex] == NULL) {
-        cColorBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES));
-        cAndBits[m_cursorSizeIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_AND_BYTES));
+    if (hMouseCursor[m_cursorIndex] == NULL) {
+        cColorBits[m_cursorIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES));
+        cAndBits[m_cursorIndex] = static_cast<u8*>(H2_ALLOC(MOUSE_CURSOR_AND_BYTES));
 
         char filename[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
         if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
@@ -256,32 +256,32 @@ void mouseManager::SetPointer(i32 frame) {
 
         gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
         gpResourceManager->ReadBlock(
-            cColorBits[m_cursorSizeIndex],
+            cColorBits[m_cursorIndex],
             MOUSE_CURSOR_BITMAP_HEADER_BYTES
         );
         gpResourceManager->ReadBlock(
-            cColorBits[m_cursorSizeIndex],
+            cColorBits[m_cursorIndex],
             MOUSE_CURSOR_COLOR_BYTES
         );
-        memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);
+        memset(cAndBits[m_cursorIndex], 0, MOUSE_CURSOR_AND_BYTES);
         {
             i32 x;
             i32 y;
             for (y = 0; y < MOUSE_CURSOR_BITMAP_WIDTH; y++) {
                 for (x = 0; x < MOUSE_CURSOR_BITMAP_WIDTH; x++) {
-                    if (*(cColorBits[m_cursorSizeIndex] + x
+                    if (*(cColorBits[m_cursorIndex] + x
                           + y * MOUSE_CURSOR_BITMAP_WIDTH)
                         == 0)
-                        *(cAndBits[m_cursorSizeIndex]
+                        *(cAndBits[m_cursorIndex]
                           + y * MOUSE_CURSOR_MASK_ROW_BYTES
                           + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
                             1
                             << (MOUSE_CURSOR_MASK_HIGH_BIT
                                 - (x & MOUSE_CURSOR_MASK_HIGH_BIT));
-                    else if (*(cColorBits[m_cursorSizeIndex] + x
+                    else if (*(cColorBits[m_cursorIndex] + x
                                + y * MOUSE_CURSOR_BITMAP_WIDTH)
                              == 1)
-                        *(cAndBits[m_cursorSizeIndex]
+                        *(cAndBits[m_cursorIndex]
                           + MOUSE_CURSOR_MASK_PLANE_BYTES + y * MOUSE_CURSOR_MASK_ROW_BYTES
                           + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
                             1
@@ -291,33 +291,33 @@ void mouseManager::SetPointer(i32 frame) {
             }
         }
 
-        bmpAndMask[m_cursorSizeIndex].bmType = 0;
-        bmpAndMask[m_cursorSizeIndex].bmWidth = MOUSE_CURSOR_BITMAP_WIDTH;
-        bmpAndMask[m_cursorSizeIndex].bmHeight = MOUSE_CURSOR_MASK_HEIGHT;
-        bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
-        bmpAndMask[m_cursorSizeIndex].bmPlanes = MOUSE_CURSOR_BITMAP_PLANES;
-        bmpAndMask[m_cursorSizeIndex].bmBitsPixel = MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL;
-        bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
-        bmpAndMask[m_cursorSizeIndex].bmBits = cAndBits[m_cursorSizeIndex];
-        hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
-        H2_ASSERT(reinterpret_cast<i32>(hbmpAndMask[m_cursorSizeIndex]));
+        bmpAndMask[m_cursorIndex].bmType = 0;
+        bmpAndMask[m_cursorIndex].bmWidth = MOUSE_CURSOR_BITMAP_WIDTH;
+        bmpAndMask[m_cursorIndex].bmHeight = MOUSE_CURSOR_MASK_HEIGHT;
+        bmpAndMask[m_cursorIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
+        bmpAndMask[m_cursorIndex].bmPlanes = MOUSE_CURSOR_BITMAP_PLANES;
+        bmpAndMask[m_cursorIndex].bmBitsPixel = MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL;
+        bmpAndMask[m_cursorIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
+        bmpAndMask[m_cursorIndex].bmBits = cAndBits[m_cursorIndex];
+        hbmpAndMask[m_cursorIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorIndex]);
+        H2_ASSERT(reinterpret_cast<i32>(hbmpAndMask[m_cursorIndex]));
 
-        IconInfo[m_cursorSizeIndex].fIcon = 0;
+        IconInfo[m_cursorIndex].fIcon = 0;
         if (m_cursorType == MOUSE_CURSOR_SPELL) {
-            IconInfo[m_cursorSizeIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
-            IconInfo[m_cursorSizeIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
+            IconInfo[m_cursorIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
+            IconInfo[m_cursorIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
         } else {
-            IconInfo[m_cursorSizeIndex].xHotspot =
-                iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-            IconInfo[m_cursorSizeIndex].yHotspot =
-                iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+            IconInfo[m_cursorIndex].xHotspot =
+                iHotSpot[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL];
+            IconInfo[m_cursorIndex].yHotspot =
+                iHotSpot[m_cursorIndex][MOUSE_CURSOR_VERTICAL];
         }
-        IconInfo[m_cursorSizeIndex].hbmMask = hbmpAndMask[m_cursorSizeIndex];
-        IconInfo[m_cursorSizeIndex].hbmColor = NULL;
-        hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
-        H2_ASSERT(reinterpret_cast<i32>(hMouseCursor[m_cursorSizeIndex]));
+        IconInfo[m_cursorIndex].hbmMask = hbmpAndMask[m_cursorIndex];
+        IconInfo[m_cursorIndex].hbmColor = NULL;
+        hMouseCursor[m_cursorIndex] = CreateIconIndirect(&IconInfo[m_cursorIndex]);
+        H2_ASSERT(reinterpret_cast<i32>(hMouseCursor[m_cursorIndex]));
     }
-    SetCursor(hMouseCursor[m_cursorSizeIndex]);
+    SetCursor(hMouseCursor[m_cursorIndex]);
 done:
     gpResourceManager->RestorePosition();
     gbPutzingWithMouseCtr--;
@@ -339,19 +339,19 @@ void mouseManager::NewUpdate(i32 force) {
     }
     if (gbColorMice != 0) {
         if (force != 0
-            || m_cursorLeft != m_mouseX - iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
-            || m_cursorTop != m_mouseY - iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]) {
+            || m_cursorLeft != m_mouseX - iHotSpot[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL]
+            || m_cursorTop != m_mouseY - iHotSpot[m_cursorIndex][MOUSE_CURSOR_VERTICAL]) {
             gOldMouseLeft = m_savedLeft;
             gOldMouseTop = m_savedTop;
             gOldMouseRight = m_cursorRight;
             gOldMouseBottom = m_cursorBottom;
 
-            m_cursorLeft = m_mouseX - iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-            m_cursorTop = m_mouseY - iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+            m_cursorLeft = m_mouseX - iHotSpot[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL];
+            m_cursorTop = m_mouseY - iHotSpot[m_cursorIndex][MOUSE_CURSOR_VERTICAL];
             m_cursorRight =
-                m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
+                m_cursorLeft + iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
             m_cursorBottom =
-                m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
+                m_cursorTop + iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL] - 1;
             if (m_cursorRight > LOGICAL_SCREEN_MAX_X)
                 m_cursorRight = LOGICAL_SCREEN_MAX_X;
             if (m_cursorBottom > LOGICAL_SCREEN_MAX_Y)
@@ -388,22 +388,22 @@ void mouseManager::NewUpdate(i32 force) {
                 gOldMouseLeft = m_savedLeft;
                 gOldMouseTop = m_savedTop;
                 gOldMouseRight =
-                    m_savedLeft + iMouseSize[m_drawnCursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
+                    m_savedLeft + iMouseSize[m_drawnCursorIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
                 gOldMouseBottom =
-                    m_savedTop + iMouseSize[m_drawnCursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
+                    m_savedTop + iMouseSize[m_drawnCursorIndex][MOUSE_CURSOR_VERTICAL] - 1;
             } else {
                 if (m_savedLeft < gOldMouseLeft)
                     gOldMouseLeft = m_savedLeft;
                 if (m_savedTop < gOldMouseTop)
                     gOldMouseTop = m_savedTop;
-                if (m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1
+                if (m_savedLeft + iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL] - 1
                     > gOldMouseRight)
                     gOldMouseRight =
-                        m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
-                if (m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1
+                        m_savedLeft + iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
+                if (m_savedTop + iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL] - 1
                     > gOldMouseBottom)
                     gOldMouseBottom =
-                        m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
+                        m_savedTop + iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL] - 1;
             }
 
             if (gOldMouseLeft > LOGICAL_SCREEN_MAX_X || gOldMouseTop > LOGICAL_SCREEN_MAX_Y
@@ -415,16 +415,16 @@ void mouseManager::NewUpdate(i32 force) {
             if (gOldMouseBottom > LOGICAL_SCREEN_MAX_Y)
                 gOldMouseBottom = LOGICAL_SCREEN_MAX_Y;
 
-            if (m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
+            if (m_savedLeft + iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL]
                 > LOGICAL_SCREEN_WIDTH)
                 m_savedWidth = LOGICAL_SCREEN_WIDTH - m_savedLeft;
             else
-                m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-            if (m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
+                m_savedWidth = iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL];
+            if (m_savedTop + iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL]
                 > LOGICAL_SCREEN_HEIGHT)
                 m_savedHeight = LOGICAL_SCREEN_HEIGHT - m_savedTop;
             else
-                m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+                m_savedHeight = iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL];
 
             gpWindowManager->m_screen->CopyToCareful(
                 m_savedUnderlying,
@@ -468,7 +468,7 @@ void mouseManager::NewUpdate(i32 force) {
                 m_savedHeight
             );
         finishUpdate:
-            m_drawnCursorSizeIndex = m_cursorSizeIndex;
+            m_drawnCursorIndex = m_cursorIndex;
         }
     }
     bInNewMouseUpdate = false;
@@ -483,16 +483,16 @@ void mouseManager::MouseCoords(i32& x, i32& y) {
 }
 
 void mouseManager::SaveAndDraw(void) {
-    if (m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
+    if (m_cursorLeft + iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL]
         > LOGICAL_SCREEN_WIDTH)
         m_savedWidth = LOGICAL_SCREEN_WIDTH - m_cursorLeft;
     else
-        m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-    if (m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
+        m_savedWidth = iMouseSize[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL];
+    if (m_cursorTop + iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL]
         > LOGICAL_SCREEN_HEIGHT)
         m_savedHeight = LOGICAL_SCREEN_HEIGHT - m_cursorTop;
     else
-        m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+        m_savedHeight = iMouseSize[m_cursorIndex][MOUSE_CURSOR_VERTICAL];
     gpWindowManager->m_screen->CopyToCareful(
         m_savedUnderlying,
         0,
@@ -581,30 +581,30 @@ void mouseManager::SetColorMice(b32 enabled) {
     if (enabled == gbColorMice)
         return;
     {
-        i32 savedWindowUpdateFlags = gpWindowManager->m_updateFlags;
-        gpWindowManager->m_updateFlags = 0;
+        i32 savedWindowUpdateFlags = gpWindowManager->m_colorCycling;
+        gpWindowManager->m_colorCycling = 0;
         gbPutzingWithMouseCtr++;
         b32 wasInNew = bInNewMouseUpdate;
         bInNewMouseUpdate = false;
         ReallyHidePointer();
         m_cursorReady = false;
-        i32 savedX = m_cursorFrame;
+        i32 savedFrame = m_cursorFrame;
         MouseCursorType oldType = m_cursorType;
-        b32 savedForcePointerUpdate = m_forcePointerUpdate;
+        b32 savedForcePointerUpdate = m_pointerLocked;
         gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
-        m_forcePointerUpdate = false;
+        m_pointerLocked = false;
         SetPointer(
             "",
-            savedX,
+            savedFrame,
             oldType
         );
-        m_forcePointerUpdate = savedForcePointerUpdate;
+        m_pointerLocked = savedForcePointerUpdate;
         m_cursorReady = true;
         ReallyShowPointer();
         bInNewMouseUpdate = wasInNew;
         gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
-        gpWindowManager->m_updateFlags = savedWindowUpdateFlags;
+        gpWindowManager->m_colorCycling = savedWindowUpdateFlags;
     }
 }

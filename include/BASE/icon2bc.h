@@ -20,7 +20,7 @@ void IconToBitmapColorTable(
     i32 clipH,
     i32 color,
     u8* colorTable,
-    i32 dimGate
+    i32 drawShadows
 );
 
 #endif

@@ -92,7 +92,7 @@ public:
     i8 m_occupyingHeroId;
     u32l m_buildings;
     i8 m_mageGuildLevel;
-    char m_unknown1d;
+    char m_unused1d;
     i16 m_dwellingAvailable[H2EnumIndex(TOWN_DWELLING_STOCK_SLOT_COUNT)];
     u8 m_onMap;
     i8 m_mayNotUpgradeToCastle;

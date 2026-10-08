@@ -119,7 +119,7 @@ typedef enum EditRadarGeometry {
     EDIT_RADAR_LARGE_WIDE_DOT = 2,
 
     EDIT_RADAR_OBSTACLE_SHADE = 3,
-    EDIT_RADAR_TOWN_COLOR     = 0x11,
+    EDIT_RADAR_SITE_COLOR     = 0x11,
     EDIT_RADAR_UNSEEN_COLOR   = 0,
     EDIT_RADAR_VIEW_COLOR     = 0xb5,
 
@@ -142,9 +142,10 @@ typedef enum EditCellDrawing {
     EDIT_CLIP_SCREEN_W  = LOGICAL_SCREEN_WIDTH,
     EDIT_CLIP_SCREEN_H  = LOGICAL_SCREEN_HEIGHT,
 
-    EDIT_LAYER_HIGH  = 2,
-    EDIT_LAYER_MID   = 1,
-    EDIT_LAYER_LOW   = 0,
+
+    EDIT_LAYER_GROUND  = 2,
+    EDIT_LAYER_SHADOW   = 1,
+    EDIT_LAYER_STANDING   = 0,
 
     EDIT_CLOUD_TILE_MASK = 3,
 
@@ -271,8 +272,8 @@ typedef enum EditTextExport {
 typedef enum EditTriggerType {
 
 
-    EDIT_TYPE_ABANDONED_MINE_A = 462,
-    EDIT_TYPE_ABANDONED_MINE_B = 662
+    EDIT_TYPE_ABANDONED_MINE_GRASS = 462,
+    EDIT_TYPE_ABANDONED_MINE_DIRT = 662
 } EditTriggerType;
 
 typedef enum EditMapFileName {
@@ -2351,227 +2352,227 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {399, 399, 392, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {400, 400, 393, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {401, 401, 394, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {402, 402, 395, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {403, 403, 396, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {404, 404, 397, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {405, 405, 398, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {406, 406, 399, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {407, 407, 400, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {408, 408, 401, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {409, 409, 402, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {410, 410, 403, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {411, 411, 404, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {412, 412, 405, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {413, 413, 406, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {414, 414, 407, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {415, 415, 408, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {416, 416, 409, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {417, 417, 410, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {418, 418, 411, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {419, 419, 412, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {420, 420, 413, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {421, 421, 414, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {422, 422, 415, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {423, 423, 416, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {424, 424, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {425, 425, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {426, 426, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {427, 427, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {428, 428, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {429, 429, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {430, 430, 417, H2EnumIndex(TILESET_ROAD), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {431, 431, 418, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {432, 432, 419, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {433, 433, 420, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {434, 434, 421, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {435, 435, 422, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {436, 436, 423, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {437, 437, 424, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {438, 438, 425, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {439, 439, 426, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {440, 440, 427, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {441, 441, 428, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {442, 442, 429, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {443, 443, 430, H2EnumIndex(TILESET_STREAM), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000000, 0x00000001}, 0xffe, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {444, 444, 7, H2EnumIndex(TILESET_OBJNWATR), OVERLAY_CATEGORY_TERRAIN, 0, 11,
      {0x00000000, 0x00000001}, 0x1, 0x1, {0x00000000, 0x00000000},
@@ -2876,22 +2877,22 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {504, 504, 485, H2EnumIndex(TILESET_OBJNGRA2), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00000001}, 0x2, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ARENA),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_HOLE),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {505, 505, 485, H2EnumIndex(TILESET_OBJNGRA2), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x2, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {506, 506, 485, H2EnumIndex(TILESET_OBJNGRA2), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x2, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {507, 507, 485, H2EnumIndex(TILESET_OBJNGRA2), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000007}, 0x2, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000007}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {508, 508, 492, H2EnumIndex(TILESET_OBJNGRA2), OVERLAY_CATEGORY_TERRAIN, 10, 6,
      {0x00000000, 0x0000030f}, 0x2, 0xffe, {0x00000000, 0x00000300},
@@ -2946,7 +2947,7 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {518, 518, 502, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00000001}, 0x4, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ARENA),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_HOLE),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {519, 519, 532, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x4, 0xffe, {0x00000000, 0x00000000},
@@ -2956,17 +2957,17 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {520, 520, 504, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x4, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {521, 521, 505, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x4, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {522, 522, 506, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000007}, 0x4, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000007}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {523, 523, 507, H2EnumIndex(TILESET_OBJNSNOW), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x4, 0xffe, {0x00000000, 0x00000000},
@@ -3376,7 +3377,7 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {604, 604, 585, H2EnumIndex(TILESET_OBJNLAVA), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00000001}, 0x10, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ARENA),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_HOLE),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {605, 605, 586, H2EnumIndex(TILESET_OBJNLAVA), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00003f3f}, 0x10, 0xffe, {0x00000000, 0x00000000},
@@ -3866,22 +3867,22 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {702, 702, 678, H2EnumIndex(TILESET_OBJNDIRT), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00000001}, 0x40, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ARENA),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_HOLE),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {703, 703, 677, H2EnumIndex(TILESET_OBJNDIRT), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x40, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {704, 704, 677, H2EnumIndex(TILESET_OBJNDIRT), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x40, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {705, 705, 677, H2EnumIndex(TILESET_OBJNDIRT), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0x40, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000003}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_OUTCROPPING),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {706, 706, 685, H2EnumIndex(TILESET_OBJNDIRT), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x0000030f}, 0x40, 0xffe, {0x00000000, 0x00000300},
@@ -4011,7 +4012,7 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {731, 731, 710, H2EnumIndex(TILESET_OBJNCRCK), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00000001}, 0x80, 0xffe, {0x00000000, 0x00000000},
      {0x00000000, 0x00000001}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_ARENA),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_HOLE),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {732, 732, 711, H2EnumIndex(TILESET_OBJNCRCK), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000001}, 0x80, 0xffe, {0x00000000, 0x00000000},
@@ -4176,12 +4177,12 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {764, 764, 203, H2EnumIndex(TILESET_OBJNMUL2), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00020707}, 0xffe, 0xfff, {0x00000000, 0x00000000},
      {0x00000000, 0x00020707}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {765, 765, 204, H2EnumIndex(TILESET_OBJNMUL2), OVERLAY_CATEGORY_TERRAIN, 0, 6,
      {0x00000000, 0x00070702}, 0xffe, 0xfff, {0x00000000, 0x00000000},
      {0x00000000, 0x00070702}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_REEFS),
+     0, 0, {0x00000000, 0x00000000}, 1, H2EnumIndex(MAP_OBJECT_STREAM),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {766, 766, 747, H2EnumIndex(TILESET_OBJNMUL2), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0xee, 0xffe, {0x00000000, 0x00000000},
@@ -4261,7 +4262,7 @@ overlayType gOverlayTypes[OVERLAY_TYPE_COUNT] = {
     {781, 781, 759, H2EnumIndex(TILESET_OBJNMUL2), OVERLAY_CATEGORY_PART, 0, 6,
      {0x00000004, 0x0e7f7f3f}, 0xfff, 0xfff, {0x00000004, 0x0e1f0000},
      {0x00000000, 0x00606024}, {0x00000000, 0x00000000}, {0x00000000, 0x00000000},
-     0, 0, {0x00000000, 0x00000400}, 0, H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER),
+     0, 0, {0x00000000, 0x00000400}, 0, H2EnumIndex(MAP_OBJECT_ROAD),
      OVERLAY_GRID_WIDTH, OVERLAY_FRAMES_CONTINUE},
     {782, 782, 758, H2EnumIndex(TILESET_OBJNMUL2), OVERLAY_CATEGORY_TERRAIN, 15, 6,
      {0x00000000, 0x00000003}, 0xa, 0xffe, {0x00000000, 0x00000000},
@@ -5163,7 +5164,7 @@ editManager::editManager(void) {
     gUndoMap.Init(MAP_HEIGHT, MAP_WIDTH);
     ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
     SaveUndo();
-    m_animationFrame = 0;
+    m_unusedAnimationFrame = 0;
     m_animationCounter = 0;
     m_tool = EDIT_TOOL_NONE;
     m_toolManager = NULL;
@@ -5278,7 +5279,7 @@ void editManager::Close(void) {
 
 
 i32 editManager::OverlayTypeAt(i32 x, i32 y) {
-    b32 isLow;
+    b32 foundGroundLayer;
     i32 sprite;
     i32 set;
     mapCellExtra* part;
@@ -5290,7 +5291,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
     found = OVERLAY_NONE;
     set = OVERLAY_NONE;
     sprite = OVERLAY_NONE;
-    isLow = false;
+    foundGroundLayer = false;
     cell = gMap.CellAt(x, y);
     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
         if (cell->m_overlayTileset != TILESET_FLAG32 && cell->m_overlayTileset != TILESET_EXTRAOVR) {
@@ -5317,7 +5318,7 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
             && cell->m_objectTileset != TILESET_EXTRAOVR) {
             set = H2EnumIndex(cell->m_objectTileset);
             sprite = cell->m_objectIndex;
-            isLow = cell->m_objectHighLayer;
+            foundGroundLayer = cell->m_objectGroundLayer;
         }
         if (cell->m_extraIndex
             && gMap.Extra(cell->m_extraIndex)->objectIndex != MAPCELL_SPRITE_NONE)
@@ -5325,11 +5326,11 @@ i32 editManager::OverlayTypeAt(i32 x, i32 y) {
         else
             part = NULL;
         while (part) {
-            if ((!part->objectHighLayer || isLow) && !part->objectShadow
+            if ((!part->objectGroundLayer || foundGroundLayer) && !part->objectShadow
                 && part->objectTileset != TILESET_FLAG32 && part->objectTileset != TILESET_EXTRAOVR) {
                 set = H2EnumIndex(part->objectTileset);
                 sprite = part->objectIndex;
-                isLow = part->objectHighLayer;
+                foundGroundLayer = part->objectGroundLayer;
             }
             if (part->nextIndex && gMap.Extra(part->nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
                 part = gMap.Extra(part->nextIndex);
@@ -5379,19 +5380,19 @@ void editManager::GrabObject(void) {
 MessageDispatchResult editManager::Main(tag_message& message) {
     i32 mouseX;
     i32 mouseY;
-    i32 amount;
+    i32 variety;
     fullMap* temp;
     tag_message move;
     i32 hint;
     i32 choice;
-    i32 objectKind;
+    i32 overlayType;
     i32 newMap;
     i32 mapX;
-    i32 cellEvent;
+    i32 cellTrigger;
     i32 mapY;
     i32 iconIndex;
     TilesetId tilesetId;
-    i32 kindIndex;
+    i32 siteName;
     mapCell* cell;
     char initial;
 
@@ -5401,8 +5402,8 @@ MessageDispatchResult editManager::Main(tag_message& message) {
     if (gConfig.editorScreenAnimation && gLastAnimationTick + EDIT_ANIMATION_TICKS < KBTickCount()
         && message.type == MESSAGE_NONE) {
         m_animationCounter++;
-        m_animationFrame++;
-        m_animationFrame %= EDIT_ANIMATION_FRAMES;
+        m_unusedAnimationFrame++;
+        m_unusedAnimationFrame %= EDIT_ANIMATION_FRAMES;
         DrawMap();
         gEditManager->m_cursorX = EDIT_NO_CELL;
         memset(&move, 0, sizeof(move));
@@ -5652,18 +5653,18 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                             ScreenToCell(mapX, mapY);
                             mapX += gEditManager->m_viewX;
                             mapY += gEditManager->m_viewY;
-                            objectKind = OverlayTypeAt(mapX, mapY);
-                            cellEvent = OVERLAY_NONE;
-                            if (objectKind != OVERLAY_NONE)
-                                cellEvent = gOverlayTypes[objectKind].trigger;
-                            if (cellEvent == OVERLAY_NONE || cellEvent == H2EnumIndex(MAP_OBJECT_NOTHING_SPECIAL)
-                                || cellEvent == H2EnumIndex(MAP_OBJECT_MOSSY_ROCK)) {
+                            overlayType = OverlayTypeAt(mapX, mapY);
+                            cellTrigger = OVERLAY_NONE;
+                            if (overlayType != OVERLAY_NONE)
+                                cellTrigger = gOverlayTypes[overlayType].trigger;
+                            if (cellTrigger == OVERLAY_NONE || cellTrigger == H2EnumIndex(MAP_OBJECT_NOTHING_SPECIAL)
+                                || cellTrigger == H2EnumIndex(MAP_OBJECT_MOSSY_ROCK)) {
                                 sprintf(gText,
                                         gTerrainNames[H2EnumIndex(giGroundToTerrain[gMap.CellAt(mapX, mapY)
                                                                             ->m_terrainImageIndex])]);
                             } else {
                                 cell = gMap.CellAt(mapX, mapY);
-                                switch (cellEvent) {
+                                switch (cellTrigger) {
                                     case H2EnumIndex(MAP_OBJECT_BARRIER):
                                     case H2EnumIndex(MAP_OBJECT_TRAVELER_TENT):
                                         sprintf(gText,
@@ -5681,41 +5682,41 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                             iconIndex = cell->m_overlayIndex;
                                             tilesetId = cell->m_overlayTileset;
                                         }
-                                        kindIndex = H2EnumIndex(GENERIC_SITE_UNKNOWN);
+                                        siteName = H2EnumIndex(GENERIC_SITE_UNKNOWN);
                                         switch (tilesetId) {
                                             case TILESET_X_LOC1:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC1_ALCHEMIST_TOWER_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_ALCHEMIST_TOWER);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_ALCHEMIST_TOWER);
                                                 else if (iconIndex < EDIT_X_LOC1_ARENA_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_ARENA);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_ARENA);
                                                 break;
                                             case TILESET_X_LOC2:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC2_STABLES_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_STABLES);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_STABLES);
                                                 else if (iconIndex < EDIT_X_LOC2_STRAY_END)
-                                                    kindIndex = EDIT_SITE_NAME_STRAY;
+                                                    siteName = EDIT_SITE_NAME_STRAY;
                                                 else if (iconIndex < EDIT_X_LOC2_MERMAID_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_MERMAID);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_MERMAID);
                                                 else if (iconIndex < EDIT_X_LOC2_SIRENS_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_SIRENS);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_SIRENS);
                                                 break;
                                             case TILESET_X_LOC3:
                                                 if (iconIndex < 0)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC3_HUT_OF_MAGI_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_HUT_OF_MAGI);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_HUT_OF_MAGI);
                                                 else if (iconIndex < EDIT_X_LOC3_EYE_OF_MAGI_END)
-                                                    kindIndex = H2EnumIndex(GENERIC_SITE_EYE_OF_MAGI);
+                                                    siteName = H2EnumIndex(GENERIC_SITE_EYE_OF_MAGI);
                                                 break;
                                         }
-                                        if (kindIndex == H2EnumIndex(GENERIC_SITE_UNKNOWN))
+                                        if (siteName == H2EnumIndex(GENERIC_SITE_UNKNOWN))
                                             sprintf(gText, localization::Tr("editor.quick_view.unknown"));
                                         else
-                                            sprintf(gText, xGenericSiteNames[kindIndex]);
+                                            sprintf(gText, xGenericSiteNames[siteName]);
                                         break;
                                     case H2EnumIndex(MAP_OBJECT_EXPANSION_DWELLING):
                                         if (cell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
@@ -5725,27 +5726,27 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                             iconIndex = cell->m_overlayIndex;
                                             tilesetId = cell->m_overlayTileset;
                                         }
-                                        kindIndex = H2EnumIndex(GENERIC_SITE_UNKNOWN);
+                                        siteName = H2EnumIndex(GENERIC_SITE_UNKNOWN);
                                         switch (tilesetId) {
                                             case TILESET_X_LOC1:
                                                 if (iconIndex < EDIT_X_LOC1_ARENA_END)
                                                     break;
                                                 if (iconIndex < EDIT_X_LOC1_DWELLING_1_END)
-                                                    kindIndex = H2EnumIndex(RECRUITMENT_SITE_BARROW_MOUNDS);
+                                                    siteName = H2EnumIndex(RECRUITMENT_SITE_BARROW_MOUNDS);
                                                 else if (iconIndex < EDIT_X_LOC1_DWELLING_2_END)
-                                                    kindIndex = H2EnumIndex(RECRUITMENT_SITE_EARTH_ALTAR);
+                                                    siteName = H2EnumIndex(RECRUITMENT_SITE_EARTH_ALTAR);
                                                 else if (iconIndex < EDIT_X_LOC1_DWELLING_3_END)
-                                                    kindIndex = H2EnumIndex(RECRUITMENT_SITE_AIR_ALTAR);
+                                                    siteName = H2EnumIndex(RECRUITMENT_SITE_AIR_ALTAR);
                                                 else if (iconIndex < EDIT_X_LOC1_DWELLING_4_END)
-                                                    kindIndex = H2EnumIndex(RECRUITMENT_SITE_FIRE_ALTAR);
+                                                    siteName = H2EnumIndex(RECRUITMENT_SITE_FIRE_ALTAR);
                                                 else if (iconIndex < EDIT_X_LOC1_DWELLING_5_END)
-                                                    kindIndex = H2EnumIndex(RECRUITMENT_SITE_WATER_ALTAR);
+                                                    siteName = H2EnumIndex(RECRUITMENT_SITE_WATER_ALTAR);
                                                 break;
                                         }
-                                        if (kindIndex == H2EnumIndex(GENERIC_SITE_UNKNOWN))
+                                        if (siteName == H2EnumIndex(GENERIC_SITE_UNKNOWN))
                                             sprintf(gText, localization::Tr("editor.quick_view.unknown"));
                                         else
-                                            sprintf(gText, xRecruitmentSiteNames[kindIndex]);
+                                            sprintf(gText, xRecruitmentSiteNames[siteName]);
                                         break;
                                     case H2EnumIndex(MAP_OBJECT_ROCK):
                                         if (cell->m_objectTileset == TILESET_X_LOC2)
@@ -5754,7 +5755,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                             sprintf(gText, localization::Tr("editor.quick_view.rocks"));
                                         break;
                                     default:
-                                        sprintf(gText, gQuickViewText[cellEvent]);
+                                        sprintf(gText, gQuickViewText[cellTrigger]);
                                         break;
                                 }
                             }
@@ -5803,37 +5804,37 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                         NormalDialog(localization::Tr("editor.text.import_failed"), NORMAL_DIALOG_INFO);
                     break;
                 case INPUT_SCAN_0:
-                    amount = 0;
+                    variety = 0;
                     goto randomize;
                 case INPUT_SCAN_1:
-                    amount = 1;
+                    variety = 1;
                     goto randomize;
                 case INPUT_SCAN_2:
-                    amount = 2;
+                    variety = 2;
                     goto randomize;
                 case INPUT_SCAN_3:
-                    amount = 3;
+                    variety = 3;
                     goto randomize;
                 case INPUT_SCAN_4:
-                    amount = 4;
+                    variety = 4;
                     goto randomize;
                 case INPUT_SCAN_5:
-                    amount = 5;
+                    variety = 5;
                     goto randomize;
                 case INPUT_SCAN_6:
-                    amount = 6;
+                    variety = 6;
                     goto randomize;
                 case INPUT_SCAN_7:
-                    amount = 7;
+                    variety = 7;
                     goto randomize;
                 case INPUT_SCAN_8:
-                    amount = 8;
+                    variety = 8;
                     goto randomize;
                 case INPUT_SCAN_9:
-                    amount = 9;
+                    variety = 9;
                 randomize:
                     if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS))))
-                        RandomizeGround(amount);
+                        RandomizeGround(variety);
                     break;
                 case INPUT_SCAN_TAB:
                     SelectTool((m_tool + 1) % EDIT_TOOL_COUNT);
@@ -5969,7 +5970,7 @@ void editManager::DrawView(i32 viewX, i32 viewY) {
     i32 oldZoom;
 
     oldZoom = m_zoomLevel;
-    if (gGeneratingMap)
+    if (gGeneratingUnseen)
         m_zoomLevel = EDIT_ZOOM_NORMAL;
     cells = gZoomViewCells[m_zoomLevel];
     for (row = 0; row < cells; row++)
@@ -5988,8 +5989,8 @@ void editManager::DrawView(i32 viewX, i32 viewY) {
     gLastAnimationTick = KBTickCount();
     if (!gConfig.editorScreenAnimation) {
         m_animationCounter++;
-        m_animationFrame++;
-        m_animationFrame %= EDIT_ANIMATION_FRAMES;
+        m_unusedAnimationFrame++;
+        m_unusedAnimationFrame %= EDIT_ANIMATION_FRAMES;
     }
     tileSize = gZoomTileSize[m_zoomLevel];
     outline = m_zoomLevel ? EDIT_SELECTION_LINE_ZOOMED : EDIT_SELECTION_LINE_NORMAL;
@@ -6061,7 +6062,7 @@ void editManager::DrawRadar(b32 updateScreen [[maybe_unused]]) {
     i32 unusedB [[maybe_unused]];
     i32 mapY;
     mapCell* cell;
-    i32 tile;
+    i32 tileset;
 
     line = gpWindowManager->m_screen->m_pixels + EDIT_RADAR_OFFSET;
     dst = line;
@@ -6090,12 +6091,12 @@ void editManager::DrawRadar(b32 updateScreen [[maybe_unused]]) {
         }
         for (x = 0; x < MAP_WIDTH; x++) {
             cell = &gMap.Column(x)[mapY * gMap.width];
-            tile = -1;
+            tileset = -1;
             if (cell->m_objectIndex != MAPCELL_SPRITE_NONE)
-                tile = H2EnumIndex(cell->m_objectTileset);
+                tileset = H2EnumIndex(cell->m_objectTileset);
             else if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
-                tile = H2EnumIndex(cell->m_overlayTileset);
-            switch (tile) {
+                tileset = H2EnumIndex(cell->m_overlayTileset);
+            switch (tileset) {
                 case H2EnumIndex(TILESET_MTNSNOW):
                 case H2EnumIndex(TILESET_MTNSWMP):
                 case H2EnumIndex(TILESET_MTNLAVA):
@@ -6117,7 +6118,7 @@ void editManager::DrawRadar(b32 updateScreen [[maybe_unused]]) {
                         case MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB):
                         case MAP_ACTION_TRIGGER(MAP_OBJECT_MINE):
                         case MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL):
-                            color = EDIT_RADAR_TOWN_COLOR;
+                            color = EDIT_RADAR_SITE_COLOR;
                             break;
                         default:
                             color = gMapColors[H2EnumIndex(giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex])]
@@ -6127,13 +6128,13 @@ void editManager::DrawRadar(b32 updateScreen [[maybe_unused]]) {
                     break;
                 case H2EnumIndex(TILESET_OBJNTOWN):
                 case H2EnumIndex(TILESET_OBJNTWBA):
-                    color = EDIT_RADAR_TOWN_COLOR;
+                    color = EDIT_RADAR_SITE_COLOR;
                     break;
                 default:
                     color = gMapColors[H2EnumIndex(giGroundToTerrain[gMap.Column(x)[mapY * gMap.width].m_terrainImageIndex])];
                     break;
             }
-            if (gGeneratingMap)
+            if (gGeneratingUnseen)
                 color = EDIT_RADAR_UNSEEN_COLOR;
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
@@ -6252,7 +6253,7 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
     gDrawCell = &gMap.Column(x)[y * gMap.width];
     gDrawX = column * gZoomTileSize[m_zoomLevel] + EDIT_VIEW_LEFT;
     gDrawY = row * gZoomTileSize[m_zoomLevel] + EDIT_VIEW_TOP;
-    if (gGeneratingMap) {
+    if (gGeneratingUnseen) {
         if (layers & EDIT_DRAW_OVERHANGING)
             TileToBitmapScale(
                 m_cloudTiles[0],
@@ -6274,11 +6275,11 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
         );
     }
     if (layers & EDIT_DRAW_OBJECTS) {
-        for (gDrawLayer = EDIT_LAYER_HIGH; gDrawLayer >= EDIT_LAYER_LOW; gDrawLayer--) {
+        for (gDrawLayer = EDIT_LAYER_GROUND; gDrawLayer >= EDIT_LAYER_STANDING; gDrawLayer--) {
             if (gDrawCell->m_objectIndex != MAPCELL_SPRITE_NONE
-                && ((gDrawLayer == EDIT_LAYER_HIGH && gDrawCell->m_objectHighLayer)
-                    || (gDrawLayer == EDIT_LAYER_MID && gDrawCell->m_objectShadow)
-                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawCell->m_objectHighLayer
+                && ((gDrawLayer == EDIT_LAYER_GROUND && gDrawCell->m_objectGroundLayer)
+                    || (gDrawLayer == EDIT_LAYER_SHADOW && gDrawCell->m_objectShadow)
+                    || (gDrawLayer == EDIT_LAYER_STANDING && !gDrawCell->m_objectGroundLayer
                         && !gDrawCell->m_objectShadow))) {
                 if (gDrawCell->m_objectTileset == TILESET_MONS32)
                     IconToBitmapScale(
@@ -6350,9 +6351,9 @@ void editManager::DrawCell(i32 x, i32 y, i32 column, i32 row, i32 layers) {
             else
                 gDrawExtra = NULL;
             while (gDrawExtra) {
-                if ((gDrawLayer == EDIT_LAYER_HIGH && gDrawExtra->objectHighLayer)
-                    || (gDrawLayer == EDIT_LAYER_MID && gDrawExtra->objectShadow)
-                    || (gDrawLayer == EDIT_LAYER_LOW && !gDrawExtra->objectHighLayer
+                if ((gDrawLayer == EDIT_LAYER_GROUND && gDrawExtra->objectGroundLayer)
+                    || (gDrawLayer == EDIT_LAYER_SHADOW && gDrawExtra->objectShadow)
+                    || (gDrawLayer == EDIT_LAYER_STANDING && !gDrawExtra->objectGroundLayer
                         && !gDrawExtra->objectShadow)) {
                     if (gDrawExtra->objectTileset == TILESET_MONS32)
                         IconToBitmapScale(
@@ -7176,7 +7177,7 @@ bool editManager::ImportMapText(void) {
             i32 length;
             char* riddleRecord;
             char sphinxHead[sizeof(mapEventExtra)];
-            char bottleHead[sizeof(signEventExtra)];
+            char signHead[sizeof(signEventExtra)];
             char* signCopy;
             char mapEventStart[sizeof(EventExtra)];
 
@@ -7191,13 +7192,13 @@ bool editManager::ImportMapText(void) {
                         return false;
                 message:
                     ReadTextLine(in, gText);
-                    memcpy(bottleHead, gEditManager->m_extras[cell->m_objectMetadata],
+                    memcpy(signHead, gEditManager->m_extras[cell->m_objectMetadata],
                            sizeof(signEventExtra));
                     length = strlen(gText) + sizeof(signEventExtra);
-                    if (!bottleHead[0])
+                    if (!signHead[0])
                         strcpy(gText, "");
                     signCopy = new char[length];
-                    memcpy(signCopy, bottleHead, sizeof(signEventExtra));
+                    memcpy(signCopy, signHead, sizeof(signEventExtra));
                     strcpy(signCopy + offsetof(signEventExtra, text), gText);
                     delete gEditManager->m_extras[cell->m_objectMetadata];
                     gEditManager->m_extras[cell->m_objectMetadata] = signCopy;
@@ -7325,8 +7326,8 @@ void editManager::UpdateTriggers(void) {
                 type = OverlayTypeAt(x, y);
                 if (type != OVERLAY_NONE) {
                     cell->m_triggerType = gOverlayTypes[type].trigger;
-                    if ((type == EDIT_TYPE_ABANDONED_MINE_A
-                         || (type == EDIT_TYPE_ABANDONED_MINE_B && x > 0 && x < MAP_WIDTH - 2
+                    if ((type == EDIT_TYPE_ABANDONED_MINE_GRASS
+                         || (type == EDIT_TYPE_ABANDONED_MINE_DIRT && x > 0 && x < MAP_WIDTH - 2
                              && y < MAP_HEIGHT - 2 && y > 0))
                         && OverlayTypeAt(x - 1, y) == type && OverlayTypeAt(x + 1, y) == type
                         && OverlayTypeAt(x, y - 1) == type && OverlayTypeAt(x, y + 1) != type)
@@ -7457,7 +7458,7 @@ i32 editManager::CountMines(void) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MINE)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
-                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE))
                 mineTotal++;
@@ -7547,7 +7548,7 @@ void editManager::WriteMines(i32 file) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE)
-                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)) {
                 if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE)) {
                     type = EDIT_MINE_TYPE_LIGHTHOUSE;
                 } else if (cell->m_triggerType
@@ -7555,7 +7556,7 @@ void editManager::WriteMines(i32 file) {
                     type = EDIT_MINE_TYPE_ABANDONED_MINE;
                 } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)) {
                     type = EDIT_MINE_TYPE_DRAGON_CITY;
-                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)) {
                     type = EDIT_MINE_TYPE_EYE_OF_MAGI;
                 } else {
                     markerCell = gMap.CellAt(x, y);
@@ -7865,7 +7866,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask [[mayb
         for (j = y; j < y + height; j++) {
             cell = gMap.CellAt(i, j);
             while (cell->m_objectIndex != MAPCELL_SPRITE_NONE
-                   && (!cell->m_objectShadow || cell->m_objectHighLayer || allLayers)
+                   && (!cell->m_objectShadow || cell->m_objectGroundLayer || allLayers)
                    && (!filtered || gClearTilesets[H2EnumIndex(cell->m_objectTileset)]))
                 RemoveLinkedObject(cell->m_objectLink);
             if (cell->m_extraIndex
@@ -7875,7 +7876,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 mask [[mayb
                 part = NULL;
             while (part) {
                 nextIndex = part->nextIndex;
-                if ((!part->objectShadow || part->objectHighLayer || allLayers)
+                if ((!part->objectShadow || part->objectGroundLayer || allLayers)
                     && (!filtered || gClearTilesets[H2EnumIndex(part->objectTileset)]))
                     RemoveLinkedObject(part->objectLink);
                 if (nextIndex && gMap.Extra(nextIndex)->objectIndex != MAPCELL_SPRITE_NONE)
@@ -9072,7 +9073,7 @@ void FillInOverlayTiles(void) {
     i32 gx;
     i32 cellIndex;
     i32 gy;
-    overlayType* shape;
+    overlayType* type;
     i32 baseFrame;
 
     curTileset = -1;
@@ -9080,38 +9081,38 @@ void FillInOverlayTiles(void) {
     typeFirstFrame = 0;
     for (i = 0; i < OVERLAY_TYPE_COUNT; i++) {
         width = 0;
-        shape = &gOverlayTypes[i];
-        if (shape->tileset != curTileset)
+        type = &gOverlayTypes[i];
+        if (type->tileset != curTileset)
             baseFrame = 0;
-        curTileset = shape->tileset;
-        if (shape->frameNumbering == OVERLAY_FRAMES_SHARED)
+        curTileset = type->tileset;
+        if (type->frameNumbering == OVERLAY_FRAMES_SHARED)
             baseFrame = typeFirstFrame;
-        if (shape->frameNumbering == OVERLAY_FRAMES_OWN)
+        if (type->frameNumbering == OVERLAY_FRAMES_OWN)
             baseFrame = 0;
         nextFrame = baseFrame;
         typeFirstFrame = baseFrame;
         cellIndex = 0;
         for (gy = 0; gy < OVERLAY_GRID_HEIGHT; gy++) {
             for (gx = 0; gx < OVERLAY_GRID_WIDTH; gx++) {
-                if (OverlayGridHas(shape->occupiedRows, gx, gy)) {
+                if (OverlayGridHas(type->occupiedRows, gx, gy)) {
                     if (OVERLAY_GRID_WIDTH - gx > width)
                         width = OVERLAY_GRID_WIDTH - gx;
-                    if (shape->frameNumbering >= 0)
-                        shape->frames[cellIndex] = nextFrame;
-                    if (OverlayGridHas(shape->animatedRows, gx, gy)) {
-                        nextFrame += shape->animationFrames + 1;
-                        baseFrame += shape->animationFrames + 1;
+                    if (type->frameNumbering >= 0)
+                        type->frames[cellIndex] = nextFrame;
+                    if (OverlayGridHas(type->animatedRows, gx, gy)) {
+                        nextFrame += type->animationFrames + 1;
+                        baseFrame += type->animationFrames + 1;
                     } else {
                         nextFrame++;
                         baseFrame++;
                     }
-                } else if (shape->frameNumbering >= 0) {
-                    shape->frames[cellIndex] = OVERLAY_NO_FRAME;
+                } else if (type->frameNumbering >= 0) {
+                    type->frames[cellIndex] = OVERLAY_NO_FRAME;
                 }
                 cellIndex++;
             }
         }
-        shape->width = width;
+        type->width = width;
     }
 }
 
@@ -9228,8 +9229,8 @@ typedef enum EditPlayerFactions {
 
 void CalculatePlayerNumbers(void) {
     i32 onlyFaction;
-    i32 humanMin;
-    i32 humanCount;
+    i32 minHumans;
+    i32 maxHumans;
     i32 player;
     i32 cellFaction;
     i32 x;
@@ -9241,9 +9242,9 @@ void CalculatePlayerNumbers(void) {
     mapCell* cell;
     u8 factionSeen[GAME_PLAYER_COUNT][EDIT_PLAYER_FACTION_SLOTS];
 
-    humanCount = 0;
+    maxHumans = 0;
     numPlayers = 0;
-    humanMin = 0;
+    minHumans = 0;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
         if (!gEditMapHeader.playerEnabled[i]) {
             gEditMapHeader.playerCanHuman[i] = false;
@@ -9252,26 +9253,26 @@ void CalculatePlayerNumbers(void) {
             if (!gEditMapHeader.playerCanHuman[i] && !gEditMapHeader.playerCanComputer[i])
                 gEditMapHeader.playerCanComputer[i] = true;
             if (gEditMapHeader.playerCanHuman[i])
-                humanCount++;
+                maxHumans++;
             if (gEditMapHeader.playerCanHuman[i] || gEditMapHeader.playerCanComputer[i])
                 numPlayers++;
             if (gEditMapHeader.playerCanHuman[i] && !gEditMapHeader.playerCanComputer[i])
-                humanMin++;
+                minHumans++;
         }
     }
-    if (!humanCount) {
+    if (!maxHumans) {
         for (i = 0; i < GAME_PLAYER_COUNT; i++) {
             if (gEditMapHeader.playerEnabled[i]) {
                 gEditMapHeader.playerCanHuman[i] = true;
-                humanCount = 1;
-                humanMin = 1;
+                maxHumans = 1;
+                minHumans = 1;
                 break;
             }
         }
     }
     gEditMapHeader.playerCount = numPlayers;
-    gEditMapHeader.minHumanPlayers = humanMin;
-    gEditMapHeader.maxHumanPlayers = humanCount;
+    gEditMapHeader.minHumanPlayers = minHumans;
+    gEditMapHeader.maxHumanPlayers = maxHumans;
     for (i = 0; i < GAME_PLAYER_COUNT; i++)
         gEditMapHeader.playerRace[i] = FACTION_NONE;
     memset(factionSeen, 0, sizeof(factionSeen));
@@ -9674,7 +9675,7 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                             break;
                         case EDIT_OPTIONS_CYCLING_BUTTON:
                             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
-                            gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+                            gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
                             redraw = true;
                             gPrefsChanged = true;
                             break;
@@ -9709,7 +9710,7 @@ void editManager::ToggleGroundVariant(void) {
     i32 terrain;
     i32 x;
     i32 y;
-    b32 vary;
+    b32 makeVaried;
     i32 ground;
 
     SaveUndo();
@@ -9720,12 +9721,12 @@ void editManager::ToggleGroundVariant(void) {
     ground = gMap.CellAt(x, y)->m_terrainImageIndex;
     terrain = H2EnumIndex(giGroundToTerrain[ground]);
     if (giGroundShape[ground] & GROUND_SHAPE_VARIED)
-        vary = false;
+        makeVaried = false;
     else
-        vary = true;
+        makeVaried = true;
     gMap.CellAt(x, y)->m_terrainImageIndex = ChooseGroundTile(
-        terrain, giGroundShape[ground] & EDIT_SHAPE_MASK, true, x, y, vary,
-        static_cast<float>(vary != false)
+        terrain, giGroundShape[ground] & EDIT_SHAPE_MASK, true, x, y, makeVaried,
+        static_cast<float>(makeVaried != false)
     );
     DrawMap();
     UpdateMapView();

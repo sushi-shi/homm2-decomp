@@ -37,7 +37,7 @@ void IconToBitmap(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 color
+    i32 outlineColor
 ) {
     s_entry = reinterpret_cast<IconEntry*>(sourceIcon->m_data) + frame;
     s_src = sourceIcon->m_data + s_entry->srcOffset;
@@ -104,9 +104,9 @@ void IconToBitmap(
                     s_src++;
                 }
                 s_spanCount = s_dimLen;
-                if (color != 0 && (s_run & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
+                if (outlineColor != 0 && (s_run & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
                     s_run = s_dimLen;
-                    s_color = static_cast<u8>(color);
+                    s_color = static_cast<u8>(outlineColor);
                     goto fill_run;
                 }
                 if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {

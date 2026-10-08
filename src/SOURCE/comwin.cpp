@@ -133,7 +133,7 @@ void ShutdownComError(const char* function) {
     ShutDown(message);
 }
 
-i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
+i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 dsrFlowControl) {
     i32 error [[maybe_unused]];
     i32 slot;
     BOOL result;
@@ -187,7 +187,7 @@ i16 com_init(u8 portNumber, ComBaudRate baudRate, i32 useDtr) {
 
     state.fParity = 0;
     state.fOutxCtsFlow = 1;
-    state.fOutxDsrFlow = useDtr != 0;
+    state.fOutxDsrFlow = dsrFlowControl != 0;
     state.fDtrControl = DTR_CONTROL_ENABLE;
     state.fInX = 0;
     state.fOutX = 0;

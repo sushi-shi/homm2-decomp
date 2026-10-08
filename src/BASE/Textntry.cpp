@@ -116,7 +116,7 @@ void textEntryWidget::Read(TextEntryReadMode type) {
         m_rectW = m_width;
         m_rectH = m_height;
         m_maxLines = 1;
-        if (type == TEXT_ENTRY_READ_MULTILINE)
+        if (type == TEXT_ENTRY_READ_SCROLLING)
             m_preserveTextOnFocus = 1;
         else
             m_preserveTextOnFocus = 0;
@@ -318,9 +318,9 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                         strcpy(edit, swap);
                                         m_cursorPosition++;
                                         SetupDisplayString(edit, m_cursorPosition);
-                                        if (m_entryType != TEXT_ENTRY_READ_MULTILINE) {
-                                            i32 lineLength = m_font->LineLength(m_text, m_innerW);
-                                            if (lineLength > m_maxLines) {
+                                        if (m_entryType != TEXT_ENTRY_READ_SCROLLING) {
+                                            i32 lineCount = m_font->LineLength(m_text, m_innerW);
+                                            if (lineCount > m_maxLines) {
                                                 strcpy(edit, copy);
                                                 m_cursorPosition--;
                                             }
@@ -348,7 +348,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
 }
 
 void textEntryWidget::Draw(void) {
-    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
+    if (m_entryType == TEXT_ENTRY_READ_SCROLLING) {
         char display[TEXT_BUFFER_CAPACITY];
         u32 length;
 
@@ -410,7 +410,7 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
         strcpy(m_text + cursor + 1, source + cursor);
     else
         m_text[cursor + 1] = 0;
-    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
+    if (m_entryType == TEXT_ENTRY_READ_SCROLLING) {
         changed = true;
         while (changed) {
             changed = false;

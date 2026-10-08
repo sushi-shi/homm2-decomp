@@ -64,7 +64,7 @@ i32 is_netbios_avail(void) {
     return 0;
 }
 
-extern "C" u16 __cdecl nb_init(u16 maxNames [[maybe_unused]], u16 maxSessions) {
+extern "C" u16 __cdecl nb_init(u16 maxNames [[maybe_unused]], u16 localNameSession) {
     NetbiosControlBlock controlBlock;
     i32 index;
     u8* statusBuffer;
@@ -79,7 +79,7 @@ extern "C" u16 __cdecl nb_init(u16 maxNames [[maybe_unused]], u16 maxSessions) {
     if (is_netbios_avail() == 0)
         return 1;
     if (gNetbiosAvail != 0) {
-        gNbMaxSess = maxSessions;
+        gNbMaxSess = localNameSession;
         for (index = 0; index < NETBIOS_SESSION_COUNT; index++) {
             gNetStatus[index] = 0;
             gNbSessLsn[index] = NETBIOS_INVALID_ID;
@@ -172,7 +172,7 @@ extern "C" u16 __cdecl nb_snd(i16 session, i16 length, void* data) {
     tag_Node* node;
 
     if (session == gNbMaxSess && length == 0) {
-        nb_add_name();
+        nb_announce_name();
         return 0;
     }
     if (!(H2EnumIndex((gNetStatus[session]) & (NETBIOS_SESSION_ACTIVE))))
@@ -385,7 +385,7 @@ void nb_thr_ctl(void) {
 }
 
 
-static void nb_add_name(void) {
+static void nb_announce_name(void) {
     if (gNbCtlNcb.commandComplete != NETBIOS_RESULT_PENDING) {
         strcpy(gNbSessBuf.bytes, gNbGroupName);
         memcpy(

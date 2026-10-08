@@ -18,7 +18,7 @@ void IconToBitmap(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 color
+    i32 outlineColor
 );
 
 #endif

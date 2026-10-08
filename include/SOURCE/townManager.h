@@ -22,12 +22,12 @@ struct SBuildingInfo {
 #pragma pack(pop)
 
 enum class TownExtraBuildingMask : u32 {
-    TOWN_EXTRA_DOCK_GRAPHIC_MASK  = 0x4000,
-    TOWN_EXTRA_RACE_FIRST_MASK    = 0x10000,
+    TOWN_EXTRA_BOAT_MASK  = 0x4000,
+    TOWN_EXTRA_0_MASK    = 0x10000,
     TOWN_EXTRA_RACE_SECOND_MASK   = 0x20000,
     TOWN_EXTRA_RACE_THIRD_MASK    = 0x40000,
     TOWN_EXTRA_RACE_LAST_MASK     = 0x80000000,
-    TOWN_EXTRA_DYNAMIC_CLEAR_MASK = 0x7ff8bfff,
+    TOWN_EXTRA_DECORATION_CLEAR_MASK = 0x7ff8bfff,
     TOWN_CLOSE_DYNAMIC_CLEAR_MASK = 0xfff8bfff
 };
 using enum TownExtraBuildingMask;
@@ -62,13 +62,13 @@ typedef enum TownManagerConstant {
     TOWN_GARRISON_STRIP_Y                    = 0x100,
     TOWN_HERO_STRIP_Y                        = 0x163,
     TOWN_HERO_STRIP_FRAME_COUNT              = 3,
-    TOWN_GARRISON_FIRST_CONTROL              = 0x74,
-    TOWN_HERO_FIRST_CONTROL                  = 0x7a,
+    TOWN_GARRISON_CREST_CONTROL              = 0x74,
+    TOWN_HERO_STRIP_PORTRAIT_CONTROL                  = 0x7a,
     TOWN_ICON_RESOURCE_TYPE                  = 1,
     TOWN_PORTRAIT_FRAME_BASE                 = 0x5a,
-    TOWN_CREST_FRAME_WITH_HERO               = 1,
+    TOWN_GARRISON_STRIP_TYPE_WITH_HERO               = 1,
     TOWN_CREST_FRAME_WITHOUT_HERO            = 4,
-    TOWN_EMPTY_HERO_PORTRAIT_OFFSET          = 0x10,
+    TOWN_CREST_NO_HERO_OFFSET          = 0x10,
     TOWN_GARRISON_SLOT_FIRST                 = 0x75,
     TOWN_GARRISON_SLOT_LAST                  = 0x79,
     TOWN_HERO_SLOT_FIRST                     = 0x7b,
@@ -159,33 +159,33 @@ public:
     townObject* m_townObjects[H2EnumIndex(BUILDING_SLOT_COUNT)];
     i32 m_townObjectCount;
     H2EnumStorage<FactionType, i32> m_lastTownType;
-    i32 m_unknownC6;
+    i32 m_unusedC6;
     heroWindow* m_townWindow;
     strip* m_garrisonStrip;
     strip* m_heroStrip;
-    strip* m_selectedStrip;
+    strip* m_hoverStrip;
     i32 m_selectedArmySlot;
-    strip* m_swapStrip;
+    strip* m_sourceStrip;
     i32 m_swapArmySlot;
-    strip* m_pendingStrip;
+    strip* m_targetStrip;
     i32 m_pendingArmySlot;
     bankBox* m_bankBox;
     char m_statusText[TOWN_MANAGER_STATUS_TEXT_SIZE];
     i32 m_lastHoverId;
-    i32 m_lastHoverSubId;
+    i32 m_lastHoverModifiers;
     TownManagerArmyCommand m_command;
-    b32 m_recruitResult;
+    b32 m_heroRecruited;
     u32l m_affordableBuildings;
     u32l m_buildableBuildings;
     b32 m_castleDialogActive;
-    H2EnumStorage<BuildingSlotType, i32> m_selectedBuilding;
+    H2EnumStorage<BuildingSlotType, i32> m_purchasedBuilding;
 
 
     heroWindow* m_buildingWindow;
     heroWindow* m_childWindow;
     i32 m_splitAmount;
     i32 m_splitMaximum;
-    i32 m_recruitState;
+    i32 m_recruitSlot;
     hero* m_recruitHero;
     townManager(void);
     virtual i32 Open(i32 id) override;
