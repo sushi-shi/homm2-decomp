@@ -867,7 +867,7 @@ i32 combatManager::WalkTowardArmyFront(
     i32 left;
     i32 step;
 
-    currentArmy->m_targetSide = COMBAT_AI_NO_ARMY;
+    currentArmy->m_targetSide = COMBAT_SIDE_NONE;
     currentArmy->m_targetIndex = COMBAT_AI_NO_ARMY;
     armyIndex = GetClosestArmy(currentArmy, side, mask);
     if (armyIndex == COMBAT_AI_NO_ARMY)
@@ -964,7 +964,7 @@ i32 combatManager::WalkTowardArmy(
                 targetSquare++;
                 break;
         }
-        if (targetSquare != COMBAT_AI_NO_ARMY)
+        if (targetSquare != ARMY_HEX_INVALID)
             routeGot = gpSearchArray->FindCombatPath(
                 currentArmy->m_hex,
                 targetSquare,

@@ -24,20 +24,20 @@ typedef enum NetbiosConstant {
 } NetbiosConstant;
 
 enum {
-    NETBIOS_COMMAND_CALL              = 0x10,
-    NETBIOS_COMMAND_LISTEN            = 0x11,
-    NETBIOS_COMMAND_HANGUP            = 0x12,
-    NETBIOS_COMMAND_SEND              = 0x14,
-    NETBIOS_COMMAND_RECEIVE           = 0x15,
-    NETBIOS_COMMAND_RECEIVE_DATAGRAM  = 0x22,
-    NETBIOS_COMMAND_RECEIVE_BROADCAST = 0x23,
-    NETBIOS_COMMAND_ADD_NAME          = 0x30,
-    NETBIOS_COMMAND_DELETE_NAME       = 0x31,
-    NETBIOS_COMMAND_RESET             = 0x32,
-    NETBIOS_COMMAND_ADAPTER_STATUS    = 0x33,
-    NETBIOS_COMMAND_CANCEL            = 0x35,
-    NETBIOS_COMMAND_PROBE             = 0x7f,
-    NETBIOS_COMMAND_ASYNC             = 0x80
+    NETBIOS_COMMAND_CALL                       = 0x10,
+    NETBIOS_COMMAND_LISTEN                     = 0x11,
+    NETBIOS_COMMAND_HANGUP                     = 0x12,
+    NETBIOS_COMMAND_SEND                       = 0x14,
+    NETBIOS_COMMAND_RECEIVE                    = 0x15,
+    NETBIOS_COMMAND_SEND_BROADCAST_DATAGRAM    = 0x22,
+    NETBIOS_COMMAND_RECEIVE_BROADCAST_DATAGRAM = 0x23,
+    NETBIOS_COMMAND_ADD_NAME                   = 0x30,
+    NETBIOS_COMMAND_DELETE_NAME                = 0x31,
+    NETBIOS_COMMAND_RESET                      = 0x32,
+    NETBIOS_COMMAND_ADAPTER_STATUS             = 0x33,
+    NETBIOS_COMMAND_CANCEL                     = 0x35,
+    NETBIOS_COMMAND_PROBE                      = 0x7f,
+    NETBIOS_COMMAND_ASYNC                      = 0x80
 };
 typedef i32 NetbiosCommand;
 

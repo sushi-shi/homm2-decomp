@@ -1283,7 +1283,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     );
                 }
                 step++;
-                if (step > CHAIN_LIGHTNING_MAX_TARGETS || currentHex == COMBAT_HEX_EMPTY)
+                if (step > CHAIN_LIGHTNING_MAX_TARGETS || currentHex == ARMY_HEX_INVALID)
                     doneWork = true;
                 break;
             case SPELL_TELEPORT:

@@ -262,13 +262,7 @@ typedef enum RemoteSaveConstant {
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
-    REMOTE_RECEIVE_TIMEOUT           = 90000,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
-    REMOTE_SAVE_INIT_RESPONSE        = 2,
-    REMOTE_SAVE_DATA_COMMAND         = 3,
-    REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
-    REMOTE_SAVE_ACK_RESPONSE_COMMAND = 5,
-    REMOTE_SAVE_FINISH_COMMAND       = 6
 } RemoteSaveConstant;
 
 typedef enum NewTurnConstant {
@@ -948,7 +942,7 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
             continue;
         if (heroClass >= FACTION_KNIGHT && heroClass <= FACTION_NECROMANCER
             && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
-            && m_heroRecs[heroIndex].m_cursorType != heroClass)
+            && m_heroRecs[heroIndex].m_faction != heroClass)
             continue;
         if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
             && m_heroRecs[heroIndex].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
@@ -1261,10 +1255,10 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
         m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
-        m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / GAME_HEROES_PER_FACTION);
+        m_heroRecs[i].m_faction = static_cast<FactionType>(i / GAME_HEROES_PER_FACTION);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
-                gStartingHeroStats[(m_heroRecs[i].m_cursorType)][j];
+                gStartingHeroStats[(m_heroRecs[i].m_faction)][j];
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_heroRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
         m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
@@ -1276,27 +1270,27 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_secondarySkills[j] = HERO_SKILL_LEVEL_NONE;
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
+        if (m_heroRecs[i].m_faction == FACTION_KNIGHT) {
             m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, HERO_SKILL_LEVEL_BASIC);
             m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
+        if (m_heroRecs[i].m_faction == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, HERO_SKILL_LEVEL_ADVANCED);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
+        if (m_heroRecs[i].m_faction == FACTION_BARBARIAN)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, HERO_SKILL_LEVEL_ADVANCED);
-        if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
+        if (m_heroRecs[i].m_faction == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, HERO_SKILL_LEVEL_ADVANCED);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
+        if (m_heroRecs[i].m_faction == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_ADVANCED);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
+        if (m_heroRecs[i].m_faction == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
             m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, HERO_SKILL_LEVEL_BASIC);
@@ -1823,7 +1817,7 @@ void game::NewMap(char* filename) {
                                   ? FACTION_SORCERESS
                                   : FACTION_NECROMANCER;
             for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
-                if (m_heroRecs[awardHero].m_cursorType == specClass
+                if (m_heroRecs[awardHero].m_faction == specClass
                     && m_availableHeroes[awardHero] == -1)
                     break;
             }
@@ -1852,7 +1846,7 @@ void game::NewMap(char* filename) {
                 m_players[player].m_availableHeroIds[0] = awardHero;
                 m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                     WEEKLY_AVAILABLE_HERO;
-                startClass = m_heroRecs[awardHero].m_cursorType;
+                startClass = m_heroRecs[awardHero].m_faction;
                 goto secondHero;
             }
         }
@@ -1870,7 +1864,7 @@ void game::NewMap(char* filename) {
                 }
                 if (specClass != FACTION_ANY) {
                     for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
-                        if (m_heroRecs[awardHero].m_cursorType == specClass
+                        if (m_heroRecs[awardHero].m_faction == specClass
                             && m_availableHeroes[awardHero] == -1)
                             break;
                     }
@@ -1883,7 +1877,7 @@ void game::NewMap(char* filename) {
                             awardHero;
                         m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                             WEEKLY_AVAILABLE_HERO;
-                        startClass = m_heroRecs[awardHero].m_cursorType;
+                        startClass = m_heroRecs[awardHero].m_faction;
                         goto secondHero;
                     }
                 }
@@ -2047,7 +2041,7 @@ void game::NewMap(char* filename) {
             if (m_players[player].m_townCount) {
                 sideClass = gpGame->m_castleRecs[m_players[player].m_townIds[0]].m_type;
             } else if (m_players[player].m_heroCount) {
-                sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_cursorType;
+                sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_faction;
             }
         }
         if (sideClass == FACTION_BARBARIAN || sideClass == FACTION_WARLOCK
@@ -2724,7 +2718,8 @@ void game::RandomizeEvents(void) {
                 && !(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell->m_flags & (MAP_CELL_OBJECT_SHADOW_ONLY))
                 && (yPosition == MAP_HEIGHT - 1
-                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags & 4)))
+                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
+                        & (MAP_CELL_SHORE))))
                 cell->m_flags |= (MAP_CELL_OCCUPIED);
         }
     }
@@ -4371,7 +4366,7 @@ void game::PerWeek(void) {
         for (innerIndex = 0; innerIndex < HERO_AVAILABLE_SLOT_COUNT; innerIndex++) {
             if (innerIndex == 1) {
                 heroClass =
-                    m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
+                    m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_faction;
             }
             heroClass = static_cast<FactionType>(
                 (Random(1, (FACTION_COUNT) - 1) + (heroClass)) % (FACTION_COUNT)
@@ -5035,13 +5030,13 @@ void game::RandomizeHeroPool(void) {
             Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX);
         m_heroRecs[heroId].m_lastWisdomOfferLevel = HERO_INITIAL_LEVEL;
 
-        if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
+        if (m_heroRecs[heroId].m_faction == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
+        else if (m_heroRecs[heroId].m_faction == FACTION_WARLOCK)
             m_heroRecs[heroId].m_spells[(SPELL_CURSE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
+        else if (m_heroRecs[heroId].m_faction == FACTION_NECROMANCER)
             m_heroRecs[heroId].m_spells[(SPELL_HASTE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
+        else if (m_heroRecs[heroId].m_faction == FACTION_WIZARD)
             m_heroRecs[heroId].m_spells[(SPELL_STONE_SKIN)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
@@ -5087,10 +5082,10 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     for (index = 0; index < RANDOM_HERO_ARMY_SELECTION_COUNT; index++) {
         if (selected[index]) {
             army->m_creatureTypes[armySlot] =
-                armyTable[(m_heroRecs[heroId].m_cursorType)][index].creature;
-            minimumCount = armyTable[(m_heroRecs[heroId].m_cursorType)][index].minimum
+                armyTable[(m_heroRecs[heroId].m_faction)][index].creature;
+            minimumCount = armyTable[(m_heroRecs[heroId].m_faction)][index].minimum
                        * RANDOM_HERO_COUNT_SCALE;
-            maximum = armyTable[(m_heroRecs[heroId].m_cursorType)][index].maximum
+            maximum = armyTable[(m_heroRecs[heroId].m_faction)][index].maximum
                            * RANDOM_HERO_COUNT_SCALE
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
@@ -5556,8 +5551,8 @@ void game::ShowComputerScreen(void) {
 }
 
 void game::ShowHeroesLogo(void) {
-    if (gpAdvManager->m_openState == 0) {
-        gpAdvManager->m_openState = true;
+    if (gpAdvManager->m_heroesLogoShown == 0) {
+        gpAdvManager->m_heroesLogoShown = true;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
         IconToBitmap(
             theIcon,
@@ -6028,7 +6023,7 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra->hasAssignedHero) {
                             mapHero = GetHero(extra->heroId);
-                            mapHero->m_cursorType = heroFaction;
+                            mapHero->m_faction = heroFaction;
                         } else {
                             heroId = RandomScan(
                                 usedHeroes,
@@ -6050,7 +6045,7 @@ void game::ProcessOnMapHeroes(void) {
                             }
                             usedHeroes[heroId] = 1;
                             mapHero = GetHero(heroId);
-                            mapHero->m_cursorType = heroFaction;
+                            mapHero->m_faction = heroFaction;
                             if (extra->hasCustomHero && extra->heroId >= GAME_HERO_COUNT)
                                 mapHero->m_portrait = extra->heroId;
                             extra->heroId = static_cast<i8>(heroId);
@@ -6364,8 +6359,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
             header->bytes,
             remotePlayer,
             REMOTE_SAVE_HEADER_SIZE,
-            ADVMGR_REMOTE_COMMAND_SAVE_GAME,
-            REMOTE_SAVE_INIT_RESPONSE,
+            REMOTE_COMMAND_SAVE_GAME,
+            REMOTE_COMMAND_SAVE_INIT_RESPONSE,
             &reply
         );
         if (!result)
@@ -6401,7 +6396,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                             header->bytes,
                             remotePlayer,
                             chunkSize + REMOTE_PACKET_INDEX_SIZE,
-                            REMOTE_SAVE_DATA_COMMAND,
+                            REMOTE_COMMAND_SAVE_DATA,
                             0
                         );
                         if (!result)
@@ -6415,8 +6410,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                     header->bytes,
                     remotePlayer,
                     REMOTE_PACKET_INDEX_SIZE,
-                    REMOTE_SAVE_ACK_REQUEST_COMMAND,
-                    REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                    REMOTE_COMMAND_SAVE_ACK_REQUEST,
+                    REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                     &reply
                 );
                 LogStr("PostWait");
@@ -6435,7 +6430,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                 }
             }
         }
-        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_FINISH_COMMAND, 1);
+        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_COMMAND_SAVE_FINISH, 1);
         if (!result)
             ShutDown(NULL);
         success = true;
@@ -6517,7 +6512,7 @@ i32 game::ReceiveSaveGame(
     gSoundBackendsReady = samplesReady;
 
     LogStr("Begin Transmit Init Confirm");
-    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_INIT_RESPONSE, 1);
+    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_COMMAND_SAVE_INIT_RESPONSE, 1);
     LogStr("End Transmit Init Confirm");
     if (!result)
         ShutDown(NULL);
@@ -6534,7 +6529,7 @@ i32 game::ReceiveSaveGame(
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
-        if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < KBTickCount()) {
+        if (lastPacketTime + REMOTE_WAIT_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 "Ошибка получения информации. Продолжать?",
                 NORMAL_DIALOG_CONFIRM
@@ -6551,7 +6546,7 @@ i32 game::ReceiveSaveGame(
                 || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = KBTickCount();
             switch (receivedPacket->command) {
-                case REMOTE_SAVE_DATA_COMMAND:
+                case REMOTE_COMMAND_SAVE_DATA:
                     packetStart = receivedPacket->payload.chunk.packetIndex;
                     received[packetStart] = 1;
                     memcpy(
@@ -6560,7 +6555,7 @@ i32 game::ReceiveSaveGame(
                         receivedPacket->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
                     break;
-                case REMOTE_SAVE_ACK_REQUEST_COMMAND:
+                case REMOTE_COMMAND_SAVE_ACK_REQUEST:
                     packetStart = receivedPacket->payload.chunk.packetIndex;
                     for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
                          index++)
@@ -6570,13 +6565,13 @@ i32 game::ReceiveSaveGame(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
                         REMOTE_SAVE_CHUNK_SIZE,
-                        REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                        REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                         1
                     );
                     if (!result)
                         ShutDown(NULL);
                     break;
-                case REMOTE_SAVE_FINISH_COMMAND:
+                case REMOTE_COMMAND_SAVE_FINISH:
                     finished = true;
                     break;
             }

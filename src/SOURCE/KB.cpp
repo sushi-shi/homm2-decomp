@@ -783,7 +783,7 @@ i32 oldmain(void) {
                         netBuffer.bytes,
                         player,
                         sizeof(OldMainNetSetup),
-                        OLD_MAIN_NETWORK_PACKET,
+                        REMOTE_COMMAND_NET_SETUP,
                         1
                     );
                     if (!transmissionResult)
@@ -896,9 +896,9 @@ i32 oldmain(void) {
             if (giEndSequence != 1) {
                 gpWindowManager->m_updateFlags = 0;
                 if (xIsExpansionMap)
-                    PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
+                    PlaySmacker(EXPANSION_DEFEAT_VIDEO);
                 else
-                    PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
+                    PlaySmacker(DEFEAT_VIDEO);
                 gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
@@ -1398,8 +1398,8 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
-                        gpTownManager->m_heroWindow0->DrawWindow();
-                        gpTownManager->m_heroWindow1->DrawWindow();
+                        gpTownManager->m_buildingWindow->DrawWindow();
+                        gpTownManager->m_childWindow->DrawWindow();
                         gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                         break;
                     default:
@@ -2851,7 +2851,7 @@ i32 WaitForOtherPlayer(void) {
                 );
                 giThisGamePos = NetPosToGamePos(giThisNetPos);
                 break;
-            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
+            case REMOTE_COMMAND_SAVE_GAME:
                 result = gpGame->ReceiveSaveGame(
                     data->payload.save.dataSize,
                     data->payload.save.crc,
@@ -2970,7 +2970,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
             if (remoteData->type == REMOTE_MESSAGE_UNRELIABLE) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData->command) {
-                    case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
+                    case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt;
@@ -2986,7 +2986,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData->command) {
-                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+                    case REMOTE_COMMAND_POP_NET_BOX:
                         remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         sprintf(
                             gText,
@@ -3064,7 +3064,7 @@ void PopNetBox(const char* text, i32 netPlayer) {
                 inputText,
                 REMOTE_BROADCAST_PLAYER,
                 strlen(inputText) + 1,
-                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
+                REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!result)
@@ -4230,7 +4230,7 @@ void HandleRemoteSuddenExit(void) {
         reinterpret_cast<char*>(&exitInfo),
         destination,
         sizeof(exitInfo),
-        ADVMGR_REMOTE_COMMAND_PLAYER_EXIT,
+        REMOTE_COMMAND_PLAYER_EXIT,
         0,
         0,
         REMOTE_MESSAGE_RELIABLE
@@ -4409,7 +4409,7 @@ exitInfoProcessed:
                 reinterpret_cast<char*>(&exitInfo),
                 1 - giThisNetPos,
                 sizeof(exitInfo),
-                ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                REMOTE_COMMAND_HOST_PLAYER_EXIT,
                 1
             );
         }
@@ -4428,7 +4428,7 @@ exitInfoProcessed:
                     reinterpret_cast<char*>(&exitInfo),
                     recipient,
                     sizeof(exitInfo),
-                    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                    REMOTE_COMMAND_HOST_PLAYER_EXIT,
                     1
                 );
             }

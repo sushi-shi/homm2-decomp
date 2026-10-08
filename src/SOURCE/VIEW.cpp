@@ -157,7 +157,7 @@ i32 combatManager::ViewGeneral(
             gText,
             "%s - %s",
             m_heroes[(side)]->m_name,
-            gAlignmentNames[(m_heroes[(side)]->m_cursorType)]
+            gAlignmentNames[(m_heroes[(side)]->m_faction)]
         );
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = GENERAL_NAME_WIDGET;

@@ -168,7 +168,6 @@ typedef enum EditKnobGeometry {
 
 typedef enum EditRadarDrag {
 
-    EDIT_RADAR_SIZE      = 0x90,
     EDIT_KNOB_DRAG_ORIGIN = 0x27
 } EditRadarDrag;
 
@@ -276,18 +275,6 @@ typedef enum EditTriggerType {
     EDIT_TYPE_ABANDONED_MINE_A = 462,
     EDIT_TYPE_ABANDONED_MINE_B = 662
 } EditTriggerType;
-
-typedef enum EditCellFlag {
-
-
-    EDIT_CELL_FLIP_VERTICAL   = 0x01,
-    EDIT_CELL_FLIP_HORIZONTAL = 0x02,
-    EDIT_CELL_SHORE           = 0x04,
-    EDIT_CELL_SHORE_CORNER    = 0x10,
-
-
-    EDIT_CELL_GROUND_KEEP     = 0x9f
-} EditCellFlag;
 
 typedef enum EditMapFileName {
 
@@ -6676,7 +6663,7 @@ void editManager::FillGround(i32 x, i32 y, i32 width, i32 height, i32 terrain) {
         for (j = y; j < y + height; j++) {
             gMap.CellAt(i, j)->m_terrainImageIndex
                 = ChooseGroundTile(terrain, EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
-            gMap.Column(i)[j * gMap.width].m_flags &= EDIT_CELL_GROUND_KEEP;
+            gMap.Column(i)[j * gMap.width].m_flags &= (MAP_CELL_GROUND_KEEP);
         }
     }
 }
@@ -6702,8 +6689,8 @@ void editManager::DoRadar(void) {
     float scale;
 
     gpMouseManager->MouseCoords(x, y);
-    if (x < ADVENTURE_RADAR_LEFT || x > ADVENTURE_RADAR_LEFT + (EDIT_RADAR_SIZE)
-        || y < ADVENTURE_RADAR_TOP || y > ADVENTURE_RADAR_TOP + (EDIT_RADAR_SIZE))
+    if (x < ADVENTURE_RADAR_LEFT || x > ADVENTURE_RADAR_RIGHT
+        || y < ADVENTURE_RADAR_TOP || y > ADVENTURE_RADAR_BOTTOM)
         return;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
@@ -7367,14 +7354,14 @@ void editManager::UpdateTriggers(void) {
                     || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE_ALT
                     || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_EAST_EDGE
                     || giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_INNER))
-                cell->m_flags |= EDIT_CELL_SHORE;
+                cell->m_flags |= (MAP_CELL_SHORE);
             else
-                cell->m_flags &= ~EDIT_CELL_SHORE;
+                cell->m_flags &= ~(MAP_CELL_SHORE);
             if (giGroundToTerrain[cell->m_terrainImageIndex] == TERRAIN_WATER
                 && giGroundShape[cell->m_terrainImageIndex] == EDIT_SHAPE_NORTH_EAST_CORNER)
-                cell->m_flags |= EDIT_CELL_SHORE_CORNER;
+                cell->m_flags |= (MAP_CELL_SHORE_CORNER);
             else
-                cell->m_flags &= ~EDIT_CELL_SHORE_CORNER;
+                cell->m_flags &= ~(MAP_CELL_SHORE_CORNER);
         }
     }
     lineType = gLineType;
@@ -8118,7 +8105,7 @@ void editManager::SetCoast(i32 x, i32 y) {
             return;
         case EDIT_SHAPE_NORTH_EDGE:
         case EDIT_SHAPE_NORTH_EDGE_ALT:
-            if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+            if (cell->m_flags & (MAP_CELL_FLIP_VERTICAL)) {
                 if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
                     gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
             } else {
@@ -8127,22 +8114,22 @@ void editManager::SetCoast(i32 x, i32 y) {
             }
             break;
         case EDIT_SHAPE_NORTH_EAST_CORNER:
-            if ((cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL))
-                == (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) {
+            if ((cell->m_flags & (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL))
+                == (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL)) {
                 if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
                     gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
                 if (x > 0 && CanBeCoast(x - 1, y))
                     gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
                 if (y < MAP_HEIGHT - 1 && x > 0 && CanBeCoast(x - 1, y + 1))
                     gMap.CellAt(x - 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
-            } else if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+            } else if (cell->m_flags & (MAP_CELL_FLIP_HORIZONTAL)) {
                 if (y > 0 && CanBeCoast(x, y - 1))
                     gMap.CellAt(x, y - 1)->m_triggerType = MAP_OBJECT_COAST;
                 if (x > 0 && CanBeCoast(x - 1, y))
                     gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
                 if (y > 0 && x > 0 && CanBeCoast(x - 1, y - 1))
                     gMap.CellAt(x - 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
-            } else if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+            } else if (cell->m_flags & (MAP_CELL_FLIP_VERTICAL)) {
                 if (y < MAP_HEIGHT - 1 && CanBeCoast(x, y + 1))
                     gMap.CellAt(x, y + 1)->m_triggerType = MAP_OBJECT_COAST;
                 if (x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y))
@@ -8160,7 +8147,7 @@ void editManager::SetCoast(i32 x, i32 y) {
             break;
         case EDIT_SHAPE_EAST_EDGE:
         case EDIT_SHAPE_EAST_EDGE_ALT:
-            if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+            if (cell->m_flags & (MAP_CELL_FLIP_HORIZONTAL)) {
                 if (x > 0 && CanBeCoast(x - 1, y))
                     gMap.CellAt(x - 1, y)->m_triggerType = MAP_OBJECT_COAST;
             } else {
@@ -8169,14 +8156,14 @@ void editManager::SetCoast(i32 x, i32 y) {
             }
             break;
         case EDIT_SHAPE_NORTH_EAST_INNER:
-            if ((cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL))
-                == (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) {
+            if ((cell->m_flags & (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL))
+                == (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL)) {
                 if (y < MAP_HEIGHT - 1 && x > 0 && CanBeCoast(x - 1, y + 1))
                     gMap.CellAt(x - 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
-            } else if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+            } else if (cell->m_flags & (MAP_CELL_FLIP_HORIZONTAL)) {
                 if (y > 0 && x > 0 && CanBeCoast(x - 1, y - 1))
                     gMap.CellAt(x - 1, y - 1)->m_triggerType = MAP_OBJECT_COAST;
-            } else if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+            } else if (cell->m_flags & (MAP_CELL_FLIP_VERTICAL)) {
                 if (y < MAP_HEIGHT - 1 && x < MAP_WIDTH - 1 && CanBeCoast(x + 1, y + 1))
                     gMap.CellAt(x + 1, y + 1)->m_triggerType = MAP_OBJECT_COAST;
             } else {
@@ -8539,7 +8526,7 @@ borders:
                         || CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) == TERRAIN_BEACH))
                     waterUpRight = true;
             }
-            cell->m_flags &= ~(EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL);
+            cell->m_flags &= ~(MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
             if ((otherUpRight || otherUpLeft || otherDownRight || otherDownLeft || otherUp || otherDown || otherRight
                  || otherLeft)
                 && (waterUpRight || waterUpLeft || waterDownRight || waterDownLeft || waterUp || waterDown
@@ -8549,65 +8536,65 @@ borders:
                 if (waterUp) {
                     if (waterLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     } else if (waterRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
                     } else if (otherRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
                     } else if (otherLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
                     }
                 } else if (waterDown) {
                     if (waterLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                     } else if (waterRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     } else if (otherRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     } else if (otherLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EDGE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     }
                 } else if (waterRight) {
                     if (otherUp) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
                     } else if (otherDown) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
                     }
                 } else if (waterLeft) {
                     if (otherUp) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     } else if (otherDown) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_SIDE_BORDER);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     }
                 } else if (otherUp) {
                     if (otherLeft) {
                         if (waterDownLeft) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                         } else if (waterUpRight) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                         } else {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                            cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                         }
                     } else if (otherRight) {
                         if (waterDownRight)
@@ -8620,7 +8607,7 @@ borders:
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
                     } else if (waterUpLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
                     }
@@ -8628,54 +8615,54 @@ borders:
                     if (otherLeft) {
                         if (waterUpLeft) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                         } else if (waterDownRight) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                         } else {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                         }
                     } else if (otherRight) {
                         if (waterUpRight) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_FAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                         } else if (waterDownLeft) {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_CORNER_SHORE_NEAR);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                         } else {
                             SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                            cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                            cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                         }
                     } else if (waterDownRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     } else if (waterDownLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     }
                 } else if (otherRight) {
                     if (waterUpRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
                     } else if (waterDownRight) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
                     }
                 } else if (otherLeft) {
                     if (waterUpLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     } else if (waterDownLeft) {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE_SHORE);
-                        cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                     } else {
                         SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
-                        cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                        cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                     }
                 }
                 continue;
@@ -8683,7 +8670,7 @@ borders:
             if (waterUp) {
                 if (waterLeft) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                 } else if (waterRight) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
                 } else {
@@ -8692,17 +8679,17 @@ borders:
             } else if (waterDown) {
                 if (waterLeft) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                 } else if (waterRight) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                 } else {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_NORTH_EDGE);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                 }
             } else if (waterLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
-                cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
             } else if (waterRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_EAST_EDGE);
             }
@@ -8711,7 +8698,7 @@ borders:
             if (otherUp) {
                 if (otherLeft) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
                 } else if (otherRight) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
                 } else {
@@ -8720,17 +8707,17 @@ borders:
             } else if (otherDown) {
                 if (otherLeft) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
                 } else if (otherRight) {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_CORNER);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                 } else {
                     SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EDGE);
-                    cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                    cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
                 }
             } else if (otherLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
-                cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
             } else if (otherRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_EAST_EDGE);
             }
@@ -8738,13 +8725,13 @@ borders:
                 continue;
             if (waterUpLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
             } else if (waterDownLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
             } else if (waterDownRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
             } else if (waterUpRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_SHORE_INNER);
             }
@@ -8752,13 +8739,13 @@ borders:
                 continue;
             if (otherUpLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_HORIZONTAL);
             } else if (otherDownLeft) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL;
+                cell->m_flags |= (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL);
             } else if (otherDownRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
-                cell->m_flags |= EDIT_CELL_FLIP_VERTICAL;
+                cell->m_flags |= (MAP_CELL_FLIP_VERTICAL);
             } else if (otherUpRight) {
                 SetCellGround(x, y, thisTerrain, EDIT_SHAPE_NORTH_EAST_INNER);
             }
@@ -8813,8 +8800,9 @@ void editManager::BlendShallowWater(void) {
                 switch (giGroundShape[cell->m_terrainImageIndex] & EDIT_SHAPE_MASK) {
                     case EDIT_SHAPE_NORTH_EAST_CORNER:
                     case EDIT_SHAPE_NORTH_EAST_INNER:
-                        *(shade + x + y * MAP_WIDTH)
-                            = (cell->m_flags & (EDIT_CELL_FLIP_VERTICAL | EDIT_CELL_FLIP_HORIZONTAL)) | shore;
+                        *(shade + x + y * MAP_WIDTH) =
+                            (cell->m_flags & (MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL))
+                            | shore;
                         break;
                     default:
                         *(shade + x + y * MAP_WIDTH) = flat;
@@ -8865,7 +8853,7 @@ void editManager::BlendShallowWater(void) {
                         neighbors.corner[*(shadeCopy + x + (y + 1) * MAP_WIDTH) & twoFlips]++;
                     if (neighbors.any) {
                         if (shape == EDIT_SHAPE_EAST_EDGE || shape == EDIT_SHAPE_EAST_EDGE_ALT) {
-                            if (cell->m_flags & EDIT_CELL_FLIP_HORIZONTAL) {
+                            if (cell->m_flags & (MAP_CELL_FLIP_HORIZONTAL)) {
                                 if (neighbors.corner[crossFlip] || neighbors.corner[twoFlips]) {
                                     if (neighbors.corner[crossFlip] > neighbors.corner[twoFlips])
                                         *(shade + x + y * MAP_WIDTH) = tileUpperLeft;
@@ -8881,7 +8869,7 @@ void editManager::BlendShallowWater(void) {
                                 }
                             }
                         } else if (shape == EDIT_SHAPE_NORTH_EDGE || shape == EDIT_SHAPE_NORTH_EDGE_ALT) {
-                            if (cell->m_flags & EDIT_CELL_FLIP_VERTICAL) {
+                            if (cell->m_flags & (MAP_CELL_FLIP_VERTICAL)) {
                                 if (neighbors.corner[vFlip] || neighbors.corner[twoFlips]) {
                                     if (neighbors.corner[vFlip] > neighbors.corner[twoFlips])
                                         *(shade + x + y * MAP_WIDTH) = tileLowerRight;
@@ -8967,7 +8955,7 @@ typedef enum EditScreenScroll {
 } EditScreenScroll;
 
 
-i32 iLastScrollTime;
+i32 gLastScrollTime;
 
 
 void editManager::ScreenScroll(MapDirection direction, b32 updatePointer) {
@@ -8976,7 +8964,7 @@ void editManager::ScreenScroll(MapDirection direction, b32 updatePointer) {
 
     xOrigin = m_viewX;
     yOrigin = m_viewY;
-    iLastScrollTime = KBTickCount();
+    gLastScrollTime = KBTickCount();
     switch (direction) {
         case MAP_DIRECTION_NORTH:
             yOrigin--;
@@ -9037,13 +9025,13 @@ void editManager::CheckScreenScroll(void) {
     rightSide = LOGICAL_SCREEN_WIDTH - (EDIT_SCROLL_BORDER) - 1;
     topSide = EDIT_SCROLL_BORDER;
     bottomSide = LOGICAL_SCREEN_HEIGHT - (EDIT_SCROLL_BORDER);
-    if (KBTickCount() - iLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
+    if (KBTickCount() - gLastScrollTime > EDIT_SCROLL_TICK_INTERVAL) {
         i32 mouseX;
         i32 mouseY;
         i32 oldMapY;
         i32 oldMapX;
 
-        iLastScrollTime = KBTickCount();
+        gLastScrollTime = KBTickCount();
         oldMapX = m_viewX;
         oldMapY = m_viewY;
         gpMouseManager->MouseCoords(mouseX, mouseY);
@@ -9590,21 +9578,21 @@ typedef enum EditSystemOptions {
 } EditSystemOptions;
 
 
-heroWindow* ESPanel;
-b32 bEPrefsChanged;
+heroWindow* gSystemOptionsWindow;
+b32 gPrefsChanged;
 
 void editManager::SystemOptions(void) {
     tag_message message [[maybe_unused]];
 
-    bEPrefsChanged = false;
-    ESPanel = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
-    if (!ESPanel)
+    gPrefsChanged = false;
+    gSystemOptionsWindow = new heroWindow(EDIT_OPTIONS_X, EDIT_OPTIONS_Y, "espanel.bin");
+    if (!gSystemOptionsWindow)
         MemError();
-    SetWinText(ESPanel, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
+    SetWinText(gSystemOptionsWindow, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
     UpdateEditorSystemOptions(true);
-    gpWindowManager->DoDialog(ESPanel, EditorSystemOptionsHandler, 0);
-    delete ESPanel;
-    if (bEPrefsChanged)
+    gpWindowManager->DoDialog(gSystemOptionsWindow, EditorSystemOptionsHandler, 0);
+    delete gSystemOptionsWindow;
+    if (gPrefsChanged)
         WritePrefs();
 }
 
@@ -9613,32 +9601,32 @@ void UpdateEditorSystemOptions(b32 initialDraw) {
 
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, EDIT_OPTIONS_ANIMATION_BUTTON);
     message.payload.widget.data.value = gConfig.editorScreenAnimation + EDIT_OPTIONS_ANIMATION_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_CYCLING_BUTTON;
     message.payload.widget.data.value = gConfig.editorPaletteCycling + EDIT_OPTIONS_CYCLING_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_BUTTON;
     message.payload.widget.data.value = gConfig.showObjectBoxes + EDIT_OPTIONS_OBJECT_BOXES_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_BUTTON;
     message.payload.widget.data.value
         = CURRENT_GRAPHICS_CONFIG.colorMouseCursor + EDIT_OPTIONS_COLOR_MICE_FRAMES;
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = EDIT_OPTIONS_ANIMATION_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.editorScreenAnimation];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_CYCLING_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.editorPaletteCycling];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_OBJECT_BOXES_TEXT;
     message.payload.widget.data.text = onOffText[gConfig.showObjectBoxes];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     message.payload.widget.id = EDIT_OPTIONS_COLOR_MICE_TEXT;
     message.payload.widget.data.text = onOffText[CURRENT_GRAPHICS_CONFIG.colorMouseCursor];
-    ESPanel->BroadcastMessage(message);
+    gSystemOptionsWindow->BroadcastMessage(message);
     if (!initialDraw)
-        ESPanel->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
+        gSystemOptionsWindow->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
 }
 
 MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
@@ -9683,24 +9671,24 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                         case EDIT_OPTIONS_ANIMATION_BUTTON:
                             gConfig.editorScreenAnimation = 1 - gConfig.editorScreenAnimation;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_CYCLING_BUTTON:
                             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
                             gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_OBJECT_BOXES_BUTTON:
                             gConfig.showObjectBoxes = 1 - gConfig.showObjectBoxes;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             break;
                         case EDIT_OPTIONS_COLOR_MICE_BUTTON:
                             CURRENT_GRAPHICS_CONFIG.colorMouseCursor
                                 = 1 - CURRENT_GRAPHICS_CONFIG.colorMouseCursor;
                             redraw = true;
-                            bEPrefsChanged = true;
+                            gPrefsChanged = true;
                             gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
                             break;
                     }

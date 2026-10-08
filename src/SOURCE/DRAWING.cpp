@@ -675,7 +675,7 @@ void combatManager::DrawBackground(void) {
                 0
             );
         if (m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
-            && (((m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_buildings) & ((TOWN_BUILDING_RAINBOW))))
+            && (((m_combatTowns[(COMBAT_DEFENDER_SIDE)]->m_buildings) & ((TOWN_BUILDING_FORTIFICATIONS))))
                    != 0)
             IconToBitmap(
                 backgroundIcon,

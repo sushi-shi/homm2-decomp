@@ -2616,7 +2616,7 @@ void philAI::ValueOfBuyingCreature(
     if (townPointer->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT) {
         heroPointer = gpGame->GetHero(townPointer->m_occupyingHeroId);
         creatureRV = static_cast<i32>(creatureRV * AI_CREATURE_VISITING_HERO_FACTOR);
-        if (gMonsterDatabase[(creature)].race == heroPointer->m_cursorType)
+        if (gMonsterDatabase[(creature)].race == heroPointer->m_faction)
             creatureRV = static_cast<i32>(creatureRV * AI_CREATURE_SAME_RACE_FACTOR);
         if ((((gMonsterDatabase[(creature)].attributes) & (MONSTER_FLAGS_SHOOTER)))) {
             for (troopSlot = 0; troopSlot < ARMY_GROUP_SLOT_COUNT;
@@ -2842,14 +2842,14 @@ void philAI::ValueOfBuyingHero(
         * (gpCurPlayer->m_aiData.m_attentionWeights.heroValue + 1.0
            - gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase)
     );
-    if (heroPointer->m_cursorType == FACTION_SORCERESS
-        || heroPointer->m_cursorType == FACTION_WARLOCK
-        || heroPointer->m_cursorType == FACTION_WIZARD
-        || heroPointer->m_cursorType == FACTION_NECROMANCER)
+    if (heroPointer->m_faction == FACTION_SORCERESS
+        || heroPointer->m_faction == FACTION_WARLOCK
+        || heroPointer->m_faction == FACTION_WIZARD
+        || heroPointer->m_faction == FACTION_NECROMANCER)
         spellCaster = true;
     else
         spellCaster = false;
-    if (townPointer->m_type == heroPointer->m_cursorType) {
+    if (townPointer->m_type == heroPointer->m_faction) {
         heroRV *= AI_HERO_PURCHASE_SAME_RACE_FACTOR + AI_HERO_PURCHASE_IDENTITY;
     } else if ((townPointer->m_mageGuildLevel >= 2 && spellCaster)
                || (townPointer->m_mageGuildLevel < 2 && !spellCaster)) {

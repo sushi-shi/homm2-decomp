@@ -135,7 +135,8 @@ public:
     class sample* m_loopingSamples[(ADVMGR_ENVIRONMENT_SOUND_COUNT)];
     class sample* m_cursorSamples[ADVMGR_CURSOR_SAMPLE_COUNT];
     b32 m_identifyHeroActive;
-    b32 m_openState;
+
+    b32 m_heroesLogoShown;
     advManager(void);
     virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
@@ -385,7 +386,7 @@ extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern b32 gbInViewWorld;
 extern i32 giLimitUpdMinX;
-extern i32 iLastScrollTime;
+extern i32 gLastScrollTime;
 extern i32 iSandAnim;
 extern i32 giLastHourGlassUpdateTime;
 extern i32 TrigX;

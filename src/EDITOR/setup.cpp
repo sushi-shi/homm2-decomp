@@ -12,15 +12,9 @@
 #include <SOURCE/X_GLOBAL.h>
 
 typedef enum SetupConstant {
-    DIALOG_CANCEL     = DIALOG_BUTTON_1,
     HELP_DIALOG       = NORMAL_DIALOG_QUICK_VIEW,
     DIALOG_RESULT_MAX = 1000
 } SetupConstant;
-
-typedef enum SetupHelpIndex {
-    NO_HELP = -1,
-    FIRST_HELP = 0
-} SetupHelpIndex;
 
 i32 gNewMapSize = MAP_DIMENSION_MEDIUM;
 b32 gNewRandomMap;
@@ -33,10 +27,10 @@ b32 SetupNewMap(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case SETUP_CHOICE_ONE:
+        case CHOICE_ONE:
             gNewRandomMap = false;
             break;
-        case SETUP_CHOICE_TWO:
+        case CHOICE_TWO:
             gNewRandomMap = true;
             break;
         case DIALOG_CANCEL:
@@ -55,16 +49,16 @@ b32 SetupMapSize(void) {
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
-        case SETUP_CHOICE_ONE:
+        case CHOICE_ONE:
             gNewMapSize = MAP_DIMENSION_SMALL;
             break;
-        case SETUP_CHOICE_TWO:
+        case CHOICE_TWO:
             gNewMapSize = MAP_DIMENSION_MEDIUM;
             break;
-        case SETUP_CHOICE_THREE:
+        case CHOICE_THREE:
             gNewMapSize = MAP_DIMENSION_LARGE;
             break;
-        case SETUP_CHOICE_FOUR:
+        case CHOICE_FOUR:
             gNewMapSize = MAP_DIMENSION_XLARGE;
             break;
         case DIALOG_CANCEL:
@@ -80,10 +74,10 @@ MessageDispatchResult SetupNewMapHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case SETUP_CHOICE_ONE:
+            case CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case SETUP_CHOICE_TWO:
+            case CHOICE_TWO:
                 helpIndex = 1;
                 break;
             case DIALOG_CANCEL:
@@ -103,16 +97,16 @@ MessageDispatchResult SetupMapSizeHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case SETUP_CHOICE_ONE:
+            case CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case SETUP_CHOICE_TWO:
+            case CHOICE_TWO:
                 helpIndex = 1;
                 break;
-            case SETUP_CHOICE_THREE:
+            case CHOICE_THREE:
                 helpIndex = 2;
                 break;
-            case SETUP_CHOICE_FOUR:
+            case CHOICE_FOUR:
                 helpIndex = 3;
                 break;
             case DIALOG_CANCEL:
@@ -159,10 +153,10 @@ MessageDispatchResult SetupMainHandler(struct tag_message& message) {
         && IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
         helpIndex = NO_HELP;
         switch (message.payload.widget.id) {
-            case SETUP_CHOICE_ONE:
+            case CHOICE_ONE:
                 helpIndex = 0;
                 break;
-            case SETUP_CHOICE_TWO:
+            case CHOICE_TWO:
                 helpIndex = 1;
                 break;
             case SETUP_CHOICE_QUIT:

@@ -57,8 +57,10 @@ public:
     u32l m_buildableBuildings;
     b32 m_castleDialogActive;
     i32 m_selectedBuilding;
-    heroWindow* m_heroWindow0;
-    heroWindow* m_heroWindow1;
+
+
+    heroWindow* m_buildingWindow;
+    heroWindow* m_childWindow;
     i32 m_splitAmount;
     i32 m_splitMaximum;
     i32 m_recruitState;

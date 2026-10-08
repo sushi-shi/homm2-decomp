@@ -188,7 +188,7 @@ hero::hero(void) {
     m_owner = 0;
     m_x = 0;
     m_y = 0;
-    m_cursorType = FACTION_KNIGHT;
+    m_faction = FACTION_KNIGHT;
     m_portrait = 0;
     m_name[0] = 0;
     heroWin = NULL;
@@ -556,7 +556,7 @@ void hero::Deallocate(i32 updateMap) {
             gpAdvManager->m_cursorActive = false;
             map = &gpGame->m_worldMap;
             DebugCheck();
-            map->GetCell(m_x, m_y)->m_flags &= ~HERO_MAP_CELL_PRESENT;
+            map->GetCell(m_x, m_y)->m_flags &= ~(MAP_CELL_HERO);
         }
         if (oldOwner == giCurPlayer)
             gpAdvManager->m_heroContextLocked = false;
@@ -748,18 +748,18 @@ void hero::CheckLevel(void) {
         SRand(m_randomSeed + nLevel * HERO_LEVEL_RANDOM_SEED_FACTOR);
         randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
         if (randomValue
-            < gHeroSkillBonus[(m_cursorType)][highIndex][(HERO_PRIMARY_ATTACK)]) {
+            < gHeroSkillBonus[(m_faction)][highIndex][(HERO_PRIMARY_ATTACK)]) {
             statBonuses[(HERO_PRIMARY_ATTACK)]++;
         } else {
             randomValue -=
-                gHeroSkillBonus[(m_cursorType)][highIndex][(HERO_PRIMARY_ATTACK)];
-            if (randomValue < gHeroSkillBonus[(m_cursorType)][highIndex]
+                gHeroSkillBonus[(m_faction)][highIndex][(HERO_PRIMARY_ATTACK)];
+            if (randomValue < gHeroSkillBonus[(m_faction)][highIndex]
                                              [(HERO_PRIMARY_DEFENSE)]) {
                 statBonuses[(HERO_PRIMARY_DEFENSE)]++;
             } else {
-                randomValue -= gHeroSkillBonus[(m_cursorType)][highIndex]
+                randomValue -= gHeroSkillBonus[(m_faction)][highIndex]
                                               [(HERO_PRIMARY_DEFENSE)];
-                if (randomValue < gHeroSkillBonus[(m_cursorType)][highIndex]
+                if (randomValue < gHeroSkillBonus[(m_faction)][highIndex]
                                                  [(HERO_PRIMARY_SPELL_POWER)]) {
                     statBonuses[(HERO_PRIMARY_SPELL_POWER)]++;
                 } else {
@@ -778,8 +778,8 @@ void hero::CheckLevel(void) {
 
         for (slot = 0; slot < HERO_SECONDARY_SKILL_CHOICE_COUNT; slot++) {
             choices[slot] = HERO_SKILL_NONE;
-            if (slot == 0 && m_cursorType != FACTION_BARBARIAN
-                && m_cursorType != FACTION_KNIGHT
+            if (slot == 0 && m_faction != FACTION_BARBARIAN
+                && m_faction != FACTION_KNIGHT
                 && m_secondarySkills[(HERO_SKILL_WISDOM)] < HERO_SKILL_LEVEL_EXPERT
                 && nLevel - m_lastWisdomOfferLevel >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                 choices[slot] = HERO_SKILL_WISDOM;
@@ -795,7 +795,7 @@ void hero::CheckLevel(void) {
                          && m_secondarySkills[(skill)] < HERO_SKILL_LEVEL_EXPERT)
                         || (m_secondarySkills[(skill)] == HERO_SKILL_LEVEL_NONE
                             && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
-                    weight -= iGetSSByAlignment[(skill)][(m_cursorType)];
+                    weight -= iGetSSByAlignment[(skill)][(m_faction)];
                     if (weight <= 0) {
                         choices[slot] = skill;
                         goto nextAttempt;
@@ -1055,7 +1055,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 gText,
                 cHeroScreen[(TEXT_DISMISS)],
                 gpHVHero->m_name,
-                gAlignmentNames[(gpHVHero->m_cursorType)]
+                gAlignmentNames[(gpHVHero->m_faction)]
             );
             break;
 
@@ -1508,7 +1508,7 @@ void SetupHeroView(void) {
         bNoDismiss = true;
 
     message.type = MESSAGE_WIDGET;
-    sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[(gpHVHero->m_cursorType)]);
+    sprintf(gText, "%s - %s", gpHVHero->m_name, gAlignmentNames[(gpHVHero->m_faction)]);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = UI_HERO_TITLE;
     message.payload.widget.data.text = gText;
@@ -1739,9 +1739,9 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitAmountSlot [[maybe_unused]] = UI_SPLIT_AMOUNT;
     tag_message message;
 
-    gpTownManager->m_heroWindow1 =
+    gpTownManager->m_childWindow =
         new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, "splitwin.bin");
-    if (gpTownManager->m_heroWindow1 == NULL)
+    if (gpTownManager->m_childWindow == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
@@ -1751,13 +1751,13 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
+    gpTownManager->m_childWindow->BroadcastMessage(message);
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
-    gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
-    delete gpTownManager->m_heroWindow1;
+    gpTownManager->m_childWindow->BroadcastMessage(message);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
         if (gpHVHero->m_army.m_creatureTypes[destinationSlot]
@@ -1894,7 +1894,7 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
         return (ssLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         bonus++;
-    if (m_cursorType == FACTION_NECROMANCER)
+    if (m_faction == FACTION_NECROMANCER)
         bonus += gpGame->CountShrines(m_owner);
     if (bonus > HERO_NECROMANCY_BONUS_MAX)
         bonus = HERO_NECROMANCY_BONUS_MAX;

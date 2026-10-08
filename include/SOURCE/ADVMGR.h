@@ -70,12 +70,6 @@ typedef enum AdventurePointerFrame {
 
 typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
-    ADVMGR_REMOTE_COMMAND_SAVE_GAME        = 1,
-    ADVMGR_REMOTE_COMMAND_POP_NET_BOX      = 11,
-    ADVMGR_REMOTE_COMMAND_COMBAT           = 21,
-    ADVMGR_REMOTE_COMMAND_PLAYER_EXIT      = 31,
-    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
-    ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
 } AdventureRemoteConstant;
 
 typedef enum AdventureBottomViewSharedConstant {

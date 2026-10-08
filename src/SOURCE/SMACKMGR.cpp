@@ -26,7 +26,6 @@
 typedef enum SmackManagerConstant {
     AUDIO_OPEN_FLAGS               = 0xfe000,
     LOW_MEMORY_MOVIE               = 30,
-    INTRO_SECOND_MUSIC             = 19,
     POINTER_ID                     = 40,
     EXPANSION_RECT_COUNT           = 4,
     CAMPAIGN_DIVIDER_X             = LOGICAL_SCREEN_WIDTH / 2,
@@ -322,9 +321,9 @@ void SmackManagerMain(void) {
                 primaryStarted = true;
             }
         } else if (!SmackWait(smk1)) {
-            if (bSmackNum == INTRO_MUSIC && !musicStarted) {
+            if (bSmackNum == DEFEAT_VIDEO && !musicStarted) {
                 musicStarted = true;
-                gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
+                gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_LOST_GAME);
             }
             if ((!primaryStarted || smk1->Frames > 1)
                 && (bSmackNum != CONGRATS || smk1->FrameNum != smk1->Frames - 1)) {

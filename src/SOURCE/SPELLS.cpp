@@ -64,9 +64,7 @@
 namespace {
 
     typedef enum CombatSpellUiConstant {
-        CONTROL_CLOSE = DIALOG_BUTTON_0,
-        HELP_MANA = 6,
-        HELP_DEFAULT = 7
+        CONTROL_CLOSE = DIALOG_BUTTON_0
     } CombatSpellUiConstant;
 
     typedef enum SpellPresentationConstant {
@@ -309,10 +307,10 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
             case VIEW_SPELL_MANA_HUNDREDS_ID:
             case VIEW_SPELL_MANA_TENS_ID:
             case VIEW_SPELL_MANA_ONES_ID:
-                gpCombatManager->CombatMessage(cSpellHelp[HELP_MANA], 1, 0, 0);
+                gpCombatManager->CombatMessage(cSpellHelp[VIEW_SPELL_HELP_SELECT_SPELL], 1, 0, 0);
                 break;
             default:
-                gpCombatManager->CombatMessage(cSpellHelp[HELP_DEFAULT], 1, 0, 0);
+                gpCombatManager->CombatMessage(cSpellHelp[VIEW_SPELL_HELP_COMBAT_DEFAULT], 1, 0, 0);
                 break;
         }
         return MESSAGE_DISPATCH_CONSUME;
