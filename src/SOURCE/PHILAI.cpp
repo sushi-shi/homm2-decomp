@@ -6889,27 +6889,25 @@ VA(0x0048aee1, 0xc5)
 void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
-    gaiHeroStrategicRVOfPos =
-        static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
-    gaiHeroEventStratRVOfPos =
-        static_cast<i16*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH * 2));
-    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
-    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(MAP_HEIGHT * MAP_WIDTH));
+    gaiLiveChanceOfPos = new i16[MAP_HEIGHT * MAP_WIDTH];
+    gaiHeroStrategicRVOfPos = new i16[MAP_HEIGHT * MAP_WIDTH];
+    gaiHeroEventStratRVOfPos = new i16[MAP_HEIGHT * MAP_WIDTH];
+    gaiTurnValueOfMine = new i8[MAP_HEIGHT * MAP_WIDTH];
+    gaiEnemyHeroReachable = new i8[MAP_HEIGHT * MAP_WIDTH];
 }
 
 VA(0x0048afa6, 0xda)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != NULL)
-        H2_FREE(gaiLiveChanceOfPos);
+        delete[] gaiLiveChanceOfPos;
     if (gaiHeroStrategicRVOfPos != NULL)
-        H2_FREE(gaiHeroStrategicRVOfPos);
+        delete[] gaiHeroStrategicRVOfPos;
     if (gaiHeroEventStratRVOfPos != NULL)
-        H2_FREE(gaiHeroEventStratRVOfPos);
+        delete[] gaiHeroEventStratRVOfPos;
     if (gaiTurnValueOfMine != NULL)
-        H2_FREE(gaiTurnValueOfMine);
+        delete[] gaiTurnValueOfMine;
     if (gaiEnemyHeroReachable != NULL)
-        H2_FREE(gaiEnemyHeroReachable);
+        delete[] gaiEnemyHeroReachable;
     gaiLiveChanceOfPos = NULL;
     gaiHeroStrategicRVOfPos = NULL;
     gaiHeroEventStratRVOfPos = NULL;

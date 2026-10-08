@@ -2868,10 +2868,10 @@ void ClearMapExtra(void) {
             H2_FREE(ppMapExtra[i]);
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra);
+        delete[] ppMapExtra;
     ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
-        H2_FREE(pwSizeOfMapExtra);
+        delete[] pwSizeOfMapExtra;
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
 }

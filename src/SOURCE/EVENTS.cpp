@@ -8108,6 +8108,7 @@ void advManager::ReceiveHeroTownData(
         gpGame->m_players[secondOwner].m_resources[IDX(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
+    // Raw storage, not `new armyGroup`/`new town`: their constructors would run before the memcpy.
     *firstArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
     *secondArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
@@ -8134,6 +8135,7 @@ void advManager::ReceiveHeroTownData(
     gotFirstHeroSecond = true;
     gotSecondHeroFirst = true;
     gotSecondHeroSecond = true;
+    // Raw storage, not `new hero`: its constructor would run before the packets fill it.
     if (firstHeroPresent) {
         *firstHero = static_cast<hero*>(H2_ALLOC(sizeof(hero)));
         gotFirstHeroFirst = false;

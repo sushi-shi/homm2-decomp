@@ -601,8 +601,8 @@ void editManager::RemoveSmallRegions(void) {
             }
         }
     }
-    delete done;
-    delete inRegion;
+    delete[] done;
+    delete[] inRegion;
     gLandCellCount = 0;
     for (countX = 0; countX < MAP_WIDTH; countX++)
         for (countY = 0; countY < MAP_HEIGHT; countY++)
@@ -1345,9 +1345,9 @@ void editManager::PlaceTowns(void) {
             }
         }
     }
-    delete regionGrid;
+    delete[] regionGrid;
     for (slot = 0; slot < GAME_PLAYER_COUNT; slot++)
-        delete reachedGrids[slot];
+        delete[] reachedGrids[slot];
 }
 #undef roadMask
 #undef destY

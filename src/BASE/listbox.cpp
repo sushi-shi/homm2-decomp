@@ -53,7 +53,7 @@ listBoxWidget::~listBoxWidget() {
 #line 25
         H2_FREE(m_items[i]);
 #line 27
-    H2_FREE(m_items);
+    delete[] m_items;
     gbSendMouseMoveMessages = false;
 }
 
@@ -142,11 +142,11 @@ void listBoxWidget::DeleteItem(i32 index) {
         if (m_itemCount == 1) {
 #line 156
             H2_FREE(m_items[0]);
-            H2_FREE(m_items);
+            delete[] m_items;
             m_items = NULL;
         } else {
 #line 162
-            char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
+            char** newItems = new char*[m_itemCount - 1];
             memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
                 memcpy(
@@ -156,7 +156,7 @@ void listBoxWidget::DeleteItem(i32 index) {
                 );
             if (m_items != NULL)
 #line 169
-                H2_FREE(m_items);
+                delete[] m_items;
             m_items = newItems;
         }
         m_itemCount--;
@@ -209,7 +209,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                         break;
                     text = message.payload.widget.data.text;
 #line 233
-                    newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
+                    newItems = new char*[m_itemCount + 1];
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
 #line 236
@@ -217,7 +217,7 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                     m_itemCount++;
                     if (m_items != NULL)
 #line 240
-                        H2_FREE(m_items);
+                        delete[] m_items;
                     m_items = newItems;
                     if (m_itemCount > m_maxVisibleItems) {
                         m_scrollRange = m_itemCount - m_maxVisibleItems;

@@ -1568,12 +1568,8 @@ void game::LoadGame(H2_CONST char* filename, i32 originalDataOnly, i32) {
     read(fileDescriptor, chunkTag, sizeof(i32));
     READ_FILE_VALUE(fileDescriptor, iMaxMapExtra);
     read(fileDescriptor, chunkTag, sizeof(i32));
-    ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
-    );
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*pwSizeOfMapExtra))
-    );
+    ppMapExtra = new void*[iMaxMapExtra];
+    pwSizeOfMapExtra = new i16[iMaxMapExtra];
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (index = 1; index < iMaxMapExtra; index++) {
@@ -3003,12 +2999,8 @@ i32 game::LoadMap(char* filename) {
     );
     m_timeEvents.count = m_mapHeader.timeEventCount;
     READ_FILE_VALUE(handle, iMaxMapExtra);
-    ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
-    );
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]))
-    );
+    ppMapExtra = new void*[iMaxMapExtra];
+    pwSizeOfMapExtra = new i16[iMaxMapExtra];
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i = 1; i < iMaxMapExtra; i++) {
@@ -6881,7 +6873,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     fileSize = FileSize(filename);
     LogInt("PostDiffFileSize", fileSize);
 
-    header = static_cast<RemoteSaveBuffer*>(H2_ALLOC(REMOTE_SAVE_BUFFER_SIZE));
+    header = new RemoteSaveBuffer;
     if (gbUseRegularCompression)
         transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
@@ -6999,7 +6991,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
 
 transmitCleanup:
     if (header)
-        H2_FREE(header);
+        delete header;
     if (transmitData)
         H2_FREE(transmitData);
     if (fileData && fileData != transmitData)

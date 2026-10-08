@@ -44,7 +44,7 @@ bitmap::bitmap(u32l id)
 VA(0x004c5ee0, 0x46)
 bitmap::~bitmap() {
     if (m_pixels != NULL)
-        delete m_pixels;
+        delete[] m_pixels;
     m_pixels = NULL;
 }
 

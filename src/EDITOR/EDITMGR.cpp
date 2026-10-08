@@ -7943,7 +7943,7 @@ b32 PickMap(FileRequesterMode mode) {
 VA(0x0040990c, 0x4d)
 void editManager::ClearErrors(void) {
     for (; gEditErrorCount > 0; gEditErrorCount--)
-        delete gEditErrors[gEditErrorCount - 1];
+        delete[] gEditErrors[gEditErrorCount - 1];
     gEditErrorCount = 0;
 }
 
