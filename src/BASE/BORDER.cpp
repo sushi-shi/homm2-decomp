@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/border.h>
@@ -12,7 +12,6 @@
 #include <SOURCE/KB.h>
 
 typedef enum BorderConstant {
-    RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff
 } BorderConstant;
 
@@ -55,7 +54,7 @@ void border::Read(void) {
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
     if (m_kind == WIDGET_KIND_BITMAP) {
-        char bitmapName[RESOURCE_NAME_CAPACITY];
+        char bitmapName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
         gpResourceManager->Read13(bitmapName);
         gpResourceManager->SavePosition();
         m_backgroundBitmap = gpResourceManager->GetBitmap(bitmapName);
@@ -63,7 +62,7 @@ void border::Read(void) {
         return;
     }
     if (m_kind == WIDGET_KIND_ICON) {
-        char iconName[RESOURCE_NAME_CAPACITY];
+        char iconName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
         gpResourceManager->Read13(iconName);
         gpResourceManager->SavePosition();
         m_backgroundIcon = gpResourceManager->GetIcon(iconName);

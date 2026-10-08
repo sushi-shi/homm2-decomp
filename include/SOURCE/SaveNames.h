@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_SAVE_NAMES_H
-#define HOMM2_SOURCE_SAVE_NAMES_H
+#ifndef HOMM2_SOURCE_SAVENAMES_H
+#define HOMM2_SOURCE_SAVENAMES_H
 
 #include <array>
 #include <cstddef>

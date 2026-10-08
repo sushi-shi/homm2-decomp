@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/MapRecords.h>
 #include <BASE/Utf8.h>
 #include <BASE/bitmap.h>
@@ -10,18 +10,16 @@
 #include <BASE/soundManager.h>
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/FINDPATH.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/town.h>
@@ -44,7 +42,7 @@ typedef enum CursorHeroShadowFrame {
     SPRITE_UP_SHADOW_STEP_4 = 0x39,
     SPRITE_UP_SHADOW_STEP_3 = 0x3a
 } CursorHeroShadowFrame;
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum CursorPrivateConstant {
     SLOW_CURSOR_CYCLE_START  = 2,
@@ -53,8 +51,6 @@ typedef enum CursorPrivateConstant {
     DIRECTION_HALF_COUNT     = H2EnumIndex(MAP_DIRECTION_COUNT) / 2,
     TURN_FRAME_MULTIPLIER    = 2,
     MOVE_TILE_HALF_COUNT     = 2,
-    GROUP_ALLOC_LINE_OFFSET  = 7,
-    GROUP_FREE_LINE_OFFSET   = 25
 } CursorPrivateConstant;
 
 #define SLOW_TURN_DELAY_SCALE 1.5
@@ -80,7 +76,7 @@ void advManager::StartCursor(MapDirection direction) {
     m_cursorMapY += directionY;
     cellX = m_mapOriginX + m_cursorMapX;
     cellY = m_mapOriginY + m_cursorMapY;
-    m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+    m_mapData->GetCell(cellX, cellY)->m_flags |= H2EnumIndex(MAP_CELL_HERO);
 }
 
 void advManager::StopCursor(i32 stopSound) {
@@ -96,7 +92,7 @@ void advManager::StopCursor(i32 stopSound) {
             m_mapOriginX + m_previousCursorMapX,
             m_mapOriginY + m_previousCursorMapY
         )
-            ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+            ->m_flags &= ~H2EnumIndex(MAP_CELL_HERO);
         m_previousCursorMapY = -1;
         m_previousCursorMapX = -1;
     }
@@ -117,8 +113,8 @@ void advManager::DrawCursor(void) {
         m_cursorTurning = S1cursorTurning;
     }
 
-    i32 drawX = m_updateMinX + CURSOR_DRAW_X;
-    drawY = m_updateMinY + CURSOR_DRAW_Y;
+    i32 drawX = m_scrollOffsetX + CURSOR_DRAW_X;
+    drawY = m_scrollOffsetY + CURSOR_DRAW_Y;
     if (m_cursorType == HERO_TYPE_BOAT)
         drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
 
@@ -132,7 +128,7 @@ void advManager::DrawCursor(void) {
                     m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
                 )
                     ->m_flags
-                & CURSOR_CELL_UNCOVERED_FLAG
+                & H2EnumIndex(MAP_CELL_SHORE)
             )) {
             DRAW_FLIPPED_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
@@ -168,7 +164,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
+                            + m_animationFrame % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_FLIPPED_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -177,7 +173,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     } else {
         drawFrame = m_cursorFrame + m_cursorFrameCount;
@@ -188,7 +184,7 @@ void advManager::DrawCursor(void) {
                     m_mapOriginY + CURSOR_MAP_DRAW_OFFSET
                 )
                     ->m_flags
-                & CURSOR_CELL_UNCOVERED_FLAG
+                & H2EnumIndex(MAP_CELL_SHORE)
             )) {
             DRAW_ADVENTURE_ICON(
                 m_heroIcons[CURSOR_BOAT_WAKE_TYPE],
@@ -224,7 +220,7 @@ void advManager::DrawCursor(void) {
         } else {
             if (m_cursorCycle == 0) {
                 drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK)
-                            + m_updateMaxY % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
+                            + m_animationFrame % H2EnumIndex(MAP_DIRECTION_COUNT) + CURSOR_FLAG_FRAME_BASE;
             }
             DRAW_ADVENTURE_ICON(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -233,7 +229,7 @@ void advManager::DrawCursor(void) {
                 drawFrame,
                 ICON_DRAW_CLIP
             );
-            ++m_updatePending;
+            ++m_flagFrameCounter;
         }
     }
 
@@ -297,8 +293,8 @@ void advManager::DrawCursorShadow(void) {
         m_cursorTurning = S1cursorTurning;
     }
 
-    i32 drawX = m_updateMinX + CURSOR_DRAW_X;
-    drawY = m_updateMinY + CURSOR_DRAW_Y;
+    i32 drawX = m_scrollOffsetX + CURSOR_DRAW_X;
+    drawY = m_scrollOffsetY + CURSOR_DRAW_Y;
     if (m_cursorType == HERO_TYPE_BOAT)
         drawY -= CURSOR_DRAW_Y - CURSOR_BOAT_DRAW_Y;
 
@@ -362,11 +358,11 @@ i32 advManager::GetCursorBaseFrame(MapDirection direction) {
     if (direction > MAP_DIRECTION_SOUTH) {
         switch (direction) {
             case MAP_DIRECTION_SOUTH_WEST:
-                return CURSOR_BOAT_BASE_FRAME_5;
+                return CURSOR_SOUTH_WEST_BASE_FRAME;
             case MAP_DIRECTION_WEST:
-                return CURSOR_BOAT_BASE_FRAME_6;
+                return CURSOR_WEST_BASE_FRAME;
             case MAP_DIRECTION_NORTH_WEST:
-                return CURSOR_BOAT_BASE_FRAME_7;
+                return CURSOR_NORTH_WEST_BASE_FRAME;
             default:
                 return 0;
         }
@@ -538,7 +534,7 @@ mapCell* advManager::MoveHero(
         boat->savedTriggerType = boatCell->m_triggerType;
         boat->savedEventData = static_cast<u8>(boatCell->m_objectMetadata);
         boat->direction = m_cursorDirection;
-        boat->heroId |= BOAT_OCCUPIED_FLAG;
+        boat->heroId |= BOAT_VACATED_FLAG;
         boatCell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT);
         boatCell->m_objectMetadata = static_cast<u16>(step);
         boat->x = static_cast<i8>(movingHero->m_x);
@@ -559,17 +555,17 @@ mapCell* advManager::MoveHero(
                 m_cursorActive = false;
                 fizzleSample = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
-                    CURSOR_FIZZLE_X,
-                    CURSOR_FIZZLE_Y,
-                    CURSOR_FIZZLE_WIDTH,
-                    CURSOR_FIZZLE_HEIGHT
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE
                 );
                 CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
                 gpWindowManager->FizzleForward(
-                    CURSOR_FIZZLE_X,
-                    CURSOR_FIZZLE_Y,
-                    CURSOR_FIZZLE_WIDTH,
-                    CURSOR_FIZZLE_HEIGHT,
+                    ADVENTURE_HERO_FIZZLE_LEFT,
+                    ADVENTURE_HERO_FIZZLE_TOP,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
+                    ADVENTURE_HERO_FIZZLE_SIZE,
                     gbThisNetHumanPlayer[giCurPlayer] ? CURSOR_INVALID_POSITION
                                                       : CURSOR_FIZZLE_COMPUTER_TYPE,
                     NULL,
@@ -626,15 +622,15 @@ mapCell* advManager::MoveHero(
         goto movementDone;
 
     if (movingHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-        town* occupiedTown = gpGame->GetTown(movingHero->m_occupiedTown);
-        occupiedTown->m_occupyingHeroId = -1;
+        town* occupiedTown = gpGame->GetTown(movingHero->m_locationMetadata);
+        occupiedTown->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     }
-    if (m_visibilityMapValid) {
-        *(m_visibilityMap + (movingHero->m_x + directionX)
+    if (m_routeShown) {
+        *(m_routeMap + (movingHero->m_x + directionX)
           + (movingHero->m_y + directionY) * MAP_WIDTH) = 0;
     }
-    m_updateMinY = 0;
-    m_updateMinX = 0;
+    m_scrollOffsetY = 0;
+    m_scrollOffsetX = 0;
     gpGame->SetVisibility(
         m_mapOriginX + directionX + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + directionY + CURSOR_MAP_DRAW_OFFSET,
@@ -685,16 +681,16 @@ mapCell* advManager::MoveHero(
                 MoveOrigin(directionX, directionY);
                 movingHero->m_x += directionX;
                 movingHero->m_y += directionY;
-                m_updateMinX = startVals[directionX + 1];
-                m_updateMinY = startVals[directionY + 1];
+                m_scrollOffsetX = startVals[directionX + 1];
+                m_scrollOffsetY = startVals[directionY + 1];
             }
             tick = platform::Ticks();
             if (step + 1 == halfSteps * MOVE_TILE_HALF_COUNT) {
-                m_updateMinX = 0;
-                m_updateMinY = 0;
+                m_scrollOffsetX = 0;
+                m_scrollOffsetY = 0;
             } else {
-                m_updateMinX += directionX * pixelsPerStep;
-                m_updateMinY += directionY * pixelsPerStep;
+                m_scrollOffsetX += directionX * pixelsPerStep;
+                m_scrollOffsetY += directionY * pixelsPerStep;
             }
             if (ComboDraw(0)) {
                 giLimitUpdMinX = -1;
@@ -733,8 +729,8 @@ mapCell* advManager::MoveHero(
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
-    m_updateMinY = 0;
-    m_updateMinX = 0;
+    m_scrollOffsetY = 0;
+    m_scrollOffsetX = 0;
 
     cursorCell = GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY);
     *eventX = m_mapOriginX + m_cursorMapX;
@@ -745,7 +741,7 @@ mapCell* advManager::MoveHero(
         switch (cursorCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_NOTHING_SPECIAL:
             case MAP_OBJECT_MOSSY_ROCK:
-            case MAP_OBJECT_REEFS:
+            case MAP_OBJECT_STREAM:
             case MAP_OBJECT_TREES:
             case MAP_OBJECT_MOUNTAINS:
             case MAP_OBJECT_VOLCANO:
@@ -761,8 +757,8 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_DUNE:
             case MAP_OBJECT_LAVA_POOL:
             case MAP_OBJECT_SHRUB:
-            case MAP_OBJECT_ARENA:
-            case MAP_OBJECT_BARROW_MOUNDS:
+            case MAP_OBJECT_HOLE:
+            case MAP_OBJECT_OUTCROPPING:
                 eventCell = NULL;
                 break;
             default:
@@ -796,14 +792,14 @@ adjacentDone:
 
     if (mapEvent) {
         if (processEvent) {
-            if (mapEvent->applyToComputer) {
+            if (mapEvent->appliesToComputer) {
                 for (step = 0; step < H2EnumIndex(RES_COUNT); ++step) {
                     gpGame->m_players[giCurPlayer].m_resources[step] +=
                         mapEvent->resources[step];
                     if (gpGame->m_players[giCurPlayer].m_resources[step] < 0)
                         gpGame->m_players[giCurPlayer].m_resources[step] = 0;
                 }
-                if (mapEvent->artifact != -1
+                if (mapEvent->artifact != MAP_EVENT_REWARD_NONE
                     && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
                     GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (mapEvent->cancelAfterVisit)
@@ -831,7 +827,7 @@ adjacentDone:
                     primaryAmount = eventAmount;
                 }
             }
-            if (mapEvent->artifact != -1
+            if (mapEvent->artifact != MAP_EVENT_REWARD_NONE
                 && movingHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
                 GiveArtifact(movingHero, ArtifactType(mapEvent->artifact), true);
                 if (primaryType != -1) {
@@ -897,7 +893,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
         if (removeMonster) {
             EraseObj(monsterCell, monsterX, monsterY);
             if (gbThisNetHumanPlayer[giCurPlayer])
-                FizzleCenter(EVENT_FIZZLE_HERO_LOSS);
+                FizzleCenter(EVENT_FIZZLE_KILL);
         }
         *adjacentMonster = 1;
     }
@@ -948,8 +944,8 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
     i32 directionX;
     i32 centerX;
     i32 directionY;
-    mapCell* southNeighborCell;
-    mapCell* northNeighborCell;
+    mapCell* belowCurrentCell;
+    mapCell* belowDestinationCell;
     i32 centerY;
 
     directionX = normalDirTable[H2EnumIndex(direction)].x;
@@ -989,15 +985,15 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
         return 0;
     }
 
-    northDirection = (1 << H2EnumIndex(direction)) & CURSOR_NORTH_DIRECTION_MASK;
-    southDirection = (1 << H2EnumIndex(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
+    northDirection = (1 << H2EnumIndex(direction)) & MAP_DIRECTIONS_NORTHWARD;
+    southDirection = (1 << H2EnumIndex(direction)) & MAP_DIRECTIONS_SOUTHWARD;
     if (northDirection) {
         if (CELL_HAS_NON_SHADOW_OBJECT(currentCell)
             && currentCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
             return 0;
         if (destinationCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
-            northNeighborCell = m_mapData->GetCell(destinationCellX, destinationCellY + 1);
-            if (CELL_HAS_NON_SHADOW_OBJECT(northNeighborCell))
+            belowDestinationCell = m_mapData->GetCell(destinationCellX, destinationCellY + 1);
+            if (CELL_HAS_NON_SHADOW_OBJECT(belowDestinationCell))
                 return 0;
         }
     }
@@ -1008,10 +1004,10 @@ i32 advManager::ValidMove(MapDirection direction, i32 eventMode) {
                 || !StopOnTrigger(destinationCell)))
             return 0;
         if (currentCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
-            southNeighborCell =
+            belowCurrentCell =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
-            if (CELL_HAS_NON_SHADOW_OBJECT(southNeighborCell)
-                && !(southNeighborCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
+            if (CELL_HAS_NON_SHADOW_OBJECT(belowCurrentCell)
+                && !(belowCurrentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
                 return 0;
         }
     }
@@ -1032,21 +1028,21 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     directionY = oldOriginY - m_mapOriginY;
     if (directionX != 0 || directionY != 0) {
         m_mapData->GetCell(oldOriginX + m_cursorMapX, oldOriginY + m_cursorMapY)->m_flags
-            &= ~CURSOR_MAP_VISIBLE_FLAG;
+            &= ~H2EnumIndex(MAP_CELL_HERO);
         m_cursorMapX += directionX;
         m_cursorMapY += directionY;
         cellX = m_mapOriginX + m_cursorMapX;
         cellY = m_mapOriginY + m_cursorMapY;
-        m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+        m_mapData->GetCell(cellX, cellY)->m_flags |= H2EnumIndex(MAP_CELL_HERO);
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
             m_mapData
                 ->GetCell(oldOriginX + m_previousCursorMapX, oldOriginY + m_previousCursorMapY)
-                ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
+                ->m_flags &= ~H2EnumIndex(MAP_CELL_HERO);
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
             cellX = m_mapOriginX + m_previousCursorMapX;
             cellY = m_mapOriginY + m_previousCursorMapY;
-            m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
+            m_mapData->GetCell(cellX, cellY)->m_flags |= H2EnumIndex(MAP_CELL_HERO);
         }
     }
     m_forceCompleteDraw = true;
@@ -1179,7 +1175,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero->m_direction = MAP_DIRECTION_EAST;
             mapHero->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
-            mapHero->m_occupiedTown =
+            mapHero->m_locationMetadata =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero->m_owner = change.player;
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =
@@ -1366,7 +1362,7 @@ void SendMapChange(
         reinterpret_cast<char*>(sMapChangeLastFew),
         CURSOR_REMOTE_PLAYER_ALL,
         sizeof(sMapChangeLastFew),
-        CURSOR_REMOTE_PACKET_TYPE,
+        REMOTE_COMMAND_GROUP_MAP_CHANGE,
         0
     );
 }

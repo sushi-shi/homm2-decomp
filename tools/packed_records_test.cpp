@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <new>
 #include <string>
@@ -39,6 +40,9 @@ bool Expect(bool valid, const char* description) {
 bool MapRoundTrip(game& state) {
     fullMap& map = *new (&state.m_worldMap) fullMap;
     map.Init(MAP_DIMENSION_SMALL, MAP_DIMENSION_SMALL);
+    // Init leaves the cells as new[] gives them; a loaded or generated map
+    // fills every one before it is written.
+    std::memset(map.Cells(), 0, sizeof(mapCell) * map.width * map.height);
     map.GetCell(3, 4)->m_objectIndex = 7;
     const i32 written = platform::FileOpen("map.bin", platform::FileMode::Write);
     if (written == -1)

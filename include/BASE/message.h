@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_MESSAGE_H
 #define HOMM2_BASE_MESSAGE_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 struct tag_message;
 
@@ -105,11 +106,11 @@ struct tag_messageKeyboardPayload {
         i32 keyCode;
         u8 keyByte;
     };
-    i32 unknown0x08;
+    i32 unused08;
     MessageModifier modifiers;
-    i32 unknown0x10;
-    i32 unknown0x14;
-    i32 unknown0x18;
+    i32 unused10;
+    i32 unused14;
+    i32 unused18;
 };
 
 struct tag_messageMousePayload {
@@ -118,16 +119,16 @@ struct tag_messageMousePayload {
     MessageModifier modifiers;
     i32 screenX;
     i32 screenY;
-    i32 unknown0x18;
+    i32 unused18;
 };
 
 struct tag_messageHoverPayload {
     i32 x;
     i32 id;
-    i32 subId;
+    i32 modifiers;
     i32 screenX;
     i32 screenY;
-    i32 unknown0x18;
+    i32 unused18;
 };
 
 union tag_messageWidgetData {
@@ -156,20 +157,20 @@ using enum ExecutiveCommand;
 
 struct tag_messageExecutivePayload {
     ExecutiveCommand command;
-    i32 unknown0x08;
-    i32 unknown0x0c;
-    i32 unknown0x10;
-    i32 unknown0x14;
+    i32 unused08;
+    i32 unused0c;
+    i32 unused10;
+    i32 unused14;
     i32 result;
 };
 
-struct tag_messageUnknownPayload {
-    i32 unknown0x04;
-    i32 unknown0x08;
-    i32 unknown0x0c;
-    i32 unknown0x10;
-    i32 unknown0x14;
-    i32 unknown0x18;
+struct tag_messageUnusedPayload {
+    i32 unused04;
+    i32 unused08;
+    i32 unused0c;
+    i32 unused10;
+    i32 unused14;
+    i32 unused18;
 };
 
 union tag_messagePayload {
@@ -178,7 +179,7 @@ union tag_messagePayload {
     tag_messageHoverPayload hover;
     tag_messageWidgetPayload widget;
     tag_messageExecutivePayload executive;
-    tag_messageUnknownPayload unknown;
+    tag_messageUnusedPayload unused;
 };
 
 struct tag_message {

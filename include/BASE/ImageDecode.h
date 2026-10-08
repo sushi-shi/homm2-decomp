@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_IMAGEDECODE_H
 #define HOMM2_BASE_IMAGEDECODE_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/IconDraw.h>
 #include <span>
 

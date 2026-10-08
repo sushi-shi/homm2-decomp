@@ -1,7 +1,8 @@
-#ifndef HOMM2_SOURCE_KB_TYPES_H
-#define HOMM2_SOURCE_KB_TYPES_H
+#ifndef HOMM2_SOURCE_KBTYPES_H
+#define HOMM2_SOURCE_KBTYPES_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <EnumCode.h>
 #include <SOURCE/combatTypes.h>
 
@@ -95,7 +96,7 @@ enum class MineType : i8 {
     MINE_TYPE_GEMS          = 5,
     MINE_TYPE_GOLD          = 6,
     MINE_TYPE_LIGHTHOUSE    = 100,
-    MINE_TYPE_ALCHEMIST_LAB = 101
+    MINE_TYPE_DRAGON_CITY = 101
 };
 using enum MineType;
 
@@ -287,9 +288,9 @@ enum class ArtifactType : i8 {
     ARTIFACT_BLACK_PEARL           = 80,
     ARTIFACT_MAGIC_BOOK            = 81,
     ARTIFACT_EDITOR_ANY_ULTIMATE   = 82,
-    ARTIFACT_EDITOR_UNUSED_84      = 83,
-    ARTIFACT_EDITOR_UNUSED_85      = 84,
-    ARTIFACT_EDITOR_UNUSED_86      = 85,
+    ARTIFACT_EDITOR_UNUSED_83      = 83,
+    ARTIFACT_EDITOR_UNUSED_84      = 84,
+    ARTIFACT_EDITOR_UNUSED_85      = 85,
     ARTIFACT_SPELL_SCROLL          = 86,
     ARTIFACT_ARM_OF_MARTYR         = 87,
     ARTIFACT_BREASTPLATE_ANDURAN   = 88,
@@ -418,7 +419,7 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_DWARF_COTTAGE              = 15,
     MAP_OBJECT_PEASANT_HUT                = 16,
     MAP_OBJECT_LOG_CABIN                  = 17,
-    MAP_OBJECT_ALCHEMIST_TOWER            = 18,
+    MAP_OBJECT_ROAD            = 18,
     MAP_OBJECT_MAP_EVENT                  = 19,
     MAP_OBJECT_DRAGON_CITY                = 20,
     MAP_OBJECT_LIGHTHOUSE                 = 21,
@@ -438,12 +439,11 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_CASTLE                     = 35,
     MAP_OBJECT_STONE_LITHS                = 36,
     MAP_OBJECT_WAGON_CAMP                 = 37,
-    MAP_OBJECT_HUT_OF_MAGI                = 38,
+    MAP_OBJECT_WELL                = 38,
     MAP_OBJECT_WHIRLPOOL                  = 39,
     MAP_OBJECT_WINDMILL                   = 40,
     MAP_OBJECT_ARTIFACT                   = 41,
-    MAP_OBJECT_MERMAID                    = 42,
-    MAP_OBJECT_HERO_INTERACTION           = H2EnumIndex(MAP_OBJECT_MERMAID),
+    MAP_OBJECT_HERO_INTERACTION           = 42,
     MAP_OBJECT_BOAT                       = 43,
     MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT   = 44,
     MAP_OBJECT_RANDOM_ARTIFACT            = 45,
@@ -451,7 +451,7 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_RANDOM_MONSTER             = 47,
     MAP_OBJECT_RANDOM_TOWN                = 48,
     MAP_OBJECT_RANDOM_CASTLE              = 49,
-    MAP_OBJECT_EYE_OF_MAGI                = 50,
+    MAP_OBJECT_RANDOM_MINE                = 50,
     MAP_OBJECT_RANDOM_MONSTER_WEAK        = 51,
     MAP_OBJECT_RANDOM_MONSTER_MEDIUM      = 52,
     MAP_OBJECT_RANDOM_MONSTER_STRONG      = 53,
@@ -466,7 +466,7 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_FORT                       = 62,
     MAP_OBJECT_TRADING_POST               = 63,
     MAP_OBJECT_ABANDONED_MINE             = 64,
-    MAP_OBJECT_SIRENS                     = 65,
+    MAP_OBJECT_DWARF_CABIN                     = 65,
     MAP_OBJECT_STANDING_STONES            = 66,
     MAP_OBJECT_IDOL                       = 67,
     MAP_OBJECT_TREE_OF_KNOWLEDGE          = 68,
@@ -499,7 +499,7 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_MAGIC_GARDEN               = 95,
     MAP_OBJECT_OBSERVATION_TOWER          = 96,
     MAP_OBJECT_FREEMANS_FOUNDRY           = 97,
-    MAP_OBJECT_REEFS                      = 98,
+    MAP_OBJECT_STREAM                      = 98,
     MAP_OBJECT_TREES                      = 99,
     MAP_OBJECT_MOUNTAINS                  = 100,
     MAP_OBJECT_VOLCANO                    = 101,
@@ -515,8 +515,8 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_DUNE                       = 111,
     MAP_OBJECT_LAVA_POOL                  = 112,
     MAP_OBJECT_SHRUB                      = 113,
-    MAP_OBJECT_ARENA                      = 114,
-    MAP_OBJECT_BARROW_MOUNDS              = 115,
+    MAP_OBJECT_HOLE                      = 114,
+    MAP_OBJECT_OUTCROPPING              = 115,
     MAP_OBJECT_RANDOM_TREASURE_ARTIFACT   = 116,
     MAP_OBJECT_RANDOM_MINOR_ARTIFACT      = 117,
     MAP_OBJECT_RANDOM_MAJOR_ARTIFACT      = 118,
@@ -524,9 +524,15 @@ enum class MapObjectType : i16 {
     MAP_OBJECT_TRAVELER_TENT              = 120,
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
-    MAP_OBJECT_JAIL                       = 123
+    MAP_OBJECT_JAIL                       = 123,
+    MAP_OBJECT_COUNT                      = 124
 };
 using enum MapObjectType;
+
+
+typedef enum MapItemSpriteConstant {
+    MAP_ITEM_SPRITE_FRAME_COUNT = 2
+} MapItemSpriteConstant;
 
 class MapTriggerCode {
 public:
@@ -632,7 +638,15 @@ template <typename Storage>
 inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator|=(
     H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerActionFlag
 ) {
-    trigger = MapTriggerCode(static_cast<i32>(trigger) | 0x80);
+    trigger = MapTriggerCode(static_cast<i32>(trigger) | MAP_TRIGGER_ACTION_FLAG);
+    return trigger;
+}
+
+template <typename Storage>
+inline H2OpenCodeStorage<MapTriggerCode, Storage>& operator^=(
+    H2OpenCodeStorage<MapTriggerCode, Storage>& trigger, MapTriggerActionFlag
+) {
+    trigger = MapTriggerCode(static_cast<i32>(trigger) ^ 0x80);
     return trigger;
 }
 
@@ -683,7 +697,6 @@ enum class BuildingSlotType : i8 {
     TOWN_OBJECT_NONE                            = BUILDING_SLOT_NONE,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
     TOWN_OBJECT_MAGE_GUILD                      = BUILDING_SLOT_MAGE_GUILD,
-    TOWN_OBJECT_PRIMARY_ANIMATION               = BUILDING_SLOT_MAGE_GUILD,
     BUILDING_SLOT_SPECIAL_ONE                   = 1,
     BUILDING_SLOT_THIEVES_GUILD                 = BUILDING_SLOT_SPECIAL_ONE,
     TOWN_OBJECT_THIEVES_GUILD                   = BUILDING_SLOT_SPECIAL_ONE,
@@ -695,14 +708,13 @@ enum class BuildingSlotType : i8 {
     BUILDING_SLOT_SPECIAL_FOUR                  = 4,
     BUILDING_SLOT_WELL                          = BUILDING_SLOT_SPECIAL_FOUR,
     TOWN_OBJECT_WELL                            = BUILDING_SLOT_SPECIAL_FOUR,
-    BUILDING_SLOT_UPGRADE_CASTLE                = 5,
-    TOWN_OBJECT_TENT                            = BUILDING_SLOT_UPGRADE_CASTLE,
-    TOWN_OBJECT_CASTLE_UPGRADE                  = BUILDING_SLOT_UPGRADE_CASTLE,
+    BUILDING_SLOT_TENT                = 5,
+    TOWN_OBJECT_TENT                            = BUILDING_SLOT_TENT,
+    TOWN_OBJECT_CASTLE_UPGRADE                  = BUILDING_SLOT_TENT,
     BUILDING_SLOT_CASTLE                        = 6,
     TOWN_OBJECT_CASTLE                          = BUILDING_SLOT_CASTLE,
-    BUILDING_SLOT_SPECIAL_SEVEN                 = 7,
-    TOWN_OBJECT_STATUE                          = BUILDING_SLOT_SPECIAL_SEVEN,
-    TOWN_OBJECT_SORCERESS_LEFT_OVERLAY          = BUILDING_SLOT_SPECIAL_SEVEN,
+    BUILDING_SLOT_STATUE                 = 7,
+    TOWN_OBJECT_STATUE                          = BUILDING_SLOT_STATUE,
     BUILDING_SLOT_SPECIAL_EIGHT                 = 8,
     TOWN_OBJECT_LEFT_TURRET                     = BUILDING_SLOT_SPECIAL_EIGHT,
     BUILDING_SLOT_SPECIAL_NINE                  = 9,
@@ -712,17 +724,16 @@ enum class BuildingSlotType : i8 {
     TOWN_OBJECT_MARKETPLACE                     = BUILDING_SLOT_SPECIAL_TEN,
     BUILDING_SLOT_WELL_EXTRA                    = 11,
     TOWN_OBJECT_SECOND_WELL                     = BUILDING_SLOT_WELL_EXTRA,
-    TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY         = BUILDING_SLOT_WELL_EXTRA,
     BUILDING_SLOT_SPECIAL_TWELVE                = 12,
     TOWN_OBJECT_MOAT                            = BUILDING_SLOT_SPECIAL_TWELVE,
     BUILDING_SLOT_SPECIAL                       = 13,
     TOWN_OBJECT_SPECIAL_BUILDING                = BUILDING_SLOT_SPECIAL,
-    BUILDING_SLOT_DISABLED_FIRST                = 14,
-    TOWN_OBJECT_BOAT                            = BUILDING_SLOT_DISABLED_FIRST,
+    BUILDING_SLOT_BOAT                = 14,
+    TOWN_OBJECT_BOAT                            = BUILDING_SLOT_BOAT,
     BUILDING_SLOT_NEUTRAL_LAST                  = 15,
     TOWN_OBJECT_CAPTAIN_QUARTERS                = BUILDING_SLOT_NEUTRAL_LAST,
     BUILDING_SLOT_DISABLED_SECOND               = 16,
-    TOWN_OBJECT_RACE_OVERLAY                    = BUILDING_SLOT_DISABLED_SECOND,
+    TOWN_OBJECT_EXTRA_0                    = BUILDING_SLOT_DISABLED_SECOND,
     BUILDING_SLOT_DISABLED_THIRD                = 17,
     TOWN_OBJECT_KNIGHT_LEFT_OVERLAY             = BUILDING_SLOT_DISABLED_THIRD,
     BUILDING_SLOT_DISABLED_FOURTH               = 18,
@@ -745,12 +756,12 @@ enum class BuildingSlotType : i8 {
     TOWN_OBJECT_UPGRADED_DWELLING_3             = BUILDING_SLOT_UPGRADE_SECOND,
     BUILDING_SLOT_UPGRADE_THIRD                 = 27,
     TOWN_OBJECT_UPGRADED_DWELLING_4             = BUILDING_SLOT_UPGRADE_THIRD,
-    BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE = 28,
-    TOWN_OBJECT_UPGRADED_DWELLING_5             = BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE,
-    BUILDING_SLOT_SPECIAL_TWENTY_NINE           = 29,
-    TOWN_OBJECT_UPGRADED_DWELLING_6             = BUILDING_SLOT_SPECIAL_TWENTY_NINE,
-    BUILDING_SLOT_SPECIAL_THIRTY                = 30,
-    TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6   = BUILDING_SLOT_SPECIAL_THIRTY,
+    BUILDING_SLOT_UPGRADE_FOURTH = 28,
+    TOWN_OBJECT_UPGRADED_DWELLING_5             = BUILDING_SLOT_UPGRADE_FOURTH,
+    BUILDING_SLOT_UPGRADE_FIFTH           = 29,
+    TOWN_OBJECT_UPGRADED_DWELLING_6             = BUILDING_SLOT_UPGRADE_FIFTH,
+    BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE                = 30,
+    TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6   = BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE,
     BUILDING_SLOT_UPGRADE_LAST                  = 29,
     BUILDING_SLOT_DWELLING_LAST                 = 30,
     BUILDING_SLOT_DISABLED_LAST                 = 31,
@@ -788,7 +799,6 @@ enum class MonsterFlags : i32 {
 using enum MonsterFlags;
 ENABLE_ENUM_FLAGS(MonsterFlags)
 
-typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE;
 
@@ -804,7 +814,7 @@ struct SMenuEnableStatus {
 };
 #pragma pack(pop)
 
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 struct tag_tilePoint {
     i8 x;
     i8 y;

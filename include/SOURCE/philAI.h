@@ -1,9 +1,56 @@
 #ifndef HOMM2_SOURCE_PHILAI_H
 #define HOMM2_SOURCE_PHILAI_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/hero.h>
+#include <SOURCE/gameTypes.h>
+
+class army;
+class hero;
+class playerData;
+class searchArray;
+class town;
+
+enum class AIPurchaseType : i32 {
+    PURCHASE_NONE     = -1,
+    PURCHASE_BUILDING = 0,
+    PURCHASE_HERO     = 1,
+    PURCHASE_CREATURE = 2
+};
+using enum AIPurchaseType;
+
+struct BHC {
+    town* pTown;
+    AIPurchaseType type;
+    union {
+        i32 what;
+        H2EnumStorage<BuildingSlotType, i32> building;
+    };
+    i32 num;
+};
+
+typedef enum AIPurchaseConstant {
+    AI_RANDOM_MINE_TYPE_COUNT      = 8,
+    AI_PURCHASE_DEBUG_DELAY        = 1500,
+} AIPurchaseConstant;
+
+typedef enum AIBattleConstant {
+    AI_BATTLE_NO_PLAYER              = -1,
+    AI_BATTLE_BASE_ARTIFACT_LIMIT    = 37,
+    AI_BATTLE_ATTACKER_ARTIFACT_BASE = 1400,
+    AI_BATTLE_DEFENDER_ARTIFACT_BASE = 1250,
+    AI_BATTLE_SPECIAL_ARTIFACT_VALUE = 50000,
+} AIBattleConstant;
+
+typedef enum AIGenericSiteConstant {
+    AI_GENERIC_SITE_GOLD_THRESHOLD        = 1500,
+    AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE = 500,
+    AI_GENERIC_SITE_MAX_LUCK              = 3,
+    AI_GENERIC_SITE_WEEK_END              = 8
+} AIGenericSiteConstant;
+
+#define AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER 0.7
 
 class armyGroup;
 class hero;
@@ -62,13 +109,13 @@ public:
     void ValueOfBuyingHero(class town* townPointer, class hero* heroPointer, i32& resourceValue, float& benefitCost);
     void GetBestHero(class town* townPointer, struct BHC& best, float& bestValue);
     void
-    LikelihoodOfEnemyAttacking(class town*, class hero*, float& chanceA, float& chanceB, i32& nAttack, i32& nValue, i32& nWeeks, float& fOut);
+    LikelihoodOfEnemyAttacking(class town*, class hero*, float& attackChance, float& lossRisk, i32& attackStrength, i32& weightedAttack, i32& attackWeeks, float& dangerRating);
     i32 MeanRVOfUnexploredTerritory(i32);
     void GetGameAttentionValue(i32 player);
     void GetTurnAttentionValue(i32 player);
     i32 RVConversion(i32* const resources);
     float TurnsToBuy(i32* const resources);
-    i32 RVOfPosition(i32 x, i32 y, i32 hasEvent, i32 eventX, i32 eventY, i32 hasStrategicEvent, i32 strategicX, i32 strategicY, i32 eventMode, i32 extraDistance);
+    i32 RVOfPosition(i32 x, i32 y, i32 hasAdjacentMonster, i32 adjacentMonsterX, i32 adjacentMonsterY, i32 beyondTurnMobility, i32 turnEndX, i32 turnEndY, i32 eventMode, i32 extraDistance);
     i32 StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate, i32 checkEnemies, i32* liveChance, i32 extraDistance);
     i32 ValueOfTown(class town* townPointer);
     void TurnCostResource(i32 player);
@@ -82,7 +129,7 @@ public:
         i32 townId = 0,
         i32 applySiegeAttackerModifiers = 0
     );
-    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 useAvailableCount, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
+    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 isFree, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
     i32 QuickCombat(
         class armyGroup* attacker,
         class hero* attackerHero,
@@ -94,7 +141,7 @@ public:
         float& defenderCasualtyFraction
     );
     void HeroInteractionAtHero(class hero* firstHero, class hero* secondHero, i32 evaluateOnly, i32* value);
-    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 doInteraction, i32* value);
+    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 evaluateOnly, i32* value);
     void RedistributeTroops(class armyGroup* sourceArmy, class armyGroup* destinationArmy, i32 preserveOne, i32 preferFast, i32 sourceStrength, i32, i32 transferBudget);
     i32 ChooseGoldOrExperience(i32, i32);
     void ChooseEvaluateBattle(
@@ -105,8 +152,8 @@ public:
         i32 isCastle,
         i32 castleId,
         i32 rewardValue,
-        i32& outFlag,
-        i32& outValue
+        i32& worthFighting,
+        i32& battleValue
     );
     i32 ChooseToFightForArtifact(ArtifactType artifact, CreatureType monster, i32);
     i32 NetValueOfArtifact(i32 artifact, i32 goldCost, i32 resourceType, i32 resourceCost);
@@ -129,8 +176,8 @@ public:
         HeroSkillLevel level
     );
     i32 ComputeValueOfFreeSS(class hero* heroPointer, HeroSecondarySkill skill);
-    i32 ManaRefreshValue(class hero* heroPointer, i32 level);
-    i32 ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance);
+    i32 ManaRefreshValue(class hero* heroPointer, i32 manaMultiplier);
+    i32 ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance);
     i32 EvaluateGenericSite(class mapCell* cell);
     i32 EvaluateBarrier(class mapCell* cell);
     i32 EvaluatePassword(class mapCell* cell);
@@ -142,4 +189,59 @@ public:
     i32 EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChance);
     i32 EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChance);
 };
+
+void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y);
+void CheckDoMain(i32 unused, i32 doMain);
+void ShowStatus(void);
+void ValidateHero(hero* pHero);
+void InitAIMapVars(void);
+void CloseAIMapVars(void);
+i32 OnMySide(i32 player);
+
+extern b32 bHeroBuiltThisTurn;
+extern float gafAITurnCostResource[H2EnumIndex(RES_COUNT)];
+extern i8* gaiEnemyHeroReachable;
+extern i16* gaiHeroEventStratRVOfPos;
+extern i16* gaiHeroStrategicRVOfPos;
+extern i16* gaiLiveChanceOfPos;
+extern i8* gaiTurnValueOfMine;
+extern b32 gbReduceByReload;
+extern i8 giBuildBoat[GAME_PLAYER_COUNT];
+extern i8 giBuildBoatStuffTurn[GAME_PLAYER_COUNT];
+extern i8 giBuildShipyard[GAME_PLAYER_COUNT];
+extern i32 giCurPlayer;
+extern u8 giCurPlayerBit;
+extern i32 giCurTurn;
+extern hero* gpCurAIHero;
+extern playerData* gpCurPlayer;
+extern u8 giCurWatchPlayerBit;
+extern i32 iAlphaMale;
+extern i32 iDummy;
+extern i32 iLastFrameRateTimer;
+extern searchArray SVSearchArray;
+
+extern b32 gbGameOver;
+extern i8 giMonType[];
+extern i32 iViewArmyNumTroops;
+extern i8 gbNGHeroType[];
+extern i16 giUABaseX;
+extern i16 giUABaseY;
+extern b32 giEndSequence;
+extern b32 gbDismissArmy;
+extern i8 gbNGHuman[];
+extern i32 iViewArmyFrame;
+extern b32 gbAllowUpgrade;
+extern H2EnumStorage<CreatureType, i32> iViewArmyType;
+extern class hero* viewSpellsHero;
+extern b32 gbUpgradeArmy;
+extern i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
+extern i8 gbNGDifficulty[];
+extern H2EnumStorage<CreatureType, i32> iViewArmyUpgradeToType;
+extern i32 viewArmyBaseX;
+extern i32 viewArmyBaseY;
+extern i8 gbNGColor[];
+extern i16 giUARadius;
+extern i8 gbNGPlayerPos[];
+extern i32 viewArmyFacingWIPXMod;
+
 #endif

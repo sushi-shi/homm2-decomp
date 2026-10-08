@@ -70,7 +70,7 @@ int main() {
         valid &= Expect(ReadHighScoreEntry(file, table.entries[index]) == HIGH_SCORE_READ_COMPLETE,
                         "read complete record");
         valid &= Expect(table.entries[index].score == index + 1
-            && table.entries[index].days == 15 && table.entries[index].scenario == 2
+            && table.entries[index].days == 15 && table.entries[index].difficultyRating == 2
             && std::strcmp(table.entries[index].playerName, "Player") == 0,
             "retain every entry in order");
         valid &= Expect(platform::FileTell(file) == (index + 1) * 100,
@@ -108,10 +108,10 @@ int main() {
     record = Record(42);
     std::fill_n(record.data() + 17, 41, 'X');
     valid &= Expect(WriteFixture(root / "DATA" / "scores.bin", {record.begin(), record.end()}),
-                    "write unterminated scenario");
+                    "write unterminated difficultyRating");
     file = platform::FileOpen("DATA/scores.bin", platform::FileMode::Read);
     valid &= Expect(ReadHighScoreEntry(file, first) == HIGH_SCORE_READ_INVALID,
-                    "reject unterminated scenario");
+                    "reject unterminated difficultyRating");
     platform::FileClose(file);
 
     HighScoreEntry entry{};
@@ -119,7 +119,7 @@ int main() {
     std::strcpy(entry.scenarioName, "Scenario");
     entry.score = 0x12345678;
     entry.days = -2;
-    entry.scenario = 2;
+    entry.difficultyRating = 2;
     entry.cheated = 1;
     file = platform::FileOpen("DATA/written.bin", platform::FileMode::Write);
     valid &= Expect(WriteHighScoreEntry(file, entry), "write explicit record");

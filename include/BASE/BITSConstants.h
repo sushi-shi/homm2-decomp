@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_BITS_CONSTANTS_H
-#define HOMM2_BASE_BITS_CONSTANTS_H
+#ifndef HOMM2_BASE_BITSCONSTANTS_H
+#define HOMM2_BASE_BITSCONSTANTS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 typedef u8 BitByte;
 typedef u32 BitWord;

@@ -1,8 +1,9 @@
 #ifndef HOMM2_BASE_MOUSEMANAGER_H
 #define HOMM2_BASE_MOUSEMANAGER_H
 
-#include <Ints.h>
-#include "baseManager.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/baseManager.h>
 
 struct tag_message;
 class bitmap;
@@ -24,9 +25,9 @@ public:
     i32 m_cursorFrame;
     icon* m_cursorIcon;
     MouseCursorType m_cursorType;
-    i32 m_cursorSizeIndex;
-    i32 m_drawnCursorSizeIndex;
-    char _pad_0x4e[0x8];
+    i32 m_cursorIndex;
+    i32 m_drawnCursorIndex;
+    char m_unused4e[0x8];
     i32 m_mouseX;
     i32 m_mouseY;
     i32 m_savedLeft;
@@ -37,7 +38,7 @@ public:
     i32 m_cursorBottom;
     i32 m_savedWidth;
     i32 m_savedHeight;
-    b32 m_forcePointerUpdate;
+    b32 m_pointerLocked;
     b32 m_cursorReady;
     i32 m_hideCount;
     mouseManager(void);
@@ -80,7 +81,6 @@ typedef enum MouseManagerConstant {
     MOUSE_CURSOR_MASK_BITS_PER_BYTE    = 8,
     MOUSE_CURSOR_MASK_HIGH_BIT         = MOUSE_CURSOR_MASK_BITS_PER_BYTE - 1,
     MOUSE_SPELL_CURSOR_HOTSPOT         = 15,
-    MOUSE_MANAGER_MESSAGE_MASK         = 0x40,
     MOUSE_INVALID_CURSOR_FRAME         = -1,
     MOUSE_DEFAULT_HOTSPOT              = -1,
     MOUSE_RELOAD_CURSOR_FRAME          = -99,

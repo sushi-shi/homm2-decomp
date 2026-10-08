@@ -1,13 +1,11 @@
-#ifndef HOMM2_EVENTS_H
-#define HOMM2_EVENTS_H
+#ifndef HOMM2_SOURCE_EVENTS_H
+#define HOMM2_SOURCE_EVENTS_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/GAME.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
-
-class hero;
 
 typedef enum CombatRemoteTransferConstant {
     COMBAT_REMOTE_BUFFER_SIZE        = 0xFF,
@@ -15,8 +13,7 @@ typedef enum CombatRemoteTransferConstant {
     COMBAT_REMOTE_HERO_FIRST_SIZE    = 200,
     COMBAT_REMOTE_HERO_SECOND_SIZE   = 50,
     COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
-    COMBAT_REMOTE_FRAGMENT_TYPE      = 1,
-    COMBAT_REMOTE_TIMEOUT            = 90000
+    COMBAT_REMOTE_FRAGMENT_TYPE      = 1
 } CombatRemoteTransferConstant;
 
 typedef enum EventRecordConstant {
@@ -25,11 +22,12 @@ typedef enum EventRecordConstant {
     EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE = 1,
     EVENT_RECORD_SIGN_HEADER_SIZE        = 9,
     EVENT_RECORD_RUMOUR_HEADER_SIZE      = 8,
-    EVENT_RECORD_TIME_GAP_FIRST_SIZE     = 2,
-    EVENT_RECORD_TIME_GAP_SECOND_SIZE    = 5,
+
+
+    EVENT_RECORD_HERO_ARTIFACT_SLOTS     = 4,
     EVENT_RECORD_HERO_ARTIFACT_COUNT     = 3,
     EVENT_RECORD_HERO_NAME_SIZE          = 13,
-    EVENT_RECORD_TOWN_NAME_SIZE          = 15
+    EVENT_RECORD_TOWN_NAME_SIZE          = 13
 } EventRecordConstant;
 
 typedef enum MapEventEncodingConstant {
@@ -41,6 +39,7 @@ typedef enum MapEventEncodingConstant {
 
 typedef enum MapEventGameplayConstant {
     PYRAMID_GUARD_STACK_QUANTITY = 10,
+    MINE_GUARDIAN_MAX_POWER      = 51,
 } MapEventGameplayConstant;
 
 enum class GenericSiteType : i32 {
@@ -84,25 +83,15 @@ struct mapEventExtra {
     char riddle[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct signEventExtra {
-    char pad[EVENT_RECORD_SIGN_HEADER_SIZE];
+
+
+    i8 active;
+    char reserved01[EVENT_RECORD_SIGN_HEADER_SIZE - 1];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct rumourEventExtra {
     char pad[EVENT_RECORD_RUMOUR_HEADER_SIZE];
     char text[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
-};
-struct timeEventExtra {
-    char unknown00;
-    i32 resources[H2EnumIndex(RES_COUNT)];
-    char unknown1d[EVENT_RECORD_TIME_GAP_FIRST_SIZE];
-    u8 appliesToComputer;
-    char unknown20;
-    u16 firstDay;
-    u16 repeatInterval;
-    char unknown25[EVENT_RECORD_TIME_GAP_SECOND_SIZE];
-    u8 appliesToHuman;
-    u8 players[GAME_PLAYER_COUNT];
-    char message[EVENT_RECORD_VARIABLE_TEXT_HEAD_SIZE];
 };
 struct mapHeroExtra {
     i8 owner;
@@ -111,13 +100,12 @@ struct mapHeroExtra {
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
-    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_COUNT];
-    char unknown16;
+    i8 artifacts[EVENT_RECORD_HERO_ARTIFACT_SLOTS];
     i32 experience;
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
     i8 skillLevels[HERO_SECONDARY_SKILL_CAPACITY];
-    char unknown2c;
+    char unused2c;
     u8 hasCustomName;
     char name[EVENT_RECORD_HERO_NAME_SIZE];
     u8 hasPatrol;
@@ -135,14 +123,19 @@ struct mapTownExtra {
     i8 hasCustomArmy;
     H2EnumStorage<CreatureType, i8> troopTypes[ARMY_GROUP_SLOT_COUNT];
     u16 troopCounts[ARMY_GROUP_SLOT_COUNT];
-    u8 hasShrine;
-    char unused18;
+    u8 hasCaptain;
+    u8 hasCustomName;
     char name[EVENT_RECORD_TOWN_NAME_SIZE];
-    i8 unknown28;
+    H2EnumStorage<FactionType, i8> faction;
+    i8 isCastle;
+    i8 disallowCastle;
 };
 #pragma pack(pop)
 
 typedef enum MapObjectEncodingConstant {
+
+
+    MAP_ITEM_FRAME_STRIDE                = 2,
     MAP_EVENT_DATA_EMPTY                 = 0,
     MAP_EVENT_DATA_AVAILABLE             = 1,
     MAP_EVENT_ARTIFACT_GUARD_FLAG        = 0x100,
@@ -208,7 +201,11 @@ typedef enum MapEventRewardConstant {
     SEA_CHEST_ARTIFACT_GOLD             = 1000,
     MAGELLAN_MAP_COST                   = 1000,
     WATERING_HOLE_MOBILITY_BONUS        = 400,
+    STABLES_MOBILITY_BONUS              = 400,
+    ALCHEMIST_CURSE_REMOVAL_COST        = 750,
     XANADU_ADMISSION_LEVEL              = 10,
+    XANADU_DIPLOMACY_MULTIPLIER         = 2,
+    ARTESIAN_SPRING_MANA_MULTIPLIER     = 2,
     TREE_KNOWLEDGE_GOLD_COST            = 2000,
     TREE_KNOWLEDGE_GEM_COST             = 10,
     PYRAMID_GUARD_COUNT                 = 50,
@@ -275,13 +272,9 @@ typedef enum MapEventSpatialConstant {
 } MapEventSpatialConstant;
 
 typedef enum MapEventDisplayConstant {
-    MINE_RESOURCE_ICON_OFFSET = 59,
+    EVENT_TEXT_MINE_CAPTURED_BASE = 59,
     BOAT_RESTORE_MODE         = 2,
     ORACLE_WINDOW_TEXT_ID     = 14,
-    COAST_FIZZLE_X            = 192,
-    COAST_FIZZLE_Y            = 192,
-    COAST_FIZZLE_WIDTH        = 96,
-    COAST_FIZZLE_HEIGHT       = 96,
 } MapEventDisplayConstant;
 
 enum class UndeadEventLevel : i32 {
@@ -301,7 +294,6 @@ enum class FlotsamReward : i32 {
 using enum FlotsamReward;
 
 typedef enum MonsterInteractionConstant {
-    MONSTER_JOIN_FORCED                     = 0x1000,
     MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,
     MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR    = 4,
@@ -319,8 +311,8 @@ typedef enum EventEffectConstant {
     EVENT_WHIRLPOOL_TRIGGER_ROLL     = 1,
     EVENT_WHIRLPOOL_TRIGGER_MAX      = 3,
     EVENT_WHIRLPOOL_ARMY_VALUE_LIMIT = 99999999,
-    EVENT_FIZZLE_HERO_LOSS           = 0,
-    EVENT_FIZZLE_ARTIFACT            = 1,
+    EVENT_FIZZLE_KILL           = 0,
+    EVENT_FIZZLE_PICKUP            = 1,
     EVENT_FIZZLE_X                   = 168,
     EVENT_FIZZLE_Y                   = 160,
     EVENT_FIZZLE_WIDTH               = 132,
@@ -346,7 +338,7 @@ typedef enum ArtifactEventMode {
     ARTIFACT_EVENT_MODE_RESOURCE_3 = 6,
     ARTIFACT_EVENT_MODE_RESOURCE_5 = 7,
 
-    ARTIFACT_EVENT_MODE_UNKNOWN_2  = 2,
+    ARTIFACT_EVENT_MODE_UNUSED_2  = 2,
 } ArtifactEventMode;
 
 constexpr ArtifactEventMode ArtifactEventModeFromCode(i32 value) {

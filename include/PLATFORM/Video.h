@@ -1,8 +1,8 @@
 #ifndef HOMM2_PLATFORM_VIDEO_H
 #define HOMM2_PLATFORM_VIDEO_H
 
-#include "Types.h"
-#include "MonochromeCursor.h"
+#include <PLATFORM/Types.h>
+#include <PLATFORM/MonochromeCursor.h>
 
 namespace platform {
 

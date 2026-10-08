@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/textWidget.h>
@@ -14,7 +14,6 @@
 #include <vector>
 
 typedef enum TextWidgetConstant {
-    RESOURCE_NAME_CAPACITY = 16,
     DRAW_MODE_MASK         = 0xff,
     TEXT_BUFFER_GROWTH     = 5
 } TextWidgetConstant;
@@ -70,7 +69,7 @@ textWidget::textWidget(
 }
 
 void textWidget::Read(void) {
-    char resourceName[RESOURCE_NAME_CAPACITY];
+    char resourceName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     i16 length = gpResourceManager->ReadWord();
     std::vector<char> legacyText(static_cast<std::size_t>(length) + 1, 0);

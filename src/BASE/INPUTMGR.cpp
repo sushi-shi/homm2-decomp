@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <string.h>
 #include <PLATFORM/Input.h>
 #include <BASE/mouseManager.h>
@@ -10,21 +10,19 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/inputManager.h>
-#include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
 #include <BASE/baseManager.h>
 #include <BASE/display.h>
+#include <BASE/font.h>
 
 enum class InputManagerScanCodeEncoding : i32 {
     SCAN_CODE_MASK          = 0xff,
     WINDOWS_HIGH_WORD_SHIFT = 16,
-    ENCODED_SCAN_CODE_SHIFT = 8,
-    ASCII_DELETE_CODE       = 0x7f,
     VIRTUAL_KEY_ENTER       = 0x0d
 };
 using enum InputManagerScanCodeEncoding;
 
-#define EncodeScanCode(scanCode) (H2EnumIndex(scanCode) << H2EnumIndex(ENCODED_SCAN_CODE_SHIFT))
+#define EncodeScanCode(scanCode) (H2EnumIndex(scanCode) << INPUT_KEY_CODE_SCAN_SHIFT)
 
 static inline i32l PackInputPoint(platform::Point point) {
     return static_cast<i32l>(
@@ -49,7 +47,7 @@ b32 bLastMouseOffscreen = false;
 b32 bLastOnscreenMouseColor = false;
 b32 bInCheckChangeCursor = false;
 
-static u8 gInputCharacterMapCp1251[0x80] = {
+static u8 gInputCharacterMapCp1251[CP1251_ASCII_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
     0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
     0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0xdd, 0x23, 0x24, 0x25, 0x26,
@@ -70,9 +68,9 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
-    event->payload.keyboard.unknown0x14 = 0;
-    event->payload.keyboard.unknown0x10 = 0;
-    event->payload.keyboard.unknown0x08 = 0;
+    event->payload.keyboard.unused14 = 0;
+    event->payload.keyboard.unused10 = 0;
+    event->payload.keyboard.unused08 = 0;
     event->payload.keyboard.keyCode = 0;
     event->type = MESSAGE_NONE;
 
@@ -88,7 +86,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                         >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
                     )
                     & H2EnumIndex(SCAN_CODE_MASK);
-            event->payload.keyboard.unknown0x08 = 0;
+            event->payload.keyboard.unused08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
@@ -116,7 +114,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                         >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
                     )
                     & H2EnumIndex(SCAN_CODE_MASK);
-            event->payload.keyboard.unknown0x08 = 0;
+            event->payload.keyboard.unused08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
                 case INPUT_SCAN_CONTROL:
@@ -143,7 +141,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
             gpInputManager->m_readIndex++;
             gpInputManager->m_readIndex %= H2EnumIndex(INPUT_EVENT_RING_CAPACITY);
         }
-        gpInputManager->m_field_0x85a = 0;
+        gpInputManager->m_keyPrefixPending = 0;
 
         if (gpWindowManager->m_active == 1) {
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12
@@ -331,13 +329,13 @@ inputManager::inputManager(void) : baseManager() {
     m_active = false;
     m_mouseMessageActive = false;
     m_requestedPriority = 1;
-    field_0x84e = 0;
-    field_0x742 = 0;
-    field_0x746 = 0;
-    field_0x74a = 1;
+    m_keyboardHookInstalled = 0;
+    m_mouseDriverReady = 0;
+    m_relativeMouse = 0;
+    m_mouseSpeedDivisor = 1;
     m_keyCodeType = INPUT_KEY_CODE_SCAN;
-    field_0x862 = -1;
-    field_0x866 = 0;
+    m_recordFile = -1;
+    m_unused866 = 0;
 }
 
 static inline void ResetEventQueue(inputManager* manager) {
@@ -383,7 +381,7 @@ void inputManager::Flush(void) {
 static inline void InitializeEmptyEvent(tag_message& event) {
     event.type = MESSAGE_NONE;
     event.payload.widget.id = 0;
-    event.payload.widget.command = BaseWidgetCommand(event.payload.widget.id);
+    event.payload.widget.command = static_cast<BaseWidgetCommand>(event.payload.widget.id);
     event.payload.widget.parameter = H2EnumIndex(event.payload.widget.command);
 }
 
@@ -437,10 +435,10 @@ void inputManager::AsciiConvert(tag_message& event) {
          && event.payload.keyboard.keyCode <= INPUT_SCAN_F10)
         || event.payload.keyboard.keyCode == INPUT_SCAN_F11
         || event.payload.keyboard.keyCode == INPUT_SCAN_F12)
-        event.payload.keyboard.keyCode = m_keyState[event.payload.keyboard.keyCode];
+        event.payload.keyboard.keyCode = m_scanCodeTable[event.payload.keyboard.keyCode];
     else
         event.payload.keyboard.keyCode =
-            m_keyState[event.payload.keyboard.keyCode] & H2EnumIndex(SCAN_CODE_MASK);
+            m_scanCodeTable[event.payload.keyboard.keyCode] & INPUT_KEY_CODE_CHARACTER_MASK;
 
     if ((event.payload.keyboard.modifiers & MESSAGE_MODIFIER_SHIFT_KEYS) == MESSAGE_MODIFIER_NONE
         && event.payload.keyboard.keyCode > 'A' - 1 && event.payload.keyboard.keyCode < 'Z' + 1)
@@ -516,97 +514,97 @@ void inputManager::AsciiConvert(tag_message& event) {
 
 void inputManager::MakeScanCodeTable(void) {
     for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
-        m_keyState[scanCode] = EncodeScanCode(scanCode);
+        m_scanCodeTable[scanCode] = EncodeScanCode(scanCode);
 
-    m_keyState[H2EnumIndex(INPUT_SCAN_NONE)] = 0;
-    m_keyState[H2EnumIndex(INPUT_SCAN_ESCAPE)] = '\x1b';
-    m_keyState[H2EnumIndex(INPUT_SCAN_1)] = '1';
-    m_keyState[H2EnumIndex(INPUT_SCAN_2)] = '2';
-    m_keyState[H2EnumIndex(INPUT_SCAN_3)] = '3';
-    m_keyState[H2EnumIndex(INPUT_SCAN_4)] = '4';
-    m_keyState[H2EnumIndex(INPUT_SCAN_5)] = '5';
-    m_keyState[H2EnumIndex(INPUT_SCAN_6)] = '6';
-    m_keyState[H2EnumIndex(INPUT_SCAN_7)] = '7';
-    m_keyState[H2EnumIndex(INPUT_SCAN_8)] = '8';
-    m_keyState[H2EnumIndex(INPUT_SCAN_9)] = '9';
-    m_keyState[H2EnumIndex(INPUT_SCAN_0)] = '0';
-    m_keyState[H2EnumIndex(INPUT_SCAN_MINUS)] = '-';
-    m_keyState[H2EnumIndex(INPUT_SCAN_EQUALS)] = '=';
-    m_keyState[H2EnumIndex(INPUT_SCAN_BACKSPACE)] = H2EnumIndex(ASCII_DELETE_CODE);
-    m_keyState[H2EnumIndex(INPUT_SCAN_TAB)] = '\t';
-    m_keyState[H2EnumIndex(INPUT_SCAN_Q)] = 'Q';
-    m_keyState[H2EnumIndex(INPUT_SCAN_W)] = 'W';
-    m_keyState[H2EnumIndex(INPUT_SCAN_E)] = 'E';
-    m_keyState[H2EnumIndex(INPUT_SCAN_R)] = 'R';
-    m_keyState[H2EnumIndex(INPUT_SCAN_T)] = 'T';
-    m_keyState[H2EnumIndex(INPUT_SCAN_Y)] = 'Y';
-    m_keyState[H2EnumIndex(INPUT_SCAN_U)] = 'U';
-    m_keyState[H2EnumIndex(INPUT_SCAN_I)] = 'I';
-    m_keyState[H2EnumIndex(INPUT_SCAN_O)] = 'O';
-    m_keyState[H2EnumIndex(INPUT_SCAN_P)] = 'P';
-    m_keyState[H2EnumIndex(INPUT_SCAN_LEFT_BRACKET)] = '[';
-    m_keyState[H2EnumIndex(INPUT_SCAN_RIGHT_BRACKET)] = ']';
-    m_keyState[H2EnumIndex(INPUT_SCAN_ENTER)] = '\n';
-    m_keyState[H2EnumIndex(INPUT_SCAN_CONTROL)] = EncodeScanCode(INPUT_SCAN_CONTROL);
-    m_keyState[H2EnumIndex(INPUT_SCAN_A)] = 'A';
-    m_keyState[H2EnumIndex(INPUT_SCAN_S)] = 'S';
-    m_keyState[H2EnumIndex(INPUT_SCAN_D)] = 'D';
-    m_keyState[H2EnumIndex(INPUT_SCAN_F)] = 'F';
-    m_keyState[H2EnumIndex(INPUT_SCAN_G)] = 'G';
-    m_keyState[H2EnumIndex(INPUT_SCAN_H)] = 'H';
-    m_keyState[H2EnumIndex(INPUT_SCAN_J)] = 'J';
-    m_keyState[H2EnumIndex(INPUT_SCAN_K)] = 'K';
-    m_keyState[H2EnumIndex(INPUT_SCAN_L)] = 'L';
-    m_keyState[H2EnumIndex(INPUT_SCAN_SEMICOLON)] = ';';
-    m_keyState[H2EnumIndex(INPUT_SCAN_APOSTROPHE)] = '\'';
-    m_keyState[H2EnumIndex(INPUT_SCAN_GRAVE)] = EncodeScanCode(INPUT_SCAN_GRAVE);
-    m_keyState[H2EnumIndex(INPUT_SCAN_LEFT_SHIFT)] = EncodeScanCode(INPUT_SCAN_LEFT_SHIFT);
-    m_keyState[H2EnumIndex(INPUT_SCAN_BACKSLASH)] = '\\';
-    m_keyState[H2EnumIndex(INPUT_SCAN_Z)] = 'Z';
-    m_keyState[H2EnumIndex(INPUT_SCAN_X)] = 'X';
-    m_keyState[H2EnumIndex(INPUT_SCAN_C)] = 'C';
-    m_keyState[H2EnumIndex(INPUT_SCAN_V)] = 'V';
-    m_keyState[H2EnumIndex(INPUT_SCAN_B)] = 'B';
-    m_keyState[H2EnumIndex(INPUT_SCAN_N)] = 'N';
-    m_keyState[H2EnumIndex(INPUT_SCAN_M)] = 'M';
-    m_keyState[H2EnumIndex(INPUT_SCAN_COMMA)] = ',';
-    m_keyState[H2EnumIndex(INPUT_SCAN_PERIOD)] = '.';
-    m_keyState[H2EnumIndex(INPUT_SCAN_SLASH)] = '/';
-    m_keyState[H2EnumIndex(INPUT_SCAN_RIGHT_SHIFT)] = EncodeScanCode(INPUT_SCAN_RIGHT_SHIFT);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_MULTIPLY)] = '*';
-    m_keyState[H2EnumIndex(INPUT_SCAN_ALT)] = EncodeScanCode(INPUT_SCAN_ALT);
-    m_keyState[H2EnumIndex(INPUT_SCAN_SPACE)] = ' ';
-    m_keyState[H2EnumIndex(INPUT_SCAN_CAPS_LOCK)] = EncodeScanCode(INPUT_SCAN_CAPS_LOCK);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F1)] = EncodeScanCode(INPUT_SCAN_F1);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F2)] = EncodeScanCode(INPUT_SCAN_F2);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F3)] = EncodeScanCode(INPUT_SCAN_F3);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F4)] = EncodeScanCode(INPUT_SCAN_F4);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F5)] = EncodeScanCode(INPUT_SCAN_F5);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F6)] = EncodeScanCode(INPUT_SCAN_F6);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F7)] = EncodeScanCode(INPUT_SCAN_F7);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F8)] = EncodeScanCode(INPUT_SCAN_F8);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F9)] = EncodeScanCode(INPUT_SCAN_F9);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F10)] = EncodeScanCode(INPUT_SCAN_F10);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUM_LOCK)] = EncodeScanCode(INPUT_SCAN_NUM_LOCK);
-    m_keyState[H2EnumIndex(INPUT_SCAN_SCROLL_LOCK)] = EncodeScanCode(INPUT_SCAN_SCROLL_LOCK);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_7)] = EncodeScanCode(INPUT_SCAN_NUMPAD_7);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_8)] = EncodeScanCode(INPUT_SCAN_NUMPAD_8);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_9)] = EncodeScanCode(INPUT_SCAN_NUMPAD_9);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_MINUS)] = '-';
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_4)] = EncodeScanCode(INPUT_SCAN_NUMPAD_4);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_5)] = EncodeScanCode(INPUT_SCAN_NUMPAD_5);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_6)] = EncodeScanCode(INPUT_SCAN_NUMPAD_6);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_PLUS)] = '+';
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_1)] = EncodeScanCode(INPUT_SCAN_NUMPAD_1);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_2)] = EncodeScanCode(INPUT_SCAN_NUMPAD_2);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_3)] = EncodeScanCode(INPUT_SCAN_NUMPAD_3);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_0)] = EncodeScanCode(INPUT_SCAN_NUMPAD_0);
-    m_keyState[H2EnumIndex(INPUT_SCAN_NUMPAD_DELETE)] = EncodeScanCode(INPUT_SCAN_NUMPAD_DELETE);
-    m_keyState[H2EnumIndex(INPUT_SCAN_SYSREQ)] = EncodeScanCode(INPUT_SCAN_SYSREQ);
-    m_keyState[H2EnumIndex(INPUT_SCAN_RESERVED_55)] = EncodeScanCode(INPUT_SCAN_RESERVED_55);
-    m_keyState[H2EnumIndex(INPUT_SCAN_ISO_BACKSLASH)] = EncodeScanCode(INPUT_SCAN_ISO_BACKSLASH);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F11)] = EncodeScanCode(INPUT_SCAN_F11);
-    m_keyState[H2EnumIndex(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NONE)] = 0;
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_ESCAPE)] = INPUT_KEY_CODE_ESCAPE;
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_1)] = '1';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_2)] = '2';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_3)] = '3';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_4)] = '4';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_5)] = '5';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_6)] = '6';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_7)] = '7';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_8)] = '8';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_9)] = '9';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_0)] = '0';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_MINUS)] = '-';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_EQUALS)] = '=';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_BACKSPACE)] = INPUT_KEY_CODE_DELETE;
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_TAB)] = '\t';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_Q)] = 'Q';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_W)] = 'W';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_E)] = 'E';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_R)] = 'R';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_T)] = 'T';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_Y)] = 'Y';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_U)] = 'U';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_I)] = 'I';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_O)] = 'O';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_P)] = 'P';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_LEFT_BRACKET)] = '[';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_RIGHT_BRACKET)] = ']';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_ENTER)] = '\n';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_CONTROL)] = EncodeScanCode(INPUT_SCAN_CONTROL);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_A)] = 'A';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_S)] = 'S';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_D)] = 'D';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F)] = 'F';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_G)] = 'G';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_H)] = 'H';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_J)] = 'J';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_K)] = 'K';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_L)] = 'L';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_SEMICOLON)] = ';';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_APOSTROPHE)] = '\'';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_GRAVE)] = EncodeScanCode(INPUT_SCAN_GRAVE);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_LEFT_SHIFT)] = EncodeScanCode(INPUT_SCAN_LEFT_SHIFT);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_BACKSLASH)] = '\\';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_Z)] = 'Z';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_X)] = 'X';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_C)] = 'C';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_V)] = 'V';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_B)] = 'B';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_N)] = 'N';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_M)] = 'M';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_COMMA)] = ',';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_PERIOD)] = '.';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_SLASH)] = '/';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_RIGHT_SHIFT)] = EncodeScanCode(INPUT_SCAN_RIGHT_SHIFT);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_MULTIPLY)] = '*';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_ALT)] = EncodeScanCode(INPUT_SCAN_ALT);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_SPACE)] = ' ';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_CAPS_LOCK)] = EncodeScanCode(INPUT_SCAN_CAPS_LOCK);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F1)] = EncodeScanCode(INPUT_SCAN_F1);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F2)] = EncodeScanCode(INPUT_SCAN_F2);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F3)] = EncodeScanCode(INPUT_SCAN_F3);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F4)] = EncodeScanCode(INPUT_SCAN_F4);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F5)] = EncodeScanCode(INPUT_SCAN_F5);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F6)] = EncodeScanCode(INPUT_SCAN_F6);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F7)] = EncodeScanCode(INPUT_SCAN_F7);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F8)] = EncodeScanCode(INPUT_SCAN_F8);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F9)] = EncodeScanCode(INPUT_SCAN_F9);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F10)] = EncodeScanCode(INPUT_SCAN_F10);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUM_LOCK)] = EncodeScanCode(INPUT_SCAN_NUM_LOCK);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_SCROLL_LOCK)] = EncodeScanCode(INPUT_SCAN_SCROLL_LOCK);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_7)] = EncodeScanCode(INPUT_SCAN_NUMPAD_7);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_8)] = EncodeScanCode(INPUT_SCAN_NUMPAD_8);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_9)] = EncodeScanCode(INPUT_SCAN_NUMPAD_9);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_MINUS)] = '-';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_4)] = EncodeScanCode(INPUT_SCAN_NUMPAD_4);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_5)] = EncodeScanCode(INPUT_SCAN_NUMPAD_5);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_6)] = EncodeScanCode(INPUT_SCAN_NUMPAD_6);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_PLUS)] = '+';
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_1)] = EncodeScanCode(INPUT_SCAN_NUMPAD_1);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_2)] = EncodeScanCode(INPUT_SCAN_NUMPAD_2);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_3)] = EncodeScanCode(INPUT_SCAN_NUMPAD_3);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_0)] = EncodeScanCode(INPUT_SCAN_NUMPAD_0);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_NUMPAD_DELETE)] = EncodeScanCode(INPUT_SCAN_NUMPAD_DELETE);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_SYSREQ)] = EncodeScanCode(INPUT_SCAN_SYSREQ);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_RESERVED_55)] = EncodeScanCode(INPUT_SCAN_RESERVED_55);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_ISO_BACKSLASH)] = EncodeScanCode(INPUT_SCAN_ISO_BACKSLASH);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F11)] = EncodeScanCode(INPUT_SCAN_F11);
+    m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
 }
 
 void CheckChangeCursor(i32 x, i32 y, i32 force) {

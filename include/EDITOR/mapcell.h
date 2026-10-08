@@ -1,14 +1,25 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 
 enum class MapCellFlag : i32 {
+    MAP_CELL_FLIP_VERTICAL      = 0x01,
+    MAP_CELL_FLIP_HORIZONTAL    = 0x02,
+    MAP_CELL_SHORE              = 0x04,
+    MAP_CELL_OCCUPIED           = 0x08,
+    MAP_CELL_SHORE_CORNER       = 0x10,
+    MAP_CELL_HERO               = 0x40,
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
-    MAP_CELL_OCCUPIED           = 0x08
+
+
+    MAP_CELL_GROUND_KEEP = MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL | MAP_CELL_SHORE
+                         | MAP_CELL_OCCUPIED | MAP_CELL_SHORE_CORNER | MAP_CELL_OBJECT_SHADOW_ONLY
 };
 using enum MapCellFlag;
+ENABLE_ENUM_FLAGS(MapCellFlag)
 
 typedef enum MapCellSentinel {
     MAPCELL_SPRITE_NONE = 0xff,
@@ -87,8 +98,10 @@ struct mapCellExtra {
     u8 animatedObject : 1;
     u8 objectTilesetBits : 7;
     u8 objectIndex;
-    u8 objectLayerBit0 : 1;
-    u8 objectLayerBit1 : 1;
+
+
+    u8 objectGroundLayer : 1;
+    u8 objectShadow : 1;
     u8 objectDrawnAsOverlay : 1;
     u8 objectMetadata : 5;
     u8 animatedOverlay : 1;
@@ -118,7 +131,7 @@ class mapCell {
 public:
     u16 m_terrainImageIndex;
     union {
-        char m_objType;
+        char m_objectBits;
         u8 m_objTypeBits;
         struct {
             u8 m_animatedObject : 1;
@@ -130,14 +143,15 @@ public:
     union {
         u16 m_objectData;
         struct {
-            u16 m_objectLayerBit0 : 1;
-            u16 m_objectLayerBit1 : 1;
+
+            u16 m_objectGroundLayer : 1;
+            u16 m_objectShadow : 1;
             u16 m_objectDrawnAsOverlay : 1;
             u16 m_objectMetadata : 13;
         };
         struct {
-            u16 m_tentFlags : 3;
-            u16 m_tentColor : 13;
+            u16 m_siteFlags : 3;
+            u16 m_siteMetadata : 13;
         };
     };
     u8 m_animatedOverlay : 1;
@@ -176,11 +190,19 @@ static_assert(sizeof(mapCell) == 12);
     ((cell)->m_objectIndex != MAPCELL_SPRITE_NONE && (cell)->ObjectTileset() != TILESET_DUMMY        \
      && ((cell)->m_flags & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)) == 0)
 
+#pragma pack(push, 1)
+
+
 struct oldMapCell {
-    u8 raw[20];
+    mapCell cell;
+    i32 objectLink;
+    i32 overlayLink;
 };
 
 struct oldMapCellExtra {
-    u8 raw[15];
+    mapCellExtra extra;
+    i32 objectLink;
+    i32 overlayLink;
 };
+#pragma pack(pop)
 #endif

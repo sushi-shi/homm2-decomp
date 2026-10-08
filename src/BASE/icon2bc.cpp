@@ -14,13 +14,13 @@ void IconToBitmapColorTable(
     i32 clipH,
     i32 color,
     u8* colorTable,
-    i32 dimGate
+    i32 drawShadows
 ) {
     images::IconOptions options;
     options.color = color;
     if (colorTable == nullptr)
         return;
     options.colorTable = colorTable;
-    options.shadows = dimGate != 0;
+    options.shadows = drawShadows != 0;
     images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <string.h>
 #include <BASE/font.h>
 #include <BASE/FontGlyph.h>
@@ -74,10 +74,10 @@ void font::DrawStringExecute(
     i32 x,
     i32 y,
     FontDrawMode mode,
-    i32 clipL,
-    i32 clipT,
-    i32 clipR,
-    i32 clipB
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
 ) {
     i32 position = x;
     const char* cursor = text;
@@ -90,19 +90,19 @@ void font::DrawStringExecute(
             continue;
         }
         if (codePoint == '{') {
-            m_suppressDraw = true;
+            m_highlight = true;
             cursor += decoded.length;
             continue;
         }
         if (codePoint == '}') {
-            m_suppressDraw = false;
+            m_highlight = false;
             cursor += decoded.length;
             continue;
         }
 
         const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
         if (glyph != 0) {
-            if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
+            if (mode == FONT_DRAW_DEFAULT && m_highlight == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -110,14 +110,14 @@ void font::DrawStringExecute(
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0
                 );
             else if (mode == FONT_DRAW_YELLOW
-                     || (mode == FONT_DRAW_DEFAULT && m_suppressDraw != 0))
+                     || (mode == FONT_DRAW_DEFAULT && m_highlight != 0))
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -125,10 +125,10 @@ void font::DrawStringExecute(
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableYellow,
                     1
@@ -141,10 +141,10 @@ void font::DrawStringExecute(
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableScenWin,
                     0
@@ -157,10 +157,10 @@ void font::DrawStringExecute(
                     y,
                     glyph,
                     ICON_DRAW_CLIP,
-                    clipL,
-                    clipT,
-                    clipR,
-                    clipB,
+                    clipX,
+                    clipY,
+                    clipW,
+                    clipH,
                     0,
                     gColorTableDarkGray,
                     1
@@ -172,7 +172,7 @@ void font::DrawStringExecute(
 }
 
 void font::DrawString(const char* text, i32 x, i32 y, FontDrawMode mode) {
-    m_suppressDraw = false;
+    m_highlight = false;
     DrawStringExecute(text, x, y, mode, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 
@@ -342,7 +342,7 @@ void font::DrawBoundedString(
         if (totalH < height)
             yPosition = (height - totalH) / CENTER_DIVISOR;
     }
-    m_suppressDraw = false;
+    m_highlight = false;
     while (position < length && text[position] != 0 && (yPosition + m_height <= height || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > height)
             ExtractLine(text, line.data(), &position, width, &lineWidth, 1);
@@ -370,9 +370,6 @@ void font::DrawBoundedString(
     }
 }
 
-#undef CENTER_DIVISOR
-#undef WRAP_HEIGHT_LINE_COUNT
-
 i32 font::LineLength(const char* text, i32 maxW) {
     if (text == NULL)
         return 0;
@@ -390,14 +387,14 @@ i32 font::LineLength(const char* text, i32 maxW) {
 }
 
 i32 font::LineWidth(const char* text) {
-    i32 width = 0;
+    i32 lineWidth = 0;
     const char* cursor = text;
     while (cursor != NULL && *cursor != 0) {
         const utf8::Decoded decoded = utf8::Decode(cursor);
         if (decoded.codePoint == '\n')
             break;
-        width += GetCharacterWidth(decoded.codePoint);
+        lineWidth += GetCharacterWidth(decoded.codePoint);
         cursor += decoded.length;
     }
-    return width;
+    return lineWidth;
 }

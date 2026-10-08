@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_FONT_GLYPH_H
-#define HOMM2_BASE_FONT_GLYPH_H
+#ifndef HOMM2_BASE_FONTGLYPH_H
+#define HOMM2_BASE_FONTGLYPH_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/Localization.h>
 
 // Shared by font drawing and measurement; profile selects the retail ICN layout.

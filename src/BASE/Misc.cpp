@@ -1,5 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <BASE/display.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
@@ -38,10 +39,7 @@ typedef enum DataEntryLayout {
     TEXT_FIELD_ICON_FRAME       = 3,
     TEXT_FIELD_HORIZONTAL_INSET = 10,
     TEXT_FIELD_VERTICAL_INSET   = 3,
-    INPUT_BOX_X                 = 213,
-    REDRAW_OFFSET               = 10,
-    DRAW_MODE                   = 1,
-    WIDGET_Z_ORDER              = -1
+    INPUT_BOX_X                 = 213
 } DataEntryLayout;
 
 typedef enum DataEntryWidgetId {
@@ -51,10 +49,6 @@ typedef enum DataEntryWidgetId {
 } DataEntryWidgetId;
 
 typedef enum MiscLogPrivateConstant {
-    MEMORY_LEAK_DEBUG_LEVEL   = 1,
-    FILE_DEBUG_LEVEL          = 2,
-    DEBUGGER_OUTPUT_LEVEL     = 4,
-    FORCED_DEBUG_LEVEL        = 9,
     FORMAT_BUFFER_SIZE        = 200,
     TEXT_BUFFER_SIZE          = 500,
     MEMORY_ENTRY_CAPACITY     = 2000,
@@ -86,6 +80,7 @@ typedef enum PCXConstant {
     PALETTE_TYPE_COLOR    = 1,
     RLE_RUN_MARKER        = 0xc0,
     RLE_RUN_LIMIT         = 0x40,
+    RLE_RUN_RECORD_BYTES  = 2,
     VGA_PALETTE_MARKER    = 0x0c,
     COMPONENT_SCALE_SHIFT = 2
 } PCXConstant;
@@ -112,11 +107,6 @@ typedef enum MiscWindowConstant {
     WINDOW_POSITION_MARGIN = 200
 } MiscWindowConstant;
 
-typedef enum MiscBlitConstant {
-    BLIT_SCROLL_OFFSET = 0x10,
-    BLIT_SCROLL_EXTENT = 0x1c0,
-} MiscBlitConstant;
-
 typedef enum SeededRandomConstant {
     INITIAL_SEED               = 0x08156a03,
     RANDOM_TERM_MULTIPLIER     = 13,
@@ -142,6 +132,7 @@ typedef enum FileIdHashConstant {
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
@@ -153,6 +144,7 @@ typedef enum FileIdHashConstant {
 #include <string.h>
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <BASE/MiscGraphicsConstants.h>
 
 static i32 giFindMid = 0;
 H2SteppedEnumStorage<DataEntryPhase, i32> bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
@@ -171,7 +163,6 @@ u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
 i32 iLastSeed = INITIAL_SEED;
-static char gMemEntryTag[sizeof("IME")] = "IME";
 
 typedef enum StatusBarLayout {
     STATUS_BAR_Y       = 460,
@@ -181,7 +172,7 @@ typedef enum StatusBarLayout {
 } StatusBarLayout;
 
 void InitMemEntry(void) {
-    LogInt(gMemEntryTag, iMemEntries);
+    LogInt("IME", iMemEntries);
     gpMemEntry = static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
     for (i32 i = 0; i < MEMORY_ENTRY_CAPACITY; ++i)
         gpMemEntry[i].used = 0;
@@ -609,10 +600,10 @@ void BlitBitmapToScreen(
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        sourceX = giScrollX + BLIT_SCROLL_OFFSET;
-        width = BLIT_SCROLL_EXTENT;
-        sourceY = giScrollY + BLIT_SCROLL_OFFSET;
-        height = BLIT_SCROLL_EXTENT;
+        sourceX = giScrollX + ADVENTURE_VIEW_BORDER;
+        width = ADVENTURE_VIEW_SIZE;
+        sourceY = giScrollY + ADVENTURE_VIEW_BORDER;
+        height = ADVENTURE_VIEW_SIZE;
     }
     gBlitRight = destinationX + width - 1;
     gBlitBottom = destinationY + height - 1;
@@ -808,20 +799,18 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
 }
 
 void FadeToColorTable(u8* colorTable, i32 increment) {
-    u8* currentColorTable;
+    u8* screenPixel;
     i32 x;
     i32 i;
     i32 y;
     u8 tempPal[PALETTE_DATA_SIZE];
     i8* paletteData;
-    i32 savedFlags;
+    i32 savedColorCycling;
 
-    savedFlags = gpWindowManager->m_updateFlags;
-    gpWindowManager->m_updateFlags = 0;
+    savedColorCycling = gpWindowManager->m_colorCycling;
+    gpWindowManager->m_colorCycling = 0;
     paletteData = gpBufferPalette->m_data;
-    for (i = 0;
-         i < H2EnumIndex(PALETTE_DATA_SIZE) / H2EnumIndex(PALETTE_CHANNEL_COUNT);
-         ++i) {
+    for (i = 0; i < PALETTE_COLOR_COUNT; ++i) {
         tempPal[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)] =
             paletteData[colorTable[i] * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_RED)];
         tempPal[i * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_GREEN)] =
@@ -830,16 +819,16 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
             paletteData[colorTable[i] * H2EnumIndex(PALETTE_CHANNEL_COUNT) + H2EnumIndex(PALETTE_CHANNEL_BLUE)];
     }
     FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
-    currentColorTable = gpWindowManager->m_screen->m_pixels;
+    screenPixel = gpWindowManager->m_screen->m_pixels;
     for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
         for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
-            *currentColorTable = colorTable[*currentColorTable];
-            ++currentColorTable;
+            *screenPixel = colorTable[*screenPixel];
+            ++screenPixel;
         }
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(paletteData);
-    gpWindowManager->m_updateFlags = savedFlags;
+    gpWindowManager->m_colorCycling = savedColorCycling;
 }
 
 i32 IsCycleColor(i32 color) {
@@ -897,7 +886,7 @@ void CreatePCXFile(
             if (runLength > 1 || (color & RLE_RUN_MARKER) == RLE_RUN_MARKER) {
                 *(encodedRow + encodedLength) = static_cast<u8>(runLength | RLE_RUN_MARKER);
                 *(encodedRow + encodedLength + 1) = color;
-                encodedLength += 2;
+                encodedLength += RLE_RUN_RECORD_BYTES;
                 sourceIndex += runLength;
             } else {
                 *(encodedRow + encodedLength) = color;
@@ -993,7 +982,7 @@ void GetDataEntry(
     i32 maximumLength,
     char* initialText,
     i32 showCancel,
-    i32 useImmediateHandler
+    i32 editImmediately
 ) {
     MouseCursorType savedCursorType;
 
@@ -1004,13 +993,13 @@ void GetDataEntry(
     char textBuffer[TEXT_BUFFER_CAPACITY];
     textEntryWidget* pText;
     tag_message message;
-    i32 nFrame;
+    i32 savedCursorFrame;
 
     savedCursorType = gpMouseManager->m_cursorType;
-    nFrame = gpMouseManager->m_cursorFrame;
+    savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;
@@ -1089,9 +1078,9 @@ void GetDataEntry(
         MemError();
     inBoxX = INPUT_BOX_X;
     inBoxY = entryY + INPUT_BOX_Y_OFFSET;
-    DataEntryWin->AddWidget(pText, WIDGET_Z_ORDER);
+    DataEntryWin->AddWidget(pText, WINDOW_Z_ORDER_TOP);
 
-    if (useImmediateHandler != 0) {
+    if (editImmediately != 0) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = false;
     } else
@@ -1100,7 +1089,7 @@ void GetDataEntry(
     delete DataEntryWin;
     gpMouseManager->SetPointer(
         "",
-        nFrame,
+        savedCursorFrame,
         savedCursorType
     );
     gbAllowTextEntryEscape = true;
@@ -1145,7 +1134,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_TEXT_WIDGET);
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
-                        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
+                        DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, ENTRY_TEXT_WIDGET, ENTRY_TEXT_WIDGET);
                         if (gbTextEntryEscaped != 0)
                             break;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;

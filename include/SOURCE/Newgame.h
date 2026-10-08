@@ -1,24 +1,24 @@
-#ifndef HOMM2_NEWGAME_H
-#define HOMM2_NEWGAME_H
+#ifndef HOMM2_SOURCE_NEWGAME_H
+#define HOMM2_SOURCE_NEWGAME_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/REQUEST.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 struct tag_message;
 
 typedef enum NewGameControlConstant {
-    NEW_GAME_DIFFICULTY_HELP_FIRST = 1,
-    NEW_GAME_DIFFICULTY_FIRST      = 0x43,
-    NEW_GAME_RACE_FIRST            = 6,
+    NEW_GAME_DIFFICULTY_BUTTON_FIRST = 1,
+    NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST      = 0x43,
+    NEW_GAME_OPPONENT_FIRST            = 6,
     NEW_GAME_COLOR_FIRST           = 0x0c,
     NEW_GAME_PLAYER_SELECT_FIRST   = 0x12,
     NEW_GAME_PLAYER_NAME_FIRST     = 0x18,
     NEW_GAME_RACE_ICON_FIRST       = 0x1e,
     NEW_GAME_RACE_CYCLE_FIRST      = 0x24,
     NEW_GAME_HANDICAP_FIRST        = 0x30,
-    NEW_GAME_PLAYER_HUMAN_FIRST    = 0x2a,
+    NEW_GAME_HANDICAP_LABEL_FIRST    = 0x2a,
     NEW_GAME_SCENARIO_NAME         = 0x40,
     NEW_GAME_RATING                = 0x42,
     NEW_GAME_MAP_SELECT            = 0x48,

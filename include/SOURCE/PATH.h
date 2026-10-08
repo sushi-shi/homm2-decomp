@@ -1,5 +1,5 @@
-#ifndef HOMM2_PATH_H
-#define HOMM2_PATH_H
+#ifndef HOMM2_SOURCE_PATH_H
+#define HOMM2_SOURCE_PATH_H
 
 #include <SOURCE/combatTypes.h>
 

@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_WINGRAPH_H
 #define HOMM2_SOURCE_WINGRAPH_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/display.h>
 
 enum GraphicsConstant : i32 {
@@ -10,6 +11,7 @@ enum GraphicsConstant : i32 {
     GRAPHICS_COLOR_DEPTH = 8,
     GRAPHICS_PALETTE_SIZE = 256,
     GRAPHICS_SYSTEM_PALETTE_SIZE = 10,
+    PALETTE_VALUE_SHIFT = 2,
 };
 
 enum class WingraphGraphicsType : i32 {

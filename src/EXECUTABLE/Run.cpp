@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/Localization.h>

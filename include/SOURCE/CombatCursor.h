@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_COMBATCURSOR_H
 #define HOMM2_SOURCE_COMBATCURSOR_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/combatTypes.h>
 
 enum class CombatMessageCommand : i32 {
@@ -74,8 +74,8 @@ constexpr CombatCursorFrame CombatCursorForAttackDirection(CombatHexDirection di
         case COMBAT_DIRECTION_SOUTHWEST: return COMBAT_CURSOR_ATTACK_SOUTHWEST;
         case COMBAT_DIRECTION_WEST: return COMBAT_CURSOR_ATTACK_WEST;
         case COMBAT_DIRECTION_NORTHWEST: return COMBAT_CURSOR_ATTACK_NORTHWEST;
-        case COMBAT_DIRECTION_WIDE_WEST: return COMBAT_CURSOR_ATTACK_WIDE_WEST;
-        case COMBAT_DIRECTION_WIDE_EAST: return COMBAT_CURSOR_ATTACK_WIDE_EAST;
+        case COMBAT_DIRECTION_WIDE_NORTH: return COMBAT_CURSOR_ATTACK_WIDE_WEST;
+        case COMBAT_DIRECTION_WIDE_SOUTH: return COMBAT_CURSOR_ATTACK_WIDE_EAST;
         case COMBAT_DIRECTION_INVALID: return COMBAT_CURSOR_INVALID;
     }
     return COMBAT_CURSOR_INVALID;

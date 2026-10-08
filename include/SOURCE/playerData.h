@@ -1,14 +1,15 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/hero.h>
 
 typedef enum PlayerDataStorageConstant {
     PLAYER_HERO_CAPACITY         = 8,
     PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
-    PLAYER_BARRIER_STATE_SIZE    = 6,
+    PLAYER_UNUSED_TAIL_SIZE    = 6,
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
 } PlayerDataStorageConstant;
 
@@ -25,25 +26,25 @@ using enum PlayerPersonality;
 
 #pragma pack(push, 1)
 struct playerAttentionWeights {
-    float gameWeightA;
-    float gameRemainder;
-    float gameWeightB;
-    float buildingValue;
-    float upgradeBase;
-    float heroValue;
+    float gameBuildingAttention;
+    float gameCreatureAttention;
+    float gameHeroAttention;
+    float turnBuildingAttention;
+    float turnCreatureAttention;
+    float turnHeroAttention;
 };
 
 class playerAIData {
 public:
     playerAttentionWeights m_attentionWeights;
-    char m_unknown18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
+    char m_unused18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
     i32 m_income[H2EnumIndex(RES_COUNT)];
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;
     i32 m_unexploredValue;
     float m_fightValueResourceWeight;
-    float m_artifactValue;
-    float m_artifactPoolShare;
+    float m_meanArtifactValue;
+    float m_unusedPlayerShare;
 };
 
 class playerData {
@@ -69,7 +70,7 @@ public:
     i32 m_resources[H2EnumIndex(RES_COUNT)];
     b8 m_evilInterface;
     i8 m_barrierTents;
-    char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
+    char m_unusedAd[PLAYER_UNUSED_TAIL_SIZE];
     playerAIData m_aiData;
     void Write(i32 file);
     void Read(i32 file);

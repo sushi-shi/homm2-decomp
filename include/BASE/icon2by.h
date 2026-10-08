@@ -1,6 +1,7 @@
-#ifndef HOMM2_ICON2BY_H
-#define HOMM2_ICON2BY_H
+#ifndef HOMM2_BASE_ICON2BY_H
+#define HOMM2_BASE_ICON2BY_H
 
+#include <Domains.h>
 #include <BASE/IconDraw.h>
 #include <span>
 

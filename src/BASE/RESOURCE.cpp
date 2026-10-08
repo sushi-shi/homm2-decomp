@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/resource.h>
 #include <SOURCE/KB.h>
 

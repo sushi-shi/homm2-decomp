@@ -1,5 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <math.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -7,7 +7,6 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
 #include <BASE/Misc.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <PLATFORM/Runtime.h>
@@ -17,7 +16,7 @@
 #include <BASE/display.h>
 #include <SOURCE/combatTypes.h>
 
-#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE \
+#define ARMY_FLIGHT_SLOW_FRAME_DURATION_SCALE \
     1.3
 
 namespace {
@@ -106,7 +105,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
 
     CombatHexDirection direction;
 
-    army* armyPointer;
+    army* targetArmy;
 
     i32 attackMask;
     i32 attackHex;
@@ -128,11 +127,11 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    armyPointer = &gpCombatManager->m_armies[H2EnumIndex(m_targetSide)][m_targetIndex];
+    targetArmy = &gpCombatManager->m_armies[H2EnumIndex(m_targetSide)][m_targetIndex];
     if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         enemyHex = destination;
     } else {
-        enemyHex = armyPointer->m_hex;
+        enemyHex = targetArmy->m_hex;
     }
     if (!ValidHex(enemyHex)) {
         return 0;
@@ -157,10 +156,10 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     }
 
     directionMask = 0;
-    if ((H2EnumIndex((armyPointer->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
+    if ((H2EnumIndex((targetArmy->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
-        directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))
+        enemyHex += targetArmy->m_facing == ARMY_FACING_RIGHT ? 1 : -1;
+        directionMask = targetArmy->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_WEST))
                                                               : (1 << H2EnumIndex(COMBAT_DIRECTION_EAST));
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
@@ -187,10 +186,10 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         }
     }
 
-    if ((H2EnumIndex((armyPointer->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
+    if ((H2EnumIndex((targetArmy->m_monster.attributes) & (MONSTER_FLAGS_WIDE)))
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        enemyHex += armyPointer->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
-        directionMask = armyPointer->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))
+        enemyHex += targetArmy->m_facing == ARMY_FACING_RIGHT ? -1 : 1;
+        directionMask = targetArmy->m_facing == ARMY_FACING_RIGHT ? (1 << H2EnumIndex(COMBAT_DIRECTION_EAST))
                                                            : (1 << H2EnumIndex(COMBAT_DIRECTION_WEST));
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(enemyHex, m_hex, directionMask);
@@ -264,7 +263,7 @@ i32 army::FlyTo(i32 destination) {
         }
     }
     if (m_facingChanged) {
-        gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     }
 
     endX = gpCombatManager->m_hexCells[destination].m_x;
@@ -301,7 +300,7 @@ i32 army::FlyTo(i32 destination) {
         frameCount = 0;
         frameStart = 0;
         midCount = 0;
-        gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(0, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
         gpWindowManager->m_screen->CopyTo(
             gpCombatManager->m_backgroundBuffer,
             0,
@@ -408,7 +407,7 @@ i32 army::FlyTo(i32 destination) {
                     || (m_animationFrame + 1 >= midCount && IS_VAMPIRE_CREATURE(m_monsterType))) {
                     glTimers[0] = static_cast<i32>(
                         platform::Ticks()
-                        + m_frameInfo.walkDuration * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE
+                        + m_frameInfo.walkDuration * ARMY_FLIGHT_SLOW_FRAME_DURATION_SCALE
                               * gfCombatSpeedMod[gConfig.combatSpeed] / frameCount
                     );
                 } else {
@@ -461,7 +460,7 @@ i32 army::FlyTo(i32 destination) {
         }
         m_facingChanged = false;
     }
-    gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
     gpCombatManager->TestRaiseDoor();
     return 1;
 }

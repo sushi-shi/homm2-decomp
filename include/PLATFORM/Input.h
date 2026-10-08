@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_INPUT_H
 #define HOMM2_PLATFORM_INPUT_H
 
-#include "Types.h"
+#include <PLATFORM/Types.h>
 
 #include <string>
 

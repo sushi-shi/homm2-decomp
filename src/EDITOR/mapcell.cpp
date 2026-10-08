@@ -1,6 +1,6 @@
-#include <Ints.h>
-#include "EDITOR/fullMap.h"
-#include "EDITOR/mapcell.h"
+#include <H2/Ints.h>
+#include <EDITOR/mapcell.h>
+#include <EDITOR/fullMap.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/Localization.h>
@@ -54,10 +54,10 @@ fullMap::~fullMap(void) {
 
 void fullMap::Close(void) {
     if (cells)
-        H2_FREE(cells);
+        delete[] cells;
     cells = NULL;
     if (extras)
-        H2_FREE(extras);
+        delete[] extras;
     extras = NULL;
     extraCount = 0;
 }
@@ -67,15 +67,15 @@ void fullMap::Init(i32 mapWidth, i32 mapHeight) {
     width = mapWidth;
     height = mapHeight;
     Close();
-    cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
+    cells = new mapCell[width * height];
 }
 
 void fullMap::ClearCellExtra(i32 index) {
     extras[index].SetObjectTileset(TILESET_NONE);
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
     extras[index].animatedObject = 0;
-    extras[index].objectLayerBit0 = 0;
-    extras[index].objectLayerBit1 = 0;
+    extras[index].objectGroundLayer = 0;
+    extras[index].objectShadow = 0;
     extras[index].objectDrawnAsOverlay = 0;
     extras[index].SetOverlayTileset(TILESET_NONE);
     extras[index].overlayIndex = MAPCELL_SPRITE_NONE;
@@ -83,6 +83,7 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].drawOverlayOnTop = 0;
     extras[index].nextIndex = 0;
 }
+
 
 i32 fullMap::GetNewCellExtraIndex(void) {
     i32 extraIndex;
@@ -95,11 +96,9 @@ i32 fullMap::GetNewCellExtraIndex(void) {
             return extraIndex;
         }
     }
-    newExtras = static_cast<mapCellExtra*>(
-        H2_ALLOC((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
-    );
+    newExtras = new mapCellExtra[extraCount + EXTRA_ALLOCATION_STEP];
     memcpy(newExtras, extras, extraCount * sizeof(mapCellExtra));
-    H2_FREE(extras);
+    delete[] extras;
     extras = newExtras;
     for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
         extras[j].nextIndex = MAPCELL_EXTRA_FREE;
@@ -166,6 +165,7 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     }
 }
 
+
 void fullMap::Write(i32 handle) {
     WriteMapData(handle, &width, sizeof(width));
     WriteMapData(handle, &height, sizeof(height));
@@ -186,12 +186,12 @@ void fullMap::Read(i32 handle, i32 convert) {
     Init(width, height);
     if (convert) {
         RequireRecordsFit(handle, width * height, sizeof(oldMapCell));
-        oldCells = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        oldCells = new oldMapCell[width * height];
         ReadMapData(handle, oldCells, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(cells + x + y * width, oldCells + x + y * width, sizeof(mapCell));
-        H2_FREE(oldCells);
+        delete[] oldCells;
     } else {
         RequireRecordsFit(handle, width * height, sizeof(mapCell));
         ReadMapData(handle, cells, width * height * sizeof(mapCell));
@@ -200,18 +200,18 @@ void fullMap::Read(i32 handle, i32 convert) {
     if (extraCount < 0 || extraCount > map_records::ExtraCapacity)
         ShutDown(localization::Tr("system.file.read_error"));
     if (extras)
-        H2_FREE(extras);
+        delete[] extras;
     if (convert) {
         RequireRecordsFit(handle, extraCount, sizeof(oldMapCellExtra));
-        extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
-        oldExtras = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
+        extras = new mapCellExtra[extraCount];
+        oldExtras = new oldMapCellExtra[extraCount];
         ReadMapData(handle, oldExtras, extraCount * sizeof(oldMapCellExtra));
         for (extraIndex = 0; extraIndex < extraCount; extraIndex++)
             memcpy(extras + extraIndex, oldExtras + extraIndex, sizeof(mapCellExtra));
-        H2_FREE(oldExtras);
+        delete[] oldExtras;
     } else {
         RequireRecordsFit(handle, extraCount, sizeof(mapCellExtra));
-        extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
+        extras = new mapCellExtra[extraCount];
         ReadMapData(handle, extras, extraCount * sizeof(mapCellExtra));
     }
     if (const char* error = map_records::CellDataError(
@@ -229,7 +229,7 @@ void fullMap::ChangeTilesetIndex(
     TilesetId tileset,
     i32 index,
     i32 overlay,
-    i32
+    i32 link [[maybe_unused]]
 ) {
     i32 extraIndex;
     mapCellExtra* extra;
@@ -247,8 +247,8 @@ void fullMap::ChangeTilesetIndex(
                     extraIndex = extra->nextIndex;
                 } else {
                     extra->animatedObject = 0;
-                    extra->objectLayerBit0 = 0;
-                    extra->objectLayerBit1 = 0;
+                    extra->objectGroundLayer = 0;
+                    extra->objectShadow = 0;
                     extra->objectDrawnAsOverlay = 0;
                     extra->SetObjectTileset(newTileset);
                     extra->objectIndex = index;
@@ -262,8 +262,8 @@ void fullMap::ChangeTilesetIndex(
             }
         } else {
             cell->m_animatedObject = 0;
-            cell->m_objectLayerBit0 = 0;
-            cell->m_objectLayerBit1 = 0;
+            cell->m_objectGroundLayer = 0;
+            cell->m_objectShadow = 0;
             cell->m_objectDrawnAsOverlay = 0;
             cell->SetObjectTileset(newTileset);
             cell->m_objectIndex = index;

@@ -1,8 +1,8 @@
-#ifndef HOMM2_CAMPAIGN_H
-#define HOMM2_CAMPAIGN_H
+#ifndef HOMM2_SOURCE_CAMPAIGN_H
+#define HOMM2_SOURCE_CAMPAIGN_H
 
 #include <BASE/dialog.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
 
@@ -52,7 +52,7 @@ typedef enum CampaignControlId {
     CAMPAIGN_SCENARIO_NUMBER_WIDGET      = 0x321,
     CAMPAIGN_SCENARIO_NAME_WIDGET        = 0x322,
     CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET = 0x323,
-    CAMPAIGN_SCENARIO_BONUS_WIDGET       = 0x324,
+    CAMPAIGN_DAYS_SPENT_WIDGET       = 0x324,
     CAMPAIGN_AWARDS_WIDGET               = 0x325,
     CAMPAIGN_BONUS_TEXT_WIDGET_FIRST     = 0x326,
 } CampaignControlId;
@@ -66,22 +66,17 @@ typedef enum CampaignDisplayConstant {
     CAMPAIGN_TRACK_ICON_SIZE       = 41,
     CAMPAIGN_TRACK_ICON_OFFSET     = 2,
     CAMPAIGN_TRACK_ICON_FRAME      = 10,
-    CAMPAIGN_TRACK_FRAME_COMPLETE  = 11,
-    CAMPAIGN_TRACK_FRAME_AVAILABLE = 10,
+    CAMPAIGN_TRACK_FRAME_AVAILABLE  = 11,
+    CAMPAIGN_TRACK_FRAME_COMPLETE = 10,
     CAMPAIGN_TRACK_FRAME_LOCKED    = 12,
-    CAMPAIGN_RESTART_CONFIRM       = 2,
-    CAMPAIGN_DIALOG_NO_RESOURCE    = -1,
-    CAMPAIGN_DIALOG_FADE_STEPS     = 8,
-    CAMPAIGN_GOOD_MUSIC            = 24,
-    CAMPAIGN_EVIL_MUSIC            = 22
 } CampaignDisplayConstant;
 
 
 #define PRESENT_RESTARTED_CAMPAIGN_MAP() \
-    (gpAdvManager->m_visibilityMapValid = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
-     gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette), \
+    (gpAdvManager->m_routeShown = false, giBottomViewOverride = BOTTOM_VIEW_NONE, \
+     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette), \
      gpAdvManager->SetInitialMapOrigin(), gpAdvManager->RedrawAdvScreen(1, 0), \
-     gpWindowManager->FadeScreen(FADE_IN, CAMPAIGN_DIALOG_FADE_STEPS, gPalette))
+     gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette))
 
 MessageDispatchResult CampaignHandler(struct tag_message& message);
 

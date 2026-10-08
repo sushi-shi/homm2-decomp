@@ -1,7 +1,8 @@
-#ifndef HOMM2_REMOTE_TYPES_H
-#define HOMM2_REMOTE_TYPES_H
+#ifndef HOMM2_SOURCE_REMOTETYPES_H
+#define HOMM2_SOURCE_REMOTETYPES_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 typedef enum RemoteMessageLayoutConstant {
     REMOTE_MESSAGE_SIZE         = 256,
@@ -27,7 +28,7 @@ typedef enum NetPlayerInfoConstant {
 
 enum class NetworkPacketType : i32 {
     NETWORK_PACKET_DATA           = 1,
-    NETWORK_PACKET_GUEST_ARRIVED  = 2,
+    NETWORK_PACKET_HERE_I_AM  = 2,
     NETWORK_PACKET_STARTUP        = 3,
     NETWORK_PACKET_GUEST_ACCEPTED = 4,
     NETWORK_PACKET_GUEST_REJECTED = 5

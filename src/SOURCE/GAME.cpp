@@ -1,15 +1,12 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/GAME.h>
 #include <BASE/message.h>
 #include <BASE/Icon2b.h>
 #include <BASE/Misc.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/FINDPATH.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <PLATFORM/File.h>
@@ -17,7 +14,7 @@
 #include <SOURCE/REMOTE_SAVE.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <PLATFORM/Binary.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Strings.h>
@@ -33,14 +30,13 @@
 #include <SOURCE/town.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/army.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/townManager.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/ExpCampaign.h>
+#include <SOURCE/Castle.h>
 #include <SOURCE/EVENTS.h>
 #include <EDITOR/mapcell.h>
 #include <EDITOR/fullMap.h>
@@ -52,10 +48,8 @@
 #include <BASE/iconWidget.h>
 #include <BASE/BITS.h>
 #include <BASE/Bzip2.h>
-#include <BASE/INPUTMGR.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
-#include <SOURCE/ARMY.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Localization.h>
 #include <SOURCE/SaveNames.h>
@@ -119,10 +113,10 @@ void RequireMapExtras(const game& state, bool newMap) {
     const auto& map = state.m_worldMap;
     if (const char* error = map_records::ExtraTableError(
             {map.cells, static_cast<std::size_t>(map.width * map.height)}, records,
-            {state.m_rumourEventIndices, state.m_rumourEventCount},
-            {state.m_timeEventIndices, state.m_timeEventCount},
+            {state.m_rumourEvents.indices, state.m_rumourEvents.count},
+            {state.m_timeEvents.indices, state.m_timeEvents.count},
             newMap ? std::span<const u16>{}
-                   : std::span<const u16>{state.m_mapEventIndices, state.m_mapEventCount},
+                   : std::span<const u16>{state.m_mapEvents.indices, state.m_mapEvents.count},
             newMap)) {
         platform::Host().Log(platform::LogLevel::Error,
             (std::string("Invalid map extras: ") + error).c_str());
@@ -158,6 +152,7 @@ bool EventIndicesFit(const u16* indices, u16 count, i32 extraCount) {
 #define GAME_SCORE_MEDIUM_DAY_SCALE 1.0
 #define GAME_SCORE_SMALL_DAY_SCALE 1.4
 #define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
+#define GAME_ULTIMATE_ARTIFACT_ONE_THIRD 0.33
 #define GAME_ULTIMATE_ARTIFACT_TWO_THIRDS                                          \
     0.66
 
@@ -182,7 +177,7 @@ typedef enum GameSaveFormatConstant {
     SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
     SAVE_SPARE_SLOT_COUNT              = 6,
-    LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
+    LOAD_CHUNK_TAG_SIZE   = 4,
     SAVE_TRUNCATED_SCALAR_SIZE         = sizeof(i8),
     SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
 } GameSaveFormatConstant;
@@ -199,9 +194,7 @@ typedef enum GameHeroSelectionConstant {
 typedef enum GameInitialStateConstant {
     INITIAL_DIFFICULTY_RATING   = 1,
     INITIAL_PLAYER_COUNT        = 4,
-    INITIAL_CALENDAR_VALUE      = 1,
     INITIAL_MAP_CHANGE_SEQUENCE = 1,
-    INITIAL_RECORD_TYPE_STRIDE  = H2EnumIndex(GAME_HERO_COUNT) / H2EnumIndex(FACTION_COUNT),
     BOAT_HERO_NONE              = -1,
     BOAT_SLOT_EMPTY             = -1
 } GameInitialStateConstant;
@@ -263,7 +256,6 @@ typedef enum GameDailyEconomyConstant {
     DAILY_CAMPAIGN_WOOD_BONUS       = 2,
     DAILY_RESOURCE_BONUS_FIRST_DAY  = 1,
     DAILY_RESOURCE_BONUS_LAST_DAY   = H2EnumIndex(RES_GOLD),
-    GAME_WEEKS_PER_MONTH            = 4,
     POWER_RING_DAILY_MANA_BONUS     = 2
 } GameDailyEconomyConstant;
 
@@ -287,27 +279,20 @@ typedef enum RandomMapConstant {
 typedef enum GameMapSetupConstant {
     COMPUTER_SCREEN_WIDGET_FIRST          = 1,
     COMPUTER_SCREEN_WIDGET_LAST           = 6,
-    HEROES_LOGO_X                         = 480,
-    HEROES_LOGO_Y                         = 16,
-    HEROES_LOGO_WIDTH                     = 144,
-    HEROES_LOGO_HEIGHT                    = 144,
     ALCHEMIST_LATE_OVERLAY_OFFSET         = 2,
     DEFAULT_DWELLING_ROLL_CAPACITY        = 10,
     DEFAULT_DWELLING_ROLL_BUCKET_COUNT    = 10,
-    TOWN_UPGRADE_TO_DWELLING_OFFSET       = 5,
     MAP_HERO_PROCESS_PASS_COUNT           = 3,
     MAP_HERO_ASSIGNMENT_PASS              = 0,
     MAP_HERO_CLASS_PASS                   = 1,
     MAP_HERO_PLACEMENT_PASS               = 2,
     MAP_HERO_FRAME_STRIDE                 = H2EnumIndex(FACTION_NEUTRAL) + 1,
     MAP_HERO_RANDOM_FACTION_FRAME         = H2EnumIndex(FACTION_NEUTRAL),
-    MAP_HEROES_PER_FACTION                = GAME_HERO_COUNT / H2EnumIndex(FACTION_COUNT),
     MAP_HERO_CLASS_SCAN_RETRY_LIMIT       = 1000,
     HERO_CONSISTENCY_POOL_THRESHOLD       = 40
 } GameMapSetupConstant;
 
 typedef enum GamePlayerTurnConstant {
-    GAME_AI_MUSIC_TRACK            = 28,
     ENVIRONMENT_ORIGIN_TILE_OFFSET = 7
 } GamePlayerTurnConstant;
 
@@ -340,24 +325,13 @@ typedef enum RemoteSaveConstant {
     REMOTE_PACKET_BATCH_SIZE         = 100,
     REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
     REMOTE_SAVE_HEADER_SIZE          = sizeof(RemoteSaveInitialization),
-    REMOTE_RECEIVE_TIMEOUT           = 90000,
-    REMOTE_RECEIVE_DIALOG_BUTTONS    = 2,
     REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
-    REMOTE_SAVE_INIT_COMMAND         = 1,
-    REMOTE_SAVE_INIT_RESPONSE        = 2,
-    REMOTE_SAVE_DATA_COMMAND         = 3,
-    REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
-    REMOTE_SAVE_ACK_RESPONSE_COMMAND = 5,
-    REMOTE_SAVE_FINISH_COMMAND       = 6
 } RemoteSaveConstant;
 
 typedef enum NewTurnConstant {
     NEW_TURN_MUSIC_FILENAME_CAPACITY = 16,
     NEW_TURN_LOWER_NAME_CAPACITY     = 52,
     NEW_TURN_BOTTOM_VIEW_DURATION    = 3000,
-    NEW_TURN_DIALOG_TYPE             = 9,
-    NEW_MONTH_MUSIC_TRACK            = 21,
-    NEW_WEEK_MUSIC_TRACK             = 20,
     NEW_MONTH_NORMAL_TEXT            = 2,
     NEW_MONTH_CREATURE_TEXT          = 3,
     NEW_MONTH_PLAGUE_TEXT            = 4,
@@ -371,8 +345,7 @@ typedef enum DiffRuntimeConstant {
     DIFF_BYTE_SHIFT       = 8,
     DIFF_BYTE_HEADER_SIZE = 2,
     DIFF_BUFFER_EXTRA     = 5000,
-    DIFF_MAX_SHORT_MATCH  = 3,
-    DIFF_COPY_FLAG_SHIFT  = 7
+    DIFF_MAX_SHORT_MATCH  = 3
 } DiffRuntimeConstant;
 
 #define SCORE_SECOND_TIER_FACTOR 0.5
@@ -408,9 +381,6 @@ typedef enum GameMonthlyConstant {
     NORMAL_NAME_MAX               = 9,
     CREATURE_LIST_MIN             = 0,
     CREATURE_LIST_MAX             = 11,
-    WELL_BUILDING                 = 0x10,
-    FIRST_DWELLING_BONUS_BUILDING = 0x800,
-    MONSTER_TRIGGER               = 0x98,
     MONSTER_SPAWN_MIN             = 0,
     MONSTER_SPAWN_MAX             = 360,
     MONSTER_SPAWN_ROLL            = 10
@@ -550,13 +520,15 @@ typedef enum GameLuckConstant {
     RAINBOW_BONUS = 2
 } GameLuckConstant;
 
-typedef enum GameTimeEventConstant {
-    EVENT_RESOURCE_PENALTY = 100000
-} GameTimeEventConstant;
-
 typedef enum GameRumourConstant {
     RUMOUR_SCRATCH_CAPACITY        = 100,
-    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT
+    RUMOUR_CATEGORY_ORDER_CAPACITY = GAME_PLAYER_COUNT,
+    RUMOUR_PICK_ATTEMPTS           = 200,
+    RUMOUR_EVENT_SHORT_TEXT_LENGTH = 2,
+    RUMOUR_TAVERN_TEXT_CHANCE      = 30,
+    RUMOUR_LEADER_CHANCE           = 80,
+    RUMOUR_ULTIMATE_REGION_CHANCE  = 33,
+    RUMOUR_ULTIMATE_TERRAIN_CHANCE = 66
 } GameRumourConstant;
 
 b32 gbGameOver = false;
@@ -569,12 +541,11 @@ typedef enum GameTuningConstant {
     RANDOM_MONSTER_SPRITE_LAST       = 0x46,
     RANDOM_MONSTER_SPRITE_TO_TRIGGER =
         0x70,
-    BANK_GUARDIAN_FLAG               = 0x100,
     TOWN_RECORD_TYPE_MASK            = 0x7f
 } GameTuningConstant;
 
 typedef enum GamePasswordConstant {
-    PASSWORD_COLOR_SHIFT = 3
+    EVENT_BARRIER_PASSWORD_SHIFT = 3
 } GamePasswordConstant;
 
 typedef enum GameLoadMapConstant {
@@ -587,55 +558,12 @@ typedef enum GameOwnershipConstant {
     TOWN_FLAG_RIGHT_FRAME        = 1,
     TOWN_NEW_OWNER_TURN_COUNT    = 2,
     MINE_FLAG_COMMON_OFFSET      = 14,
-    MINE_FLAG_MERCURY_OFFSET     = 21,
+    MINE_FLAG_ALCHEMIST_LAB_OFFSET     = 21,
     MINE_FLAG_WOOD_OFFSET        = 28,
-    MINE_FLAG_ALCHEMIST_OFFSET   = 35,
+    MINE_FLAG_DRAGON_CITY_OFFSET   = 35,
     MINE_FLAG_LIGHTHOUSE_OFFSET  = 42,
-    MINE_ALCHEMIST_FLAG_Y_OFFSET = 3
+    MINE_DRAGON_CITY_FLAG_Y_OFFSET = 3
 } GameOwnershipConstant;
-
-typedef enum GameViewSpellsConstant {
-    VIEW_SPELLS_WINDOW_X               = 86,
-    VIEW_SPELLS_WINDOW_Y               = 87,
-    VIEW_SPELL_PREVIOUS_ID             = 2,
-    VIEW_SPELL_NEXT_ID                 = 3,
-    VIEW_SPELL_COMBAT_TAB_ID           = 4,
-    VIEW_SPELL_ADVENTURE_TAB_ID        = 5,
-    VIEW_SPELL_MANA_LABEL_ID           = 6,
-    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
-    VIEW_SPELL_MANA_TENS_ID            = 8,
-    VIEW_SPELL_MANA_ONES_ID            = 9,
-    VIEW_SPELL_CLOSE_ID                = 10,
-    VIEW_SPELL_PAGE_SIZE               = 12,
-    VIEW_SPELL_TEXT_ID_BASE            = 30,
-    VIEW_SPELL_ICON_ID_0               = 100,
-    VIEW_SPELL_ICON_ID_1               = 101,
-    VIEW_SPELL_ICON_ID_2               = 102,
-    VIEW_SPELL_ICON_ID_3               = 103,
-    VIEW_SPELL_ICON_ID_4               = 104,
-    VIEW_SPELL_ICON_ID_5               = 105,
-    VIEW_SPELL_ICON_ID_6               = 106,
-    VIEW_SPELL_ICON_ID_7               = 107,
-    VIEW_SPELL_ICON_ID_8               = 108,
-    VIEW_SPELL_ICON_ID_9               = 109,
-    VIEW_SPELL_ICON_ID_10              = 110,
-    VIEW_SPELL_ICON_ID_11              = 111,
-    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_NAME_WIDTH              = 78,
-    VIEW_SPELL_MANA_MAX                = 999,
-    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
-    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
-    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
-    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
-    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
-    VIEW_SPELL_HELP_PREVIOUS           = 0,
-    VIEW_SPELL_HELP_NEXT               = 1,
-    VIEW_SPELL_HELP_COMBAT             = 2,
-    VIEW_SPELL_HELP_ADVENTURE          = 3,
-    VIEW_SPELL_HELP_CLOSE              = 4,
-    VIEW_SPELL_HELP_OTHER              = 5,
-    VIEW_SPELL_HELP_MANA               = 8
-} GameViewSpellsConstant;
 
 typedef enum GameViewArmyConstant {
     VIEW_ARMY_UNUSED_BASE_X           = 86,
@@ -646,7 +574,6 @@ typedef enum GameViewArmyConstant {
     VIEW_ARMY_DETAIL_WIDGET_ID        = 4,
     VIEW_ARMY_MONSTER_WIDGET_ID       = 5,
     VIEW_ARMY_UPGRADE_ACTION_ID       = 500,
-    VIEW_ARMY_FINISH_COMMAND          = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT),
     VIEW_ARMY_WINDOW_X                = 19,
     VIEW_ARMY_WINDOW_Y                = 75,
     VIEW_ARMY_MONSTER_BASE_X          = 167,
@@ -655,7 +582,6 @@ typedef enum GameViewArmyConstant {
     VIEW_ARMY_LOW_MEMORY_MONSTER_Y    = 93,
     VIEW_ARMY_MONSTER_WIDGET_WIDTH    = 86,
     VIEW_ARMY_MONSTER_WIDGET_HEIGHT   = 149,
-    VIEW_ARMY_MONSTER_WIDGET_Z_ORDER  = 5,
     VIEW_ARMY_ICON_CENTER_DIVISOR     = 2,
     VIEW_ARMY_FILENAME_SIZE           = 16,
     VIEW_ARMY_NAME_SIZE               = 32,
@@ -673,9 +599,7 @@ typedef enum GameViewArmyConstant {
     VIEW_ARMY_SPELL_WIDGET_ID_BASE    = 200,
     VIEW_ARMY_ANIMATION_INITIAL_DELAY = 90,
     VIEW_ARMY_HANDLER_FRAME_DELAY     = 5,
-    VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2,
-    VIEW_ARMY_DWELLING_UPGRADE_OFFSET =
-        H2EnumIndex(BUILDING_SLOT_UPGRADE_FIRST) - H2EnumIndex(BUILDING_SLOT_DWELLING_SECOND)
+    VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2
 } GameViewArmyConstant;
 
 typedef enum GameArmyDetailText {
@@ -744,7 +668,7 @@ void playerData::Write(i32 file) {
     WriteGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
     WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
     WriteGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    WriteGameData(file, m_unknownad, sizeof(m_unknownad));
+    WriteGameData(file, m_unusedAd, sizeof(m_unusedAd));
 }
 
 void playerData::Read(i32 file) {
@@ -774,7 +698,7 @@ void playerData::Read(i32 file) {
     ReadGameData(file, m_aiData.m_income, sizeof(m_aiData.m_income));
     ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
     ReadGameData(file, &m_barrierTents, sizeof(m_barrierTents));
-    ReadGameData(file, m_unknownad, sizeof(m_unknownad));
+    ReadGameData(file, m_unusedAd, sizeof(m_unusedAd));
 }
 
 i32 playerData::NextHero(i32) {
@@ -808,11 +732,11 @@ i32 playerData::HasMobileHero(void) {
     return 0;
 }
 
-i32 GetNumObelisks(i32 color) {
+i32 GetNumObelisks(i32 player) {
     i32 count = 0;
     i32 index;
     for (index = 0; index < GAME_OBELISK_VISITOR_COUNT; index++) {
-        if (gpGame->m_obeliskVisitors[index] & (1 << color))
+        if (gpGame->m_obeliskVisitors[index] & (1 << player))
             count++;
     }
     return count;
@@ -873,15 +797,15 @@ typedef enum UltimateArtifactHintConstant {
 } UltimateArtifactHintConstant;
 
 void ComputeUALoc(i32 playerIndex) {
-    i32 result = gpGame->SetupPuzzlePieces(playerIndex, 1);
-    if (result < MINIMUM_PUZZLE_PIECES
+    i32 puzzlePieces = gpGame->SetupPuzzlePieces(playerIndex, 1);
+    if (puzzlePieces < MINIMUM_PUZZLE_PIECES
         || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
         gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = 0;
         gpGame->m_players[playerIndex].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
         gpGame->m_players[playerIndex].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
     } else {
         i32 chance =
-            (result - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
+            (puzzlePieces - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
         if (chance > HINT_CHANCE_MAXIMUM)
             chance = HINT_CHANCE_MAXIMUM;
         if (chance < HINT_CHANCE_MINIMUM)
@@ -938,14 +862,14 @@ typedef enum PuzzleSetupConstant {
 
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCount = GetNumObelisks(player);
-    i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
+    i32 piecesBeyondObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float fraction = m_obeliskCount > 0
         ? static_cast<float>(GetNumObelisks(player) / static_cast<double>(m_obeliskCount)) : 0.0f;
     float interp =
         (fraction * fraction + fraction)
         / H2EnumIndex(PUZZLE_INTERPOLATION_TERM_COUNT)
         ;
-    pieceCount = static_cast<i32>(pieceCount + unvisitedObelisks * interp);
+    pieceCount = static_cast<i32>(pieceCount + piecesBeyondObelisks * interp);
 
     if (GetNumObelisks(player) == m_obeliskCount)
         pieceCount = PUZZLE_PIECE_COUNT;
@@ -1012,10 +936,10 @@ fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
-i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
+i32 game::CreateBoat(i32 x, i32 y, i32 skipNotify) {
     i32 boatIndex = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIndex != -1) {
-        if (notify == 0)
+        if (skipNotify == 0)
             SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
         m_boatSlots[boatIndex] = boatIndex;
         boatRecord* boat = &m_boats[boatIndex];
@@ -1061,15 +985,15 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
         heroIndex = Random(0, H2EnumIndex(GAME_HERO_COUNT) - 1);
-        if (m_availableHeroes[heroIndex] != HERO_AVAILABILITY_UNAVAILABLE
-            && m_availableHeroes[heroIndex] != WEEKLY_AVAILABLE_HERO)
+        if (m_heroOwners[heroIndex] != HERO_AVAILABILITY_UNAVAILABLE
+            && m_heroOwners[heroIndex] != HERO_AVAILABILITY_FOR_HIRE)
             continue;
-        if (m_availableHeroes[heroIndex] == WEEKLY_AVAILABLE_HERO
+        if (m_heroOwners[heroIndex] == HERO_AVAILABILITY_FOR_HIRE
             && attempts < HERO_SELECTION_REUSE_RETRY_LIMIT)
             continue;
         if (heroClass >= FACTION_KNIGHT && heroClass <= FACTION_NECROMANCER
             && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
-            && m_heroRecs[heroIndex].m_cursorType != heroClass)
+            && m_heroRecs[heroIndex].m_faction != heroClass)
             continue;
         if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
             && m_heroRecs[heroIndex].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
@@ -1128,15 +1052,15 @@ void EncodeGameFileText(
     }
 }
 
-i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
+i32 game::SaveGame(const char* filename, i32 generateName, i8 baseFormat) {
     // Unsaveable runtime state is a save failure, not a load (read) error.
     const auto requireSaveableState = [](bool condition) {
         if (!condition)
             ShutDown(localization::Tr("system.file.write_error"));
     };
-    requireSaveableState(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY
-                         && m_timeEventCount <= GAME_TIME_EVENT_CAPACITY
-                         && m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
+    requireSaveableState(m_rumourEvents.count <= GAME_RUMOUR_EVENT_CAPACITY
+                         && m_timeEvents.count <= GAME_TIME_EVENT_CAPACITY
+                         && m_mapEvents.count <= GAME_MAP_EVENT_CAPACITY);
     requireSaveableState(iMaxMapExtra > 0 && ppMapExtra != nullptr && pwSizeOfMapExtra != nullptr);
     // Record sizes are i16, so a nonnegative size always fits the save buffer.
     static_assert(GAME_SAVE_BUFFER_SIZE >= std::numeric_limits<i16>::max());
@@ -1147,19 +1071,19 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     char workBuffer[SAVE_LEGACY_SCRATCH_SIZE];
 
     i32 outFile;
-    i32 iFile;
+    i32 index;
     std::string genName;
     bchar humans[GAME_PLAYER_COUNT];
     char playerBuffer[1];
     void* emptyPayload;
 
     i32 chunkTag;
-    i32 oldTag;
+    i32 expansionMarker;
 
     emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
-        expansionFormat = 1;
+        baseFormat = 1;
     gpAdvManager->DemobilizeCurrHero();
 
     if (generateName) {
@@ -1170,11 +1094,11 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
             genName += ".GXC";
         } else {
             nHuman = 0;
-            for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
-                if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
+            for (index = 0; index < GAME_PLAYER_COUNT; index++) {
+                if (m_playerDead[index] == 0 && gbHumanPlayer[index])
                     nHuman++;
             }
-            genName += xIsExpansionMap && !expansionFormat ? ".GX" : ".GM";
+            genName += xIsExpansionMap && !baseFormat ? ".GX" : ".GM";
             genName += std::to_string(nHuman);
         }
     } else {
@@ -1206,9 +1130,9 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     if (outFile == -1)
         FileError(savePath.c_str());
 
-    oldTag = -1;
-    if (!expansionFormat)
-        WriteGameData(outFile, &oldTag, sizeof(oldTag));
+    expansionMarker = -1;
+    if (!baseFormat)
+        WriteGameData(outFile, &expansionMarker, sizeof(expansionMarker));
     WriteGameData(outFile, &m_worldMap.width, sizeof(m_worldMap.width));
     WriteGameData(outFile, &m_worldMap.height, sizeof(m_worldMap.height));
     WriteGameData(outFile, &m_mapHeader, sizeof(m_mapHeader));
@@ -1220,11 +1144,11 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
     WriteGameData(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
     decltype(cPlayerNames) serializedPlayerNames{};
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; ++iFile) {
+    for (index = 0; index < GAME_PLAYER_COUNT; ++index) {
         EncodeGameFileText(
-            cPlayerNames[iFile],
-            serializedPlayerNames[iFile],
-            sizeof(serializedPlayerNames[iFile]),
+            cPlayerNames[index],
+            serializedPlayerNames[index],
+            sizeof(serializedPlayerNames[index]),
             "player name"
         );
     }
@@ -1235,13 +1159,13 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
         WriteGameData(outFile, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        WriteGameData(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        WriteGameData(outFile, &xCampaign, sizeof(xCampaign));
     } else {
         WriteGameData(outFile, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
             WriteGameData(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
-    if (!expansionFormat)
+    if (!baseFormat)
         WriteGameData(outFile, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
@@ -1254,29 +1178,29 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
     WriteGameData(outFile, m_playerDead, sizeof(m_playerDead));
 
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
-        humans[iFile] = gbHumanPlayer[iFile];
-        if (m_playerDead[iFile] != 0)
-            humans[iFile] = false;
+    for (index = 0; index < GAME_PLAYER_COUNT; index++) {
+        humans[index] = gbHumanPlayer[index];
+        if (m_playerDead[index] != 0)
+            humans[index] = false;
     }
     WriteGameData(outFile, humans, GAME_PLAYER_COUNT);
     WriteGameData(outFile, &m_day, sizeof(m_day));
     WriteGameData(outFile, &m_week, sizeof(m_week));
     WriteGameData(outFile, &m_month, sizeof(m_month));
-    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++)
-        m_players[iFile].Write(outFile);
+    for (index = 0; index < GAME_PLAYER_COUNT; index++)
+        m_players[index].Write(outFile);
 
     WriteGameData(outFile, &m_obeliskCount, sizeof(m_obeliskCount));
-    for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
-        m_heroRecs[iFile].Write(outFile, !expansionFormat);
-    WriteGameData(outFile, m_availableHeroes, sizeof(m_availableHeroes));
+    for (index = 0; index < GAME_HERO_COUNT; index++)
+        m_heroRecs[index].Write(outFile, !baseFormat);
+    WriteGameData(outFile, m_heroOwners, sizeof(m_heroOwners));
     town serializedCastles[GAME_TOWN_COUNT];
     memcpy(serializedCastles, m_castleRecs, sizeof(serializedCastles));
-    for (iFile = 0; iFile < GAME_TOWN_COUNT; ++iFile) {
+    for (index = 0; index < GAME_TOWN_COUNT; ++index) {
         EncodeGameFileText(
-            m_castleRecs[iFile].m_name,
-            serializedCastles[iFile].m_name,
-            sizeof(serializedCastles[iFile].m_name),
+            m_castleRecs[index].m_name,
+            serializedCastles[index].m_name,
+            sizeof(serializedCastles[index].m_name),
             "town name"
         );
     }
@@ -1285,10 +1209,10 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     WriteGameData(outFile, m_townBuiltToday, sizeof(m_townBuiltToday));
     WriteGameData(outFile, m_mines, sizeof(m_mines));
     WriteGameData(outFile, m_mineOwners, sizeof(m_mineOwners));
-    if (!expansionFormat)
-        WriteGameData(outFile, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
+    if (!baseFormat)
+        WriteGameData(outFile, m_artifactPlaced, H2EnumIndex(ARTIFACT_COUNT));
     else
-        WriteGameData(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+        WriteGameData(outFile, m_artifactPlaced, ARTIFACT_BASE_TABLE_SIZE);
     WriteGameData(outFile, m_boats, sizeof(m_boats));
     WriteGameData(outFile, m_boatSlots, sizeof(m_boatSlots));
     WriteGameData(outFile, m_obeliskVisitors, sizeof(m_obeliskVisitors));
@@ -1301,29 +1225,29 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 expansionFormat) {
     );
     WriteGameData(outFile, serializedRumour, sizeof(serializedRumour));
     WriteGameData(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    WriteEventHeader(outFile, m_rumourEventCount, m_rumourEventIndices[0]);
+    WriteEventHeader(outFile, m_rumourEvents.count, m_rumourEvents.indices[0]);
     WriteGameData(
         outFile,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_rumourEvents.count * sizeof(m_rumourEvents.indices[0])
     );
-    WriteEventHeader(outFile, m_timeEventCount, m_timeEventIndices[0]);
-    WriteGameData(outFile, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    WriteEventHeader(outFile, m_mapEventCount, m_mapEventIndices[0]);
-    WriteGameData(outFile, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    WriteEventHeader(outFile, m_timeEvents.count, m_timeEvents.indices[0]);
+    WriteGameData(outFile, m_timeEvents.indices, m_timeEvents.count * sizeof(m_timeEvents.indices[0]));
+    WriteEventHeader(outFile, m_mapEvents.count, m_mapEvents.indices[0]);
+    WriteGameData(outFile, m_mapEvents.indices, m_mapEvents.count * sizeof(m_mapEvents.indices[0]));
 
     chunkTag = GAME_FILE_MARKER;
 
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
     WriteGameData(outFile, &iMaxMapExtra, sizeof(iMaxMapExtra));
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-    for (iFile = 1; iFile < iMaxMapExtra; iFile++) {
+    for (index = 1; index < iMaxMapExtra; index++) {
         WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
-        WriteGameData(outFile, pwSizeOfMapExtra + iFile, sizeof(pwSizeOfMapExtra[iFile]));
-        if (ppMapExtra[iFile] != NULL)
-            WriteGameData(outFile, ppMapExtra[iFile], pwSizeOfMapExtra[iFile]);
+        WriteGameData(outFile, pwSizeOfMapExtra + index, sizeof(pwSizeOfMapExtra[index]));
+        if (ppMapExtra[index] != NULL)
+            WriteGameData(outFile, ppMapExtra[index], pwSizeOfMapExtra[index]);
         else
-            WriteGameData(outFile, emptyPayload, pwSizeOfMapExtra[iFile]);
+            WriteGameData(outFile, emptyPayload, pwSizeOfMapExtra[index]);
     }
     WriteGameData(outFile, &chunkTag, sizeof(chunkTag));
     WriteGameData(outFile, mapExtra, MAP_WIDTH * MAP_HEIGHT);
@@ -1352,10 +1276,10 @@ void game::SetupOrigData(void) {
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
-    m_month = INITIAL_CALENDAR_VALUE;
-    m_week = INITIAL_CALENDAR_VALUE;
-    m_day = INITIAL_CALENDAR_VALUE;
-    giCurTurn = INITIAL_CALENDAR_VALUE;
+    m_month = CALENDAR_FIRST;
+    m_week = CALENDAR_FIRST;
+    m_day = CALENDAR_FIRST;
+    giCurTurn = CALENDAR_FIRST;
 
     i32 i;
     i32 j;
@@ -1386,8 +1310,8 @@ void game::SetupOrigData(void) {
     }
 
     m_obeliskCount = 0;
-    gpAdvManager->m_heroContextLocked = false;
-    memset(m_availableHeroes, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_availableHeroes));
+    gpAdvManager->m_heroMobilized = false;
+    memset(m_heroOwners, HERO_AVAILABILITY_UNAVAILABLE, sizeof(m_heroOwners));
     for (i = 0; i < GAME_HERO_COUNT; i++) {
         memset(&m_heroRecs[i], 0, sizeof(m_heroRecs[i]));
         memset(m_heroRecs[i].m_spells, 0, sizeof(m_heroRecs[i].m_spells));
@@ -1403,10 +1327,10 @@ void game::SetupOrigData(void) {
             sizeof(m_heroRecs[i].m_name),
             gHeroDefaultNames[i]
         );
-        m_heroRecs[i].m_cursorType = FactionTypeFromOrdinal(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_heroRecs[i].m_faction = FactionTypeFromOrdinal(i / GAME_HEROES_PER_FACTION);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)
             m_heroRecs[i].m_primaryStats[j] =
-                gStartingHeroStats[H2EnumIndex(m_heroRecs[i].m_cursorType)][j];
+                gStartingHeroStats[H2EnumIndex(m_heroRecs[i].m_faction)][j];
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_heroRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
         m_heroRecs[i].m_destinationY = HERO_DESTINATION_NONE;
@@ -1418,27 +1342,27 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_secondarySkills[j] = HERO_SKILL_LEVEL_NONE;
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
+        if (m_heroRecs[i].m_faction == FACTION_KNIGHT) {
             m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, HERO_SKILL_LEVEL_BASIC);
             m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
+        if (m_heroRecs[i].m_faction == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, HERO_SKILL_LEVEL_ADVANCED);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
+        if (m_heroRecs[i].m_faction == FACTION_BARBARIAN)
             m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, HERO_SKILL_LEVEL_ADVANCED);
-        if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
+        if (m_heroRecs[i].m_faction == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, HERO_SKILL_LEVEL_ADVANCED);
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
+        if (m_heroRecs[i].m_faction == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_ADVANCED);
         }
-        if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
+        if (m_heroRecs[i].m_faction == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
             m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, HERO_SKILL_LEVEL_BASIC);
@@ -1451,7 +1375,7 @@ void game::SetupOrigData(void) {
         m_castleRecs[i].m_onMap = 0;
         m_castleRecs[i].m_id = i;
         m_castleRecs[i].m_owner = TOWN_OWNER_NONE;
-        m_castleRecs[i].m_type = FactionTypeFromOrdinal(i / INITIAL_RECORD_TYPE_STRIDE);
+        m_castleRecs[i].m_type = FactionTypeFromOrdinal(i / GAME_HEROES_PER_FACTION);
         m_castleRecs[i].m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
         for (j = 0; j < ARMY_GROUP_SLOT_COUNT; j++)
             m_castleRecs[i].m_army.m_creatureTypes[j] = CREATURE_NONE;
@@ -1481,24 +1405,24 @@ void game::SetupOrigData(void) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
+void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
 
     char isHuman[GAME_PLAYER_COUNT];
 
     i32 rows;
     char pathBuffer[SAVE_PATH_CAPACITY];
-    b8 expTag;
+    b8 isExpansionSave;
     i32 fileDescriptor;
 
     i32 index;
     char playerBuffer[1];
-    char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
+    char chunkTag[LOAD_CHUNK_TAG_SIZE];
     i32 numHumans;
     i32 wide;
 
     LogStr("LG1");
-    if (loadFromFile) {
+    if (originalDataOnly) {
         SetupOrigData();
         return;
     }
@@ -1507,7 +1431,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    if (loadFromFile || platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (originalDataOnly || platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) == 0)
         utf8::Format(pathBuffer, "%s%s", ".\\DATA\\", filename);
     else
         utf8::Format(pathBuffer, "%s%s", gcGamePath, filename);
@@ -1517,10 +1441,10 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         FileError(pathBuffer);
     ClearMapExtra();
 
-    expTag = false;
+    isExpansionSave = false;
     ReadGameData(fileDescriptor, &wide, sizeof(wide));
     if (wide == -1) {
-        expTag = true;
+        isExpansionSave = true;
         ReadGameData(fileDescriptor, &wide, sizeof(wide));
     }
     ReadGameData(fileDescriptor, &rows, sizeof(rows));
@@ -1573,9 +1497,9 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        ReadGameData(fileDescriptor, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        ReadGameData(fileDescriptor, &xCampaign, sizeof(xCampaign));
     }
-    if (expTag)
+    if (isExpansionSave)
         ReadGameData(fileDescriptor, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
@@ -1621,8 +1545,8 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
 
     ReadGameData(fileDescriptor, &m_obeliskCount, sizeof(m_obeliskCount));
     for (index = 0; index < GAME_HERO_COUNT; index++)
-        m_heroRecs[index].Read(fileDescriptor, expTag);
-    ReadGameData(fileDescriptor, m_availableHeroes, sizeof(m_availableHeroes));
+        m_heroRecs[index].Read(fileDescriptor, isExpansionSave);
+    ReadGameData(fileDescriptor, m_heroOwners, sizeof(m_heroOwners));
     ReadGameData(fileDescriptor, m_castleRecs, sizeof(m_castleRecs));
     for (town& castle : m_castleRecs) {
         const auto field = localization::TextField(castle.m_name);
@@ -1634,10 +1558,10 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fileDescriptor, m_townBuiltToday, sizeof(m_townBuiltToday));
     ReadGameData(fileDescriptor, m_mines, sizeof(m_mines));
     ReadGameData(fileDescriptor, m_mineOwners, sizeof(m_mineOwners));
-    if (expTag)
-        ReadGameData(fileDescriptor, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
+    if (isExpansionSave)
+        ReadGameData(fileDescriptor, m_artifactPlaced, H2EnumIndex(ARTIFACT_COUNT));
     else
-        ReadGameData(fileDescriptor, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+        ReadGameData(fileDescriptor, m_artifactPlaced, ARTIFACT_BASE_TABLE_SIZE);
     ReadGameData(fileDescriptor, m_boats, sizeof(m_boats));
     ReadGameData(fileDescriptor, m_boatSlots, sizeof(m_boatSlots));
     ReadGameData(fileDescriptor, m_obeliskVisitors, sizeof(m_obeliskVisitors));
@@ -1656,19 +1580,19 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
         RequireGameText({m_defaultPlayerNames + index * GAME_DEFAULT_PLAYER_NAME_SIZE,
                         GAME_DEFAULT_PLAYER_NAME_SIZE}, "default player name");
     }
-    ReadEventHeader(fileDescriptor, m_rumourEventCount, m_rumourEventIndices[0]);
-    RequireGameData(m_rumourEventCount <= GAME_RUMOUR_EVENT_CAPACITY);
+    ReadEventHeader(fileDescriptor, m_rumourEvents.count, m_rumourEvents.indices[0]);
+    RequireGameData(m_rumourEvents.count <= GAME_RUMOUR_EVENT_CAPACITY);
     ReadGameData(
         fileDescriptor,
-        m_rumourEventIndices,
-        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_rumourEvents.count * sizeof(m_rumourEvents.indices[0])
     );
-    ReadEventHeader(fileDescriptor, m_timeEventCount, m_timeEventIndices[0]);
-    RequireGameData(m_timeEventCount <= GAME_TIME_EVENT_CAPACITY);
-    ReadGameData(fileDescriptor, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    ReadEventHeader(fileDescriptor, m_mapEventCount, m_mapEventIndices[0]);
-    RequireGameData(m_mapEventCount <= GAME_MAP_EVENT_CAPACITY);
-    ReadGameData(fileDescriptor, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    ReadEventHeader(fileDescriptor, m_timeEvents.count, m_timeEvents.indices[0]);
+    RequireGameData(m_timeEvents.count <= GAME_TIME_EVENT_CAPACITY);
+    ReadGameData(fileDescriptor, m_timeEvents.indices, m_timeEvents.count * sizeof(m_timeEvents.indices[0]));
+    ReadEventHeader(fileDescriptor, m_mapEvents.count, m_mapEvents.indices[0]);
+    RequireGameData(m_mapEvents.count <= GAME_MAP_EVENT_CAPACITY);
+    ReadGameData(fileDescriptor, m_mapEvents.indices, m_mapEvents.count * sizeof(m_mapEvents.indices[0]));
 
     ReadGameData(fileDescriptor, chunkTag, sizeof(i32));
     ReadGameData(fileDescriptor, &iMaxMapExtra, sizeof(iMaxMapExtra));
@@ -1678,15 +1602,11 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     RequireGameData(iMaxMapExtra > 0 && iMaxMapExtra <= map_records::ExtraCapacity
                     && mapExtraTableBytes >= 0
                     && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
-    RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
-    RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
-    RequireGameData(EventIndicesFit(m_mapEventIndices, m_mapEventCount, iMaxMapExtra));
-    ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
-    );
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*pwSizeOfMapExtra))
-    );
+    RequireGameData(EventIndicesFit(m_rumourEvents.indices, m_rumourEvents.count, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_timeEvents.indices, m_timeEvents.count, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_mapEvents.indices, m_mapEvents.count, iMaxMapExtra));
+    ppMapExtra = new void*[iMaxMapExtra];
+    pwSizeOfMapExtra = new i16[iMaxMapExtra];
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (index = 1; index < iMaxMapExtra; index++) {
@@ -1705,7 +1625,7 @@ void game::LoadGame(const char* filename, i32 loadFromFile, i32) {
     ReadGameData(fileDescriptor, chunkTag, sizeof(i32));
     platform::FileClose(fileDescriptor);
 
-    gpAdvManager->m_heroContextLocked = false;
+    gpAdvManager->m_heroMobilized = false;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = 1 << giCurPlayer;
     giCurWatchPlayer = giCurPlayer;
@@ -1978,7 +1898,7 @@ void game::NewMap(const char* filename) {
         m_players[player].m_ultimateArtifactHintY = -1;
 
         selectedTown = -1;
-        if (m_mapHeader.unknown25 == 0 && m_players[player].m_townCount > 0) {
+        if (m_mapHeader.noStartingHero == 0 && m_players[player].m_townCount > 0) {
             for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
                 for (nTown = 0; nTown < m_players[player].m_townCount; nTown++) {
                     if (selectedTown == -1
@@ -1998,7 +1918,7 @@ void game::NewMap(const char* filename) {
                     m_castleRecs[m_players[player].m_townIds[selectedTown]].m_type,
                     0
                 );
-            m_availableHeroes[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
+            m_heroOwners[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
                 player;
             m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_owner =
                 player;
@@ -2027,8 +1947,8 @@ void game::NewMap(const char* filename) {
                                   ? FACTION_SORCERESS
                                   : FACTION_NECROMANCER;
             for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
-                if (m_heroRecs[awardHero].m_cursorType == specClass
-                    && m_availableHeroes[awardHero] == -1)
+                if (m_heroRecs[awardHero].m_faction == specClass
+                    && m_heroOwners[awardHero] == -1)
                     break;
             }
             if (awardHero < GAME_HERO_COUNT) {
@@ -2050,9 +1970,9 @@ void game::NewMap(const char* filename) {
                     m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player].m_availableHeroIds[0] = awardHero;
-                m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
-                    WEEKLY_AVAILABLE_HERO;
-                startClass = m_heroRecs[awardHero].m_cursorType;
+                m_heroOwners[m_players[player].m_availableHeroIds[0]] =
+                    HERO_AVAILABILITY_FOR_HIRE;
+                startClass = m_heroRecs[awardHero].m_faction;
                 goto secondHero;
             }
         }
@@ -2070,8 +1990,8 @@ void game::NewMap(const char* filename) {
                 }
                 if (specClass != FACTION_ANY) {
                     for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
-                        if (m_heroRecs[awardHero].m_cursorType == specClass
-                            && m_availableHeroes[awardHero] == -1)
+                        if (m_heroRecs[awardHero].m_faction == specClass
+                            && m_heroOwners[awardHero] == -1)
                             break;
                     }
                     if (awardHero < GAME_HERO_COUNT) {
@@ -2085,9 +2005,9 @@ void game::NewMap(const char* filename) {
                         m_heroRecs[awardHero].m_portrait = curPic;
                         m_players[player].m_availableHeroIds[0] =
                             awardHero;
-                        m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
-                            WEEKLY_AVAILABLE_HERO;
-                        startClass = m_heroRecs[awardHero].m_cursorType;
+                        m_heroOwners[m_players[player].m_availableHeroIds[0]] =
+                            HERO_AVAILABILITY_FOR_HIRE;
+                        startClass = m_heroRecs[awardHero].m_faction;
                         goto secondHero;
                     }
                 }
@@ -2098,13 +2018,13 @@ void game::NewMap(const char* filename) {
                 startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
             m_players[player].m_availableHeroIds[0] =
                 GetNewHeroId(player, startClass, 0);
-            m_availableHeroes[m_players[player].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
+            m_heroOwners[m_players[player].m_availableHeroIds[0]] = HERO_AVAILABILITY_FOR_HIRE;
         }
     secondHero:
         startClass = (startClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % H2EnumIndex(FACTION_COUNT);
         m_players[player].m_availableHeroIds[1] =
             GetNewHeroId(player, startClass, 0);
-        m_availableHeroes[m_players[player].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
+        m_heroOwners[m_players[player].m_availableHeroIds[1]] = HERO_AVAILABILITY_FOR_HIRE;
     }
 
     for (player = 0; player < m_playerCount; player++) {
@@ -2114,7 +2034,7 @@ void game::NewMap(const char* filename) {
             yPosition = m_heroRecs[m_players[player].m_heroIds[nTown]].m_y;
             m_heroRecs[m_players[player].m_heroIds[nTown]].m_locationType =
                 m_worldMap.GetCell(xPosition, yPosition)->m_triggerType;
-            m_heroRecs[m_players[player].m_heroIds[nTown]].m_occupiedTown =
+            m_heroRecs[m_players[player].m_heroIds[nTown]].m_locationMetadata =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
             m_worldMap.GetCell(xPosition, yPosition)->m_triggerType =
                 MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
@@ -2209,15 +2129,15 @@ void game::NewMap(const char* filename) {
     SetupAdjacentMons();
     if (m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         xPosition = m_mapHeader.lossConditionValue;
-        yPosition = m_mapHeader.lossTownY;
+        yPosition = m_mapHeader.lossConditionY;
         m_mapHeader.lossConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
-            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
             m_mapHeader.lossConditionValue =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPosition, yPosition - 1)->m_triggerType
-                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
                 m_mapHeader.lossConditionValue =
                     m_worldMap.GetCell(xPosition, yPosition - 1)->m_objectMetadata;
             else
@@ -2226,15 +2146,15 @@ void game::NewMap(const char* filename) {
     }
     if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         xPosition = m_mapHeader.victoryConditionValue;
-        yPosition = m_mapHeader.victoryTownY;
+        yPosition = m_mapHeader.victoryConditionY;
         m_mapHeader.victoryConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
-            == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+            == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
             m_mapHeader.victoryConditionValue =
                 m_worldMap.GetCell(xPosition, yPosition)->m_objectMetadata;
         else {
             if (m_worldMap.GetCell(xPosition, yPosition - 1)->m_triggerType
-                == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID)))
+                == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
                 m_mapHeader.victoryConditionValue =
                     m_worldMap.GetCell(xPosition, yPosition - 1)->m_objectMetadata;
             else
@@ -2248,10 +2168,10 @@ void game::NewMap(const char* filename) {
                    < FACTION_COUNT) {
             sideClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
         } else {
-            if (!!m_players[player].m_townCount) {
+            if (m_players[player].m_townCount) {
                 sideClass = gpGame->m_castleRecs[m_players[player].m_townIds[0]].m_type;
-            } else if (!!m_players[player].m_heroCount) {
-                sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_cursorType;
+            } else if (m_players[player].m_heroCount) {
+                sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_faction;
             }
         }
         if (sideClass == FACTION_BARBARIAN || sideClass == FACTION_WARLOCK
@@ -2281,19 +2201,19 @@ inline town* GetCastleSlot(game* instance, i32 index) {
 }
 
 void game::RandomizeEvents(void) {
-    b32 valid;
+    b32 shadowOnly;
     u32 extraIndex;
     i32 row;
     i32 xPosition;
-    ArtifactType value;
-    i32 shrineId = 1;
-    i32 bottleId = 1;
-    i32 jailId = 1;
-    i32 sphinxId = 1;
-    i32 tentId = 1;
-    i32 hutId = 1;
-    i32 eyeId = 1;
-    i32 signId = 1;
+    ArtifactType artifact;
+    i32 obeliskId = 1;
+    i32 gazeboId = 1;
+    i32 fortId = 1;
+    i32 witchDoctorId = 1;
+    i32 mercenaryCampId = 1;
+    i32 standingStonesId = 1;
+    i32 treeOfKnowledgeId = 1;
+    i32 xanaduId = 1;
     i32 lowerTileIndex;
     mapCell* cell;
     i32 yPosition;
@@ -2304,15 +2224,15 @@ void game::RandomizeEvents(void) {
     i32 mineId;
     EventExtra* mapEvent;
     town* townRec;
-    mapCell* townEntrance;
+    mapCell* dockCell;
     CreatureType artifactGuardianChoices[ARTIFACT_GUARDIAN_CHOICE_COUNT];
     i32 lowerCount;
     i32 upperCount;
     TilesetId lowerTilesets[LAYER_SCAN_CAPACITY];
     TilesetId upperTilesets[LAYER_SCAN_CAPACITY];
 
-    m_mapEventCount = 0;
-    memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
+    m_mapEvents.count = 0;
+    memset(m_mapEvents.indices, 0, sizeof(m_mapEvents.indices));
 
     for (yPosition = 0; yPosition < MAP_HEIGHT; yPosition++) {
         for (xPosition = 0; xPosition < MAP_WIDTH; xPosition++) {
@@ -2330,7 +2250,7 @@ void game::RandomizeEvents(void) {
                     cell->SetObjectTileset(TILESET_NONE);
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     CreateBoat(xPosition, yPosition, 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
@@ -2342,30 +2262,30 @@ void game::RandomizeEvents(void) {
                         eventData->active = 0;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MAP_EVENT):
-                    RequireGameData(m_mapEventCount < GAME_MAP_EVENT_CAPACITY);
-                    m_mapEventIndices[m_mapEventCount] = cell->m_objectMetadata;
+                    RequireGameData(m_mapEvents.count < GAME_MAP_EVENT_CAPACITY);
+                    m_mapEvents.indices[m_mapEvents.count] = cell->m_objectMetadata;
                     mapEvent = static_cast<EventExtra*>(MapExtraRecord(cell->m_objectMetadata, map_records::Kind::MapEvent));
                     mapEvent->x = xPosition;
                     mapEvent->y = yPosition;
                     mapEvent->active = true;
                     cell->m_objectMetadata = 0;
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->SetObjectTileset(TILESET_NONE);
-                    m_mapEventCount++;
+                    m_mapEvents.count++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_GAZEBO):
-                    cell->m_objectMetadata = bottleId++;
+                    cell->m_objectMetadata = gazeboId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FORT):
-                    cell->m_objectMetadata = jailId++;
+                    cell->m_objectMetadata = fortId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_WITCH_DOCTOR_HUT):
-                    cell->m_objectMetadata = sphinxId;
-                    sphinxId++;
+                    cell->m_objectMetadata = witchDoctorId;
+                    witchDoctorId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_MERCENARY_CAMP):
-                    cell->m_objectMetadata = tentId++;
+                    cell->m_objectMetadata = mercenaryCampId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_STANDING_STONES):
                     if (xPosition > 0
@@ -2374,16 +2294,16 @@ void game::RandomizeEvents(void) {
                         cell->m_objectMetadata =
                             m_worldMap.GetCell(xPosition - 1, yPosition)->m_objectMetadata;
                     else
-                        cell->m_objectMetadata = hutId++;
+                        cell->m_objectMetadata = standingStonesId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_XANADU):
-                    cell->m_objectMetadata = signId++;
+                    cell->m_objectMetadata = xanaduId++;
                     break;
                 case MAP_PASSIVE_TRIGGER(MAP_OBJECT_WHIRLPOOL):
                     cell->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_OBELISK):
-                    cell->m_objectMetadata = shrineId++;
+                    cell->m_objectMetadata = obeliskId++;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_FLOTSAM):
                     cell->m_objectMetadata =
@@ -2552,7 +2472,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_OF_KNOWLEDGE):
                     cell->m_objectMetadata =
-                        eyeId++
+                        treeOfKnowledgeId++
                         | (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
                            << TREE_KNOWLEDGE_MODE_SHIFT);
                     break;
@@ -2570,7 +2490,7 @@ void game::RandomizeEvents(void) {
                     }
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE):
-                    cell->m_objectMetadata = cell->m_objectIndex / 2;
+                    cell->m_objectMetadata = cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT;
                     switch (cell->m_objectMetadata) {
                         case H2EnumIndex(RES_WOOD):
                         case H2EnumIndex(RES_ORE):
@@ -2622,7 +2542,7 @@ void game::RandomizeEvents(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_HOUSE):
                     cell->m_objectMetadata = Random(15, 25);
                     break;
-                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_CABIN):
                     cell->m_objectMetadata = Random(10, 20);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_WATCH_TOWER):
@@ -2638,13 +2558,13 @@ void game::RandomizeEvents(void) {
                     cell->m_objectMetadata = Random(20, 40);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TROLL_BRIDGE):
-                    cell->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
+                    cell->m_objectMetadata = Random(4, 6) | DWELLING_GUARDED_FLAG;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_CITY_OF_DEAD):
-                    cell->m_objectMetadata = Random(4, 6) | BANK_GUARDIAN_FLAG;
+                    cell->m_objectMetadata = Random(4, 6) | DWELLING_GUARDED_FLAG;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY):
-                    cell->m_objectMetadata = BANK_GUARDIAN_FLAG | 2;
+                    cell->m_objectMetadata = DWELLING_GUARDED_FLAG | 2;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_CAVE):
                     cell->m_objectMetadata = Random(10, 20);
@@ -2669,8 +2589,8 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT):
                     randomValue = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value = ArtifactTypeFromCode(cell->m_objectIndex / 2);
-                    if (value == ARTIFACT_SPELL_SCROLL)
+                    artifact = ArtifactTypeFromCode(cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT);
+                    if (artifact == ARTIFACT_SPELL_SCROLL)
                         break;
                     if (randomValue < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
                         if (randomValue % EVENT_BUCKET_COUNT
@@ -2682,14 +2602,14 @@ void game::RandomizeEvents(void) {
                         else
                             cell->m_objectMetadata = ARTIFACT_EVENT_MODE_PICKUP;
                     } else if (randomValue < ARTIFACT_EVENT_GUARD_CUTOFF) {
-                        if (gArtifactLevel[H2EnumIndex(value)] == ARTIFACT_LEVEL_TREASURE)
+                        if (gArtifactLevel[H2EnumIndex(artifact)] == ARTIFACT_LEVEL_TREASURE)
                             cell->m_objectMetadata = ARTIFACT_EVENT_MODE_GOLD;
-                        else if (gArtifactLevel[H2EnumIndex(value)] == ARTIFACT_LEVEL_MINOR)
+                        else if (gArtifactLevel[H2EnumIndex(artifact)] == ARTIFACT_LEVEL_MINOR)
                             cell->m_objectMetadata =
                                 (Random(H2EnumIndex(RES_WOOD), H2EnumIndex(RES_GEMS))
                                  << ARTIFACT_EVENT_RESOURCE_SHIFT)
                                 | ARTIFACT_EVENT_MODE_RESOURCE_3;
-                        else if (gArtifactLevel[H2EnumIndex(value)] == ARTIFACT_LEVEL_MAJOR)
+                        else if (gArtifactLevel[H2EnumIndex(artifact)] == ARTIFACT_LEVEL_MAJOR)
                             cell->m_objectMetadata =
                                 (Random(H2EnumIndex(RES_WOOD), H2EnumIndex(RES_GEMS))
                                  << ARTIFACT_EVENT_RESOURCE_SHIFT)
@@ -2706,9 +2626,9 @@ void game::RandomizeEvents(void) {
                         artifactGuardianChoices[8] = CREATURE_GIANT;
                         artifactGuardianChoices[9] = CREATURE_TITAN;
                         cell->m_objectMetadata = MAP_EVENT_ARTIFACT_GUARD_FLAG;
-                        if (gArtifactLevel[H2EnumIndex(value)] == ARTIFACT_LEVEL_TREASURE)
+                        if (gArtifactLevel[H2EnumIndex(artifact)] == ARTIFACT_LEVEL_TREASURE)
                             cell->m_objectMetadata |= H2EnumIndex(CREATURE_ROGUE);
-                        else if (gArtifactLevel[H2EnumIndex(value)] == ARTIFACT_LEVEL_MINOR)
+                        else if (gArtifactLevel[H2EnumIndex(artifact)] == ARTIFACT_LEVEL_MINOR)
                             cell->m_objectMetadata |= H2EnumIndex(artifactGuardianChoices[Random(
                                 EVENT_ROLL_MIN,
                                 MINOR_GUARDIAN_CHOICE_COUNT - 1
@@ -2736,19 +2656,19 @@ void game::RandomizeEvents(void) {
                     townRec->m_boatY = -1;
                     townRec->m_boatX = -1;
                     if (yPosition <= MAP_HEIGHT - CASTLE_BOAT_Y_OFFSET - 1) {
-                        townEntrance = gpAdvManager->GetCell(
+                        dockCell = gpAdvManager->GetCell(
                             xPosition - CASTLE_BOAT_X_OFFSET,
                             yPosition + CASTLE_BOAT_Y_OFFSET
                         );
-                        if (CELL_TERRAIN(townEntrance) == TERRAIN_WATER) {
+                        if (CELL_TERRAIN(dockCell) == TERRAIN_WATER) {
                             townRec->m_boatX = xPosition - CASTLE_BOAT_X_OFFSET;
                             townRec->m_boatY = yPosition + CASTLE_BOAT_Y_OFFSET;
                         } else {
-                            townEntrance = gpAdvManager->GetCell(
+                            dockCell = gpAdvManager->GetCell(
                                 xPosition + CASTLE_BOAT_X_OFFSET,
                                 yPosition + CASTLE_BOAT_Y_OFFSET
                             );
-                            if (CELL_TERRAIN(townEntrance) == TERRAIN_WATER) {
+                            if (CELL_TERRAIN(dockCell) == TERRAIN_WATER) {
                                 townRec->m_boatX =
                                     xPosition + CASTLE_BOAT_X_OFFSET;
                                 townRec->m_boatY =
@@ -2813,17 +2733,17 @@ void game::RandomizeEvents(void) {
     for (yPosition = 0; yPosition < MAP_HEIGHT; yPosition++) {
         for (xPosition = 0; xPosition < MAP_WIDTH; xPosition++) {
             cell = m_worldMap.GetCell(xPosition, yPosition);
-            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectLayerBit1) {
-                valid = true;
+            if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectShadow) {
+                shadowOnly = true;
                 extraIndex = cell->m_extraIndex;
                 while (extraIndex != 0) {
                     extra = m_worldMap.Extra(extraIndex);
                     if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                        && !extra->objectLayerBit1)
-                        valid = false;
+                        && !extra->objectShadow)
+                        shadowOnly = false;
                     extraIndex = extra->nextIndex;
                 }
-                if (valid)
+                if (shadowOnly)
                     cell->m_flags |= H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY);
             }
         }
@@ -2856,7 +2776,7 @@ void game::RandomizeEvents(void) {
                         m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
                         & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
-                    if (!cell->m_objectLayerBit1) {
+                    if (!cell->m_objectShadow) {
                         upperTilesets[upperCount] = cell->ObjectTileset();
 
                         upperCount++;
@@ -2867,7 +2787,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (upperCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             upperTilesets[upperCount] = extra->ObjectTileset();
 
                             upperCount++;
@@ -2878,7 +2798,7 @@ void game::RandomizeEvents(void) {
                             extra = NULL;
                     }
                     below = m_worldMap.GetCell(xPosition, yPosition + 1);
-                    if (!below->m_objectLayerBit1) {
+                    if (!below->m_objectShadow) {
                         lowerTilesets[lowerCount] = below->ObjectTileset();
 
                         lowerCount++;
@@ -2889,7 +2809,7 @@ void game::RandomizeEvents(void) {
                         extra = NULL;
                     while (lowerCount < LAYER_SCAN_CAPACITY && extra != NULL) {
                         if (extra->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra->objectLayerBit1) {
+                            && !extra->objectShadow) {
                             lowerTilesets[lowerCount] = extra->ObjectTileset();
 
                             lowerCount++;
@@ -2924,35 +2844,36 @@ void game::RandomizeEvents(void) {
                 && !(cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell->m_flags & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY))
                 && (yPosition == MAP_HEIGHT - 1
-                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags & 4)))
+                    || (m_worldMap.GetCell(xPosition, yPosition + 1)->m_flags
+                        & H2EnumIndex(MAP_CELL_SHORE))))
                 cell->m_flags |= H2EnumIndex(MAP_CELL_OCCUPIED);
         }
     }
 }
 
 void game::InitializePasswords(void) {
-    bchar flag;
+    bchar unique;
     i32 i;
     i32 j;
     for (i = 0; i < X_GLOBAL_PASSWORD_STRING_INDEX_COUNT; i++) {
-        flag = false;
-        while (flag == 0) {
+        unique = false;
+        while (!unique) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
-            flag = true;
+            unique = true;
             for (j = 0; j < i; j++) {
                 if (xPasswordStringsIndex[i] == xPasswordStringsIndex[j])
-                    flag = false;
+                    unique = false;
             }
         }
     }
 }
 
 void game::RandomizeBarrier(mapCell* cell) {
-    i32 index = cell->m_objectMetadata;
-    index &= EVENT_BARRIER_COLOR_MASK;
-    i32 passwordIndex = xPasswordStringsIndex[index];
-    i32 color = (passwordIndex << PASSWORD_COLOR_SHIFT) | index;
-    cell->m_objectMetadata = color;
+    i32 barrierColor = cell->m_objectMetadata;
+    barrierColor &= EVENT_BARRIER_COLOR_MASK;
+    i32 passwordIndex = xPasswordStringsIndex[barrierColor];
+    i32 packedMetadata = (passwordIndex << EVENT_BARRIER_PASSWORD_SHIFT) | barrierColor;
+    cell->m_objectMetadata = packedMetadata;
 }
 
 void game::RandomizePassword(mapCell* cell) {
@@ -3032,31 +2953,27 @@ i32 game::LoadMap(const char* filename) {
     RequireGameData(m_mapHeader.rumourCount <= GAME_RUMOUR_EVENT_CAPACITY);
     ReadGameData(
         handle,
-        m_rumourEventIndices,
-        m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
+        m_rumourEvents.indices,
+        m_mapHeader.rumourCount * sizeof(m_rumourEvents.indices[0])
     );
-    m_rumourEventCount = m_mapHeader.rumourCount;
+    m_rumourEvents.count = m_mapHeader.rumourCount;
     RequireGameData(m_mapHeader.timeEventCount <= GAME_TIME_EVENT_CAPACITY);
     ReadGameData(
         handle,
-        m_timeEventIndices,
-        m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
+        m_timeEvents.indices,
+        m_mapHeader.timeEventCount * sizeof(m_timeEvents.indices[0])
     );
-    m_timeEventCount = m_mapHeader.timeEventCount;
+    m_timeEvents.count = m_mapHeader.timeEventCount;
     ReadGameData(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
     const i32 mapExtraTableBytes = platform::FileLength(handle) - platform::FileTell(handle);
     const i32 minimumExtraRecordSize = sizeof(i16);
     RequireGameData(iMaxMapExtra > 0 && iMaxMapExtra <= map_records::ExtraCapacity
                     && mapExtraTableBytes >= 0
                     && iMaxMapExtra - 1 <= mapExtraTableBytes / minimumExtraRecordSize);
-    RequireGameData(EventIndicesFit(m_rumourEventIndices, m_rumourEventCount, iMaxMapExtra));
-    RequireGameData(EventIndicesFit(m_timeEventIndices, m_timeEventCount, iMaxMapExtra));
-    ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
-    );
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]))
-    );
+    RequireGameData(EventIndicesFit(m_rumourEvents.indices, m_rumourEvents.count, iMaxMapExtra));
+    RequireGameData(EventIndicesFit(m_timeEvents.indices, m_timeEvents.count, iMaxMapExtra));
+    ppMapExtra = new void*[iMaxMapExtra];
+    pwSizeOfMapExtra = new i16[iMaxMapExtra];
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i = 1; i < iMaxMapExtra; i++) {
@@ -3135,7 +3052,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
 void game::ClaimMine(i32 mineId, i32 player) {
     i32 x;
     i32 y;
-    i32 flag;
+    i32 flagFrameBase;
     mapCell* cell;
 
     SendMapChange(
@@ -3150,20 +3067,20 @@ void game::ClaimMine(i32 mineId, i32 player) {
     m_mines[mineId].owner = player;
     m_mineOwners[mineId] = player;
     switch (m_mines[mineId].resourceType) {
-        case MINE_TYPE_ALCHEMIST_LAB:
-            flag = MINE_FLAG_ALCHEMIST_OFFSET;
+        case MINE_TYPE_DRAGON_CITY:
+            flagFrameBase = MINE_FLAG_DRAGON_CITY_OFFSET;
             break;
         case MINE_TYPE_LIGHTHOUSE:
-            flag = MINE_FLAG_LIGHTHOUSE_OFFSET;
+            flagFrameBase = MINE_FLAG_LIGHTHOUSE_OFFSET;
             break;
         case MINE_TYPE_WOOD:
-            flag = MINE_FLAG_WOOD_OFFSET;
+            flagFrameBase = MINE_FLAG_WOOD_OFFSET;
             break;
         case MINE_TYPE_MERCURY:
-            flag = MINE_FLAG_MERCURY_OFFSET;
+            flagFrameBase = MINE_FLAG_ALCHEMIST_LAB_OFFSET;
             break;
         default:
-            flag = MINE_FLAG_COMMON_OFFSET;
+            flagFrameBase = MINE_FLAG_COMMON_OFFSET;
             break;
     }
     switch (m_mines[mineId].resourceType) {
@@ -3175,9 +3092,9 @@ void game::ClaimMine(i32 mineId, i32 player) {
             x = m_mines[mineId].x + 1;
             y = m_mines[mineId].y - 1;
             break;
-        case MINE_TYPE_ALCHEMIST_LAB:
+        case MINE_TYPE_DRAGON_CITY:
             x = m_mines[mineId].x - 1;
-            y = m_mines[mineId].y - MINE_ALCHEMIST_FLAG_Y_OFFSET;
+            y = m_mines[mineId].y - MINE_DRAGON_CITY_FLAG_Y_OFFSET;
             break;
         case MINE_TYPE_LIGHTHOUSE:
             x = m_mines[mineId].x;
@@ -3199,7 +3116,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
             x,
             y,
             TILESET_FLAG32,
-            flag + GetPlayerColor(static_cast<i8>(player)),
+            flagFrameBase + GetPlayerColor(static_cast<i8>(player)),
             1,
             -1
         );
@@ -3251,7 +3168,7 @@ game::ViewSpells(
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = static_cast<i16>(
                 spellType == SPELL_TYPE_COMBAT
-                ? VIEW_SPELL_COMBAT_TAB_ID : VIEW_SPELL_ADVENTURE_TAB_ID
+                ? VIEW_SPELL_ADVENTURE_TAB_ID : VIEW_SPELL_COMBAT_TAB_ID
             );
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
@@ -3430,18 +3347,18 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
+                        case VIEW_SPELL_ADVENTURE_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_ADVENTURE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
-                        case VIEW_SPELL_ADVENTURE_TAB_ID:
+                        case VIEW_SPELL_COMBAT_TAB_ID:
                             gpGame->m_viewSpellsType = SPELL_TYPE_COMBAT;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case DIALOG_BUTTON_0:
-                            message.payload.widget.id = VIEW_SPELL_CLOSE_ID;
+                            message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
                             break;
                     }
                 }
@@ -3482,15 +3399,15 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
-                        case VIEW_SPELL_COMBAT_TAB_ID:
-                            NormalDialog(
-                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
-                                NORMAL_DIALOG_QUICK_VIEW
-                            );
-                            break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
                             NormalDialog(
                                 cSpellHelp[VIEW_SPELL_HELP_ADVENTURE],
+                                NORMAL_DIALOG_QUICK_VIEW
+                            );
+                            break;
+                        case VIEW_SPELL_COMBAT_TAB_ID:
+                            NormalDialog(
+                                cSpellHelp[VIEW_SPELL_HELP_COMBAT],
                                 NORMAL_DIALOG_QUICK_VIEW
                             );
                             break;
@@ -3551,7 +3468,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& message) {
                 break;
         }
 
-        if (message.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
+        if (message.payload.widget.id == H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT)) {
             message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
             return MESSAGE_DISPATCH_FORWARD;
         }
@@ -3571,11 +3488,11 @@ MessageDispatchResult ViewSpecialHandler(tag_message& message) {
             case VIEW_SPELL_NEXT_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_NEXT]);
                 break;
-            case VIEW_SPELL_COMBAT_TAB_ID:
-                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
-                break;
             case VIEW_SPELL_ADVENTURE_TAB_ID:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_ADVENTURE]);
+                break;
+            case VIEW_SPELL_COMBAT_TAB_ID:
+                strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_COMBAT]);
                 break;
             case DIALOG_BUTTON_0:
                 strcpy(gText, cSpellHelp[VIEW_SPELL_HELP_CLOSE]);
@@ -3646,7 +3563,7 @@ void game::ViewArmy(
              loopIndex++) {
             if (gDwellingType[H2EnumIndex(castle->m_type)][loopIndex - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)]
                     == monsterType
-                && (H2EnumIndex((castle->m_buildings) & ((1 << (loopIndex + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))))) {
+                && (H2EnumIndex((castle->m_buildings) & ((1 << (loopIndex + CASTLE_UPGRADE_OFFSET)))))) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = NextCreatureType(monsterType);
             }
@@ -3701,7 +3618,7 @@ void game::ViewArmy(
         filename,
         sViewArmyMonFrameInfo.animationFrames[H2EnumIndex(ARMY_ANIMATION_WALK)][0],
         facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
-        VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
+        VIEW_ARMY_MONSTER_WIDGET_ID,
         WIDGET_KIND_ICON_DIRECT,
         1
     );
@@ -3931,15 +3848,15 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                     case VIEW_ARMY_CLOSE_BUTTON:
                     case DIALOG_BUTTON_1:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
-                        message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
                     case VIEW_ARMY_DISMISS_ID:
                         NormalDialog(localization::Tr("army.confirm.dismiss"), NORMAL_DIALOG_CONFIRM);
                         if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
                             gbDismissArmy = true;
-                            message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
-                            message.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                            message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+                            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
@@ -3968,9 +3885,9 @@ MessageDispatchResult ViewArmyHandler(tag_message& message) {
                                 if (resourceType != RES_NONE)
                                     gpCurPlayer->m_resources[H2EnumIndex(resourceType)] -= resourceCost;
                                 gbUpgradeArmy = true;
-                                message.payload.widget.id = VIEW_ARMY_FINISH_COMMAND;
+                                message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
                                 message.payload.widget.command =
-                                    BaseWidgetCommand(VIEW_ARMY_FINISH_COMMAND);
+                                    WIDGET_COMMAND_DIALOG_SELECT;
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
@@ -4149,12 +4066,12 @@ i32 game::GetRandomNumTroops(CreatureType monsterType) {
 
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
-    gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
-    gSoundBackendsReady = 0;
+    gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_AI_TURN);
+    gbSoundEnabled = 0;
 }
 
 void game::TurnOffAIMusic(void) {
-    gSoundBackendsReady = 1;
+    gbSoundEnabled = 1;
 }
 
 void game::NextPlayer(void) {
@@ -4230,18 +4147,18 @@ void game::NextPlayer(void) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         giForceSwitchMusic = platform::Ticks();
-        gSoundBackendsReady = 0;
+        gbSoundEnabled = 0;
     }
     if (m_day == 1 && giCurTurn != 1)
-        gSoundBackendsReady = 0;
+        gbSoundEnabled = 0;
 
     DoNewTurn();
     CheckEndGame(END_GAME_FORCE_NONE, false);
-    if (gbThisNetHumanPlayer[giCurPlayer] && gSoundBackendsReady == 0
+    if (gbThisNetHumanPlayer[giCurPlayer] && gbSoundEnabled == 0
         && giForceSwitchMusic == -1) {
-        gSoundBackendsReady = 1;
+        gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
@@ -4264,17 +4181,17 @@ i32 game::ComputeDailyGold(i32 player) {
         if (m_mines[index].owner == player) {
             if (m_mines[index].resourceType == MINE_TYPE_GOLD)
                 dailyGold += MINE_GOLD_INCOME;
-            if (m_mines[index].resourceType == MINE_TYPE_ALCHEMIST_LAB)
+            if (m_mines[index].resourceType == MINE_TYPE_DRAGON_CITY)
                 dailyGold += MINE_GOLD_INCOME;
         }
     }
 
     for (index = 0; index < GAME_TOWN_COUNT; index++) {
         if (m_castleRecs[index].m_owner == player) {
-            dailyGold += (H2EnumIndex((m_castleRecs[index].m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_UPGRADE_CASTLE)))))
+            dailyGold += (H2EnumIndex((m_castleRecs[index].m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_TENT)))))
                              ? DAILY_GOLD_VILLAGE_INCOME
                              : DAILY_GOLD_TOWN_INCOME;
-            if ((H2EnumIndex((m_castleRecs[index].m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_SPECIAL_SEVEN))))))
+            if ((H2EnumIndex((m_castleRecs[index].m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_STATUE))))))
                 dailyGold += DAILY_GOLD_STATUE_INCOME;
             if (m_castleRecs[index].m_type == FACTION_WARLOCK
                 && (H2EnumIndex((m_castleRecs[index].m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_SPECIAL))))))
@@ -4406,7 +4323,7 @@ void game::PerDay(void) {
             m_day = 1;
             PerWeek();
         }
-        if (m_week > GAME_WEEKS_PER_MONTH) {
+        if (m_week > CALENDAR_WEEKS_PER_MONTH) {
             m_week = 1;
             PerMonth();
         }
@@ -4454,7 +4371,7 @@ void game::PerDay(void) {
         currentTown = GetTown(player);
         if (!(H2EnumIndex((currentTown->m_buildings) & ((1 << H2EnumIndex(BUILDING_SLOT_MAGE_GUILD))))))
             continue;
-        if (currentTown->m_occupyingHeroId != -1) {
+        if (currentTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
             townHero = GetHero(currentTown->m_occupyingHeroId);
             maxSpellPoints = HERO_NORMAL_SPELL_POINTS(*townHero);
             if (maxSpellPoints > townHero->m_spellPoints)
@@ -4478,7 +4395,7 @@ void game::PerWeek(void) {
 
     giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = Random(0, WEEK_NAME_LAST);
-    if (m_week != GAME_WEEKS_PER_MONTH) {
+    if (m_week != CALENDAR_WEEKS_PER_MONTH) {
         outerIndex = Random(1, SPECIAL_WEEK_ROLL_MAX);
         if (outerIndex == 1) {
             giWeekType = CALENDAR_PERIOD_CREATURE;
@@ -4525,7 +4442,7 @@ void game::PerWeek(void) {
         for (innerIndex = 0; innerIndex < HERO_AVAILABLE_SLOT_COUNT; innerIndex++) {
             if (innerIndex == 1) {
                 heroClass =
-                    m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
+                    m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_faction;
             }
             heroClass =
                 FactionTypeFromOrdinal((Random(1, H2EnumIndex(FACTION_COUNT) - 1) + H2EnumIndex(heroClass)) % H2EnumIndex(FACTION_COUNT));
@@ -4537,17 +4454,17 @@ void game::PerWeek(void) {
                     m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]];
             }
 
-            if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
-                == WEEKLY_AVAILABLE_HERO) {
+            if (gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
+                == HERO_AVAILABILITY_FOR_HIRE) {
                 if ((H2EnumIndex((gpGame
                             ->m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                             .m_eventFlags) & (HERO_EVENT_RESERVED_FOR_RECRUITMENT))))
                     continue;
             }
             {
-                if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
-                    == WEEKLY_AVAILABLE_HERO)
-                    gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = -1;
+                if (gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
+                    == HERO_AVAILABILITY_FOR_HIRE)
+                    gpGame->m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = -1;
                 if (innerIndex == 1 && !gbHumanPlayer[outerIndex])
                     desiredClass = FACTION_ANY;
                 gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex] =
@@ -4556,7 +4473,7 @@ void game::PerWeek(void) {
                         desiredClass,
                         !gbHumanPlayer[outerIndex] && gpGame->m_difficulty > DIFFICULTY_EASY
                     );
-                m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = WEEKLY_AVAILABLE_HERO;
+                m_heroOwners[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = HERO_AVAILABILITY_FOR_HIRE;
             }
         }
     }
@@ -4626,7 +4543,7 @@ void game::PerWeek(void) {
                     if (WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(4, 8);
                     break;
-                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_CABIN):
                     if (WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(3, 6);
                     break;
@@ -4640,7 +4557,7 @@ void game::PerWeek(void) {
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_CITY):
                     if (WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
-                        < WEEKLY_MONSTER_POPULATION_LIMIT)
+                        < WEEKLY_TREE_CITY_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(10, 20);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_CAVE):
@@ -4659,21 +4576,21 @@ void game::PerWeek(void) {
                     if (!(WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
-                               < WEEKLY_DRAGON_CITY_LIMIT)
+                               < WEEKLY_GUARDED_DWELLING_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_CITY_OF_DEAD):
                     if (!(WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
-                               < WEEKLY_DRAGON_CITY_LIMIT)
+                               < WEEKLY_GUARDED_DWELLING_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY):
                     if (!(WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
                         && WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata
-                               < WEEKLY_DRAGON_CITY_LIMIT)
+                               < WEEKLY_GUARDED_DWELLING_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += 1;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_EXPANSION_DWELLING):
@@ -4700,13 +4617,13 @@ void game::PerWeek(void) {
 }
 
 void game::WeeklyRecruitSite(mapCell* cell) {
-    i32 type = cell->m_objectMetadata;
-    type &= EVENT_RECRUIT_TYPE_MASK;
+    i32 siteType = cell->m_objectMetadata;
+    siteType &= EVENT_RECRUIT_TYPE_MASK;
     i32 recruitCount = cell->m_objectMetadata;
     recruitCount >>= EVENT_RECRUIT_COUNT_SHIFT;
-    i32 value;
+    i32 packedSite;
 
-    switch (type) {
+    switch (siteType) {
         case 0:
             recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
             break;
@@ -4726,16 +4643,16 @@ void game::WeeklyRecruitSite(mapCell* cell) {
 
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
-    value = (recruitCount << EVENT_RECRUIT_COUNT_SHIFT) | type;
-    cell->m_objectMetadata = value;
+    packedSite = (recruitCount << EVENT_RECRUIT_COUNT_SHIFT) | siteType;
+    cell->m_objectMetadata = packedSite;
 }
 
 void game::WeeklyGenericSite(mapCell* cell) {
-    i32 type = cell->m_objectMetadata;
-    type &= GENERIC_SITE_TYPE_MASK;
-    switch (type) {
+    i32 siteType = cell->m_objectMetadata;
+    siteType &= GENERIC_SITE_TYPE_MASK;
+    switch (siteType) {
         case 4:
-            cell->m_objectMetadata = type;
+            cell->m_objectMetadata = siteType;
             break;
     }
 }
@@ -4768,10 +4685,10 @@ void game::PerMonth(void) {
                 growth = gMonsterDatabase[H2EnumIndex(gDwellingType[H2EnumIndex(townPointer->m_type)]
                                                            [j - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)])]
                               .growth;
-                if ((H2EnumIndex((townPointer->m_buildings) & (WELL_BUILDING))))
+                if ((H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_WELL)))))
                     growth += TOWN_WELL_BASE_GROWTH_BONUS;
                 if (j == H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)
-                    && (H2EnumIndex((townPointer->m_buildings) & (FIRST_DWELLING_BONUS_BUILDING))))
+                    && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_WELL_EXTRA)))))
                     growth += TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
@@ -4794,11 +4711,11 @@ void game::PerMonth(void) {
         for (x = 0; x < MAP_WIDTH; x++) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 spot = gpAdvManager->GetCell(x, y);
-                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
-                    && !spot->m_objectLayerBit0 && CELL_TERRAIN(spot) != TERRAIN_WATER) {
+                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectShadow
+                    && !spot->m_objectGroundLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
-                        spot->m_triggerType = MONSTER_TRIGGER;
+                        spot->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
                         spot->SetObjectTileset(TILESET_MONS32);
                         spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
                         spot->m_objectMetadata =
@@ -5075,7 +4992,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     WORLDMAP->GetCell(x + 1, y - 1)->m_overlayIndex = mineFrame + 1;
 
     if (resType == MINE_TYPE_MERCURY) {
-        WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
+        WORLDMAP->GetCell(x + 1, y)->m_objectBits |= 1;
         trigger = MAP_OBJECT_ALCHEMIST_LAB;
     } else if (resType == MINE_TYPE_WOOD) {
         trigger = MAP_OBJECT_SAWMILL;
@@ -5115,12 +5032,12 @@ void game::RandomizeMine(i32 x, i32 y) {
 void game::InitRandomArtifacts(void) {
 
     i32 y;
-    memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
+    memset(m_artifactPlaced, 0, sizeof(m_artifactPlaced));
     for (i32 x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->GetCell(x, y);
             if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_ARTIFACT)))
-                m_randomArtifacts[cell->m_objectIndex / 2] = 1;
+                m_artifactPlaced[cell->m_objectIndex / MAP_ITEM_SPRITE_FRAME_COUNT] = 1;
         }
     }
 }
@@ -5140,8 +5057,8 @@ i32 game::GetRandomArtifactId(
 
         if (!(H2EnumIndex((gArtifactLevel[H2EnumIndex(artifact)]) & (levelMask))))
             continue;
-        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
-            || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
+        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_83
+            || artifact == ARTIFACT_EDITOR_UNUSED_84 || artifact == ARTIFACT_EDITOR_UNUSED_85
             || artifact == ARTIFACT_SPELL_SCROLL)
             continue;
         if (xIsPlayingExpansionCampaign) {
@@ -5150,7 +5067,7 @@ i32 game::GetRandomArtifactId(
                 || artifact == ARTIFACT_SPHERE_NEGATION)
                 continue;
         }
-        if (tries++ < ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[H2EnumIndex(artifact)])
+        if (tries++ < ARTIFACT_UNIQUE_RETRIES && m_artifactPlaced[H2EnumIndex(artifact)])
             continue;
         if (IsCursedItem(artifact)) {
             if (!allowCursed)
@@ -5164,7 +5081,7 @@ i32 game::GetRandomArtifactId(
             break;
     }
 
-    m_randomArtifacts[H2EnumIndex(artifact)] = 1;
+    m_artifactPlaced[H2EnumIndex(artifact)] = 1;
     return H2EnumIndex(artifact);
 }
 
@@ -5187,15 +5104,15 @@ void game::RandomizeHeroPool(void) {
         m_heroRecs[heroId].m_mobility = m_heroRecs[heroId].m_remainingMobility;
         m_heroRecs[heroId].m_randomSeed =
             Random(RANDOM_HERO_SEED_MIN, RANDOM_HERO_SEED_MAX);
-        m_heroRecs[heroId].m_enabled = RANDOM_HERO_ENABLED;
+        m_heroRecs[heroId].m_lastWisdomOfferLevel = HERO_INITIAL_LEVEL;
 
-        if (m_heroRecs[heroId].m_cursorType == FACTION_SORCERESS)
+        if (m_heroRecs[heroId].m_faction == FACTION_SORCERESS)
             m_heroRecs[heroId].m_spells[H2EnumIndex(SPELL_BLESS)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WARLOCK)
+        else if (m_heroRecs[heroId].m_faction == FACTION_WARLOCK)
             m_heroRecs[heroId].m_spells[H2EnumIndex(SPELL_CURSE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_NECROMANCER)
+        else if (m_heroRecs[heroId].m_faction == FACTION_NECROMANCER)
             m_heroRecs[heroId].m_spells[H2EnumIndex(SPELL_HASTE)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
-        else if (m_heroRecs[heroId].m_cursorType == FACTION_WIZARD)
+        else if (m_heroRecs[heroId].m_faction == FACTION_WIZARD)
             m_heroRecs[heroId].m_spells[H2EnumIndex(SPELL_STONE_SKIN)] = RANDOM_HERO_STARTING_SPELL_KNOWN;
     }
 }
@@ -5241,10 +5158,10 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     for (index = 0; index < RANDOM_HERO_ARMY_SELECTION_COUNT; index++) {
         if (selected[index]) {
             army->m_creatureTypes[armySlot] =
-                armyTable[H2EnumIndex(m_heroRecs[heroId].m_cursorType)][index].creature;
-            minimumCount = armyTable[H2EnumIndex(m_heroRecs[heroId].m_cursorType)][index].minimum
+                armyTable[H2EnumIndex(m_heroRecs[heroId].m_faction)][index].creature;
+            minimumCount = armyTable[H2EnumIndex(m_heroRecs[heroId].m_faction)][index].minimum
                        * RANDOM_HERO_COUNT_SCALE;
-            maximum = armyTable[H2EnumIndex(m_heroRecs[heroId].m_cursorType)][index].maximum
+            maximum = armyTable[H2EnumIndex(m_heroRecs[heroId].m_faction)][index].maximum
                            * RANDOM_HERO_COUNT_SCALE
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
@@ -5340,14 +5257,14 @@ void game::ProcessRandomObjects(void) {
                     }
                 monsterBoundsReady:
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
-                    cell->m_objectIndex = Random(0, 65);
+                    cell->m_objectIndex = Random(0, H2EnumIndex(CREATURE_COUNT) - 1);
                     while (gMonsterDatabase[cell->m_objectIndex].fightValue <= minValue
                            || gMonsterDatabase[cell->m_objectIndex].fightValue >= maxValue)
-                        cell->m_objectIndex = Random(0, 65);
+                        cell->m_objectIndex = Random(0, H2EnumIndex(CREATURE_COUNT) - 1);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_RESOURCE):
                     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_RESOURCE);
-                    randomType = Random(0, 6);
+                    randomType = Random(H2EnumIndex(RES_WOOD), H2EnumIndex(RES_GOLD));
                     ConvertObject(
                         x - 1,
                         y,
@@ -5357,7 +5274,7 @@ void game::ProcessRandomObjects(void) {
                         16,
                         16,
                         TILESET_OBJNRSRC,
-                        randomType * 2,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5370,16 +5287,16 @@ void game::ProcessRandomObjects(void) {
                         17,
                         17,
                         TILESET_OBJNRSRC,
-                        randomType * 2 + 1,
+                        randomType * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     switch (randomType) {
-                        case 0:
-                        case 2:
+                        case H2EnumIndex(RES_WOOD):
+                        case H2EnumIndex(RES_ORE):
                             cell->m_objectMetadata = Random(8, 16);
                             break;
-                        case 6:
+                        case H2EnumIndex(RES_GOLD):
                             cell->m_objectMetadata = Random(5, 10);
                             break;
                         default:
@@ -5399,7 +5316,7 @@ void game::ProcessRandomObjects(void) {
                         162,
                         162,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5412,7 +5329,7 @@ void game::ProcessRandomObjects(void) {
                         163,
                         163,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5429,7 +5346,7 @@ void game::ProcessRandomObjects(void) {
                         166,
                         166,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5442,7 +5359,7 @@ void game::ProcessRandomObjects(void) {
                         167,
                         167,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5459,7 +5376,7 @@ void game::ProcessRandomObjects(void) {
                         168,
                         168,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5472,7 +5389,7 @@ void game::ProcessRandomObjects(void) {
                         169,
                         169,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5489,7 +5406,7 @@ void game::ProcessRandomObjects(void) {
                         170,
                         170,
                         TILESET_OBJNARTI,
-                        artifactId * 2,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
@@ -5502,12 +5419,12 @@ void game::ProcessRandomObjects(void) {
                         171,
                         171,
                         TILESET_OBJNARTI,
-                        artifactId * 2 + 1,
+                        artifactId * MAP_ITEM_SPRITE_FRAME_COUNT + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                case MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE):
                     RandomizeMine(x, y);
                     break;
             }
@@ -5710,14 +5627,14 @@ void game::ShowComputerScreen(void) {
 }
 
 void game::ShowHeroesLogo(void) {
-    if (gpAdvManager->m_openState == 0) {
-        gpAdvManager->m_openState = true;
+    if (gpAdvManager->m_heroesLogoShown == 0) {
+        gpAdvManager->m_heroesLogoShown = true;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
         IconToBitmap(
             theIcon,
             gpWindowManager->m_screen,
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
             0,
             ICON_DRAW_NO_CLIP,
             0,
@@ -5727,10 +5644,10 @@ void game::ShowHeroesLogo(void) {
             0
         );
         gpWindowManager->UpdateScreenRegion(
-            HEROES_LOGO_X,
-            HEROES_LOGO_Y,
-            HEROES_LOGO_WIDTH,
-            HEROES_LOGO_HEIGHT
+            ADVENTURE_RADAR_LEFT,
+            ADVENTURE_RADAR_TOP,
+            ADVENTURE_RADAR_SIZE,
+            ADVENTURE_RADAR_SIZE
         );
         gpResourceManager->Dispose(theIcon);
     }
@@ -5745,15 +5662,15 @@ void game::WaitForPlayer(const char* text, i32 player) {
             giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
         else
             giBottomViewOverride = BOTTOM_VIEW_NONE;
-        gSoundBackendsReady = 1;
-        gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
+        gbSoundEnabled = 1;
+        gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
         gpAdvManager->UpdateTownLocators(1, 1);
         gpAdvManager->UpdateScreen(0, 1);
         ShowHeroesLogo();
         gbAllBlack = false;
-        NormalDialog(text, 1, -1, -1, WAIT_DIALOG_TYPE, gpGame->m_players[player].m_color);
+        NormalDialog(text, 1, -1, -1, NORMAL_DIALOG_CREST, gpGame->m_players[player].m_color);
         gpSoundManager->SwitchAmbientMusic(-1);
     }
 }
@@ -5902,7 +5819,7 @@ void game::SetupTowns(void) {
     i32 attempts;
     i8 usedSpells[H2EnumIndex(SPELL_COUNT)];
     i32 owner;
-    i32 combatSpells;
+    i32 adventureSpells;
     i32 roll;
     SpellType spell;
     i32 spellLevel;
@@ -5983,7 +5900,7 @@ void game::SetupTowns(void) {
                           | H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6));
                 else
                     castle->m_buildings &=
-                        -1 - (1 << (slot - TOWN_UPGRADE_TO_DWELLING_OFFSET));
+                        -1 - (1 << (slot - CASTLE_UPGRADE_OFFSET));
             }
         }
         for (slot = H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST);
@@ -6004,9 +5921,9 @@ void game::SetupTowns(void) {
                     castle->m_spellCounts[slot - TOWN_MAGE_GUILD_FIRST_LEVEL]++;
             }
         }
-        if (extra->hasShrine)
+        if (extra->hasCaptain)
             castle->m_buildings |= H2EnumIndex(TOWN_BUILDING_CAPTAIN_QUARTERS);
-        castle->m_mayNotUpgradeToCastle = extra->unknown28;
+        castle->m_mayNotUpgradeToCastle = extra->disallowCastle;
         const std::string townName = localization::DecodeExternalText(localization::TextField(extra->name));
         utf8::Copy(castle->m_name, sizeof(castle->m_name), townName.c_str());
 
@@ -6058,7 +5975,7 @@ void game::SetupTowns(void) {
         spellsPerLevel[spellLevel]++;
 
         for (spellLevel = 0; spellLevel < TOWN_MAGE_GUILD_LEVEL_COUNT; spellLevel++) {
-            combatSpells = 0;
+            adventureSpells = 0;
             for (spellIndex = 0; spellIndex < TOWN_MAGE_GUILD_SPELLS_PER_LEVEL; spellIndex++) {
                 if (castle->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex]
                     != SPELL_NONE) {
@@ -6087,7 +6004,7 @@ void game::SetupTowns(void) {
                         if (spell == SPELL_DIMENSION_DOOR)
                             spellValue = 1500;
                     } while (
-                        (combatSpells == 1
+                        (adventureSpells == 1
                          && (H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_ADVENTURE))))
                         || Random(0, 10)
                                > gsSpellInfo[H2EnumIndex(spell)].raceChance[H2EnumIndex(castle->m_type)]
@@ -6095,7 +6012,7 @@ void game::SetupTowns(void) {
                         || Random(1, 1500) > spellValue
                     );
                     if ((H2EnumIndex((gsSpellInfo[H2EnumIndex(spell)].attributes) & (SPELL_INFO_ATTRIBUTE_ADVENTURE))))
-                        combatSpells++;
+                        adventureSpells++;
                     castle
                         ->m_spellSlots[spellLevel * TOWN_MAGE_GUILD_SPELLS_PER_LEVEL + spellIndex] =
                         spell;
@@ -6174,12 +6091,12 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra->hasAssignedHero) {
                             mapHero = GetHero(extra->heroId);
-                            mapHero->m_cursorType = heroFaction;
+                            mapHero->m_faction = heroFaction;
                         } else {
                             heroId = RandomScan(
                                 usedHeroes,
-                                H2EnumIndex(heroFaction) * MAP_HEROES_PER_FACTION,
-                                MAP_HEROES_PER_FACTION,
+                                H2EnumIndex(heroFaction) * GAME_HEROES_PER_FACTION,
+                                GAME_HEROES_PER_FACTION,
                                 MAP_HERO_CLASS_SCAN_RETRY_LIMIT,
                                 0
                             );
@@ -6192,11 +6109,11 @@ void game::ProcessOnMapHeroes(void) {
                                     0
                                 );
                                 heroFaction =
-                                    FactionTypeFromCode(heroId / MAP_HEROES_PER_FACTION);
+                                    FactionTypeFromCode(heroId / GAME_HEROES_PER_FACTION);
                             }
                             usedHeroes[heroId] = 1;
                             mapHero = GetHero(heroId);
-                            mapHero->m_cursorType = heroFaction;
+                            mapHero->m_faction = heroFaction;
                             if (extra->hasCustomHero && extra->heroId >= GAME_HERO_COUNT)
                                 mapHero->m_portrait = extra->heroId;
                             extra->heroId = static_cast<i8>(heroId);
@@ -6249,10 +6166,10 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (isJail) {
                             mapHero->m_owner = -1;
-                            m_availableHeroes[extra->heroId] = HERO_AVAILABILITY_JAILED;
+                            m_heroOwners[extra->heroId] = HERO_AVAILABILITY_JAILED;
                         } else {
                             mapHero->m_owner = extra->owner;
-                            m_availableHeroes[extra->heroId] = mapHero->m_owner;
+                            m_heroOwners[extra->heroId] = mapHero->m_owner;
                             m_players[mapHero->m_owner]
                                 .m_heroIds[m_players[mapHero->m_owner].m_heroCount] =
                                 mapHero->m_id;
@@ -6277,7 +6194,7 @@ void game::ProcessOnMapHeroes(void) {
                             cell->SetObjectTileset(TILESET_NONE);
                             cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                             cell->m_objectMetadata = 0;
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                         }
 
                         if (extra->hasCustomSkills) {
@@ -6341,15 +6258,15 @@ void game::CheckHeroConsistency(void) {
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] == 0) {
             for (slot = 0; slot < HERO_AVAILABLE_SLOT_COUNT; slot++) {
-                if ((m_availableHeroes[m_players[player].m_availableHeroIds[slot]] >= 0
-                     && m_availableHeroes[m_players[player].m_availableHeroIds[slot]]
-                            <= H2EnumIndex(FACTION_NECROMANCER))
+                if ((m_heroOwners[m_players[player].m_availableHeroIds[slot]] >= 0
+                     && m_heroOwners[m_players[player].m_availableHeroIds[slot]]
+                            <= GAME_PLAYER_COUNT - 1)
                     || (totalHeroes < HERO_CONSISTENCY_POOL_THRESHOLD
-                        && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
+                        && m_heroOwners[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
                         GetNewHeroId(player, FACTION_ANY, 0);
-                    m_availableHeroes[m_players[player].m_availableHeroIds[slot]] =
-                        WEEKLY_AVAILABLE_HERO;
+                    m_heroOwners[m_players[player].m_availableHeroIds[slot]] =
+                        HERO_AVAILABILITY_FOR_HIRE;
                 }
             }
         }
@@ -6358,35 +6275,35 @@ void game::CheckHeroConsistency(void) {
     for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
         for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
             cell = gpAdvManager->GetCell(mapX, mapY);
-            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MERMAID))) {
+            if (cell->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION))) {
                 if (cell->m_objectMetadata < GAME_HERO_COUNT) {
                     boardHro = GetHero(cell->m_objectMetadata);
                     if (boardHro->m_x != mapX || boardHro->m_y != mapY) {
-                        cell->m_triggerType = 0;
+                        cell->m_triggerType = MAP_OBJECT_NONE;
                         cell->m_objectMetadata = 0;
                     }
                     if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
                         if (boardHro->m_locationType
                             == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
-                            townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
-                            townOccupied->m_occupyingHeroId = -1;
+                            townOccupied = gpGame->GetTown(boardHro->m_locationMetadata);
+                            townOccupied->m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
                         }
                         if (boardHro->m_x == mapX && boardHro->m_y == mapY) {
                             RestoreCell(
                                 boardHro->m_x,
                                 boardHro->m_y,
                                 boardHro->m_locationType,
-                                boardHro->m_occupiedTown,
+                                boardHro->m_locationMetadata,
                                 NULL,
                                 1
                             );
                         } else {
-                            cell->m_triggerType = 0;
+                            cell->m_triggerType = MAP_OBJECT_NONE;
                             cell->m_objectMetadata = 0;
                         }
                     }
                 } else {
-                    cell->m_triggerType = 0;
+                    cell->m_triggerType = MAP_OBJECT_NONE;
                 }
             }
         }
@@ -6447,7 +6364,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
 
     b32 done;
 
-    bool samplesReady;
+    bool savedSoundEnabled;
     u8* fileData;
     char* acknowledged;
     RemoteSaveBuffer* header;
@@ -6468,11 +6385,11 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     compressionCapacity = 0;
     compressedSize = 0;
 
-    samplesReady = gSoundBackendsReady;
-    gSoundBackendsReady = 1;
+    savedSoundEnabled = gbSoundEnabled;
+    gbSoundEnabled = 1;
     oldTrack = gpSoundManager->m_musicTrack;
     gpSoundManager->SwitchAmbientMusic(-1);
-    gSoundBackendsReady = samplesReady;
+    gbSoundEnabled = savedSoundEnabled;
 
     LogStr("Transmit Game Start");
     if (gpAdvManager->m_active == 1)
@@ -6553,8 +6470,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
             header->bytes,
             remotePlayer,
             REMOTE_SAVE_HEADER_SIZE,
-            REMOTE_SAVE_INIT_COMMAND,
-            REMOTE_SAVE_INIT_RESPONSE,
+            REMOTE_COMMAND_SAVE_GAME,
+            REMOTE_COMMAND_SAVE_INIT_RESPONSE,
             &reply
         );
         if (!result)
@@ -6595,7 +6512,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                             header->bytes,
                             remotePlayer,
                             chunkSize + REMOTE_PACKET_INDEX_SIZE,
-                            REMOTE_SAVE_DATA_COMMAND,
+                            REMOTE_COMMAND_SAVE_DATA,
                             0
                         );
                         if (!result)
@@ -6613,8 +6530,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                     header->bytes,
                     remotePlayer,
                     REMOTE_PACKET_INDEX_SIZE,
-                    REMOTE_SAVE_ACK_REQUEST_COMMAND,
-                    REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                    REMOTE_COMMAND_SAVE_ACK_REQUEST,
+                    REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                     &reply
                 );
                 LogStr("PostWait");
@@ -6633,7 +6550,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                 }
             }
         }
-        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_FINISH_COMMAND, 1);
+        result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_COMMAND_SAVE_FINISH, 1);
         if (!result)
             ShutDown(NULL);
         success = true;
@@ -6655,10 +6572,10 @@ transmitCleanup:
         gpAdvManager->UpdBottomView(true, true, true);
     }
     if (oldTrack != -1) {
-        samplesReady = gSoundBackendsReady;
-        gSoundBackendsReady = 1;
+        savedSoundEnabled = gbSoundEnabled;
+        gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(oldTrack);
-        gSoundBackendsReady = samplesReady;
+        gbSoundEnabled = savedSoundEnabled;
     }
     return success;
 }
@@ -6749,18 +6666,18 @@ i32 game::ReceiveSaveGame(
     if (gpAdvManager->m_active == 1)
         BVResMsg(localization::Tr("network.data.receiving"), RES_NONE, 0);
 
-    samplesReady = gSoundBackendsReady;
+    samplesReady = gbSoundEnabled;
     oldTrack = gpSoundManager->m_musicTrack;
-    gSoundBackendsReady = 1;
+    gbSoundEnabled = 1;
     gpSoundManager->SwitchAmbientMusic(-1);
-    gSoundBackendsReady = samplesReady;
+    gbSoundEnabled = samplesReady;
 
     LogStr("Begin Transmit Init Confirm");
     result = TransmitRemoteData(
         NULL,
         remotePlayer,
         0,
-        REMOTE_SAVE_INIT_RESPONSE,
+        REMOTE_COMMAND_SAVE_INIT_RESPONSE,
         1,
         1,
         REMOTE_MESSAGE_DEFAULT
@@ -6781,8 +6698,8 @@ i32 game::ReceiveSaveGame(
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
-        if (lastPacketTime + REMOTE_RECEIVE_TIMEOUT < platform::Ticks()) {
-            NormalDialog(localization::Tr("network.receive.retry"), REMOTE_RECEIVE_DIALOG_BUTTONS);
+        if (lastPacketTime + REMOTE_WAIT_TIMEOUT < platform::Ticks()) {
+            NormalDialog(localization::Tr("network.receive.retry"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
                 lastPacketTime = platform::Ticks();
             else
@@ -6795,7 +6712,7 @@ i32 game::ReceiveSaveGame(
                 || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
             lastPacketTime = platform::Ticks();
             switch (receivedPacket->command) {
-                case REMOTE_SAVE_DATA_COMMAND: {
+                case REMOTE_COMMAND_SAVE_DATA: {
                     u16 encodedPacketStart = 0;
                     RequireGameData(
                         receivedPacket->payloadSize >= REMOTE_PACKET_INDEX_SIZE
@@ -6823,7 +6740,7 @@ i32 game::ReceiveSaveGame(
                     );
                     break;
                 }
-                case REMOTE_SAVE_ACK_REQUEST_COMMAND: {
+                case REMOTE_COMMAND_SAVE_ACK_REQUEST: {
                     u16 encodedPacketStart = 0;
                     RequireGameData(
                         receivedPacket->payloadSize >= REMOTE_PACKET_INDEX_SIZE
@@ -6847,14 +6764,14 @@ i32 game::ReceiveSaveGame(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
                         REMOTE_SAVE_CHUNK_SIZE,
-                        REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                        REMOTE_COMMAND_SAVE_ACK_RESPONSE,
                         1
                     );
                     if (!result)
                         ShutDown(NULL);
                     break;
                 }
-                case REMOTE_SAVE_FINISH_COMMAND:
+                case REMOTE_COMMAND_SAVE_FINISH:
                     finished = true;
                     break;
             }
@@ -6909,10 +6826,10 @@ receiveCleanup:
         gpAdvManager->UpdBottomView(true, true, true);
     }
     if (oldTrack != -1) {
-        samplesReady = gSoundBackendsReady;
-        gSoundBackendsReady = 1;
+        samplesReady = gbSoundEnabled;
+        gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(oldTrack);
-        gSoundBackendsReady = samplesReady;
+        gbSoundEnabled = samplesReady;
     }
     return success;
 }
@@ -6956,7 +6873,7 @@ void game::DoNewTurn(void) {
         } else {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[0], cPlayerNames[giCurPlayer], gpCurPlayer->m_daysLeft);
         }
-        NormalDialog(gText, 1, -1, -1, NEW_TURN_DIALOG_TYPE, gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)));
+        NormalDialog(gText, 1, -1, -1, NORMAL_DIALOG_CREST, gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)));
     }
 
     if (gpCurPlayer->m_heroCount > 0) {
@@ -6968,11 +6885,11 @@ void game::DoNewTurn(void) {
 
     if (m_day == 1 && (m_month != 1 || m_week != 1 || m_day != 1)) {
         if (gbThisNetHumanPlayer[giCurPlayer])
-            gSoundBackendsReady = 1;
+            gbSoundEnabled = 1;
         if (giWeekType != CALENDAR_PERIOD_NONE) {
             musicTrack = -1;
             if (m_week == 1) {
-                musicTrack = NEW_MONTH_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_MONTH;
                 strcpy(musicFile, "newmonth.82m");
                 if (giMonthType == CALENDAR_PERIOD_NORMAL) {
                     utf8::Format(
@@ -6997,7 +6914,7 @@ void game::DoNewTurn(void) {
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
                 }
             } else {
-                musicTrack = NEW_WEEK_MUSIC_TRACK;
+                musicTrack = MUSIC_TRACK_NEW_WEEK;
                 strcpy(musicFile, "newweek.82m");
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
@@ -7018,7 +6935,7 @@ void game::DoNewTurn(void) {
             }
             gpSoundManager->PlayAmbientMusic(musicTrack);
             gpMouseManager->SetPointer(0);
-            NormalDialog(gText, 1);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
             gpSoundManager->SwitchAmbientMusic(
                 giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
             );
@@ -7044,11 +6961,11 @@ i32 game::GetBoatsBuilt(void) {
     return count;
 }
 
-i32 game::GetNumThievesGuilds(i32 color) {
+i32 game::GetNumThievesGuilds(i32 player) {
     i32 count = 0;
     i32 i;
-    for (i = 0; i < m_players[color].m_townCount; i++) {
-        if ((H2EnumIndex((gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings) & (H2EnumIndex(TOWN_BUILDING_THIEVES_GUILD)))))
+    for (i = 0; i < m_players[player].m_townCount; i++) {
+        if ((H2EnumIndex((gpGame->m_castleRecs[m_players[player].m_townIds[i]].m_buildings) & (H2EnumIndex(TOWN_BUILDING_THIEVES_GUILD)))))
             count++;
     }
     return count;
@@ -7123,7 +7040,7 @@ void game::RestoreCell(
     i32 x,
     i32 y,
     MapTriggerCode objectType,
-    i32 barrier,
+    i32 objectMetadata,
     mapCell* passedCell,
     i32
 ) {
@@ -7134,12 +7051,12 @@ void game::RestoreCell(
         cell = gpAdvManager->GetCell(x, y);
     if (y > 0 && objectType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
-        cell->m_triggerType = 0;
+        cell->m_triggerType = MAP_OBJECT_NONE;
         cell->m_objectMetadata = 0;
         return;
     }
     cell->m_triggerType = objectType;
-    cell->m_objectMetadata = barrier;
+    cell->m_objectMetadata = objectMetadata;
 }
 
 void game::SetMapSize(i32 width, i32 height) {
@@ -7437,7 +7354,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
         position = JOIN_HEADER_SIZE;
         while (position < diffLength) {
-            copyFlag = diffData[position] >> DIFF_COPY_FLAG_SHIFT;
+            copyFlag = diffData[position] >> COMMAND_SHIFT;
             RequireGameData(
                 ReadDiffHeaderInfo(diffData, diffLength, &position, &copyLength)
             );
@@ -7508,17 +7425,17 @@ void game::SetupNewRumour(void) {
     i32l categoryStats[GAME_PLAYER_COUNT];
     i32 direction;
     i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
-    if (m_rumourEventCount != 0 && Random(0, 9) < m_rumourEventCount) {
+    if (m_rumourEvents.count != 0 && Random(0, 9) < m_rumourEvents.count) {
         attempts = 0;
-        while (attempts++ < 200) {
-            if (m_rumourEventCount > 1)
-                eventIndex = Random(0, m_rumourEventCount - 1);
+        while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
+            if (m_rumourEvents.count > 1)
+                eventIndex = Random(0, m_rumourEvents.count - 1);
             else
                 eventIndex = 0;
             event =
-                static_cast<rumourEventExtra*>(MapExtraRecord(m_rumourEventIndices[eventIndex], map_records::Kind::Rumour));
+                static_cast<rumourEventExtra*>(MapExtraRecord(m_rumourEvents.indices[eventIndex], map_records::Kind::Rumour));
             const auto text = MapExtraText(event, offsetof(rumourEventExtra, text));
-            if (text.size() > 2 && text[0] != '@') {
+            if (text.size() > RUMOUR_EVENT_SHORT_TEXT_LENGTH && text[0] != '@') {
                 const std::string rumour = localization::DecodeExternalText(text);
                 utf8::Copy(m_rumour, sizeof(m_rumour), rumour.c_str());
                 event->text[0] = '@';
@@ -7527,13 +7444,16 @@ void game::SetupNewRumour(void) {
         }
     }
 
-    if (Random(0, 100) < 30) {
-        strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+    if (Random(0, 100) < RUMOUR_TAVERN_TEXT_CHANCE) {
+        strcpy(
+            m_rumour,
+            cRandomTavernText[(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]
+        );
     } else {
         roll = Random(0, 100);
-        if (roll < 80 && giCurTurn > 1) {
+        if (roll < RUMOUR_LEADER_CHANCE && giCurTurn > 1) {
             attempts = 0;
-            while (attempts++ < 200) {
+            while (attempts++ < RUMOUR_PICK_ATTEMPTS) {
                 selectionRoll = Random(
                     H2EnumIndex(THIEVES_CATEGORY_OBELISKS), H2EnumIndex(THIEVES_CATEGORY_INCOME)
                 );
@@ -7573,42 +7493,42 @@ void game::SetupNewRumour(void) {
             }
         }
         selectionRoll = Random(0, 100);
-        if (selectionRoll < 33) {
-            if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
-                  || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                direction = 7;
-            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33
+        if (selectionRoll < RUMOUR_ULTIMATE_REGION_CHANCE) {
+            if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
+                  || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                direction = H2EnumIndex(MAP_DIRECTION_NORTH_WEST);
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD
                          || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                direction = 5;
-            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * 0.33)) {
-                direction = 6;
+                direction = H2EnumIndex(MAP_DIRECTION_SOUTH_WEST);
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.width) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                direction = H2EnumIndex(MAP_DIRECTION_WEST);
             } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
                              * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
-                         || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                direction = 1;
+                         || m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                direction = H2EnumIndex(MAP_DIRECTION_NORTH_EAST);
             } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
                              * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS
                          || m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
                                 * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                direction = 3;
+                direction = H2EnumIndex(MAP_DIRECTION_SOUTH_EAST);
             } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.width)
                              * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                direction = 2;
-            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * 0.33)) {
-                direction = 0;
+                direction = H2EnumIndex(MAP_DIRECTION_EAST);
+            } else if (!(m_ultimateArtifactX >= H2EnumIndex(m_mapHeader.height) * GAME_ULTIMATE_ARTIFACT_ONE_THIRD)) {
+                direction = H2EnumIndex(MAP_DIRECTION_NORTH);
             } else if (!(m_ultimateArtifactX <= H2EnumIndex(m_mapHeader.height)
                              * GAME_ULTIMATE_ARTIFACT_TWO_THIRDS)) {
-                direction = 4;
+                direction = H2EnumIndex(MAP_DIRECTION_SOUTH);
             } else {
-                direction = 8;
+                direction = KB_DIRECTION_TEXT_CENTRAL;
             }
             utf8::Format(
                 m_rumour,
                 localization::Tr("rumor.ultimate_artifact.region"),
                 cDirections[direction]
             );
-        } else if (selectionRoll < 66) {
+        } else if (selectionRoll < RUMOUR_ULTIMATE_TERRAIN_CHANCE) {
             utf8::Format(
                 m_rumour,
                 localization::Tr("rumor.ultimate_artifact.terrain"),
@@ -7625,7 +7545,7 @@ void game::SetupNewRumour(void) {
                 gArtifactNames[H2EnumIndex(m_ultimateArtifactId)]
             );
         } else {
-            strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
+            strcpy(m_rumour, cRandomTavernText[(giCurTurn / CALENDAR_DAYS_PER_WEEK) % KB_RANDOM_TAVERN_TEXT_COUNT]);
         }
     }
 }
@@ -7633,8 +7553,8 @@ void game::SetupNewRumour(void) {
 EventExtra* GetMapEvent(i32 x, i32 y) {
     EventExtra* event;
     i32 i;
-    for (i = 0; i < gpGame->m_mapEventCount; i++) {
-        event = static_cast<EventExtra*>(MapExtraRecord(gpGame->m_mapEventIndices[i], map_records::Kind::MapEvent));
+    for (i = 0; i < gpGame->m_mapEvents.count; i++) {
+        event = static_cast<EventExtra*>(MapExtraRecord(gpGame->m_mapEvents.indices[i], map_records::Kind::MapEvent));
         if (event->x == x && event->y == y && event->active != 0
             && event->players[gpGame->m_players[giCurPlayer].m_color] != 0)
             return event;
@@ -7643,7 +7563,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
 }
 
 void game::CheckForTimeEvent(void) {
-    timeEventExtra* event;
+    EventExtra* event;
     i32 dayNumber;
     i32 eventIndex;
     i32 resourceIndex;
@@ -7654,8 +7574,8 @@ void game::CheckForTimeEvent(void) {
     i32 resourceAmount;
 
     dayNumber = GAME_DAY_NUMBER(*this);
-    for (eventIndex = 0; eventIndex < m_timeEventCount; eventIndex++) {
-        event = static_cast<timeEventExtra*>(MapExtraRecord(m_timeEventIndices[eventIndex], map_records::Kind::TimeEvent));
+    for (eventIndex = 0; eventIndex < m_timeEvents.count; eventIndex++) {
+        event = static_cast<EventExtra*>(MapExtraRecord(m_timeEvents.indices[eventIndex], map_records::Kind::TimeEvent));
         if (((gbHumanPlayer[giCurPlayer] && event->appliesToHuman)
              || (!gbHumanPlayer[giCurPlayer] && event->appliesToComputer))
             && event->players[GetPlayerColor(giCurPlayer)]
@@ -7688,15 +7608,15 @@ void game::CheckForTimeEvent(void) {
             }
             if (primaryType >= 0 && primaryType <= H2EnumIndex(RES_COUNT) - 1
                 && primaryAmount < 0) {
-                primaryAmount -= EVENT_RESOURCE_PENALTY;
+                primaryAmount -= NORMAL_DIALOG_DAILY_RESOURCE_OFFSET;
             }
             if (secondaryType >= 0 && secondaryType <= H2EnumIndex(RES_COUNT) - 1
                 && secondaryAmount < 0) {
-                secondaryAmount -= EVENT_RESOURCE_PENALTY;
+                secondaryAmount -= NORMAL_DIALOG_DAILY_RESOURCE_OFFSET;
             }
             if (gbThisNetHumanPlayer[giCurPlayer]) {
                 const std::string eventMessage =
-                    localization::DecodeExternalText(MapExtraText(event, offsetof(timeEventExtra, message)));
+                    localization::DecodeExternalText(MapExtraText(event, offsetof(EventExtra, message)));
                 NormalDialog(eventMessage.c_str(), 1, -1, -1, primaryType, primaryAmount, secondaryType, secondaryAmount);
             }
         }
@@ -7762,7 +7682,7 @@ i32 game::CountShrines(i32 player) {
                 occupier = gpGame->GetHero(cell->m_objectMetadata);
                 if (occupier->m_locationType
                     == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE)))
-                    castle = GetCastle(occupier->m_occupiedTown);
+                    castle = GetCastle(occupier->m_locationMetadata);
             }
             if (castle != NULL && castle->m_owner == player
                 && (H2EnumIndex((castle->m_buildings) & (H2EnumIndex(TOWN_BUILDING_TAVERN))))

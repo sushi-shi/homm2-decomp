@@ -1,7 +1,7 @@
-#ifndef HOMM2_SPELL_MASK_H
-#define HOMM2_SPELL_MASK_H
+#ifndef HOMM2_SOURCE_SPELLMASK_H
+#define HOMM2_SOURCE_SPELLMASK_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <algorithm>
 #include <span>
 

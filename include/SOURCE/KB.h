@@ -1,12 +1,11 @@
-#ifndef HOMM2_KB_H
-#define HOMM2_KB_H
+#ifndef HOMM2_SOURCE_KB_H
+#define HOMM2_SOURCE_KB_H
 
-#include <BASE/dialog.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 
 
 struct SSpellInfo;
@@ -34,16 +33,20 @@ struct tag_tilePoint;
 struct mapEventExtra;
 class town;
 class townManager;
-#include <SOURCE/KB_TYPES.h>
+
+#include <SOURCE/kbTypes.h>
 #include <BASE/message.h>
 #include <BASE/soundManager.h>
-#include <BASE/WINMGR.h>
-#include <SOURCE/GAME.h>
+#include <BASE/heroWindowManager.h>
+#include <BASE/dialog.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/town.h>
 
 typedef enum GlobalTimerConstant {
     GLOBAL_TIMER_COUNT               = 10,
     GLOBAL_NET_BOX_CURSOR_TIMER_SLOT = 0,
+    HIGH_SCORE_TIMER_SLOT            = 0,
+    COMBAT_EFFECT_TIMER_SLOT         = 1,
     GLOBAL_BUTTON_REPEAT_TIMER_SLOT  = 2,
     GLOBAL_MUSIC_FADE_TIMER_SLOT     = 4,
     GLOBAL_POLL_SOUND_TIMER_SLOT     = 5,
@@ -100,12 +103,14 @@ typedef enum CampaignConstant {
     CAMPAIGN_SWITCHING_MAP            = 11,
     CAMPAIGN_SWITCHING_SCENARIO       = 4,
     CAMPAIGN_NO_SCENARIO              = -1,
+    CAMPAIGN_CHOICE_NO_VALUE          = -1,
+    CAMPAIGN_CHOICE_NO_AMOUNT         = -1,
     CAMPAIGN_ROLAND_FINAL_SCENARIO    = 9,
     CAMPAIGN_ARCHIBALD_FINAL_SCENARIO = 10,
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
     CAMPAIGN_SETUP_RESET_SIZE         = 0x41,
     CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
-    CAMPAIGN_CARRYOVER_PLAYER         = 3,
+    CAMPAIGN_STRENGTHENED_ROLAND_PLAYER         = 3,
     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
     CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
     CAMPAIGN_NORMAL_SCENARIO_LIMIT    = 5,
@@ -145,18 +150,6 @@ struct SPlayerExit {
     b8 hostReported;
     b8 continueGame;
 };
-
-typedef enum EventWindowConstant {
-    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
-    EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
-    EVENT_WINDOW_FIRST_RESOURCE_WIDGET  = 0x1e14,
-    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = 0x1e15,
-    EVENT_WINDOW_LUCK                   = 10,
-    EVENT_WINDOW_BAD_LUCK               = 11,
-    EVENT_WINDOW_MORALE                 = 12,
-    EVENT_WINDOW_BAD_MORALE             = 13,
-    EVENT_WINDOW_EXPERIENCE             = 14
-} EventWindowConstant;
 
 typedef enum KbBuildingConstant {
     KB_BUILDING_NEUTRAL_LIMIT  = 16,
@@ -199,12 +192,12 @@ typedef enum NormalDialogAnswer {
 typedef enum NormalDialogConstant {
     NORMAL_DIALOG_INFO                     = 1,
     NORMAL_DIALOG_CONFIRM                  = 2,
-    NORMAL_DIALOG_BUTTON_PAIR              = 3,
+    NORMAL_DIALOG_OK_CANCEL              = 3,
     NORMAL_DIALOG_QUICK_VIEW               = 4,
-    NORMAL_DIALOG_WAIT_FIRST               = 5,
-    NORMAL_DIALOG_WAIT_LAST                = 6,
-    NORMAL_DIALOG_DISABLE_SEVENTH          = 7,
-    NORMAL_DIALOG_DISABLE_EIGHTH           = 8,
+    NORMAL_DIALOG_WAIT_OK               = 5,
+    NORMAL_DIALOG_WAIT_CANCEL                = 6,
+    NORMAL_DIALOG_CHOOSE_ONE_OF_TWO         = 7,
+    NORMAL_DIALOG_SHOW_BUTTON_7            = 8,
     NORMAL_DIALOG_RESOURCE_COUNT           = 2,
     NORMAL_DIALOG_PRIMARY_BONUS_OFFSET     = 100,
     NORMAL_DIALOG_DAILY_RESOURCE_OFFSET    = 100000,
@@ -224,7 +217,13 @@ typedef enum NormalDialogConstant {
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
     NORMAL_DIALOG_TIMEOUT_MAX              = 20000,
     NORMAL_DIALOG_TEXT_WIDGET_ID           = 1,
+    NORMAL_DIALOG_DEFAULT_X                = 159,
 } NormalDialogConstant;
+
+typedef enum EventWindowConstant {
+    EVENT_WINDOW_IGNORED_BUTTON         = DIALOG_BUTTON_4,
+    EVENT_WINDOW_SECOND_RESOURCE_WIDGET = NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID + 1
+} EventWindowConstant;
 
 enum class CheckEndGameForcedResult : i32 {
     END_GAME_FORCE_NONE    = 0,
@@ -248,7 +247,7 @@ struct HighScoreEntry {
     char scenarioName[HIGH_SCORE_SCENARIO_NAME_SIZE];
     i32 score;
     i32 days;
-    i32 scenario;
+    i32 difficultyRating;
     char cheated;
     char reserved[HIGH_SCORE_RESERVED_SIZE];
 };
@@ -266,35 +265,35 @@ typedef enum AppMenuCommand {
     APP_MENU_SOUND_LAST      = 0x9c66,
     APP_MENU_SPEED_FIRST     = 0x9c68,
     APP_MENU_SPEED_LAST      = 0x9c6c,
-    APP_MENU_UNKNOWN_9C6D    = 0x9c6d,
+    APP_MENU_CD_STEREO    = 0x9c6d,
     APP_MENU_TOGGLE_ROUTE    = 0x9c6e,
-    APP_MENU_TOGGLE_BLACKOUT = 0x9c6f,
-    APP_MENU_RESTART_0       = 0x9ca6,
-    APP_MENU_RESTART_1       = 0x9ca8,
-    APP_MENU_RESTART_2       = 0x9ca9,
-    APP_MENU_RESTART_3       = 0x9caa,
-    APP_MENU_RESTART_4       = 0x9cab,
-    APP_MENU_UNKNOWN_9CAD    = 0x9cad,
-    APP_MENU_RESTART_5       = 0x9cae,
-    APP_MENU_RESTART_6       = 0x9caf,
-    APP_MENU_RESTART_7       = 0x9cb0,
-    APP_MENU_RESTART_8       = 0x9cb2,
-    APP_MENU_RESTART_9       = 0x9cb3,
-    APP_MENU_RESTART_10      = 0x9cb5,
-    APP_MENU_RESTART_11      = 0x9cb6,
-    APP_MENU_RESTART_12      = 0x9cb8,
-    APP_MENU_RESTART_13      = 0x9cb9,
-    APP_MENU_LOAD_0          = 0x9cbb,
-    APP_MENU_LOAD_1          = 0x9cbc,
-    APP_MENU_LOAD_2          = 0x9cbf,
-    APP_MENU_LOAD_3          = 0x9cc0,
-    APP_MENU_LOAD_4          = 0x9cc1,
-    APP_MENU_LOAD_5          = 0x9cc3,
-    APP_MENU_LOAD_6          = 0x9cc4,
-    APP_MENU_LOAD_7          = 0x9cc6,
-    APP_MENU_LOAD_8          = 0x9cc7,
-    APP_MENU_LOAD_9          = 0x9cc9,
-    APP_MENU_LOAD_10         = 0x9cca,
+    APP_MENU_VIEW_ENEMY_MOVES = 0x9c6f,
+    APP_MENU_NEW_STANDARD_GAME       = 0x9ca6,
+    APP_MENU_NEW_CAMPAIGN_1       = 0x9ca8,
+    APP_MENU_NEW_CAMPAIGN_2       = 0x9ca9,
+    APP_MENU_NEW_CAMPAIGN_3       = 0x9caa,
+    APP_MENU_NEW_CAMPAIGN_4       = 0x9cab,
+    APP_MENU_UNUSED_9CAD    = 0x9cad,
+    APP_MENU_NEW_HOT_SEAT_2       = 0x9cae,
+    APP_MENU_NEW_HOT_SEAT_3       = 0x9caf,
+    APP_MENU_NEW_HOT_SEAT_4       = 0x9cb0,
+    APP_MENU_NEW_NETWORK_HOST       = 0x9cb2,
+    APP_MENU_NEW_NETWORK_GUEST       = 0x9cb3,
+    APP_MENU_NEW_MODEM_HOST      = 0x9cb5,
+    APP_MENU_NEW_MODEM_GUEST      = 0x9cb6,
+    APP_MENU_NEW_DIRECT_HOST      = 0x9cb8,
+    APP_MENU_NEW_DIRECT_GUEST      = 0x9cb9,
+    APP_MENU_LOAD_STANDARD_GAME          = 0x9cbb,
+    APP_MENU_LOAD_CAMPAIGN_GAME          = 0x9cbc,
+    APP_MENU_LOAD_HOT_SEAT_2          = 0x9cbf,
+    APP_MENU_LOAD_HOT_SEAT_3          = 0x9cc0,
+    APP_MENU_LOAD_HOT_SEAT_4          = 0x9cc1,
+    APP_MENU_LOAD_NETWORK_HOST          = 0x9cc3,
+    APP_MENU_LOAD_NETWORK_GUEST          = 0x9cc4,
+    APP_MENU_LOAD_MODEM_HOST          = 0x9cc6,
+    APP_MENU_LOAD_MODEM_GUEST          = 0x9cc7,
+    APP_MENU_LOAD_DIRECT_HOST          = 0x9cc9,
+    APP_MENU_LOAD_DIRECT_GUEST         = 0x9cca,
     APP_MENU_SAVE            = 0x9ccb,
     APP_MENU_EXIT            = 0x9ccc,
     APP_MENU_CHEAT_REVEAL    = 0x9ccd,
@@ -323,23 +322,7 @@ using enum DialogWaitType;
 
 typedef enum OldMainConstant {
     OLD_MAIN_MATCH_BUFFER_SIZE                = 8,
-    OLD_MAIN_PLAYER_NAME_LENGTH               = 21,
     OLD_MAIN_DEFAULT_NAME_LENGTH              = 3,
-    OLD_MAIN_DEFAULT_NAME_STRIDE              = 4,
-    OLD_MAIN_MAIN_MUSIC                       = 42,
-    OLD_MAIN_HIGH_SCORE_MUSIC                 = 43,
-    OLD_MAIN_FADE_SPEED                       = 8,
-    OLD_MAIN_LONG_FADE_SPEED                  = 0x80,
-    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL         = 9,
-    OLD_MAIN_INTRO_PUBLISHER_VIDEO            = 0x49,
-    OLD_MAIN_INTRO_PRIMARY_VIDEO              = 0x42,
-    OLD_MAIN_INTRO_FALLBACK_VIDEO             = 1,
-    OLD_MAIN_INTRO_SECONDARY_VIDEO            = 0x41,
-    OLD_MAIN_CREDITS_FIRST_VIDEO              = 0x48,
-    OLD_MAIN_CREDITS_SECOND_VIDEO             = 0x24,
-    OLD_MAIN_CREDITS_THIRD_VIDEO              = 0x4a,
-    OLD_MAIN_STANDARD_VICTORY_VIDEO           = 3,
-    OLD_MAIN_EXPANSION_VICTORY_VIDEO          = 0x40,
     OLD_MAIN_NEW_GAME                         = 0x65,
     OLD_MAIN_LOAD_GAME                        = 0x66,
     OLD_MAIN_HIGH_SCORES                      = 0x67,
@@ -348,12 +331,8 @@ typedef enum OldMainConstant {
     OLD_MAIN_SETUP_NEW                        = 0,
     OLD_MAIN_SETUP_LOAD                       = 1,
     OLD_MAIN_NET_BUFFER_SIZE                  = 256,
-    OLD_MAIN_NETWORK_PACKET                   = 0x20,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
-    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
-    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
-    OLD_MAIN_DIALOG_WAIT                      = 6,
+    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = CAMPAIGN_ARCHIBALD_FINAL_SCENARIO + 1,
+    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = CAMPAIGN_ROLAND_FINAL_SCENARIO + 1,
 } OldMainConstant;
 
 #pragma pack(push, 1)
@@ -386,20 +365,14 @@ struct KbRemotePacket {
 #pragma pack(pop)
 
 typedef enum AppMenuConstant {
-    APP_MENU_CONFIRM_OK          = DIALOG_BUTTON_5,
-    APP_MENU_CHECKED             = 8,
-    APP_MENU_UNCHECKED           = 0,
-    APP_MENU_CONFIRM_DIALOG      = 2,
     APP_MENU_REVEAL_SIZE         = 0x1e,
     APP_MENU_REVEAL_RADIUS       = 0xb4,
     APP_MENU_SPELL_COUNT         = 10,
-    APP_MENU_RESOURCE_COUNT      = 7,
     APP_MENU_RESOURCE_BONUS      = 10,
     APP_MENU_GOLD_BONUS          = 1000,
     APP_MENU_MOVEMENT_BONUS      = 299999,
     APP_MENU_CHEAT_SPELL_POINTS  = 999,
     APP_MENU_CHEAT_ARMY_QUANTITY = 5,
-    APP_MENU_CLOSE_MESSAGE       = 0x10,
     APP_MENU_ARMY_FIRST          = 41000,
     APP_MENU_ARMY_LAST           = 41066,
     APP_MENU_SECONDARY_FIRST     = 42000,
@@ -408,8 +381,6 @@ typedef enum AppMenuConstant {
     APP_MENU_BUILDING_LAST       = 43101,
     APP_MENU_COMBAT_FIRST        = 44000,
     APP_MENU_COMBAT_LAST         = 44200,
-    APP_MENU_COMBAT_HEX_COUNT    = 117,
-    APP_MENU_FORMATION_HEX_COUNT = 15
 } AppMenuConstant;
 
 typedef enum NetBoxConstant {
@@ -448,7 +419,7 @@ i32 InterpretCommandLine(void);
 MessageDispatchResult InitMenuHandler(struct tag_message& message);
 MessageDispatchResult NullHandler(struct tag_message& message);
 MessageDispatchResult RecruitHeroHandler(tag_message& message);
-const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading);
 const char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
 const char* GetMonsterName(CreatureType monster);
@@ -466,7 +437,7 @@ void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
 i32 GetMonType(i32 score, HighScoreType highScoreType);
-i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, const char* scenarioName);
+i32 AddScoreToHighScore(i32 score, i32 days, i32 difficultyRating, HighScoreType highScoreType, const char* scenarioName);
 void BVResMsg(const char* text, ResourceType resourceType, i32 quantity);
 void GOut(const char* text);
 i32 NetPosToGamePos(i32 netPosition);
@@ -598,6 +569,21 @@ extern i32 giBottomViewOverrideEndTime;
 extern H2EnumStorage<ResourceType, i32> giBottomViewResource;
 extern i32 giBottomViewResourceQty;
 extern WindowColorCycleMode giCycleType;
+
+typedef enum DebugLevel {
+    MEMORY_LEAK_DEBUG_LEVEL                    = 1,
+    CELL_WINDOW_DEBUG_LEVEL                    = 1,
+    FILE_DEBUG_LEVEL                           = 2,
+    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
+    AI_PURCHASE_DEBUG_LEVEL                    = 3,
+    DEBUGGER_OUTPUT_LEVEL                      = 4,
+    COMBAT_AUTO_RESOLVE_DEBUG_LEVEL            = 4,
+    AI_PURCHASE_VALUE_DEBUG_LEVEL              = 5,
+    POSITION_DEBUG_LEVEL                       = 5,
+    FORCED_DEBUG_LEVEL                         = 9,
+    OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL          = 9,
+    AI_BATTLE_DEBUG_LEVEL                      = 9
+} DebugLevel;
 extern i32 giDebugLevel;
 extern i32 giDialogTimeout;
 extern H2EnumStorage<TerrainType, u8> giGroundToTerrain[];
@@ -631,7 +617,7 @@ extern class mouseManager* gpMouseManager;
 extern philAI* gpPhilAI;
 extern resourceManager* gpResourceManager;
 extern searchArray* gpSearchArray;
-extern soundManager* gpSoundManager;
+extern class soundManager* gpSoundManager;
 extern townManager* gpTownManager;
 extern class heroWindowManager* gpWindowManager;
 extern i32 gResourceBaseValue[];

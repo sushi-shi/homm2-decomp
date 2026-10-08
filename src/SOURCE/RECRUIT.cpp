@@ -1,7 +1,7 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
@@ -21,18 +21,16 @@
 #include <SOURCE/townManager.h>
 #include <SOURCE/Localization.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/advManager.h>
 
 typedef enum RecruitConstant {
-    RESOURCE_COUNT              = 6,
-    GOLD_RESOURCE               = 6,
     WINDOW_X                    = 0x8f,
     WINDOW_Y                    = 0x10,
     QUICK_WINDOW_X              = 0xa0,
     QUICK_WINDOW_Y              = 0x10,
     NAME_SIZE                   = 40,
     LABEL_SIZE                  = 40,
-    RECRUIT_DRAW_LAST_WIDGET_ID = 0x7fff,
     VIEW_ARMY_X                 = 0x77,
     VIEW_ARMY_Y                 = 0x20,
     NO_ROOM_DIALOG_X            = 177,
@@ -50,7 +48,7 @@ typedef enum RecruitControl {
     INCREASE_CONTROL       = 0x45,
     DECREASE_CONTROL       = 0x46,
     MAXIMUM_CONTROL        = 0x47,
-    GOLD_ICON_CONTROL      = 0x49,
+    GOLD_COST_CONTROL      = 0x49,
     RESOURCE_ICON_CONTROL  = 0x4a,
     RESOURCE_COST_CONTROL  = 0x4b,
     GOLD_TOTAL_CONTROL     = 0x4d,
@@ -78,7 +76,7 @@ void SetupRecruitWin(
     window->BroadcastMessage(message);
 
     utf8::Format(label, "%d", goldCost);
-    message.payload.widget.id = GOLD_ICON_CONTROL;
+    message.payload.widget.id = GOLD_COST_CONTROL;
     window->BroadcastMessage(message);
     if (resourceType != RES_NONE) {
         utf8::Format(label, "%d", resourceCost);
@@ -128,7 +126,7 @@ i32 recruitUnit::Open(i32 priority) {
         m_resourceCost,
         *m_available
     );
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     Update();
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
@@ -138,7 +136,7 @@ i32 recruitUnit::Open(i32 priority) {
     );
     gpWindowManager->AddWindow(m_window, -1, 1);
 
-    goldMaximum = gpCurPlayer->m_resources[GOLD_RESOURCE] / m_goldCost;
+    goldMaximum = gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] / m_goldCost;
     if (m_resourceType != RES_NONE) {
         resourceMaximum = gpCurPlayer->m_resources[H2EnumIndex(m_resourceType)] / m_resourceCost;
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
@@ -259,7 +257,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         break;
                 }
                 Update();
-                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                 break;
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
@@ -271,7 +269,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_quantity = m_maximum;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case DECREASE_CONTROL:
                         if (quickView != 0)
@@ -281,7 +279,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_quantity = 0;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case MAXIMUM_CONTROL:
                         if (quickView != 0)
@@ -289,7 +287,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         m_quantity = m_maximum;
                         Update();
                         m_window
-                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, RECRUIT_DRAW_LAST_WIDGET_ID);
+                            ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case CANCEL_CONTROL:
                         if (quickView != 0)
@@ -311,7 +309,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_noRoom = true;
                             goto checkClose;
                         }
-                        gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
+                        gpCurPlayer->m_resources[H2EnumIndex(RES_GOLD)] -= m_quantity * m_goldCost;
                         if (m_resourceType != RES_NONE) {
                             gpCurPlayer->m_resources[H2EnumIndex(m_resourceType)] -=
                                 m_quantity * m_resourceCost;
@@ -337,7 +335,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
 }
 
 recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[H2EnumIndex(RES_COUNT)];
     i32 resourceIndex;
 
     m_sourceType = RECRUIT_SOURCE_EVENT;
@@ -346,12 +344,12 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     m_creatureType = creatureType;
     m_available = available;
     GetMonsterCost(m_creatureType, unitCosts);
-    m_goldCost = unitCosts[GOLD_RESOURCE];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    m_goldCost = unitCosts[H2EnumIndex(RES_GOLD)];
+    for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < H2EnumIndex(RES_GOLD)) {
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[H2EnumIndex(m_resourceType)];
     } else {
@@ -361,7 +359,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
 }
 
 recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[H2EnumIndex(RES_COUNT)];
     i32 resourceIndex;
 
     m_refreshTown = refreshTown;
@@ -370,12 +368,12 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     m_creatureType = gDwellingType[H2EnumIndex(townData->m_type)][dwelling];
     m_available = &townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(m_creatureType, unitCosts);
-    m_goldCost = unitCosts[GOLD_RESOURCE];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    m_goldCost = unitCosts[H2EnumIndex(RES_GOLD)];
+    for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < H2EnumIndex(RES_GOLD)) {
         m_resourceType = ResourceType(resourceIndex);
         m_resourceCost = unitCosts[H2EnumIndex(m_resourceType)];
     } else {
@@ -388,7 +386,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     CreatureType monsterType;
     ResourceType resourceType;
     heroWindow* recruitWindow;
-    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 unitCosts[H2EnumIndex(RES_COUNT)];
     i32 resourceCost;
     i32 goldCost;
     i32 resourceIndex;
@@ -397,12 +395,12 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     monsterType = gDwellingType[H2EnumIndex(townData->m_type)][dwelling];
     avail = townData->m_dwellingAvailable[dwelling];
     GetMonsterCost(monsterType, unitCosts);
-    goldCost = unitCosts[GOLD_RESOURCE];
-    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+    goldCost = unitCosts[H2EnumIndex(RES_GOLD)];
+    for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_GOLD); ++resourceIndex) {
         if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resourceIndex < RESOURCE_COUNT) {
+    if (resourceIndex < H2EnumIndex(RES_GOLD)) {
         resourceType = ResourceType(resourceIndex);
         resourceCost = unitCosts[H2EnumIndex(resourceType)];
     } else {

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
@@ -13,7 +13,8 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/wingraph.h>
@@ -27,29 +28,9 @@
 #include <string>
 
 typedef enum SmackManagerConstant {
-    PALETTE_VALUE_SHIFT            = 2,
     AUDIO_OPEN_FLAGS               = 0xfe000,
-    NORMAL_FADE                    = 0x80,
-    SHORT_FADE                     = 8,
-    FAST_FADE                      = 4,
-    CHOOSE_CAMPAIGN                = 35,
-    SMACK_CREDITS                  = 36,
-    SMACK_EARTH                    = 37,
-    FIRST_NETWORK                  = 39,
-    EXPANSION_CAMPAIGN             = 67,
-    EXPANSION_FIRST_MOVIE          = 68,
-    SPECIAL_MUSIC                  = 72,
-    BUKA_LOGO                      = 73,
-    BUKA_CREDITS                   = 74,
-    CONGRATS                       = 2,
-    INTRO_MUSIC                    = 3,
     LOW_MEMORY_MOVIE               = 30,
-    BACKGROUND_COLOR               = 36,
-    MAIN_MUSIC                     = 42,
-    LOSE_MUSIC                     = 43,
-    INTRO_SECOND_MUSIC             = 19,
     POINTER_ID                     = 40,
-    POINTER_DEFAULT                = 0,
     EXPANSION_RECT_COUNT           = 4,
     CAMPAIGN_DIVIDER_X             = LOGICAL_SCREEN_WIDTH / 2,
     CAMPAIGN_LEFT_FRAME            = 0,
@@ -72,7 +53,6 @@ typedef enum SmackManagerConstant {
     VIDEO_SPEED_TEST               = 3,
     VIDEO_OPEN_READ_SLOW_THRESHOLD = 2000,
     VIDEO_DECOMP_SLOW_THRESHOLD    = 1300,
-    SMACK_OPTION_COUNT             = 75
 } SmackManagerConstant;
 
 static i8 bExpansionSmackNum;
@@ -251,7 +231,7 @@ void SmackManagerMain(void) {
         0
     );
     if (SmackOptions[bSmackNum].fadeIn)
-        gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, NULL);
 
     playing = true;
     primaryStarted = false;
@@ -272,7 +252,7 @@ void SmackManagerMain(void) {
                     MOUSE_AUTO_CURSOR_TYPE
                 );
                 gpMouseManager->ReallyShowPointer();
-                gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
+                gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                 backImage = gpResourceManager->GetIcon(
                     "x_ivy.icn"
                 );
@@ -289,13 +269,13 @@ void SmackManagerMain(void) {
                 ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
                 UpdatePalette(gPalette->m_data);
                 memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-                gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_FAST, NULL);
                 primaryStarted = true;
             }
         } else if (!platform::MovieWaiting(smk1)) {
-            if (bSmackNum == INTRO_MUSIC && !musicStarted) {
+            if (bSmackNum == DEFEAT_VIDEO && !musicStarted) {
                 musicStarted = true;
-                gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
+                gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_LOST_GAME);
             }
             if ((!primaryStarted || platform::MovieFrameCount(smk1) > 1)
                 && (bSmackNum != CONGRATS
@@ -315,12 +295,12 @@ void SmackManagerMain(void) {
                     }
                     if (SmackOptions[bSmackNum].fadeIn) {
                         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-                        gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
+                        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_FAST, NULL);
                     }
                     if (bSmackNum == SMACK_CREDITS || bSmackNum == BUKA_CREDITS)
-                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
-                    if (bSmackNum == SPECIAL_MUSIC)
-                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
+                    if (bSmackNum == CYBERLORE_CREDITS)
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                 }
                 primaryStarted = true;
             }
@@ -458,7 +438,7 @@ void SmackManagerMain(void) {
             && platform::MovieFrameIndex(smk1) + 1 == platform::MovieFrameCount(smk1)
             && !musicStarted) {
             musicStarted = true;
-            gpSoundManager->PlayAmbientMusic(LOSE_MUSIC);
+            gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_HIGH_SCORE);
         }
 
         if (!SmackOptions[bSmackNum].waitForInput
@@ -480,21 +460,21 @@ playbackDone:
         gpMouseManager->HideColorPointer();
         gpMouseManager->SetPointer(
             "advmice.mse",
-            POINTER_DEFAULT,
+            ADVENTURE_POINTER_DEFAULT,
             MOUSE_AUTO_CURSOR_TYPE
         );
     }
 
     if (SmackOptions[bSmackNum].fadeOut) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-        gpWindowManager->FadeScreen(FADE_OUT, SHORT_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
             0,
             LOGICAL_SCREEN_WIDTH,
             LOGICAL_SCREEN_HEIGHT,
-            BACKGROUND_COLOR
+            SCREEN_FILL_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
@@ -507,14 +487,14 @@ playbackDone:
         );
     } else if (!gbPlayedThrough && bSmackNum != CONGRATS) {
         memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
-        gpWindowManager->FadeScreen(FADE_OUT, NORMAL_FADE, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, NULL);
         FillBitmapArea(
             gpWindowManager->m_screen,
             0,
             0,
             LOGICAL_SCREEN_WIDTH,
             LOGICAL_SCREEN_HEIGHT,
-            BACKGROUND_COLOR
+            SCREEN_FILL_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
@@ -564,10 +544,10 @@ i32 PlaySmacker(i32 smackNumber) {
     gbInSmackMgr = true;
     gbPlayedThrough = false;
     memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    oldUpdateFlags = gpWindowManager->m_updateFlags;
-    gpWindowManager->m_updateFlags = 0;
+    oldUpdateFlags = gpWindowManager->m_colorCycling;
+    gpWindowManager->m_colorCycling = 0;
     if (smackNumber != EXPANSION_CAMPAIGN) {
-        gSoundBackendsReady = 1;
+        gbSoundEnabled = 1;
         gpSoundManager->PlayAmbientMusic(-1);
     }
     if (gConfig.slowVideo == VIDEO_SPEED_TEST) {
@@ -585,7 +565,7 @@ i32 PlaySmacker(i32 smackNumber) {
     bSmackNum = smackNumber;
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, PALETTE_DATA_SIZE);
-    gpWindowManager->m_updateFlags = oldUpdateFlags;
+    gpWindowManager->m_colorCycling = oldUpdateFlags;
     gbInSmackMgr = false;
     return gbPlayedThrough;
 }

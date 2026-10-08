@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/tileset.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Raster.h>

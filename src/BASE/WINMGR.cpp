@@ -1,4 +1,5 @@
-#include <BASE/WINMGR.h>
+#include <H2/Ints.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/Utf8.h>
 
 typedef enum WindowColorCycleConstant {
@@ -40,33 +41,19 @@ typedef enum WindowColorCyclePaletteOffset {
     DEFAULT_CYCLE_SAVE_OFFSET           = 69
 } WindowColorCyclePaletteOffset;
 
-typedef enum WindowScreenConstant {
-    FRAMEBUFFER_DWORD_COUNT = 0x12c00,
-    FRAMEBUFFER_FILL_COLOR  = 0x24
-} WindowScreenConstant;
-
 typedef enum WindowFizzleConstant {
-    FIZZLE_DEFAULT_DELAY          = 150,
     FIZZLE_CYCLE_TABLE_BYTES      = 0x10000,
     FIZZLE_LOOKUP_HIGH_BYTE_SHIFT = 8,
-    DIALOG_FADE_STEPS             = 8,
     SCREENSHOT_FILENAME_CAPACITY  = 16
 } WindowFizzleConstant;
-
-#ifdef __clang__
-#else
-#endif
 
 i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 i16 memSelector;
 
-static inline u32& FadeSavedUpdate(void) {
-    static u32 savedUpdate;
-    return savedUpdate;
+static inline u32& FadeSavedColorCycling(void) {
+    static u32 savedColorCycling;
+    return savedColorCycling;
 }
-
-#include <Ints.h>
-
 
 i32 iCombatCycleFrame = 0;
 u8 gbEveryOtherCycle = true;
@@ -75,7 +62,6 @@ i32 iCycle2Count = 0;
 i32 iCycle3Count = 0;
 i32 iDialogNestCount = 0;
 
-#include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>
@@ -92,7 +78,7 @@ void CycleColors(i32 forceUpdate) {
         return;
     if (gpWindowManager->m_active != 1)
         return;
-    if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
+    if (gpWindowManager->m_colorCycling == 0 && forceUpdate == 0)
         return;
 
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT)
@@ -257,13 +243,13 @@ void CycleColors(i32 forceUpdate) {
 
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = false;
-    m_activeWindow = NULL;
+    m_previousFocusWindow = NULL;
     m_focusWindow = NULL;
     m_windowListTail = NULL;
     m_windowListHead = NULL;
     m_screen = NULL;
     m_screenshotIndex = 1;
-    m_updateFlags = 0;
+    m_colorCycling = 0;
     m_fizzleSource = NULL;
     m_fizzleWork = NULL;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
@@ -283,7 +269,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen->m_pixels = platform::Video().Pixels();
     memset(
         m_screen->m_pixels,
-        FRAMEBUFFER_FILL_COLOR,
+        SCREEN_FILL_COLOR,
         LOGICAL_SCREEN_WIDTH * LOGICAL_SCREEN_HEIGHT
     );
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
@@ -325,6 +311,7 @@ MessageDispatchResult heroWindowManager::Main(struct tag_message& message) {
     return result;
 }
 
+
 MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& message) {
     return Main(message);
 }
@@ -339,11 +326,11 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand command,
     return Main(message);
 }
 
-void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 openFlags) {
+void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 updateScreen) {
     heroWindow* currentWindow = m_windowListTail;
     if ((H2EnumIndex((window->m_winFlags) & (WINDOW_FLAG_FIXED_LAYER))))
         zOrder = 0;
-    if (zOrder == -1) {
+    if (zOrder == WINDOW_Z_ORDER_TOP) {
         if (currentWindow == NULL)
             zOrder = 0;
         else
@@ -351,7 +338,7 @@ void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 open
     }
     if (zOrder != 0 && m_windowListHead == NULL)
         return;
-    if (window->Open(zOrder, openFlags) != 0)
+    if (window->Open(zOrder, updateScreen) != 0)
         return;
     while (currentWindow != NULL && currentWindow->m_zOrder > zOrder)
         currentWindow = currentWindow->m_prevWindow;
@@ -372,7 +359,7 @@ void heroWindowManager::AddWindow(class heroWindow* window, i32 zOrder, i32 open
         currentWindow->m_nextWindow->m_prevWindow = window;
         currentWindow->m_nextWindow = window;
     }
-    m_activeWindow = m_focusWindow;
+    m_previousFocusWindow = m_focusWindow;
     m_focusWindow = window;
 }
 
@@ -397,13 +384,13 @@ void heroWindowManager::RemoveWindow(class heroWindow* window) {
                 window->m_nextWindow->m_prevWindow = window->m_prevWindow;
         }
     }
-    if (m_activeWindow == window)
-        m_activeWindow = NULL;
-    if (m_activeWindow == NULL) {
+    if (m_previousFocusWindow == window)
+        m_previousFocusWindow = NULL;
+    if (m_previousFocusWindow == NULL) {
         m_focusWindow = m_windowListTail;
         return;
     }
-    m_focusWindow = m_activeWindow;
+    m_focusWindow = m_previousFocusWindow;
 }
 
 i32 heroWindowManager::DoDialog(
@@ -421,9 +408,9 @@ i32 heroWindowManager::DoDialog(
     iDialogNestCount++;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
-        AddWindow(window, -1, 1);
+        AddWindow(window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
     if (fade != 0)
-        gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
+        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
     gpInputManager->Flush();
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
     done = false;
@@ -457,10 +444,6 @@ i32 heroWindowManager::DoDialog(
     return 0;
 }
 
-#undef MESSAGE_DISPATCH_CONTINUE
-#undef MESSAGE_DISPATCH_CONSUME
-#undef MESSAGE_DISPATCH_FORWARD
-
 void heroWindowManager::UpdateScreen(void) {
     PollSound();
     BitmapToScreen(m_screen);
@@ -483,23 +466,23 @@ void heroWindowManager::RedrawScreen(void) {
     }
 }
 
-void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* currentPalette) {
+void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 increment, class palette* currentPalette) {
     if (currentPalette != NULL)
         SetPalette(currentPalette->m_data, 0);
     switch (direction) {
         case FADE_IN: {
-            u32 saved = m_updateFlags;
-            m_updateFlags = 0;
+            u32 saved = m_colorCycling;
+            m_colorCycling = 0;
             PollSound();
-            FadeIn(steps);
-            m_updateFlags = saved | FadeSavedUpdate();
+            FadeIn(increment);
+            m_colorCycling = saved | FadeSavedColorCycling();
             break;
         }
         case FADE_OUT:
-            FadeSavedUpdate() = m_updateFlags;
-            m_updateFlags = 0;
+            FadeSavedColorCycling() = m_colorCycling;
+            m_colorCycling = 0;
             PollSound();
-            FadeOut(steps);
+            FadeOut(increment);
             break;
     }
     PollSound();
@@ -563,7 +546,7 @@ void heroWindowManager::FizzleForward(
     i32 frame;
     i32 sourceY;
     i32 sourceX;
-    i8* colorCycleBuffer;
+    i8* fizzleTable;
     i32 saveFlags;
 
     if (bShowIt == 0)
@@ -585,25 +568,25 @@ void heroWindowManager::FizzleForward(
     if (width <= 0 || height <= 0)
         return;
 
-    saveFlags = m_updateFlags;
-    m_updateFlags = 0;
+    saveFlags = m_colorCycling;
+    m_colorCycling = 0;
     if (delay == -1)
         delay = FIZZLE_DEFAULT_DELAY;
     paletteBuffer = static_cast<i8*>(H2_ALLOC(PALETTE_DATA_SIZE));
     m_fizzleWork = new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-    colorCycleBuffer = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
+    fizzleTable = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
     BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
     for (frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "CCYCLE%02d.BIN", frame);
         gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
-        gpResourceManager->ReadBlock(colorCycleBuffer, FIZZLE_CYCLE_TABLE_BYTES);
+        gpResourceManager->ReadBlock(fizzleTable, FIZZLE_CYCLE_TABLE_BYTES);
         for (sourceY = y; sourceY < y + height; sourceY++) {
             savePixel = m_fizzleSource->m_pixels + (sourceY - y) * m_fizzleSource->m_width;
             workPixel = m_fizzleWork->m_pixels + (sourceY - y) * width;
             screenPixel = m_screen->m_pixels + sourceY * LOGICAL_SCREEN_WIDTH + x;
             for (sourceX = x; sourceX < x + width; sourceX++) {
-                *screenPixel = colorCycleBuffer[static_cast<u16>(
+                *screenPixel = fizzleTable[static_cast<u16>(
                     *workPixel | (*savePixel << FIZZLE_LOOKUP_HIGH_BYTE_SHIFT)
                 )];
                 savePixel++;
@@ -628,12 +611,12 @@ void heroWindowManager::FizzleForward(
     BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
     BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
     gbEnlargeScreenBlit = true;
-    m_updateFlags = saveFlags;
+    m_colorCycling = saveFlags;
     delete m_fizzleSource;
     m_fizzleSource = NULL;
     delete m_fizzleWork;
     m_fizzleWork = NULL;
-    H2_FREE(colorCycleBuffer);
+    H2_FREE(fizzleTable);
     H2_FREE(paletteBuffer);
 }
 

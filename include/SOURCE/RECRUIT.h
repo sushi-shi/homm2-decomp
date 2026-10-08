@@ -1,8 +1,8 @@
-#ifndef HOMM2_RECRUIT_H
-#define HOMM2_RECRUIT_H
+#ifndef HOMM2_SOURCE_RECRUIT_H
+#define HOMM2_SOURCE_RECRUIT_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 
 class heroWindow;
 class town;

@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_BINARY_H
 #define HOMM2_PLATFORM_BINARY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 #include <cstddef>
 

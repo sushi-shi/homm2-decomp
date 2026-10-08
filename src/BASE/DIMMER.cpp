@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/widget.h>
 #include <BASE/dimmerWidget.h>
 #include <BASE/resourceManager.h>
@@ -28,5 +28,3 @@ MessageDispatchResult dimmerWidget::Main(struct tag_message& message) {
 void dimmerWidget::Draw(void) {
     Dim();
 }
-
-dimmerWidget::~dimmerWidget() {}

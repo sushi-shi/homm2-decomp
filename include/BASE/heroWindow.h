@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_HEROWINDOW_H
 #define HOMM2_BASE_HEROWINDOW_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 
 class widget;
@@ -41,12 +41,18 @@ typedef enum HeroWindowConstant {
     HERO_WINDOW_NAME_CAPACITY = 0x14
 } HeroWindowConstant;
 
+typedef enum HeroWindowZOrder {
+
+
+    WINDOW_Z_ORDER_TOP = -1
+} HeroWindowZOrder;
+
 class heroWindow {
 public:
     i32 m_zOrder;
     heroWindow* m_nextWindow;
     heroWindow* m_prevWindow;
-    char name[HERO_WINDOW_NAME_CAPACITY];
+    char m_name[HERO_WINDOW_NAME_CAPACITY];
     WindowFlag m_winFlags;
     WindowState m_winState;
     i32 m_posX;
@@ -59,7 +65,7 @@ public:
     heroWindow(void);
     heroWindow(i32 x, i32 y, i32 width, i32 height, WindowFlag flags);
     heroWindow(i32 x, i32 y, const char* resourceName);
-    i32 Open(i32 x, i32 flags);
+    i32 Open(i32 zOrder, i32 updateScreen);
     void RemoveAndDeleteWidget(i32 id);
     void Close(void);
     void AddWidget(class widget* newWidget, i32 zOrder);

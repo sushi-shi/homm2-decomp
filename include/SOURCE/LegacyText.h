@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_LEGACY_TEXT_H
-#define HOMM2_SOURCE_LEGACY_TEXT_H
+#ifndef HOMM2_SOURCE_LEGACYTEXT_H
+#define HOMM2_SOURCE_LEGACYTEXT_H
 
 #include <cstddef>
 #include <string>

@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_BZIP2_H
 #define HOMM2_BASE_BZIP2_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 namespace compression {
 
