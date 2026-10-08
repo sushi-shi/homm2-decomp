@@ -111,8 +111,6 @@ using enum CombatControlId;
 
     typedef enum CombatRemoteConstant {
         REMOTE_PACKET_TYPE = 1,
-        REMOTE_COMMAND_MESSAGE = 11,
-        REMOTE_COMMAND_ACTION = 23
     } CombatRemoteConstant;
 
     enum class CombatActionDataIndex : i32 {
@@ -322,13 +320,13 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
             reinterpret_cast<CombatRemotePacket*>(GetRemoteData(REMOTE_PACKET_TYPE));
         if (packet != NULL && packet->type == REMOTE_MESSAGE_RELIABLE) {
             switch (packet->command) {
-                case REMOTE_COMMAND_ACTION:
+                case REMOTE_COMMAND_COMBAT_ACTION:
                     giNextAction = packet->nextAction;
                     giNextActionExtra = packet->nextActionExtra;
                     giNextActionGridIndex = packet->nextActionGridIndex;
                     giNextActionGridIndex2 = packet->nextActionGridIndex2;
                     goto ProcessAction;
-                case REMOTE_COMMAND_MESSAGE:
+                case REMOTE_COMMAND_POP_NET_BOX:
                     PopNetBox(packet->text, packet->sender);
                     break;
             }
@@ -2425,7 +2423,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             reinterpret_cast<char*>(actionData),
             iCombatControlNetPos[H2EnumIndex(COMBAT_DEFENDER_SIDE) - H2EnumIndex(m_currentSide)],
             sizeof(actionData),
-            REMOTE_COMMAND_ACTION,
+            REMOTE_COMMAND_COMBAT_ACTION,
             1
         );
         LogStr("Post T");

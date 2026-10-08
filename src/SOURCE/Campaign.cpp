@@ -977,7 +977,7 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] = CREATURE_NONE;
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
-        switch (armyHero->m_cursorType) {
+        switch (armyHero->m_faction) {
             case FACTION_WARLOCK:
                 armyHero->m_army.Add(CREATURE_CENTAUR, WARLOCK_CENTAUR_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_GARGOYLE, WARLOCK_GARGOYLE_COUNT, -1);

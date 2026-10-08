@@ -5,11 +5,22 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
+
 enum class MapCellFlag : i32 {
+    MAP_CELL_FLIP_VERTICAL      = 0x01,
+    MAP_CELL_FLIP_HORIZONTAL    = 0x02,
+    MAP_CELL_SHORE              = 0x04,
+    MAP_CELL_OCCUPIED           = 0x08,
+    MAP_CELL_SHORE_CORNER       = 0x10,
+    MAP_CELL_HERO               = 0x40,
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
-    MAP_CELL_OCCUPIED           = 0x08
+
+
+    MAP_CELL_GROUND_KEEP = MAP_CELL_FLIP_VERTICAL | MAP_CELL_FLIP_HORIZONTAL | MAP_CELL_SHORE
+                         | MAP_CELL_OCCUPIED | MAP_CELL_SHORE_CORNER | MAP_CELL_OBJECT_SHADOW_ONLY
 };
 using enum MapCellFlag;
+ENABLE_ENUM_FLAGS(MapCellFlag)
 
 typedef enum MapCellSentinel {
     MAPCELL_SPRITE_NONE = 0xff,

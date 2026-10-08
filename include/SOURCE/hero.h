@@ -58,7 +58,6 @@ typedef enum HeroConstant {
     HERO_PATROL_NONE                          = 0xff,
     HERO_DESTINATION_NONE                     = -1,
     HERO_INTERACTION_TURN_NONE                = -99,
-    HERO_MAP_CELL_PRESENT                     = 0x40,
     HERO_NAME_SIZE                            = 13,
     HERO_PRIMARY_STAT_COUNT                   = 4,
     HERO_ARTIFACT_SLOT_COUNT                  = 14,
@@ -128,7 +127,7 @@ public:
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
     char m_name[HERO_NAME_SIZE];
-    H2EnumStorage<HeroCursorType, u8> m_cursorType;
+    H2EnumStorage<FactionType, u8> m_faction;
     H2EnumStorage<HeroPortrait, u8> m_portrait;
     i32 m_x;
     i32 m_y;

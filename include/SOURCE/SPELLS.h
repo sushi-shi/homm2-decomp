@@ -53,7 +53,6 @@ typedef enum SpellGameplayConstant {
 } SpellGameplayConstant;
 
 typedef enum SpellDrawingConstant {
-    COMBAT_HEX_EMPTY                     = -1,
     COMBAT_SPELL_TARGET_Y_OFFSET         = 17,
     SPELL_FIREBALL_FRAME_COUNT           = 12,
     SPELL_COLD_RING_FRAME_COUNT          = 7,

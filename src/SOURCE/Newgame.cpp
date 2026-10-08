@@ -41,11 +41,6 @@ typedef enum NewGameConstant {
     GAME_SETUP_BUFFER_SIZE                = 240,
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
-    GAME_REMOTE_SETUP                     = 0x33,
-    GAME_REMOTE_MAP_HEADER                = 0x34,
-    GAME_REMOTE_START                     = 0x35,
-    GAME_REMOTE_CANCEL                    = 0x36,
-    GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
     GAME_SWAP_SEARCH_DONE                 = 999,
@@ -427,12 +422,12 @@ i32 game::NewGame(void) {
             remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
             if (remoteBuffer != NULL && remoteBuffer->type == REMOTE_MESSAGE_RELIABLE) {
                 switch (remoteBuffer->command) {
-                    case GAME_REMOTE_MAP_HEADER:
+                    case REMOTE_COMMAND_MAP_HEADER:
                         memset(&m_mapHeader, 0, sizeof(m_mapHeader));
                         memcpy(&m_mapHeader, remoteBuffer->payload, GAME_MAP_PACKET_SIZE);
                         mapHeaderOk = true;
                         break;
-                    case GAME_REMOTE_PLAYER_INFO:
+                    case REMOTE_COMMAND_PLAYER_INFO:
                         memcpy(
                             gsNetPlayerInfo,
                             remoteBuffer->payload,
@@ -525,7 +520,7 @@ i32 game::NewGame(void) {
                 mapInfo,
                 REMOTE_BROADCAST_PLAYER,
                 GAME_MAP_PACKET_SIZE,
-                GAME_REMOTE_MAP_HEADER,
+                REMOTE_COMMAND_MAP_HEADER,
                 1
             );
             if (!transmitResult)
@@ -535,7 +530,7 @@ i32 game::NewGame(void) {
                 netPlayerPacket,
                 REMOTE_BROADCAST_PLAYER,
                 GAME_PLAYER_INFO_PACKET_SIZE,
-                GAME_REMOTE_PLAYER_INFO,
+                REMOTE_COMMAND_PLAYER_INFO,
                 1
             );
             if (!transmitResult)
@@ -956,7 +951,7 @@ cleanup:
                 && (remotePacketResult->type == REMOTE_MESSAGE_RELIABLE
                     || remotePacketResult->type == REMOTE_MESSAGE_UNRELIABLE)) {
                 switch (remotePacketResult->command) {
-                    case GAME_REMOTE_START:
+                    case REMOTE_COMMAND_GAME_START:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
                         message.type = MESSAGE_WIDGET;
@@ -964,7 +959,7 @@ cleanup:
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
 
-                    case GAME_REMOTE_CANCEL:
+                    case REMOTE_COMMAND_GAME_CANCEL:
                         NormalDialog(
                             localization::Tr("network.host.canceled_game"),
                             NORMAL_DIALOG_INFO
@@ -972,7 +967,7 @@ cleanup:
                         ShutDown(NULL);
                         break;
 
-                    case GAME_REMOTE_SETUP:
+                    case REMOTE_COMMAND_GAME_SETUP:
                         if (strcmp(remotePacketResult->payload, gpGame->m_mapHeader.name) != 0)
                             break;
                         memcpy(
@@ -983,7 +978,7 @@ cleanup:
                         redraw = true;
                         break;
 
-                    case GAME_REMOTE_MAP_HEADER:
+                    case REMOTE_COMMAND_MAP_HEADER:
                         memset(&mapHeader, 0, sizeof(mapHeader));
                         memcpy(
                             &mapHeader,
@@ -993,7 +988,7 @@ cleanup:
                         gpGame->ProcessNewMap(&mapHeader);
                         break;
 
-                    case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+                    case REMOTE_COMMAND_POP_NET_BOX:
                         redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
@@ -1048,7 +1043,7 @@ cleanup:
                 cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1],
                 REMOTE_BROADCAST_PLAYER,
                 strlen(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1]) + 1,
-                ADVMGR_REMOTE_COMMAND_POP_NET_BOX,
+                REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!sendResult)
@@ -1116,7 +1111,7 @@ cleanup:
                                         NULL,
                                         REMOTE_BROADCAST_PLAYER,
                                         0,
-                                        GAME_REMOTE_START,
+                                        REMOTE_COMMAND_GAME_START,
                                         1
                                     );
                                 }
@@ -1132,7 +1127,7 @@ cleanup:
                                         NULL,
                                         REMOTE_BROADCAST_PLAYER,
                                         0,
-                                        GAME_REMOTE_CANCEL,
+                                        REMOTE_COMMAND_GAME_CANCEL,
                                         1
                                     );
                                     ShutDown(NULL);
@@ -1384,7 +1379,7 @@ cleanup:
                                             mapPacketLocal,
                                             REMOTE_BROADCAST_PLAYER,
                                             GAME_MAP_PACKET_SIZE,
-                                            GAME_REMOTE_MAP_HEADER,
+                                            REMOTE_COMMAND_MAP_HEADER,
                                             1
                                         );
                                     }
@@ -1413,7 +1408,7 @@ cleanup:
             mapNamePacket,
             REMOTE_BROADCAST_PLAYER,
             GAME_SETUP_PACKET_SIZE,
-            GAME_REMOTE_SETUP,
+            REMOTE_COMMAND_GAME_SETUP,
             1
         );
         if (!sendResult)

@@ -13,8 +13,7 @@ typedef enum CombatRemoteTransferConstant {
     COMBAT_REMOTE_HERO_FIRST_SIZE    = 200,
     COMBAT_REMOTE_HERO_SECOND_SIZE   = 50,
     COMBAT_REMOTE_PACKET_HEADER_SIZE = 9,
-    COMBAT_REMOTE_FRAGMENT_TYPE      = 1,
-    COMBAT_REMOTE_TIMEOUT            = 90000
+    COMBAT_REMOTE_FRAGMENT_TYPE      = 1
 } CombatRemoteTransferConstant;
 
 typedef enum EventRecordConstant {

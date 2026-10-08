@@ -3587,12 +3587,12 @@ i32 oldmain(void) {
         result = gpWindowManager->m_dialogResult;
         gbInSetupDialog = false;
         switch (result) {
-            case SETUP_CHOICE_TWO:
+            case CHOICE_TWO:
                 if (PickMap(FILE_REQUESTER_MAP))
                     keepRunning = false;
                 sprintf(loadName, gMapFileName);
                 break;
-            case SETUP_CHOICE_ONE:
+            case CHOICE_ONE:
                 if (SetupNewMap())
                     keepRunning = false;
                 break;
@@ -3612,7 +3612,7 @@ i32 oldmain(void) {
     );
     if (gpExec->AddManager(gEditManager, BASE_MANAGER_PRIORITY_UNASSIGNED))
         ShutDown(localization::Tr("system.manager.add_failed"));
-    if (result == SETUP_CHOICE_TWO) {
+    if (result == CHOICE_TWO) {
         strcpy(gMapFileName, loadName);
         gEditManager->LoadMap(gMapFileName);
         ProtectShippedMap();

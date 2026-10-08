@@ -26,7 +26,6 @@ typedef enum CursorConstant {
     CURSOR_SHADOW_ANIM_FIRST            = 9,
     CURSOR_SHADOW_ANIM_END              = 0x24,
     CURSOR_SLOW_TURN_MULTIPLIER         = 3,
-    CURSOR_CELL_UNCOVERED_FLAG          = 0x04,
     CURSOR_MOVE_HALF_TILE_PIXELS        = 16,
     CURSOR_RESOURCE_LAST                = H2EnumIndex(RES_COUNT) - 1,
     CURSOR_RESOURCE_DIALOG_PENALTY      = 100000,

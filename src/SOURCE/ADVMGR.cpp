@@ -947,7 +947,7 @@ advManager::advManager(void) {
 
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
-    m_openState = false;
+    m_heroesLogoShown = false;
     bShowIt = false;
     m_adventureBorder = NULL;
 
@@ -3625,7 +3625,7 @@ void advManager::DrawCell(
                         s_drawHeroType =
                             s_drawHero->IsEmbarked()
                                 ? HERO_TYPE_BOAT
-                                : static_cast<HeroCursorType>(s_drawHero->m_cursorType);
+                                : static_cast<HeroCursorType>(s_drawHero->m_faction);
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = true;
                         if (s_drawHero->IsEmbarked()) {
@@ -3682,7 +3682,7 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
+                                && (s_drawCell->m_flags & H2EnumIndex(MAP_CELL_SHORE)) == 0) {
                                 DRAW_FLIPPED_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
                                     s_drawPixelX + CELL_PIXELS,
@@ -3743,7 +3743,7 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
+                                && (s_drawCell->m_flags & H2EnumIndex(MAP_CELL_SHORE)) == 0) {
                                 DRAW_ADVENTURE_ICON(
                                     m_heroIcons[HERO_ICON_FROTH],
                                     s_drawPixelX,
@@ -3784,7 +3784,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (m_cursorActive != 0 && (s_drawCell->m_flags & HERO_MAP_CELL_PRESENT) != 0
+                if (m_cursorActive != 0 && (s_drawCell->m_flags & H2EnumIndex(MAP_CELL_HERO)) != 0
                     && (m_comboHeroDrawn == 0 || (H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW))))
                     && mapX == m_mapOriginX + VIEW_CENTER_CELL
                     && mapY == m_mapOriginY + VIEW_CENTER_CELL) {
@@ -4017,7 +4017,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         return;
     }
 
-    gpAdvManager->m_openState = false;
+    gpAdvManager->m_heroesLogoShown = false;
     xrem = ymod = 0;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
@@ -4085,7 +4085,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 color = RADAR_UNSEEN_COLOR;
             } else {
                 cell = m_mapData->GetCell(i, j);
-                if ((cell->m_flags & HERO_MAP_CELL_PRESENT) != 0
+                if ((cell->m_flags & H2EnumIndex(MAP_CELL_HERO)) != 0
                     && i == m_mapOriginX + VIEW_CENTER_CELL
                     && j == m_mapOriginY + VIEW_CENTER_CELL) {
                     color = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
@@ -6621,7 +6621,7 @@ void advManager::DemobilizeCurrHero(void) {
     }
     cell->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
     cell->m_objectMetadata = heroPointer->m_id;
-    cell->m_flags &= ~HERO_MAP_CELL_PRESENT;
+    cell->m_flags &= ~H2EnumIndex(MAP_CELL_HERO);
     m_cursorActive = false;
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
@@ -6685,12 +6685,12 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_previousCursorMapX = CURSOR_INVALID_POSITION;
     m_cursorType = contextHero->IsEmbarked()
                        ? HERO_TYPE_BOAT
-                       : static_cast<HeroCursorType>(contextHero->m_cursorType);
+                       : static_cast<HeroCursorType>(contextHero->m_faction);
     m_cursorDirection = contextHero->m_direction;
     m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
 
     mapCell* currentCell = GetCell(contextHero->m_x, contextHero->m_y);
-    currentCell->m_flags |= HERO_MAP_CELL_PRESENT;
+    currentCell->m_flags |= H2EnumIndex(MAP_CELL_HERO);
     gpGame->RestoreCell(
         contextHero->m_x,
         contextHero->m_y,
@@ -7800,8 +7800,8 @@ void advManager::TeleportTo(
     }
 
     oldCellFlag = false;
-    if (cellOld->m_flags & HERO_MAP_CELL_PRESENT) {
-        cellOld->m_flags -= HERO_MAP_CELL_PRESENT;
+    if (cellOld->m_flags & H2EnumIndex(MAP_CELL_HERO)) {
+        cellOld->m_flags -= H2EnumIndex(MAP_CELL_HERO);
         oldCellFlag = true;
     } else {
         gpGame->RestoreCell(
@@ -7845,7 +7845,7 @@ void advManager::TeleportTo(
     );
 
     if (bShowIt != 0) {
-        destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
+        destinationCell->m_flags |= H2EnumIndex(MAP_CELL_HERO);
         gpWindowManager->SaveFizzleSource(
             ADVENTURE_VIEW_BORDER,
             ADVENTURE_VIEW_BORDER,
@@ -7872,7 +7872,7 @@ void advManager::TeleportTo(
         mapHero->m_locationType = destinationCell->m_triggerType;
         mapHero->m_occupiedTown = destinationCell->m_objectMetadata;
         if (oldCellFlag != 0) {
-            destinationCell->m_flags |= HERO_MAP_CELL_PRESENT;
+            destinationCell->m_flags |= H2EnumIndex(MAP_CELL_HERO);
         } else {
             destinationCell->m_triggerType =
                 (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION));
@@ -8491,7 +8491,7 @@ void advManager::ScreenScroll(MapDirection direction, i32 updatePointer) {
 
     xOrigin = m_mapOriginX;
     yOrigin = m_mapOriginY;
-    iLastScrollTime = KBTickCount();
+    gLastScrollTime = KBTickCount();
 
     switch (direction) {
         case MAP_DIRECTION_NORTH:
@@ -8557,8 +8557,8 @@ void advManager::CheckScreenScroll(void) {
     i32 oldMapX;
     i32 oldMapY;
 
-    if (KBTickCount() - iLastScrollTime > SCROLL_TICK_INTERVAL) {
-        iLastScrollTime = KBTickCount();
+    if (KBTickCount() - gLastScrollTime > SCROLL_TICK_INTERVAL) {
+        gLastScrollTime = KBTickCount();
         oldMapX = m_mapOriginX;
         oldMapY = m_mapOriginY;
         gpMouseManager->MouseCoords(mouseX, mouseY);
@@ -8733,7 +8733,7 @@ char* advManager::CheckHandleNet(void) {
         && (receivedPacket->type == REMOTE_MESSAGE_RELIABLE
             || receivedPacket->type == REMOTE_MESSAGE_UNRELIABLE)) {
         switch (receivedPacket->command) {
-            case ADVMGR_REMOTE_COMMAND_SAVE_GAME:
+            case REMOTE_COMMAND_SAVE_GAME:
                 remotePlayerExited = ADVMGR_REMOTE_PAYLOAD(receivedPacket)->save.playerExited;
                 if (!gpGame->ReceiveSaveGame(
                         ADVMGR_REMOTE_PAYLOAD(receivedPacket)->save.dataSize,
@@ -8755,11 +8755,11 @@ char* advManager::CheckHandleNet(void) {
                 LoadRemote();
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_POP_NET_BOX:
+            case REMOTE_COMMAND_POP_NET_BOX:
                 PopNetBox(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes, receivedPacket->sender);
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_COMBAT:
+            case REMOTE_COMMAND_COMBAT:
                 if (gbInCombat) {
                     return reinterpret_cast<char*>(receivedPacket);
                 } else {
@@ -8767,12 +8767,12 @@ char* advManager::CheckHandleNet(void) {
                 }
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
+            case REMOTE_COMMAND_PLAYER_EXIT:
                 LogStr("Receive Remote Player Exit");
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->playerExit);
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
+            case REMOTE_COMMAND_HOST_PLAYER_EXIT:
                 LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
                     receivedPacket->sender,
@@ -8781,7 +8781,7 @@ char* advManager::CheckHandleNet(void) {
                 );
                 break;
 
-            case ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE:
+            case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                 ProcessIncomingGroupMapChange(ADVMGR_REMOTE_PAYLOAD(receivedPacket)->bytes);
                 break;
 
@@ -8973,7 +8973,8 @@ i32 advManager::FindAdjacentMonster(
                     if (s_adjacentMonsterY < originY) {
                         if ((GetCell(originX, originY)->m_objectIndex == MAPCELL_SPRITE_NONE
                              || GetCell(originX, originY)->m_objectTileset == TILESET_DUMMY
-                             || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
+                             || (GetCell(originX, originY)->m_flags
+                                 & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)))
                             && (s_adjacentMonsterX != excludedX
                                 || s_adjacentMonsterY != excludedY)) {
                             goto foundAdjacentMonster;
@@ -9012,7 +9013,8 @@ i32 advManager::FindAdjacentMonster(
                     if (s_adjacentMonsterY < originY) {
                         if ((GetCell(originX, originY)->m_objectIndex == MAPCELL_SPRITE_NONE
                              || GetCell(originX, originY)->m_objectTileset == TILESET_DUMMY
-                             || (GetCell(originX, originY)->m_flags & HOVER_UNREACHABLE))
+                             || (GetCell(originX, originY)->m_flags
+                                 & H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY)))
                             && (s_adjacentMonsterX != excludedX
                                 || s_adjacentMonsterY != excludedY)) {
                             goto foundAdjacentMonster;
@@ -10065,7 +10067,7 @@ u8 StopOnTrigger(class mapCell* cell) {
 }
 
 i32 giLimitUpdMinX = -1;
-i32 iLastScrollTime = 0;
+i32 gLastScrollTime = 0;
 i32 iSandAnim = 0;
 i32 giLastHourGlassUpdateTime = 0;
 i32 TrigX = 0;

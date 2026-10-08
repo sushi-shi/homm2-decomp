@@ -219,7 +219,7 @@ nb_sess(NetbiosSessionOperation operation, ...) {
             if (gNbSessNcb[destinationSession].commandComplete == NETBIOS_RESULT_PENDING) {
                 switch (gNbSessNcb[destinationSession].command & ~NETBIOS_COMMAND_ASYNC) {
                     case NETBIOS_COMMAND_CALL:
-                    case NETBIOS_COMMAND_RECEIVE_BROADCAST:
+                    case NETBIOS_COMMAND_RECEIVE_BROADCAST_DATAGRAM:
                         return 0;
                     default:
                         break;
@@ -394,7 +394,8 @@ static void nb_add_name(void) {
             NETBIOS_NAME_SIZE
         );
         memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
-        gNbCtlNcb.command = NETBIOS_COMMAND_RECEIVE_DATAGRAM | NETBIOS_COMMAND_ASYNC;
+        gNbCtlNcb.command =
+            NETBIOS_COMMAND_SEND_BROADCAST_DATAGRAM | NETBIOS_COMMAND_ASYNC;
         gNbCtlNcb.nameNumber = gNbLocalNum;
         gNbCtlNcb.length = strlen(gNbGroupName) + NETBIOS_NAME_SIZE;
         gNbCtlNcb.buffer = gNbSessBuf.bytes;
@@ -446,7 +447,7 @@ static NetbiosResult __fastcall nb_recv_any(i32 session) {
     if (gNbSessNcb[session].commandComplete != NETBIOS_RESULT_PENDING) {
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
         gNbSessNcb[session].command =
-            NETBIOS_COMMAND_RECEIVE_BROADCAST | NETBIOS_COMMAND_ASYNC;
+            NETBIOS_COMMAND_RECEIVE_BROADCAST_DATAGRAM | NETBIOS_COMMAND_ASYNC;
         gNbSessNcb[session].nameNumber = gNbLocalNum;
         gNbSessNcb[session].length = NETBIOS_PAYLOAD_SIZE;
         gNbSessNcb[session].buffer = gNbRcvData[session].bytes;
