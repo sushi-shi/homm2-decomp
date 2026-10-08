@@ -3913,11 +3913,11 @@ i32 philAI::ValueOfTown(town* townPointer) {
     sum += 750;
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN
         && gpGame->m_mapHeader.lossConditionValue == townPointer->m_x
-        && gpGame->m_mapHeader.lossTownY == townPointer->m_y)
+        && gpGame->m_mapHeader.lossConditionY == townPointer->m_y)
         sum += 50000;
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && gpGame->m_mapHeader.victoryConditionValue == townPointer->m_x
-        && gpGame->m_mapHeader.victoryTownY == townPointer->m_y)
+        && gpGame->m_mapHeader.victoryConditionY == townPointer->m_y)
         sum += 50000;
     return sum;
 }
@@ -4885,7 +4885,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 eva
         wantShare = static_cast<float>(wantShare * 0.5);
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && gpGame->m_mapHeader.victoryConditionValue == townPointer->m_x
-        && gpGame->m_mapHeader.victoryTownY == townPointer->m_y) {
+        && gpGame->m_mapHeader.victoryConditionY == townPointer->m_y) {
         wantShare = 0.8f;
     }
     transferShare = (wantShare < townShare ? townShare - wantShare : wantShare - townShare);
@@ -6428,7 +6428,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance)
                 freeFlag = true;
                 goto creature_purchase;
             case MAP_OBJECT_DWARF_COTTAGE:
-            case MAP_OBJECT_SIRENS:
+            case MAP_OBJECT_DWARF_CABIN:
                 buyCreature = CREATURE_DWARF;
                 freeFlag = true;
                 goto creature_purchase;
@@ -6844,7 +6844,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
 
 VA(0x0048ad43, 0x56)
 i32 philAI::EvaluateBarrier(mapCell* cell) {
-    i32 color = cell->m_tentColor;
+    i32 color = cell->m_siteMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
     if (PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 5000;
@@ -6854,7 +6854,7 @@ i32 philAI::EvaluateBarrier(mapCell* cell) {
 
 VA(0x0048ad99, 0x56)
 i32 philAI::EvaluatePassword(mapCell* cell) {
-    i32 color = cell->m_tentColor;
+    i32 color = cell->m_siteMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
     if (!PLAYER_HAS_VISITED_TENT(*gpCurPlayer, color))
         return 2500;
@@ -6879,10 +6879,10 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 replacementSlot;
     i32 H2_UNUSED(unusedValue);
     i16 availableCount;
-    recruitmentSiteType = static_cast<RecruitSiteType>(cell->m_tentColor);
+    recruitmentSiteType = static_cast<RecruitSiteType>(cell->m_siteMetadata);
     recruitmentSiteType =
         static_cast<RecruitSiteType>(IDX(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK);
-    availableCount = cell->m_tentColor;
+    availableCount = cell->m_siteMetadata;
     availableCount >>= EVENT_RECRUIT_COUNT_SHIFT;
     creatureType = 0;
     purchaseValue = 0;

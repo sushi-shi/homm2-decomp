@@ -358,7 +358,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_DATA:
             ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
@@ -480,7 +480,7 @@ i32 wsWaitForHost(void) {
             }
             wsSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                NETWORK_PACKET_HERE_I_AM,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

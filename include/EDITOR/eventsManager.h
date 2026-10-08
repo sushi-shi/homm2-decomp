@@ -77,8 +77,8 @@ H2_ENUM_END(MonsterWindowConstant)
 
 H2_ENUM_BEGIN(NewMapWindowConstant)
     // editnew.bin: a track and a knob (escroll.icn) per terrain and density
-    // row, the arrow buttons, the town placement pair, the generate-unseen
-    // toggle and a radio button per player count.
+    // row, the arrow buttons, the terrain scatter/centre pair (gScatterTerrain),
+    // the generate-unseen toggle and a radio button per player count.
     NEW_MAP_FIRST_TERRAIN_DECREASE = 100,
     NEW_MAP_FIRST_TERRAIN_INCREASE = 200,
     NEW_MAP_FIRST_TERRAIN_TRACK    = 400,
@@ -87,8 +87,8 @@ H2_ENUM_BEGIN(NewMapWindowConstant)
     NEW_MAP_FIRST_DENSITY_INCREASE = 700,
     NEW_MAP_FIRST_DENSITY_TRACK    = 900,
     NEW_MAP_FIRST_DENSITY_KNOB     = 1000,
-    NEW_MAP_SCATTER_TOWNS          = 1100,
-    NEW_MAP_CENTRE_TOWNS           = 1101,
+    NEW_MAP_SCATTER_TERRAIN          = 1100,
+    NEW_MAP_CENTRE_TERRAIN           = 1101,
     NEW_MAP_GENERATE_UNSEEN        = 1300,
     // The player count radio buttons: NEW_MAP_PLAYERS_BASE + players.
     NEW_MAP_PLAYERS_BASE           = 1498,

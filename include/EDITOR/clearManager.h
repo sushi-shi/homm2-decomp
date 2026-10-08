@@ -15,7 +15,7 @@ class iconWidget;
 struct tag_message;
 
 H2_ENUM_BEGIN(ClearHelp)
-    // gClearHelp's rows: the brushes (EditBrush) first.
+    // gObjectPanelHelp's rows: the brushes (EditBrush) first.
     CLEAR_HELP_NONE = -1
 H2_ENUM_END(ClearHelp)
 
@@ -33,7 +33,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void UpdateBrushButtons(void);
     void TrackCursor(void);
-    void SelectBrush(i32 brush, i32 x, i32 y);
+    void OutlineBrush(i32 brush, i32 x, i32 y);
 };
 #pragma pack(pop)
 SIZE(clearManager, 0x4e);

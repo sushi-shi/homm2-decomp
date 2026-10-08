@@ -74,7 +74,7 @@ public:
     virtual void Close(void) OVERRIDE;
     void UpdateButtons(void);
     i32 GetBrushSize(void);
-    void SelectBrush(i32 size, i32 x, i32 y);
+    void OutlineBrush(i32 size, i32 x, i32 y);
     void TrackCursor(void);
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Idle(void);

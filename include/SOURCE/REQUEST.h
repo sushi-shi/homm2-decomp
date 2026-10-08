@@ -66,8 +66,8 @@ struct SMapHeader {
     // editor's "Start with hero in each player's main castle", cleared).
     u8 noStartingHero;
     H2_ENUM_STORAGE(FactionType, i8) playerRace[GAME_PLAYER_COUNT];
-    u16 victoryTownY;
-    u16 lossTownY;
+    u16 victoryConditionY;
+    u16 lossConditionY;
     u16 victorySideThreshold;
     // Zero in every shipped map; neither the game nor the editor reads it.
     u8 reserved32[MAP_HEADER_RESERVED_SIZE];

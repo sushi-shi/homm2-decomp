@@ -152,7 +152,7 @@ The shared units' bodies equal the game's under the game's profiles (`/Od
 /Ob1 /Gr /G5`, BASE with `/Gy /YX`). 297 of the 299 editor-only functions keep a full `/Od`
 frame (the other two are a `ret` and a thunk), and the CLEARMGR seed compiled with the game's `base` profile
 takes the retail sizes (Open 312, Close 184, UpdateBrushButtons 160,
-SelectBrush 169 bytes) where `/O2` does not; the editor's own objects use
+OutlineBrush 169 bytes) where `/O2` does not; the editor's own objects use
 `base`.
 
 ## Comparison

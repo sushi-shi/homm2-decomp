@@ -93,9 +93,9 @@ struct mapCellExtra {
     u8 animatedObject : 1;
     H2_ENUM_BITFIELD(TilesetId, u8) objectTileset : 7;
     u8 objectIndex;
-    // The object part draws on the high layer (overlayType::highLayer), or
-    // is only a shadow.
-    u8 objectHighLayer : 1;
+    // The object part lies on the ground (overlayType::groundLayer: drawn
+    // under shadows and standing parts), or is only a shadow.
+    u8 objectGroundLayer : 1;
     u8 objectShadow : 1;
     u8 objectDrawnAsOverlay : 1;
     u8 objectMetadata : 5;
@@ -121,7 +121,7 @@ class mapCell {
 public:
     u16 m_terrainImageIndex;
     union {
-        char m_objType;
+        char m_objectBits;
         u8 m_objTypeBits;
         struct {
             u8 m_animatedObject : 1;
@@ -133,15 +133,15 @@ public:
     union {
         u16 m_objectData;
         struct {
-            // As mapCellExtra's: the high layer, and a shadow part.
-            u16 m_objectHighLayer : 1;
+            // As mapCellExtra's: a part lying on the ground, and a shadow part.
+            u16 m_objectGroundLayer : 1;
             u16 m_objectShadow : 1;
             u16 m_objectDrawnAsOverlay : 1;
             u16 m_objectMetadata : 13;
         };
         struct {
-            u16 m_tentFlags : 3;
-            u16 m_tentColor : 13;
+            u16 m_siteFlags : 3;
+            u16 m_siteMetadata : 13;
         };
     };
     u8 m_animatedOverlay : 1;

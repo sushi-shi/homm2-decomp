@@ -760,7 +760,7 @@ mapCell* advManager::MoveHero(
         switch (cursorCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_NOTHING_SPECIAL:
             case MAP_OBJECT_MOSSY_ROCK:
-            case MAP_OBJECT_REEFS:
+            case MAP_OBJECT_STREAM:
             case MAP_OBJECT_TREES:
             case MAP_OBJECT_MOUNTAINS:
             case MAP_OBJECT_VOLCANO:
@@ -776,8 +776,8 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_DUNE:
             case MAP_OBJECT_LAVA_POOL:
             case MAP_OBJECT_SHRUB:
-            case MAP_OBJECT_ARENA:
-            case MAP_OBJECT_BARROW_MOUNDS:
+            case MAP_OBJECT_HOLE:
+            case MAP_OBJECT_OUTCROPPING:
                 eventCell = NULL;
         }
         goto movementDone;

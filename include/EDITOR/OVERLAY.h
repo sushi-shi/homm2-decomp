@@ -123,7 +123,7 @@ struct overlayType {
     // The cells that run the object's event.
     OverlayGrid entranceRows;
     // Its object parts draw on the high layer.
-    u8 highLayer;
+    u8 groundLayer;
     // The map object (MapObjectType) its cells take as their trigger.
     u8 trigger;
     // The grid columns from its leftmost part to the anchor's, as

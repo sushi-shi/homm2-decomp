@@ -125,7 +125,7 @@ SIZE(NetbiosSessionBuffer, NETBIOS_PAYLOAD_SIZE);
 SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENTS_SIZE);
 
 i32 is_netbios_avail(void);
-H2_C_LINKAGE u16 __cdecl nb_init(u16 maxNames, u16 maxSessions);
+H2_C_LINKAGE u16 __cdecl nb_init(u16 maxNames, u16 localNameSession);
 H2_C_LINKAGE void __fastcall nb_term(void);
 H2_C_LINKAGE u16 __cdecl nb_rcv(i16 maxLength, void* buffer);
 H2_C_LINKAGE u16 __cdecl nb_snd(i16 session, i16 length, void* data);

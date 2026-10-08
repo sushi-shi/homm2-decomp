@@ -135,7 +135,7 @@ src/BASE/soundmgr.cpp	soundManager::Open	2[24]	code	bMusicIsLooping[[]2?] = 1;	a
 src/EDITOR/*.cpp	*	*	code	case *FIRST* + *:	the n-th control of a widget-id run (FIRST + n) in a case label
 src/EDITOR/*.cpp	*	*	code	i32 H2_UNUSED(unused*)[[]*];	an unused local array kept for the retail stack frame
 src/EDITOR/*.cpp	*	*	declaration	DATA(*) i32 gUnusedData*	an unreferenced retail datum's initializer or element count (it keeps its retail .data place)
-src/EDITOR/EDITMGR.cpp	editManager::Main	*	code	amount = ?;	the digit key's ground-variety level (Ctrl+0..9 calls RandomizeGround with 0..9)
+src/EDITOR/EDITMGR.cpp	editManager::Main	*	code	variety = ?;	the digit key's ground-variety level (Ctrl+0..9 calls RandomizeGround with 0..9)
 src/EDITOR/EDITMGR.cpp	editManager::DrawRadar	[23]	code	memset(dst + ? * EDIT_SCREEN_PITCH, color, ADVENTURE_RADAR_SMALL_CELL_PIXELS);	the third and fourth rows of a small map's 4x4 radar dot
 src/EDITOR/EDITMGR.cpp	editManager::DoRadar	2	code	*gZoomViewCells[[]m_zoomLevel] / 2;	half the view: a radar click centres the view on its cell
 src/EDITOR/*.cpp	*Knob	0.5	code	* + 0.5;	rounds the knob's scaled position to the nearest cell or row
@@ -154,7 +154,7 @@ src/EDITOR/specedit.cpp	FillVictoryConditionList	2	code	*playerCount - 2*	the de
 src/EDITOR/townedit.cpp	eventsManager::FillInTownEdit	2	code	*2 * TOWN_EDIT_LABEL_STEP;	the second label row above a building control (TOWN_EDIT_LABEL_STEP each)
 src/EDITOR/RANDOM.cpp	editManager::PaintRandomTerrain	*	code	*	the terrain painter's retail tuning: its patch count, walk weights (rolled 3..7, drifting by -1..1 and tested against a 0..9 roll), averaging divisors and seed reserve factor
 src/EDITOR/RANDOM.cpp	editManager::PlaceObstacleChains	*	code	*	the chain layer's retail tuning: percent odds and thresholds, its quarter and three-quarter map-width bands, steep direction picks and two-column steps
-src/EDITOR/RANDOM.cpp	editManager::PlaceTowns	*	code	*	the castle placer's retail tuning: region share thresholds (percent), castle slot and region rank indices, rating weights and distance penalties, the castle footprint and road offsets, and the harbour walk's step limits and odds
+src/EDITOR/RANDOM.cpp	editManager::PlaceCastles	*	code	*	the castle placer's retail tuning: region share thresholds (percent), castle slot and region rank indices, rating weights and distance penalties, the castle footprint and road offsets, and the harbour walk's step limits and odds
 src/EDITOR/RANDOM.cpp	editManager::PlaceRandomObjects	*	code	*	the object placer's retail tuning: the monster density scale, map margins, the town footprint, resource-site quotas, appeal weights, distance thresholds and odds
 src/EDITOR/RANDOM.cpp	editManager::PlaceTreasures	*	code	*	the treasure placer's retail odds and thresholds (percent rolls), guard ratio and map margins
 src/EDITOR/RANDOM.cpp	editManager::ScatterDecorations	*	code	*	each terrain's decoration chance (retail values) and its roll

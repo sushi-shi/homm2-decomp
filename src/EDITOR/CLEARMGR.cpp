@@ -121,7 +121,7 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                 break;
                         }
                         if (help >= 0)
-                            NormalDialog(gClearHelp[help], NORMAL_DIALOG_QUICK_VIEW);
+                            NormalDialog(gObjectPanelHelp[help], NORMAL_DIALOG_QUICK_VIEW);
                         break;
                     }
                     switch (message.payload.widget.id) {
@@ -153,7 +153,7 @@ MessageDispatchResult clearManager::Main(tag_message& message) {
                                             gEditManager->ClearArea(
                                                 x, y, gClearBrush + 1, gClearBrush + 1,
                                                 0, false, false);
-                                            SelectBrush(gClearBrush, x, y);
+                                            OutlineBrush(gClearBrush, x, y);
                                             gEditManager->DrawMap();
                                             gEditManager->UpdateMapView();
                                             gEditManager->DrawRadar(true);
@@ -239,7 +239,7 @@ void clearManager::TrackCursor(void) {
     mapY += gEditManager->m_viewY;
     if (gEditManager->m_cursorX != mapX || gEditManager->m_cursorY != mapY
         || gEditManager->m_cursorSize != gClearBrush || gClearCursorMoves) {
-        SelectBrush(gClearBrush, mapX, mapY);
+        OutlineBrush(gClearBrush, mapX, mapY);
         pending = gpInputManager->PeekEvent();
         if (pending.type == MESSAGE_MOUSE_MOVE) {
             gClearCursorMoves++;
@@ -259,7 +259,7 @@ void clearManager::TrackCursor(void) {
 }
 
 VA(0x0040194a, 0xa9)
-void clearManager::SelectBrush(i32 brush, i32 x, i32 y) {
+void clearManager::OutlineBrush(i32 brush, i32 x, i32 y) {
     if (brush == EDIT_BRUSH_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;

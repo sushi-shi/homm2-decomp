@@ -1955,7 +1955,7 @@ void game::GetLossConditionText(char* text) {
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
             case MAP_LOSS_TOWN:
-                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
+                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossConditionY);
                 city = GetTown(townId);
                 sprintf(
                     text,
@@ -2020,7 +2020,7 @@ void game::GetVictoryConditionText(char* text) {
         switch (m_mapHeader.victoryCondition) {
             case MAP_VICTORY_CAPTURE_TOWN:
                 targetTown = GetTown(
-                    GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY)
+                    GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryConditionY)
                 );
                 sprintf(
                     text,

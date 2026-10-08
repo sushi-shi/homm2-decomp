@@ -275,16 +275,17 @@ void dpProcessMessages(void) {
 #undef destination
 #endif
 
+#define messageData startup // frame-slot spelling
 VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
-    void* startup = rcvBufIn + 1;
+    void* messageData = rcvBufIn + 1;
     i32 i;
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
             ENQUEUE_TRANSPORT_PACKET(rcvBufIn, size);
             break;
-        case NETWORK_PACKET_GUEST_ARRIVED:
+        case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
@@ -295,7 +296,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 if (gbRemoteGameOpen != 0) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
                     gsNetPlayerInfo[giNumHumanPlayers] =
-                        *static_cast<SNetPlayerInfo*>(startup);
+                        *static_cast<SNetPlayerInfo*>(messageData);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = true;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
@@ -312,10 +313,10 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             giHostAcceptStatus = HOST_ACCEPT_REJECTED;
             break;
         case NETWORK_PACKET_STARTUP:
-            giNumHumanPlayers = static_cast<DirectPlayStartupMessage*>(startup)->playerCount;
-            giThisNetPos = static_cast<DirectPlayStartupMessage*>(startup)->netPosition;
+            giNumHumanPlayers = static_cast<DirectPlayStartupMessage*>(messageData)->playerCount;
+            giThisNetPos = static_cast<DirectPlayStartupMessage*>(messageData)->netPosition;
             LogInt("DPMSGSTARTUP", giThisNetPos, sender);
-            memcpy(giNetPosToDCOPos, static_cast<DirectPlayStartupMessage*>(startup)->playerIds, sizeof(giNetPosToDCOPos));
+            memcpy(giNetPosToDCOPos, static_cast<DirectPlayStartupMessage*>(messageData)->playerIds, sizeof(giNetPosToDCOPos));
             bStartUpInfoReceived = true;
             break;
         default:
@@ -323,6 +324,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             break;
     }
 }
+#undef messageData
 
 #if H2_RETAIL_COMPILER
 #define result rv
@@ -466,7 +468,7 @@ i32 dpWaitForHost(void) {
             giHostAcceptStatus = HOST_ACCEPT_PENDING;
             dpSendMessage(
                 0,
-                NETWORK_PACKET_GUEST_ARRIVED,
+                NETWORK_PACKET_HERE_I_AM,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );
@@ -623,7 +625,7 @@ DATA(0x005242d8) b32 bStartUpInfoReceived = false;
 DATA(0x005242dc) HMODULE hinstDplayx = NULL;
 DATA(0x005242e0) H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
 iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
-DATA(0x005242e4) H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
+DATA(0x005242e4) H2_ENUM_STORAGE_STEPPED(DirectPlayJoinState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
 DATA(0x005242e8) i32 iWaitForHostWaitCount = 0;
 DATA(0x005242ec) i32 iEnumCount = 0;
 DATA(0x005242f0) i32 iLastHereIAmTickCount = 0;

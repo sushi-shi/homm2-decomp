@@ -8,7 +8,7 @@
 // ClearStatusText, gMaps, gMapFileName, gStatusText,
 // gStatusTextShown, gStatusTextHoldTime, gStatusTextClearTime,
 // gCommandLineInterpreted, gShowMapInfo, gClearFlags, gObjectClass,
-// gGenerateUnseen, gGeneratingMap, gRandomMapPlayers, the gUnusedData
+// gGenerateUnseen, gGeneratingUnseen, gRandomMapPlayers, the gUnusedData
 // holders of unreferenced retail storage, and the editor table names.
 
 #include <match.h>
@@ -917,7 +917,7 @@ DATA(0x00480298) i32 gZoomTileSize[EDIT_ZOOM_COUNT] = {32, 16, 8};
 // The road and stream tools' tiles by neighbour mask (eight neighbours, the
 // second set for a cell whose neighbours need the edge variants; four
 // neighbours for a stream end), and which road tiles join their neighbours.
-DATA(0x004802a4) u8 gLineTiles[LINE_NEIGHBOUR_MASKS] = {
+DATA(0x004802a4) u8 gRoadSideTiles[ROAD_NEIGHBOUR_MASKS] = {
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
@@ -935,7 +935,7 @@ DATA(0x004802a4) u8 gLineTiles[LINE_NEIGHBOUR_MASKS] = {
     15, 8, 15, 8, 15, 8, 15, 8, 15, 1, 15, 1, 15, 1, 15, 1,
     255, 8, 255, 8, 255, 8, 255, 8, 15, 1, 15, 1, 15, 1, 15, 1
 };
-DATA(0x004803a4) u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS] = {
+DATA(0x004803a4) u8 gRoadTiles[ROAD_NEIGHBOUR_MASKS] = {
     0, 18, 17, 10, 18, 18, 18, 10, 17, 18, 17, 10, 11, 11, 11, 10,
     10, 10, 17, 10, 2, 2, 2, 2, 17, 17, 17, 17, 17, 17, 17, 17,
     11, 18, 2, 18, 18, 18, 18, 18, 11, 18, 2, 18, 11, 18, 2, 2,
@@ -953,14 +953,14 @@ DATA(0x004803a4) u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS] = {
     14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
     3, 21, 3, 21, 3, 21, 3, 21, 21, 21, 21, 21, 21, 21, 21, 21
 };
-DATA(0x004804a4) u8 gLineEndTiles[LINE_END_MASKS] = {
+DATA(0x004804a4) u8 gStreamTiles[STREAM_NEIGHBOUR_MASKS] = {
     3, 2, 3, 1, 2, 2, 0, 11, 3, 4, 3, 9, 7, 8, 10, 6
 };
-DATA(0x004804b4) u8 gRoadTileJoins[LINE_ROAD_TILES] = {
+DATA(0x004804b4) u8 gRoadTileOnLine[LINE_ROAD_TILES] = {
     1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1
 };
-DATA(0x004804d4) u8 gRoadTileJoinsAlt[LINE_ROAD_TILES] = {
+DATA(0x004804d4) u8 gRoadTileIsRoad[LINE_ROAD_TILES] = {
     1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0,
     1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1
 };
@@ -982,7 +982,7 @@ DATA(0x004804f4) H2_CONST char* gTerrainHelp[EDITOR_TERRAIN_HELP_COUNT] = {
     localization::Tr("editor.table.gTerrainHelp.13")
 };
 // The eraser panel: its brushes, then the object classes it erases.
-DATA(0x0048052c) H2_CONST char* gClearHelp[CLEAR_HELP_COUNT] = {
+DATA(0x0048052c) H2_CONST char* gObjectPanelHelp[CLEAR_HELP_COUNT] = {
     localization::Tr("editor.table.gClearHelp.0"),
     localization::Tr("editor.table.gClearHelp.1"),
     localization::Tr("editor.table.gClearHelp.2"),
@@ -1023,7 +1023,8 @@ DATA(0x0048057c) H2_CONST char* gEditPanelHelp[EDIT_PANEL_HELP_COUNT] = {
     localization::Tr("editor.table.gEditPanelHelp.14"),
     localization::Tr("editor.table.gEditPanelHelp.15")
 };
-// The terrains the random map dialog names.
+// The terrain names the random map generator's status line shows
+// ('Drawing ground type - %s').
 DATA(0x004805bc) H2_CONST char* gEditTerrainNames[EDITOR_TERRAIN_NAME_COUNT] = {
     localization::Tr("editor.table.gEditTerrainNames.0"),
     localization::Tr("editor.table.gEditTerrainNames.1"),
@@ -3466,9 +3467,9 @@ DATA(0x004a4a04) b32 gbInDialog = false;
 DATA(0x004a4a08) b32 gbMinimized = false;
 DATA(0x004a4a0c) b32 gbInSetupDialog = false;
 // The random map generator draws the map only when it is done
-// (gGenerateUnseen); gGeneratingMap holds the map view while it works.
+// (gGenerateUnseen); gGeneratingUnseen holds the map view while it works.
 DATA(0x004a4a10) b32 gGenerateUnseen = false;
-DATA(0x004a4a14) b32 gGeneratingMap = false;
+DATA(0x004a4a14) b32 gGeneratingUnseen = false;
 DATA(0x004a4a18) i32 gUnusedData4a4a18 = 0;
 DATA(0x004a4a1c) b32 gbInSmackMgr = false;
 DATA(0x004a4a20) i32 gStatusTextClearTime = 0;

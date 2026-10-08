@@ -12,7 +12,8 @@ class heroWindow;
 
 // The open specification dialog.
 extern heroWindow* gSpecWindow;
-// The share of the map's cells that are not water, in percent.
+// The share of the map's cells that are not water, in percent; computed by EditMapSpecifications
+// and never read.
 extern i32 gLandPercent;
 
 // Edits gEditMapHeader; cancelling restores it. The editor passes whether

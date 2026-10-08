@@ -140,9 +140,10 @@ void ShutdownComError(H2_CONST char* function) {
 #if H2_RETAIL_COMPILER
 #define error err
 #define result rv
+#define dsrFlowControl useDtr
 #endif
 VA(0x00432ba2, 0x2fc)
-i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
+i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 dsrFlowControl) {
     i32 H2_UNUSED(error);
     i32 slot;
     BOOL result;
@@ -196,7 +197,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
 
     state.fParity = 0;
     state.fOutxCtsFlow = 1;
-    state.fOutxDsrFlow = useDtr != 0;
+    state.fOutxDsrFlow = dsrFlowControl != 0;
     state.fDtrControl = DTR_CONTROL_ENABLE;
     state.fInX = 0;
     state.fOutX = 0;
@@ -228,6 +229,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
 #if H2_RETAIL_COMPILER
 #undef error
 #undef result
+#undef dsrFlowControl
 #endif
 
 VA(0x00432e9e, 0xe9)

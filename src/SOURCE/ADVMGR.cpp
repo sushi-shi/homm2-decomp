@@ -2590,7 +2590,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         || cellPointer->m_objectTileset == TILESET_DUMMY) {
         cellPointer->m_objectTileset = TILESET_OBJNDIRT;
         cellPointer->m_objectIndex = DIG_HOLE_FRAME;
-        cellPointer->m_objectHighLayer = 1;
+        cellPointer->m_objectGroundLayer = 1;
         cellPointer->m_objectShadow = 1;
         cellPointer->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
     }
@@ -3381,7 +3381,7 @@ void advManager::DrawCell(
                     s_drawPixelY
                 );
 
-                if (s_drawCell->m_objectHighLayer
+                if (s_drawCell->m_objectGroundLayer
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
@@ -3416,7 +3416,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (s_drawExtra->objectHighLayer
+                    if (s_drawExtra->objectGroundLayer
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawExtra->objectTileset)],
@@ -3450,7 +3450,7 @@ void advManager::DrawCell(
                     }
                 }
 
-                if (s_drawCell->m_objectShadow && !s_drawCell->m_objectHighLayer
+                if (s_drawCell->m_objectShadow && !s_drawCell->m_objectGroundLayer
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     DRAW_ADVENTURE_ICON(
                         m_objectIcons[IDX(s_drawCell->m_objectTileset)],
@@ -3483,7 +3483,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (s_drawExtra->objectShadow && !s_drawExtra->objectHighLayer
+                    if (s_drawExtra->objectShadow && !s_drawExtra->objectGroundLayer
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
                         DRAW_ADVENTURE_ICON(
                             m_objectIcons[IDX(s_drawExtra->objectTileset)],
@@ -3520,7 +3520,7 @@ void advManager::DrawCell(
 
             if (HAS(drawMask, ADVMGR_DRAW_OBJECT)) {
                 if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !s_drawCell->m_objectHighLayer && !s_drawCell->m_objectShadow
+                    && !s_drawCell->m_objectGroundLayer && !s_drawCell->m_objectShadow
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
@@ -3564,7 +3564,7 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if (!s_drawExtra->objectHighLayer && !s_drawExtra->objectShadow
+                    if (!s_drawExtra->objectGroundLayer && !s_drawExtra->objectShadow
                         && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != TILESET_MONS32
                         && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
@@ -7810,7 +7810,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                 return ADVMGR_SOUND_DWELLING;
             case MAP_OBJECT_LOG_CABIN:
                 return ADVMGR_SOUND_DWELLING;
-            case MAP_OBJECT_SIRENS:
+            case MAP_OBJECT_DWARF_CABIN:
                 return ADVMGR_SOUND_DWELLING;
             case MAP_OBJECT_RUINS:
                 return ADVMGR_SOUND_RUINS;

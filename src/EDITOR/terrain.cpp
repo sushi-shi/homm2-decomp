@@ -176,7 +176,7 @@ i32 terrainManager::GetBrushSize(void) {
 }
 
 VA(0x00429172, 0xa9)
-void terrainManager::SelectBrush(i32 size, i32 x, i32 y) {
+void terrainManager::OutlineBrush(i32 size, i32 x, i32 y) {
     if (size == TERRAIN_BRUSH_SIZE_SINGLE) {
         gSelectionX = x;
         gSelectionY = y;
@@ -209,7 +209,7 @@ void terrainManager::TrackCursor(void) {
     y += gEditManager->m_viewY;
     if (gEditManager->m_cursorX != x || gEditManager->m_cursorY != y
         || gEditManager->m_cursorSize != gEditManager->m_brushSize || gTerrainCursorMoves) {
-        SelectBrush(gEditManager->m_brushSize, x, y);
+        OutlineBrush(gEditManager->m_brushSize, x, y);
         nextEvent = gpInputManager->PeekEvent();
         if (nextEvent.type == MESSAGE_MOUSE_MOVE) {
             gTerrainCursorMoves++;
@@ -234,6 +234,7 @@ void terrainManager::TrackCursor(void) {
 #define width width_o     // frame-slot spelling
 #define height height_j   // frame-slot spelling
 #define oldSize oldSize_b // frame-slot spelling
+#define terrain ground // frame-slot spelling
 VA(0x00429398, 0xa3e)
 MessageDispatchResult terrainManager::Main(tag_message& message) {
     tag_message peek;
@@ -242,7 +243,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
     b32 first;
     i32 x;
     i32 y;
-    i32 ground;
+    i32 terrain;
     tag_message event;
     i32 oldSize;
     i32 height;
@@ -346,9 +347,9 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                             case EDIT_CONTROL_MAP:
                                 if (HAS(message.payload.widget.modifiers,
                                         MESSAGE_MODIFIER_RIGHT_BUTTON))
-                                    ground = IDX(TERRAIN_WATER);
+                                    terrain = IDX(TERRAIN_WATER);
                                 else
-                                    ground = IDX(m_terrain);
+                                    terrain = IDX(m_terrain);
                                 gSelectionX = EDIT_NO_CELL;
                                 gEditManager->m_brushSize = GetBrushSize();
                                 anchorX = message.payload.widget.screenX;
@@ -381,24 +382,24 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                             m_lastY = y;
                                             switch (gEditManager->m_brushSize) {
                                                 case TERRAIN_BRUSH_SIZE_SINGLE:
-                                                    SelectBrush(gEditManager->m_brushSize, x, y);
+                                                    OutlineBrush(gEditManager->m_brushSize, x, y);
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
                                                         EDIT_BRUSH_SINGLE_CELLS, EDIT_BRUSH_SINGLE_CELLS,
-                                                        ground);
+                                                        terrain);
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_DOUBLE:
-                                                    SelectBrush(gEditManager->m_brushSize, x, y);
+                                                    OutlineBrush(gEditManager->m_brushSize, x, y);
                                                     width = x < MAP_WIDTH - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
                                                     height = y < MAP_HEIGHT - 1 ? EDIT_BRUSH_DOUBLE_CELLS : 1;
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
-                                                        width, height, ground);
+                                                        width, height, terrain);
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_QUADRUPLE:
-                                                    SelectBrush(gEditManager->m_brushSize, x, y);
+                                                    OutlineBrush(gEditManager->m_brushSize, x, y);
                                                     width = x < MAP_WIDTH - (EDIT_BRUSH_QUADRUPLE_CELLS - 1)
                                                                 ? EDIT_BRUSH_QUADRUPLE_CELLS
                                                                 : MAP_WIDTH - x;
@@ -408,7 +409,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                                     gEditManager->PaintGround(
                                                         x - gEditManager->m_viewX,
                                                         y - gEditManager->m_viewY,
-                                                        width, height, ground);
+                                                        width, height, terrain);
                                                     break;
                                                 case TERRAIN_BRUSH_SIZE_AREA:
                                                     gSelectionX = x < anchorX ? x : anchorX;
@@ -441,7 +442,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
                                     && gSelectionX >= 0)
                                     gEditManager->FillGround(
                                         gSelectionX, gSelectionY,
-                                        gSelectionWidth, gSelectionHeight, ground);
+                                        gSelectionWidth, gSelectionHeight, terrain);
                                 gSelectionX = gSelectionY = EDIT_NO_CELL;
                                 gEditManager->BlendTerrain(IDX(m_terrain), false, true, false, false);
                                 gEditManager->DrawMap();
@@ -484,6 +485,7 @@ MessageDispatchResult terrainManager::Main(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONTINUE;
 }
+#undef terrain
 #undef help
 #undef peek
 #undef first

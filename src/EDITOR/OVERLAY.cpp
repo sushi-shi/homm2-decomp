@@ -61,7 +61,7 @@ H2_ENUM_BEGIN(OverlayPlacementConstant)
 H2_ENUM_END(OverlayPlacementConstant)
 
 H2_ENUM_BEGIN(OverlayManagerLayout)
-    // gClearHelp's right-click help of the first class.
+    // gObjectPanelHelp's right-click help of the first class.
     OVERLAY_CLASS_HELP_FIRST      = 5,
     // The class buttons: transparent borders over the panel's swatches.
     OVERLAY_CLASS_BUTTON_SIZE     = 0x1b,
@@ -320,7 +320,7 @@ MessageDispatchResult overlayManager::Main(tag_message& message) {
                             && message.payload.widget.id
                                    < OVERLAY_CLASS_BUTTON_ID_FIRST + IDX(OVERLAY_CLASS_COUNT))
                             NormalDialog(
-                                gClearHelp
+                                gObjectPanelHelp
                                     [OVERLAY_CLASS_HELP_FIRST + message.payload.widget.id
                                      - OVERLAY_CLASS_BUTTON_ID_FIRST],
                                 NORMAL_DIALOG_QUICK_VIEW
@@ -568,23 +568,23 @@ b32 CanPlaceOverlay(overlayType* type, i32 left, i32 top, b32 overObjects) {
                                && !OverlayGridHas(shape->shadowRows, x, y))
                         return false;
                     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE
-                        || (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !cell->m_objectHighLayer
-                            && shape->highLayer))
+                        || (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !cell->m_objectGroundLayer
+                            && shape->groundLayer))
                         gKeptLinks[kept++] = cell->m_overlayLink;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && !overObjects)
                         return false;
                     if (cell->m_objectIndex != MAPCELL_SPRITE_NONE
-                        && (!shape->highLayer || cell->m_objectHighLayer))
+                        && (!shape->groundLayer || cell->m_objectGroundLayer))
                         gCoveredLinks[covered++] = cell->m_objectLink;
                     if (cell->m_extraIndex) {
                         part = &gMap.extras[cell->m_extraIndex];
                         while (part) {
                             if (part->overlayIndex != MAPCELL_SPRITE_NONE
                                 || (part->objectIndex != MAPCELL_SPRITE_NONE
-                                    && !part->objectHighLayer && shape->highLayer))
+                                    && !part->objectGroundLayer && shape->groundLayer))
                                 gKeptLinks[kept++] = part->overlayLink;
                             if (part->objectIndex != MAPCELL_SPRITE_NONE
-                                && (!shape->highLayer || part->objectHighLayer))
+                                && (!shape->groundLayer || part->objectGroundLayer))
                                 gCoveredLinks[covered++] = part->objectLink;
                             part = part->nextIndex ? &gMap.extras[part->nextIndex] : NULL;
                         }
@@ -752,7 +752,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             node->overlayTileset = static_cast<TilesetId>(type->tileset);
                             if (row < OVERLAY_GRID_HEIGHT - 2
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
-                                && (type->trigger != IDX(MAP_OBJECT_ALCHEMIST_TOWER)
+                                && (type->trigger != IDX(MAP_OBJECT_ROAD)
                                     || !OverlayGridHas(type->entranceRows, col, row + 1))
                                 && !OverlayGridHas(type->shadowRows, col, row + 1))
                                 node->drawOverlayOnTop = 1;
@@ -768,7 +768,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                             dest->m_overlayTileset = static_cast<TilesetId>(type->tileset);
                             if (row < OVERLAY_GRID_HEIGHT - 2
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
-                                && (type->trigger != IDX(MAP_OBJECT_ALCHEMIST_TOWER)
+                                && (type->trigger != IDX(MAP_OBJECT_ROAD)
                                     || !OverlayGridHas(type->entranceRows, col, row + 1))
                                 && !OverlayGridHas(type->shadowRows, col, row + 1))
                                 dest->m_drawOverlayOnTop = 1;
@@ -793,17 +793,17 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                                 node->objectShadow = 1;
                             else
                                 node->objectShadow = 0;
-                            if (row < OVERLAY_GRID_HEIGHT - 1 && !type->highLayer
+                            if (row < OVERLAY_GRID_HEIGHT - 1 && !type->groundLayer
                                 && !OverlayGridHas(type->shadowRows, col, row)
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
                                 && !OverlayGridHas(type->shadowRows, col, row + 1))
                                 node->objectDrawnAsOverlay = 1;
                             else
                                 node->objectDrawnAsOverlay = 0;
-                            if (type->highLayer)
-                                node->objectHighLayer = 1;
+                            if (type->groundLayer)
+                                node->objectGroundLayer = 1;
                             else
-                                node->objectHighLayer = 0;
+                                node->objectGroundLayer = 0;
                             if (OverlayGridHas(type->animatedRows, col, row))
                                 node->animatedObject = 1;
                             else
@@ -832,17 +832,17 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
                                 dest->m_objectShadow = 1;
                             else
                                 dest->m_objectShadow = 0;
-                            if (row < OVERLAY_GRID_HEIGHT - 1 && !type->highLayer
+                            if (row < OVERLAY_GRID_HEIGHT - 1 && !type->groundLayer
                                 && !OverlayGridHas(type->shadowRows, col, row)
                                 && OverlayGridHas(type->occupiedRows, col, row + 1)
                                 && !OverlayGridHas(type->shadowRows, col, row + 1))
                                 dest->m_objectDrawnAsOverlay = 1;
                             else
                                 dest->m_objectDrawnAsOverlay = 0;
-                            if (type->highLayer)
-                                dest->m_objectHighLayer = 1;
+                            if (type->groundLayer)
+                                dest->m_objectGroundLayer = 1;
                             else
-                                dest->m_objectHighLayer = 0;
+                                dest->m_objectGroundLayer = 0;
                             if (OverlayGridHas(type->animatedRows, col, row))
                                 dest->m_animatedObject = 1;
                             else

@@ -38,10 +38,10 @@ extern u8* gLineMap;
 void SetLineType(i32 type);
 void AddLineCell(i32 x, i32 y);
 // Whether an object of the tileset is a tile of the current line; a road's
-// tiles count only when they join (gRoadTileJoins, or gRoadTileJoinsAlt for
+// tiles count only when they join (gRoadTileOnLine, or gRoadTileIsRoad for
 // the alternate set).
-b32 IsLineTile(TilesetId tileset, i32 index, b32 alternate);
-void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 alternate);
+b32 IsLineTile(TilesetId tileset, i32 index, b32 forRoadFlag);
+void BuildLineMap(i32 fromX, i32 fromY, i32 toX, i32 toY, b32 forRoadFlag);
 void DrawRoads(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawStreams(i32 fromX, i32 fromY, i32 toX, i32 toY);
 void DrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY);

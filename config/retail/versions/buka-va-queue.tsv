@@ -1437,7 +1437,7 @@ SOURCE/netwin	0x742b2	0xc0	exact	0x004a7186	extern "C" u16 __fastcall nb_snd(i16
 SOURCE/netwin	0x74372	0x49f	exact	0x004a726a	extern "C" u16 __cdecl
 SOURCE/netwin	0x74839	0xf	exact	0x004a7737	extern "C" char __fastcall nb_stat(i16 session)
 SOURCE/netwin	0x74848	0x215	exact	0x004a7758	void nb_thr_ctl(void)
-SOURCE/netwin	0x74a5d	0xb5	exact	0x004a79c6	static void nb_add_name(void)
+SOURCE/netwin	0x74a5d	0xb5	exact	0x004a79c6	static void nb_announce_name(void)
 SOURCE/netwin	0x74b12	0x152	exact	0x004a7a81	static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb)
 SOURCE/netwin	0x74ca5	0xb4	exact	0x004a7c4b	static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_recv_any(i32 session)
 SOURCE/netwin	0x74d59	0x11d	exact	0x004a7d09	static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb)

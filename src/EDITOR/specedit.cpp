@@ -221,7 +221,7 @@ void FillVictoryConditionList(void) {
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, townExtra->hasCustomName ? townExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
-                    if (x == gEditMapHeader.victoryConditionValue && y == gEditMapHeader.victoryTownY)
+                    if (x == gEditMapHeader.victoryConditionValue && y == gEditMapHeader.victoryConditionY)
                         listSelection = i;
                 }
             }
@@ -238,7 +238,7 @@ void FillVictoryConditionList(void) {
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, heroExtra->hasCustomName ? heroExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
-                    if (x == gEditMapHeader.victoryConditionValue && y == gEditMapHeader.victoryTownY)
+                    if (x == gEditMapHeader.victoryConditionValue && y == gEditMapHeader.victoryConditionY)
                         listSelection = i;
                 }
             }
@@ -324,7 +324,7 @@ void SetVictoryConditionChoice(i32 choice) {
                 x = 1;
             } else {
                 gEditMapHeader.victoryConditionValue = x;
-                gEditMapHeader.victoryTownY = y;
+                gEditMapHeader.victoryConditionY = y;
             }
             break;
         case MAP_VICTORY_DEFEAT_HERO:
@@ -332,7 +332,7 @@ void SetVictoryConditionChoice(i32 choice) {
                 x = 1;
             } else {
                 gEditMapHeader.victoryConditionValue = x;
-                gEditMapHeader.victoryTownY = y;
+                gEditMapHeader.victoryConditionY = y;
             }
             break;
         case MAP_VICTORY_ACCUMULATE_GOLD:
@@ -382,7 +382,7 @@ void FillLossConditionList(void) {
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, townExtra->hasCustomName ? townExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
-                    if (x == gEditMapHeader.lossConditionValue && y == gEditMapHeader.lossTownY)
+                    if (x == gEditMapHeader.lossConditionValue && y == gEditMapHeader.lossConditionY)
                         listSelection = i;
                 }
             }
@@ -399,7 +399,7 @@ void FillLossConditionList(void) {
                         gEditManager->m_extras[gMap.GetCell(x, y)->m_objectMetadata]);
                     sprintf(itemText, "(%d, %d) %s", x, y, heroExtra->hasCustomName ? heroExtra->name : "");
                     gSpecWindow->BroadcastMessage(listMessage);
-                    if (x == gEditMapHeader.lossConditionValue && y == gEditMapHeader.lossTownY)
+                    if (x == gEditMapHeader.lossConditionValue && y == gEditMapHeader.lossConditionY)
                         listSelection = i;
                 }
             }
@@ -446,7 +446,7 @@ void SetLossConditionChoice(i32 choice) {
                 x = 1;
             } else {
                 gEditMapHeader.lossConditionValue = x;
-                gEditMapHeader.lossTownY = y;
+                gEditMapHeader.lossConditionY = y;
             }
             break;
         case MAP_LOSS_HERO:
@@ -454,7 +454,7 @@ void SetLossConditionChoice(i32 choice) {
                 x = 1;
             } else {
                 gEditMapHeader.lossConditionValue = x;
-                gEditMapHeader.lossTownY = y;
+                gEditMapHeader.lossConditionY = y;
             }
             break;
         case MAP_LOSS_TIME:
@@ -880,7 +880,7 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gSpecWindow->BroadcastMessage(message);
                     if (IDX(gEditMapHeader.victoryCondition) != message.payload.widget.data.value) {
                         gEditMapHeader.victoryCondition = static_cast<MapVictoryCondition>(message.payload.widget.data.value);
-                        gEditMapHeader.victoryConditionValue = gEditMapHeader.victoryTownY = 0;
+                        gEditMapHeader.victoryConditionValue = gEditMapHeader.victoryConditionY = 0;
                         FillVictoryConditionList();
                         update = true;
                     }
@@ -901,7 +901,7 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gSpecWindow->BroadcastMessage(message);
                     if (IDX(gEditMapHeader.lossCondition) != message.payload.widget.data.value) {
                         gEditMapHeader.lossCondition = static_cast<MapLossCondition>(message.payload.widget.data.value);
-                        gEditMapHeader.lossConditionValue = gEditMapHeader.lossTownY = 0;
+                        gEditMapHeader.lossConditionValue = gEditMapHeader.lossConditionY = 0;
                         FillLossConditionList();
                         update = true;
                     }

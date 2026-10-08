@@ -2108,7 +2108,7 @@ void game::NewMap(char* filename) {
     SetupAdjacentMons();
     if (m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         xPosition = m_mapHeader.lossConditionValue;
-        yPosition = m_mapHeader.lossTownY;
+        yPosition = m_mapHeader.lossConditionY;
         m_mapHeader.lossConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
             == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
@@ -2125,7 +2125,7 @@ void game::NewMap(char* filename) {
     }
     if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         xPosition = m_mapHeader.victoryConditionValue;
-        yPosition = m_mapHeader.victoryTownY;
+        yPosition = m_mapHeader.victoryConditionY;
         m_mapHeader.victoryConditionValue = 0;
         if (m_worldMap.GetCell(xPosition, yPosition)->m_triggerType
             == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))
@@ -2562,7 +2562,7 @@ void game::RandomizeEvents(void) {
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_TREE_HOUSE):
                     cell->m_objectMetadata = Random(15, 25);
                     break;
-                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_CABIN):
                     cell->m_objectMetadata = Random(10, 20);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_WATCH_TOWER):
@@ -4778,7 +4778,7 @@ void game::PerWeek(void) {
                     if (WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(4, 8);
                     break;
-                case MAP_ACTION_TRIGGER(MAP_OBJECT_SIRENS):
+                case MAP_ACTION_TRIGGER(MAP_OBJECT_DWARF_CABIN):
                     if (WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
                         WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata += Random(3, 6);
                     break;
@@ -4964,7 +4964,7 @@ void game::PerMonth(void) {
             for (y = 0; y < MAP_HEIGHT; y++) {
                 spot = gpAdvManager->GetCell(x, y);
                 if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectShadow
-                    && !spot->m_objectHighLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
+                    && !spot->m_objectGroundLayer && CELL_TERRAIN(spot) != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
                         spot->m_triggerType = MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER);
@@ -5258,7 +5258,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     WORLDMAP->GetCell(x + 1, y - 1)->m_overlayIndex = mineFrame + 1;
 
     if (resType == MINE_TYPE_MERCURY) {
-        WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
+        WORLDMAP->GetCell(x + 1, y)->m_objectBits |= 1;
         trigger = MAP_OBJECT_ALCHEMIST_LAB;
     } else if (resType == MINE_TYPE_WOOD) {
         trigger = MAP_OBJECT_SAWMILL;

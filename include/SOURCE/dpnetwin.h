@@ -46,15 +46,15 @@ H2_ENUM_CLASS_BEGIN(DirectPlayFirstGuestState)
 H2_ENUM_CLASS_END(DirectPlayFirstGuestState)
 H2_ENUM_STEPPED(DirectPlayFirstGuestState)
 
-H2_ENUM_CLASS_BEGIN(DirectPlayHostState)
+H2_ENUM_CLASS_BEGIN(DirectPlayJoinState)
     HOST_ENUMERATE_SESSIONS = 0,
     HOST_JOIN_SESSION       = 1,
     HOST_CREATE_PLAYER      = 2,
     HOST_ANNOUNCE_PLAYER    = 3,
     HOST_WAIT_FOR_ACCEPT    = 4,
     HOST_WAIT_FOR_STARTUP   = 5
-H2_ENUM_CLASS_END(DirectPlayHostState)
-H2_ENUM_STEPPED(DirectPlayHostState)
+H2_ENUM_CLASS_END(DirectPlayJoinState)
+H2_ENUM_STEPPED(DirectPlayJoinState)
 #pragma pack(pop)
 SIZE(DirectPlayStartupMessage, 0x1a);
 
@@ -87,7 +87,7 @@ extern i32* piDPRcvBufferSize;
 extern b32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
 extern H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32) iDPWaitForFirstGuestStatus;
-extern H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus;
+extern H2_ENUM_STORAGE_STEPPED(DirectPlayJoinState, i32) iDPWaitForHostStatus;
 extern i32 iWaitForHostWaitCount;
 extern i32 iEnumCount;
 extern i32 iLastHereIAmTickCount;

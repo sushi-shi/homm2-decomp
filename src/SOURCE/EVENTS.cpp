@@ -2160,7 +2160,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LOG_CABIN:
         case MAP_OBJECT_WATCH_TOWER:
         case MAP_OBJECT_TREE_HOUSE:
-        case MAP_OBJECT_SIRENS:
+        case MAP_OBJECT_DWARF_CABIN:
         case MAP_OBJECT_HALFLING_HOLE:
         case MAP_OBJECT_EXCAVATION:
         case MAP_OBJECT_CAVE:
@@ -3589,7 +3589,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
         currentCell->m_objectIndex = extra->objectIndex;
         currentCell->m_objectTileset = extra->objectTileset;
         currentCell->m_animatedObject = extra->animatedObject;
-        currentCell->m_objectHighLayer = extra->objectHighLayer;
+        currentCell->m_objectGroundLayer = extra->objectGroundLayer;
         currentCell->m_objectShadow = extra->objectShadow;
         extra->objectIndex = 0;
         extra->objectTileset = TILESET_DUMMY;
@@ -4213,7 +4213,7 @@ void advManager::EventSound(
         case MAP_OBJECT_LOG_CABIN:
         case MAP_OBJECT_WATCH_TOWER:
         case MAP_OBJECT_TREE_HOUSE:
-        case MAP_OBJECT_SIRENS:
+        case MAP_OBJECT_DWARF_CABIN:
         case MAP_OBJECT_HALFLING_HOLE:
         case MAP_OBJECT_EXCAVATION:
         case MAP_OBJECT_CAVE:
@@ -5030,7 +5030,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             siteIndex = RECRUIT_PEASANT;
             break;
         case MAP_OBJECT_DWARF_COTTAGE:
-        case MAP_OBJECT_SIRENS:
+        case MAP_OBJECT_DWARF_CABIN:
             siteIndex = RECRUIT_DWARF;
             break;
         case MAP_OBJECT_LOG_CABIN:
@@ -6277,7 +6277,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_DWARF_COTTAGE:
-        case MAP_OBJECT_SIRENS:
+        case MAP_OBJECT_DWARF_CABIN:
             creatureType = CREATURE_DWARF;
             freeRecruit = true;
             goto creaturePurchase;

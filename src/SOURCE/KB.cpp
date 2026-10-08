@@ -2210,7 +2210,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
         victoryTownData = gpGame->GetTown(gpGame->GetTownId(
             gpGame->m_mapHeader.victoryConditionValue,
-            gpGame->m_mapHeader.victoryTownY
+            gpGame->m_mapHeader.victoryConditionY
         ));
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
             && (gbHumanPlayer[IDX(victoryTownData->m_owner)] || gpGame->m_mapHeader.computerAlsoWins)) {
@@ -2241,7 +2241,7 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
         lossTown = gpGame->GetTown(
-            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
+            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossConditionY)
         );
         if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[IDX(lossTown->m_owner)]) {
             defeated = true;

@@ -26,7 +26,8 @@ H2_ENUM_END(EditorStatusBar)
 
 H2_ENUM_BEGIN(EditorFileConstant)
     EDITOR_MAP_FILE_NAME_SIZE   = 16,
-    // gClearFlags: every eraser layer selected.
+    // gClearFlags: every eraser layer selected (HoMM1's clear-options dialog read it; this editor
+    // never does).
     EDITOR_CLEAR_FLAGS_DEFAULT  = 0x3fff
 H2_ENUM_END(EditorFileConstant)
 
@@ -50,8 +51,8 @@ H2_ENUM_BEGIN(EditorTableCount)
     // The map view's zoom levels.
     EDIT_ZOOM_COUNT = 3,
     // The road and stream tools' neighbour-mask tables.
-    LINE_NEIGHBOUR_MASKS = 256,
-    LINE_END_MASKS = 16,
+    ROAD_NEIGHBOUR_MASKS = 256,
+    STREAM_NEIGHBOUR_MASKS = 16,
     LINE_ROAD_TILES = 32,
     EDITOR_TERRAIN_HELP_COUNT = 14,
     EDIT_PANEL_HELP_COUNT = 16,
@@ -71,7 +72,7 @@ H2_ENUM_BEGIN(EditorTableCount)
     // The random map generator's terrain and density settings.
     RANDOM_MAP_TERRAIN_COUNT = 8,
     RANDOM_MAP_DENSITY_COUNT = 5,
-    // gWinSetup: the editor dialogs' captions.
+    // gWinSetup: the editor dialogs' label texts by window and widget (SetWinText).
     EDITOR_DIALOG_WIN_SETUP_COUNT = 0x74,
     // The map's time event and rumour capacities.
     EDITOR_TIME_EVENT_CAPACITY = 50,
@@ -108,7 +109,7 @@ extern double gDensityPercent[RANDOM_MAP_DENSITY_COUNT];
 // map, or (unset) gathers them toward its centre.
 extern b32 gScatterTerrain;
 extern b32 gGenerateUnseen;
-extern b32 gGeneratingMap;
+extern b32 gGeneratingUnseen;
 extern i32 gObjectClass;
 #define gNextObjectLink gNextObjectLinkValue // spelling fixes .bss order
 extern i32 gNextObjectLink;
@@ -119,11 +120,11 @@ extern i32 gZoomScale[EDIT_ZOOM_COUNT];
 extern i32 gZoomCellSize[EDIT_ZOOM_COUNT];
 extern i32 gZoomViewCells[EDIT_ZOOM_COUNT];
 extern i32 gZoomTileSize[EDIT_ZOOM_COUNT];
-extern u8 gLineTiles[LINE_NEIGHBOUR_MASKS];
-extern u8 gLineEdgeTiles[LINE_NEIGHBOUR_MASKS];
-extern u8 gLineEndTiles[LINE_END_MASKS];
-extern u8 gRoadTileJoins[LINE_ROAD_TILES];
-extern u8 gRoadTileJoinsAlt[LINE_ROAD_TILES];
+extern u8 gRoadSideTiles[ROAD_NEIGHBOUR_MASKS];
+extern u8 gRoadTiles[ROAD_NEIGHBOUR_MASKS];
+extern u8 gStreamTiles[STREAM_NEIGHBOUR_MASKS];
+extern u8 gRoadTileOnLine[LINE_ROAD_TILES];
+extern u8 gRoadTileIsRoad[LINE_ROAD_TILES];
 extern H2_CONST char* gTerrainHelp[EDITOR_TERRAIN_HELP_COUNT];
 extern H2_CONST char* gEditPanelHelp[EDIT_PANEL_HELP_COUNT];
 extern H2_CONST char* gEditTerrainNames[EDITOR_TERRAIN_NAME_COUNT];
@@ -138,7 +139,7 @@ extern H2_CONST char* gSystemOptionsHelp[EDIT_SYSTEM_OPTIONS_HELP_COUNT];
 extern H2_CONST char* gVictoryConditionNames[SPEC_VICTORY_CONDITION_COUNT];
 extern H2_CONST char* gLossConditionNames[SPEC_LOSS_CONDITION_COUNT];
 // The eraser panel's help: its brushes, then the object classes it erases.
-extern H2_CONST char* gClearHelp[CLEAR_HELP_COUNT];
+extern H2_CONST char* gObjectPanelHelp[CLEAR_HELP_COUNT];
 
 // The editor manager (InitMainClasses).
 class editManager;

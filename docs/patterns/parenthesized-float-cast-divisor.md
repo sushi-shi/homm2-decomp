@@ -6,7 +6,7 @@ into `fidiv`, and the multiply after it still takes a `dword` (float)
 constant, so the division is not a `double` one
 ([fidiv-vs-fild-fdivp](fidiv-vs-fild-fdivp.md)).
 
-Measured on `editManager::PlaceTowns` (EDT2PL.exe 0x1e709), the land share of
+Measured on `editManager::PlaceCastles` (EDT2PL.exe 0x1e709), the land share of
 each region:
 
 ```

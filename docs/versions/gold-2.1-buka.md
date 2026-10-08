@@ -84,7 +84,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   the dtor (0x470df0) touches only `+0x42`, and a whole-image census of every
   `gpSoundManager` dereference tops out at `+0x4e`. The removed state resolved
   four ways: `m_samplesReady` is the byte global at 0x5348f1 that this tree
-  already spelled `gSoundBackendsReady` (26 sites in ADVMGR/GAME/SMACKMGR);
+  already spelled `gbSoundEnabled` (26 sites in ADVMGR/GAME/SMACKMGR);
   `m_currentTrack`/`m_fadeSteps` were never separate from `m_musicTrack`
   (`+0x4e`) and `m_musicFadeSteps` (`+0x4a`); `m_midiReady`/`m_midiStarted`
   became the `BASE/MusicFlags` trio and `m_cdReady`/`m_cdStarted` collapsed
@@ -890,7 +890,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 - **[unclassified] `advManager::LoadRemote` (0x412c7a) ends with two one-shot
   warning dialogs the reconstruction did not have.** After
-  `gSoundBackendsReady = 1;` retail adds
+  `gbSoundEnabled = 1;` retail adds
   `if ((i8)gpGame->m_cheated) { static i32 once = 0; if (!once) { once = 1;
   sprintf(gText, "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n");
   NormalDialog(gText, NORMAL_DIALOG_INFO, ...); } }` and the same shape for

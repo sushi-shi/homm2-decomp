@@ -64,11 +64,11 @@ H2_ENUM_BEGIN(RandomMapConstant)
     RANDOM_MAP_CROWDED           = 100,
     // gMineResources: the five mines' resources.
     RANDOM_MAP_MINE_RESOURCE_COUNT = 5,
-    // PlaceTowns: the land regions it numbers (a castle per player); a
+    // PlaceCastles: the land regions it numbers (a castle per player); a
     // scan ends by setting its counters past the map.
     RANDOM_MAP_REGION_LIMIT      = 255,
     RANDOM_MAP_END_SCAN          = 999,
-    // PlaceTowns: a castle on another region than its peers digs its
+    // PlaceCastles: a castle on another region than its peers digs its
     // harbour without a step limit.
     RANDOM_MAP_UNLIMITED_STEPS   = 999,
     // PlaceRandomObjects: a town per this many land cells (at most this
@@ -144,7 +144,7 @@ H2_ENUM_BEGIN(ChainPiece)
 H2_ENUM_END(ChainPiece)
 
 // A cell of a new'ed MAP_WIDTH x MAP_HEIGHT byte grid: RemoveSmallRegions'
-// visited and region marks, PlaceTowns' region numbers and each castle's
+// visited and region marks, PlaceCastles' region numbers and each castle's
 // reach.
 #define MAP_GRID_CELL(grid, x, y) (*((grid) + (x) + (y) * MAP_WIDTH))
 
@@ -203,7 +203,7 @@ void editManager::GenerateRandomMap(void) {
         return;
     }
     if (gGenerateUnseen)
-        gGeneratingMap = true;
+        gGeneratingUnseen = true;
     InitializeMap(true, MAP_WIDTH, MAP_HEIGHT);
     for (terrain = 0; terrain < GAME_PLAYER_COUNT; terrain++) {
         gEditMapHeader.playerCanHuman[terrain] = true;
@@ -252,7 +252,7 @@ void editManager::GenerateRandomMap(void) {
             gDensityPercent[RANDOM_MAP_DENSITY_MONSTERS]
         );
         ShowStatusText(localization::Tr("editor.random.status.land"));
-        PlaceTowns();
+        PlaceCastles();
         for (terrain = 0; terrain <= IDX(TERRAIN_BEACH); terrain++)
             BlendTerrain(terrain, true, false, true, false);
         gVaryTiles = true;
@@ -268,13 +268,13 @@ void editManager::GenerateRandomMap(void) {
         if (!done)
             continue;
     }
-    if (gGeneratingMap) {
+    if (gGeneratingUnseen) {
         if (EditMapSpecifications(true) && !SaveMap(gMapFileName)) {
             sprintf(gText, localization::Tr("editor.random.saved"), gEditMapHeader.name);
             NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
         ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
-        gGeneratingMap = false;
+        gGeneratingUnseen = false;
     }
     DrawMap();
     ShowStatusText("");
@@ -895,11 +895,12 @@ b32 editManager::PlaceChainLink(i32* x, i32* y, i32 direction, b32 H2_UNUSED(mou
 #define nearY nearY_h               // frame-slot spelling
 #define foundX foundX_j             // frame-slot spelling
 #define castlePlaced castlePlaced_a // frame-slot spelling
+#define extraLiths extraRoads // frame-slot spelling
 VA(0x0041e709, 0x21c1)
-void editManager::PlaceTowns(void) {
+void editManager::PlaceCastles(void) {
     i32 terrain;
     b32 cutOff[GAME_PLAYER_COUNT];
-    b32 extraRoads[GAME_PLAYER_COUNT];
+    b32 extraLiths[GAME_PLAYER_COUNT];
     i32 nearX;
     i32 castleRegion[GAME_PLAYER_COUNT];
     i32 tileX;
@@ -947,7 +948,7 @@ void editManager::PlaceTowns(void) {
     tileX = tileY = 0;
     for (slot = 0; slot < GAME_PLAYER_COUNT; slot++) {
         cutOff[slot] = false;
-        extraRoads[slot] = false;
+        extraLiths[slot] = false;
     }
     castles[PLAYER_COLOR_BLUE] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_0];
     castles[PLAYER_COLOR_GREEN] = &gOverlayTypes[OVERLAY_RANDOM_CASTLE_1];
@@ -1246,15 +1247,15 @@ void editManager::PlaceTowns(void) {
         }
     }
     if (Random(0, 100) < 50) {
-        extraRoads[0] = true;
-        extraRoads[1] = true;
+        extraLiths[0] = true;
+        extraLiths[1] = true;
         if (Random(0, 100) < 50)
-            extraRoads[2] = true;
+            extraLiths[2] = true;
         if (Random(0, 100) < 50)
-            extraRoads[3] = true;
+            extraLiths[3] = true;
     }
     if (cutOff[0] || cutOff[1] || cutOff[2] || cutOff[3] || cutOff[4] || cutOff[5]
-        || extraRoads[0]) {
+        || extraLiths[0]) {
         ShowStatusText(localization::Tr("editor.random.status.roads"));
         for (slot = 0; slot < gRandomMapPlayers; slot++) {
             cutOff[slot] = false;
@@ -1315,7 +1316,7 @@ void editManager::PlaceTowns(void) {
             }
         }
         for (slot = 0; slot < gRandomMapPlayers; slot++) {
-            if (cutOff[slot] || extraRoads[slot]) {
+            if (cutOff[slot] || extraLiths[slot]) {
                 steps = 20000;
                 tracing = true;
                 while (tracing) {
@@ -1349,6 +1350,7 @@ void editManager::PlaceTowns(void) {
     for (slot = 0; slot < GAME_PLAYER_COUNT; slot++)
         delete[] reachedGrids[slot];
 }
+#undef extraLiths
 #undef roadMask
 #undef destY
 #undef castleRegion
@@ -1440,12 +1442,12 @@ b32 editManager::PlaceResourceSite(i32 x, i32 y, i32 resource) {
 #undef unusedIndex
 #undef unusedMarker
 
-#define kind kind_p                           // frame-slot spelling
+#define resource kind_p                           // frame-slot spelling
 #define placed placed_b                       // frame-slot spelling
 #define tries tries_c                         // frame-slot spelling
 #define obelisks obelisks_l                   // frame-slot spelling
 #define veryStrongMonster veryStrongMonster_i // frame-slot spelling
-#define decorations decorations_a             // frame-slot spelling
+#define obeliskTries decorations_a             // frame-slot spelling
 #define weakMonster weakMonster_i             // frame-slot spelling
 #define unusedEntry unusedEntry_i             // frame-slot spelling
 #define mediumMonster mediumMonster_k         // frame-slot spelling
@@ -1457,10 +1459,10 @@ VA(0x00420ae1, 0xac8)
 void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
     b32 placed;
     b32 valid;
-    i32 kind;
+    i32 resource;
     i32 towns;
     overlayType* H2_UNUSED(weakMonster);
-    i32 decorations;
+    i32 obeliskTries;
     i32 x;
     i32 appeal;
     overlayType* H2_UNUSED(veryStrongMonster);
@@ -1563,13 +1565,13 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
             valid = true;
             while (valid && tries < 10) {
                 tries++;
-                kind = Random(0, IDX(RES_GOLD));
+                resource = Random(0, IDX(RES_GOLD));
                 appeal = 4;
-                if (quota[kind] > 0)
+                if (quota[resource] > 0)
                     appeal += 30;
-                if (kind == IDX(RES_WOOD))
+                if (resource == IDX(RES_WOOD))
                     appeal += 8;
-                if (kind == IDX(RES_ORE))
+                if (resource == IDX(RES_ORE))
                     appeal += 8;
                 for (i = 0; i < MAP_WIDTH; i++) {
                     for (j = 0; j < MAP_WIDTH; j++) {
@@ -1581,10 +1583,10 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
                             dist = MANHATTAN_LENGTH(i - x, j - y);
                             if (dist < 10)
                                 appeal -= 10 - dist;
-                            if (((kind == IDX(RES_WOOD)
+                            if (((resource == IDX(RES_WOOD)
                                   && gMap.CellAt(i, j)->m_triggerType
                                          == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL))
-                                 || (kind == IDX(RES_MERCURY)
+                                 || (resource == IDX(RES_MERCURY)
                                      && gMap.CellAt(i, j)->m_triggerType
                                             == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)))
                                 && dist < 15)
@@ -1595,10 +1597,10 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
                 if (Random(0, 40) < appeal) {
                     gEditManager->ClearArea(x, y - 1, 2, 2, EDIT_CLEAR_ALL, false, false);
                     gEditManager->ClearArea(x - 1, y + 1, 1, 1, EDIT_CLEAR_ALL, false, false);
-                    placed = PlaceResourceSite(x, y, kind);
+                    placed = PlaceResourceSite(x, y, resource);
                     if (placed) {
                         sitesPlaced++;
-                        quota[kind]--;
+                        quota[resource]--;
                         if (Random(0, 100) < monsterDensity)
                             PlaceOverlayAt(
                                 Random(0, 100) < 30 ? mediumMonster : strongMonster, x - 1, y + 1);
@@ -1609,32 +1611,32 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
             }
         }
     }
-    decorations = gLandCellCount / RANDOM_MAP_LAND_PER_OBELISK;
-    if (decorations > RANDOM_MAP_MAX_OBELISKS)
-        decorations = RANDOM_MAP_MAX_OBELISKS;
-    if (decorations < RANDOM_MAP_MIN_OBELISKS)
-        decorations = RANDOM_MAP_MIN_OBELISKS;
-    decorations = decorations * RANDOM_MAP_TRIES_PER_OBJECT;
-    while (decorations > 0) {
-        decorations--;
+    obeliskTries = gLandCellCount / RANDOM_MAP_LAND_PER_OBELISK;
+    if (obeliskTries > RANDOM_MAP_MAX_OBELISKS)
+        obeliskTries = RANDOM_MAP_MAX_OBELISKS;
+    if (obeliskTries < RANDOM_MAP_MIN_OBELISKS)
+        obeliskTries = RANDOM_MAP_MIN_OBELISKS;
+    obeliskTries = obeliskTries * RANDOM_MAP_TRIES_PER_OBJECT;
+    while (obeliskTries > 0) {
+        obeliskTries--;
         valid = true;
         x = Random(0, MAP_WIDTH - 1);
         y = Random(0, MAP_WIDTH - 1);
         if (CELL_TERRAIN(gMap.CellAt(x, y)) != TERRAIN_WATER) {
             ground = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
             if (CanPlaceOverlayAt(obelisks[ground], x, y, false)) {
-                decorations -= RANDOM_MAP_TRIES_PER_OBJECT;
+                obeliskTries -= RANDOM_MAP_TRIES_PER_OBJECT;
                 PlaceOverlayAt(obelisks[ground], x, y);
             }
         }
     }
 }
-#undef kind
+#undef resource
 #undef placed
 #undef tries
 #undef obelisks
 #undef veryStrongMonster
-#undef decorations
+#undef obeliskTries
 #undef weakMonster
 #undef unusedEntry
 #undef mediumMonster
@@ -1645,31 +1647,34 @@ void editManager::PlaceRandomObjects(i32 density, i32 monsterDensity) {
 
 #define treasures treasures_f                 // frame-slot spelling
 #define lamp lamp_j                           // frame-slot spelling
-#define southEast southEast_g                 // frame-slot spelling
-#define northEast northEast_m                 // frame-slot spelling
-#define south south_c                         // frame-slot spelling
+#define southEastOpen southEast_g                 // frame-slot spelling
+#define northEastOpen northEast_m                 // frame-slot spelling
+#define southBlocked south_c                         // frame-slot spelling
 #define roll roll_a                           // frame-slot spelling
 #define veryStrongMonster veryStrongMonster_i // frame-slot spelling
 #define weakMonster weakMonster_i             // frame-slot spelling
 #define mediumMonster mediumMonster_l         // frame-slot spelling
 #define anyMonster anyMonster_j               // frame-slot spelling
 #define kind kind_i                           // frame-slot spelling
-#define guards guards_h                       // frame-slot spelling
+#define roamingMonsters guards_h                       // frame-slot spelling
 #define placedCount placedCount_p             // frame-slot spelling
 #define resource resource_a                   // frame-slot spelling
-#define southWest southWest_p                 // frame-slot spelling
-#define northWest northWest_c                 // frame-slot spelling
+#define southWestOpen southWest_p                 // frame-slot spelling
+#define northWestOpen northWest_c                 // frame-slot spelling
 #define minorArtifact minorArtifact_p         // frame-slot spelling
 #define guardedCount guardedCount_j           // frame-slot spelling
+#define northBlocked north // frame-slot spelling
+#define eastBlocked east   // frame-slot spelling
+#define westBlocked west   // frame-slot spelling
 VA(0x004215a9, 0xbdb)
 void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
     overlayType* lamp;
     i32 treasures;
-    b32 south;
-    b32 northEast;
-    b32 southEast;
+    b32 southBlocked;
+    b32 northEastOpen;
+    b32 southEastOpen;
     overlayType* chest;
-    b32 east;
+    b32 eastBlocked;
     overlayType* H2_UNUSED(anyMonster);
     overlayType* mediumMonster;
     i32 x;
@@ -1679,15 +1684,15 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
     overlayType* strongMonster;
     i32 placedCount;
     overlayType* majorArtifact;
-    i32 guards;
+    i32 roamingMonsters;
     i32 kind;
     i32 y;
-    b32 northWest;
-    b32 southWest;
+    b32 northWestOpen;
+    b32 southWestOpen;
     overlayType* resource;
-    b32 north;
+    b32 northBlocked;
     overlayType* minorArtifact;
-    b32 west;
+    b32 westBlocked;
     overlayType* treasureArtifact;
     i32 guardedCount;
     i32 layout;
@@ -1716,54 +1721,54 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
             && gMap.CellAt(x, y)->m_objectTileset == TILESET_NONE) {
             gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, false, false);
             roll = Random(0, 100);
-            northWest = southWest = northEast = southEast = north = south = east = west = false;
+            northWestOpen = southWestOpen = northEastOpen = southEastOpen = northBlocked = southBlocked = eastBlocked = westBlocked = false;
             if (y == 0 || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_WATER
                 || (gMap.CellAt(x, y - 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !gMap.CellAt(x, y - 1)->m_objectHighLayer
+                    && !gMap.CellAt(x, y - 1)->m_objectGroundLayer
                     && !gMap.CellAt(x, y - 1)->m_objectShadow))
-                north = true;
+                northBlocked = true;
             if (y == MAP_HEIGHT - 1 || CELL_TERRAIN(gMap.CellAt(x, y + 1)) == TERRAIN_WATER
                 || (gMap.CellAt(x, y + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !gMap.CellAt(x, y + 1)->m_objectHighLayer
+                    && !gMap.CellAt(x, y + 1)->m_objectGroundLayer
                     && !gMap.CellAt(x, y + 1)->m_objectShadow))
-                south = true;
+                southBlocked = true;
             if (x == 0 || CELL_TERRAIN(gMap.CellAt(x - 1, y)) == TERRAIN_WATER
                 || (gMap.CellAt(x - 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !gMap.CellAt(x - 1, y)->m_objectHighLayer
+                    && !gMap.CellAt(x - 1, y)->m_objectGroundLayer
                     && !gMap.CellAt(x - 1, y)->m_objectShadow))
-                west = true;
+                westBlocked = true;
             if (x == MAP_WIDTH - 1 || CELL_TERRAIN(gMap.CellAt(x + 1, y)) == TERRAIN_WATER
                 || (gMap.CellAt(x + 1, y)->m_objectIndex != MAPCELL_SPRITE_NONE
-                    && !gMap.CellAt(x + 1, y)->m_objectHighLayer
+                    && !gMap.CellAt(x + 1, y)->m_objectGroundLayer
                     && !gMap.CellAt(x + 1, y)->m_objectShadow))
-                east = true;
+                eastBlocked = true;
             if (x < MAP_WIDTH + 1 && y > 0
                 && CELL_TERRAIN(gMap.CellAt(x + 1, y - 1)) != TERRAIN_WATER
                 && gMap.CellAt(x + 1, y - 1)->m_objectTileset == TILESET_NONE)
-                northEast = true;
+                northEastOpen = true;
             if (x < MAP_WIDTH + 1 && y < MAP_HEIGHT - 1
                 && CELL_TERRAIN(gMap.CellAt(x + 1, y + 1)) != TERRAIN_WATER
                 && gMap.CellAt(x + 1, y + 1)->m_objectTileset == TILESET_NONE)
-                southEast = true;
+                southEastOpen = true;
             if (x > 0 && y < MAP_HEIGHT - 1
                 && CELL_TERRAIN(gMap.CellAt(x - 1, y + 1)) != TERRAIN_WATER
                 && gMap.CellAt(x - 1, y + 1)->m_objectTileset == TILESET_NONE)
-                southWest = true;
+                southWestOpen = true;
             if (x > 0 && y > 0 && CELL_TERRAIN(gMap.CellAt(x - 1, y - 1)) != TERRAIN_WATER
                 && gMap.CellAt(x - 1, y - 1)->m_objectTileset == TILESET_NONE)
-                northWest = true;
-            if (!east || !west || !north || !south) {
+                northWestOpen = true;
+            if (!eastBlocked || !westBlocked || !northBlocked || !southBlocked) {
                 placedCount++;
                 treasures -= RANDOM_MAP_TRIES_PER_OBJECT;
                 layout = TREASURE_UNGUARDED;
                 if (guardedCount * 5 < placedCount) {
-                    if (west && south && northEast && !southWest && !southEast && !northWest)
+                    if (westBlocked && southBlocked && northEastOpen && !southWestOpen && !southEastOpen && !northWestOpen)
                         layout = TREASURE_GUARD_NE;
-                    else if (west && north && southEast && !northWest && !southWest && !northEast)
+                    else if (westBlocked && northBlocked && southEastOpen && !northWestOpen && !southWestOpen && !northEastOpen)
                         layout = TREASURE_GUARD_SE;
-                    else if (east && north && southWest && !northEast && !northWest && !southEast)
+                    else if (eastBlocked && northBlocked && southWestOpen && !northEastOpen && !northWestOpen && !southEastOpen)
                         layout = TREASURE_GUARD_SW;
-                    else if (east && south && northWest && !southEast && !southWest && !northEast)
+                    else if (eastBlocked && southBlocked && northWestOpen && !southEastOpen && !southWestOpen && !northEastOpen)
                         layout = TREASURE_GUARD_NW;
                 }
                 if (layout > TREASURE_UNGUARDED) {
@@ -1807,16 +1812,16 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
             }
         }
     }
-    guards = gLandCellCount / RANDOM_MAP_LAND_PER_MONSTER;
-    ScaleByDensity(&guards, monsterDensity);
-    guards = guards * RANDOM_MAP_TRIES_PER_OBJECT;
-    while (guards > 0) {
-        guards--;
+    roamingMonsters = gLandCellCount / RANDOM_MAP_LAND_PER_MONSTER;
+    ScaleByDensity(&roamingMonsters, monsterDensity);
+    roamingMonsters = roamingMonsters * RANDOM_MAP_TRIES_PER_OBJECT;
+    while (roamingMonsters > 0) {
+        roamingMonsters--;
         x = Random(0, MAP_WIDTH - 1);
         y = Random(0, MAP_WIDTH - 1);
         if (CELL_TERRAIN(gMap.CellAt(x, y)) != TERRAIN_WATER
             && gMap.CellAt(x, y)->m_objectTileset == TILESET_NONE) {
-            guards -= RANDOM_MAP_TRIES_PER_OBJECT;
+            roamingMonsters -= RANDOM_MAP_TRIES_PER_OBJECT;
             gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, false, false);
             kind = Random(0, 100);
             if (kind < 40)
@@ -1828,22 +1833,25 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
         }
     }
 }
+#undef northBlocked
+#undef eastBlocked
+#undef westBlocked
 #undef treasures
 #undef lamp
-#undef southEast
-#undef northEast
-#undef south
+#undef southEastOpen
+#undef northEastOpen
+#undef southBlocked
 #undef roll
 #undef veryStrongMonster
 #undef weakMonster
 #undef mediumMonster
 #undef anyMonster
 #undef kind
-#undef guards
+#undef roamingMonsters
 #undef placedCount
 #undef resource
-#undef southWest
-#undef northWest
+#undef southWestOpen
+#undef northWestOpen
 #undef minorArtifact
 #undef guardedCount
 

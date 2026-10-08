@@ -238,19 +238,21 @@ public:
     iconWidget* m_horizontalKnob;
     iconWidget* m_verticalKnob;
     i32 m_zoomLevel;
-    // Set by every edit; saving clears it.
+    // Set by every edit and the text import; saving and loading clear it. Nothing reads it: quit
+    // and load always ask.
     b32 m_mapChanged;
-    // The map cell of the object the object tool placed last (-1: none).
+    // The map cell of the object the object tool placed last (-1: none), and a state the tool
+    // clears on each placement; nothing reads any of the three.
     i32 m_placedX;
     i32 m_placedY;
     i32 m_placedState;
     // The terrain tool's brush size.
     i32 m_brushSize;
-    // The cursor outline's size index (the clear tool's brush sizes).
+    // The brush size (terrain or eraser) the cursor outline was last drawn for.
     i32 m_cursorSize;
     // The object animation frame the map view draws (0..5), and the step
     // counter the animated overlays divide.
-    i32 m_animationFrame;
+    i32 m_unusedAnimationFrame;
     i32 m_animationCounter;
     // The executive manager of the selected tool.
     baseManager* m_toolManager;
@@ -347,7 +349,7 @@ public:
     i32 CountNearbyObstacles(i32 x, i32 y);
     void PlaceObstacleChains(i32 density, b32 mountains);
     b32 PlaceChainLink(i32* x, i32* y, i32 direction, b32 mountains, char tileset);
-    void PlaceTowns(void);
+    void PlaceCastles(void);
     b32 PlaceResourceSite(i32 x, i32 y, i32 resource);
     void PlaceRandomObjects(i32 density, i32 monsterDensity);
     void PlaceTreasures(i32 density, i32 monsterDensity);
@@ -393,7 +395,8 @@ extern SMapHeader gEditMapHeader;
 // The map text export's file (set while it runs).
 #define gTextFileName gTextFileNameBlockBuffer // spelling fixes .bss order
 extern char* gTextFileName;
-// Set while BlendTerrain may pick ground variants.
+// Set by the random map generator around its last BlendTerrain and RandomizeGround; nothing reads
+// it.
 #define gVaryTiles gVaryTilesBase // spelling fixes .bss order
 extern b32 gVaryTiles;
 // Set when ClearArea erased a road or stream part (to redraw the lines).
@@ -427,7 +430,8 @@ void ShowStatusWarning(H2_CONST char* text);
 // whose variant is rolled at (x, y) with the given chance (force: whenever
 // the terrain has variants).
 i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
-// Whether screen point (x, y) lies on the map view.
+// Whether screen point (x, y) lies on the map view, short of its last 16 pixels on the right and
+// bottom (the test compares with the view's width, not its right edge).
 i32 InMapArea(i32 x, i32 y);
 // Numbers the parts of every catalogue entry (gOverlayTypes) by the frames
 // of its tileset.

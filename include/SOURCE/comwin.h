@@ -57,7 +57,7 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32);
     while (((node) = pop_node(anchor)) != NULL)                                                    \
     H2_FREE(node)
 void ShutdownComError(H2_CONST char* function);
-i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr);
+i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 dsrFlowControl);
 void com_term(i16 portIndex);
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer);
 i16 com_snd(i16 portIndex, u16, u16 length, H2_CONST void* data, i32 priority);
