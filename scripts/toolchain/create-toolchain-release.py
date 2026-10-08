@@ -344,6 +344,7 @@ def main() -> None:
     output = Path(os.environ.get(
         "OUTPUT", REPO / "build" / "homm2-toolchain-vc6-sp5.tar.xz")).expanduser().resolve()
 
+    (REPO / "build").mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=REPO / "build") as scratch:
         tree = build(Path(scratch), disc, sp5, masm_disk)
         verify(tree)
