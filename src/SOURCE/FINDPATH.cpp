@@ -53,13 +53,12 @@ searchArray::~searchArray() {
 
 void searchArray::Init(void) {
     Close();
-    m_storage.cells =
-        static_cast<searchCell*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell)));
+    m_storage.cells = new searchCell[MAP_WIDTH * MAP_HEIGHT];
 }
 
 void searchArray::Close(void) {
     if (m_storage.cells != NULL)
-        H2_FREE(m_storage.cells);
+        delete[] m_storage.cells;
     m_storage.cells = NULL;
 }
 

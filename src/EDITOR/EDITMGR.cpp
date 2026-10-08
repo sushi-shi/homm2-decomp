@@ -7805,7 +7805,7 @@ b32 PickMap(FileRequesterMode mode) {
 
 void editManager::ClearErrors(void) {
     for (; gEditErrorCount > 0; gEditErrorCount--)
-        delete gEditErrors[gEditErrorCount - 1];
+        delete[] gEditErrors[gEditErrorCount - 1];
     gEditErrorCount = 0;
 }
 

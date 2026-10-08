@@ -51,7 +51,7 @@ dropListWidget::~dropListWidget() {
         delete m_savedBackground;
     for (i32 itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
         H2_FREE(m_items[itemIndex]);
-    H2_FREE(m_items);
+    delete[] m_items;
 }
 
 void dropListWidget::Read(void) {
@@ -114,10 +114,10 @@ void dropListWidget::DeleteItem(i32 index) {
             m_selectedIndex = -1;
         if (m_itemCount == 1) {
             H2_FREE(m_items[0]);
-            H2_FREE(m_items);
+            delete[] m_items;
             m_items = NULL;
         } else {
-            char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
+            char** newItems = new char*[m_itemCount - 1];
             memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
                 memcpy(
@@ -126,7 +126,7 @@ void dropListWidget::DeleteItem(i32 index) {
                     (m_itemCount - index - 1) * sizeof(*m_items)
                 );
             if (m_items != NULL)
-                H2_FREE(m_items);
+                delete[] m_items;
             m_items = newItems;
         }
         m_itemCount--;
@@ -173,14 +173,13 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     if (message.payload.widget.id != m_id)
                         break;
                     text = message.payload.widget.data.text;
-                    newItems =
-                        static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
+                    newItems = new char*[m_itemCount + 1];
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
                     ALLOC_COPY_STRING(newItems[m_itemCount], text);
                     m_itemCount++;
                     if (m_items != NULL)
-                        H2_FREE(m_items);
+                        delete[] m_items;
                     m_items = newItems;
                     break;
 

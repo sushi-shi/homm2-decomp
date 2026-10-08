@@ -40,7 +40,7 @@ bitmap::bitmap(u32l id)
 
 bitmap::~bitmap() {
     if (m_pixels != NULL)
-        delete m_pixels;
+        delete[] m_pixels;
     m_pixels = NULL;
 }
 
