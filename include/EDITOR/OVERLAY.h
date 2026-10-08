@@ -343,4 +343,4 @@ MessageDispatchResult PickerHandler(struct tag_message& message);
 // The selected m_types entry (OVERLAY_NONE: none).
 extern i32 gSelectedOverlay;
 
-#endif
+#endif // HOMM2_EDITOR_OVERLAY_H

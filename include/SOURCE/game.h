@@ -382,4 +382,4 @@ void CompressTest3(void);
 
 extern bchar bMapInitialized;
 
-#endif
+#endif // HOMM2_SOURCE_GAME_H

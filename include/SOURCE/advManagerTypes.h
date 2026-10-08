@@ -1,5 +1,5 @@
-#ifndef HOMM2_ADVMGR_TYPES_H
-#define HOMM2_ADVMGR_TYPES_H
+#ifndef HOMM2_SOURCE_ADVMANAGERTYPES_H
+#define HOMM2_SOURCE_ADVMANAGERTYPES_H
 
 #include <match.h>
 #include <SOURCE/advManager.h>
@@ -16,4 +16,4 @@ union AdventureRemotePayload {
 
 SIZE(AdventureRemotePayload, REMOTE_MESSAGE_PAYLOAD_SIZE);
 
-#endif
+#endif // HOMM2_SOURCE_ADVMANAGERTYPES_H

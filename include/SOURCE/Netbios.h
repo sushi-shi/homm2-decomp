@@ -1,5 +1,5 @@
-#ifndef HOMM2_NETBIOS_H
-#define HOMM2_NETBIOS_H
+#ifndef HOMM2_SOURCE_NETBIOS_H
+#define HOMM2_SOURCE_NETBIOS_H
 
 #include <Domains.h>
 
@@ -29,4 +29,4 @@ extern H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForHostStatus;
 extern H2_ENUM_STORAGE_STEPPED(NetbiosWaitState, i8) iWaitForGuestStatus;
 extern i32 iLastBroadcastTime;
 
-#endif
+#endif // HOMM2_SOURCE_NETBIOS_H

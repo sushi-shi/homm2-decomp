@@ -1,5 +1,5 @@
-#ifndef HOMM2_CURSOR_H
-#define HOMM2_CURSOR_H
+#ifndef HOMM2_SOURCE_CURSOR_H
+#define HOMM2_SOURCE_CURSOR_H
 
 #include <match.h>
 #include <Domains.h>
@@ -104,4 +104,4 @@ H2_ENUM_BEGIN(CursorHeroTurnShadowFrame)
     CURSOR_HERO_TURN_SHADOW_FRAME_58 = 58,
 H2_ENUM_END(CursorHeroTurnShadowFrame)
 
-#endif
+#endif // HOMM2_SOURCE_CURSOR_H

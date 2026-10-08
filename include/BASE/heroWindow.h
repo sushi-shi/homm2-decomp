@@ -78,4 +78,4 @@ public:
     void MoveWindow(i32 dx, i32 dy);
 };
 #pragma pack(pop)
-#endif
+#endif // HOMM2_BASE_HEROWINDOW_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICON2BC_H
-#define HOMM2_ICON2BC_H
+#ifndef HOMM2_BASE_ICON2BC_H
+#define HOMM2_BASE_ICON2BC_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -23,4 +23,4 @@ void IconToBitmapColorTable(
     i32 dimGate
 );
 
-#endif
+#endif // HOMM2_BASE_ICON2BC_H

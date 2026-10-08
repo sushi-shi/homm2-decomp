@@ -19,4 +19,4 @@ struct IconEntry {
 SIZE(IconEntry, 0xd);
 #endif
 
-#endif
+#endif // HOMM2_BASE_ICONENTRY_H

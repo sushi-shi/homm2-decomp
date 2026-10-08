@@ -14,4 +14,4 @@ extern char* gSphinxText;
 
 MessageDispatchResult EditSphinxHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_RIDLEDIT_H

@@ -95,4 +95,4 @@ extern b32 gEditJailedHero;
 
 MessageDispatchResult EditHeroHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_HEROEDIT_H

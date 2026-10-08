@@ -30,4 +30,4 @@ public:
     virtual ~resource(void) = 0;
 };
 #pragma pack(pop)
-#endif
+#endif // HOMM2_BASE_RESOURCE_H

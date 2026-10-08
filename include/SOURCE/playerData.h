@@ -109,4 +109,4 @@ SIZE(playerData, 0x11b);
 // Keep the signed byte promotion and raw mask result; color decoding is caller-owned.
 #define PLAYER_HAS_VISITED_TENT(p, color) ((p).m_barrierTents & (1 << (color)))
 extern playerData* gpCurPlayer;
-#endif
+#endif // HOMM2_SOURCE_PLAYERDATA_H

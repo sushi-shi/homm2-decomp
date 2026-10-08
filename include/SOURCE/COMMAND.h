@@ -1,5 +1,5 @@
-#ifndef HOMM2_COMMAND_H
-#define HOMM2_COMMAND_H
+#ifndef HOMM2_SOURCE_COMMAND_H
+#define HOMM2_SOURCE_COMMAND_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -41,4 +41,4 @@ SIZE(CombatRemotePacket, 0x100);
 MessageDispatchResult WinCombatHandler(struct tag_message& message);
 i32 InCombatArea(i32 x, i32 y);
 
-#endif
+#endif // HOMM2_SOURCE_COMMAND_H

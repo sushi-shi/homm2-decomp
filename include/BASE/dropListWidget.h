@@ -100,4 +100,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(dropListWidget, 0xb4);
-#endif
+#endif // HOMM2_BASE_DROPLISTWIDGET_H

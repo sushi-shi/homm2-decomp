@@ -162,4 +162,4 @@ extern u8 bGotMidi[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 
-#endif
+#endif // HOMM2_BASE_SOUNDMANAGER_H

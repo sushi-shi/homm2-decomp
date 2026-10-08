@@ -1,5 +1,5 @@
-#ifndef HOMM2_BLUR_H
-#define HOMM2_BLUR_H
+#ifndef HOMM2_BASE_BLUR_H
+#define HOMM2_BASE_BLUR_H
 
 #include <H2/Ints.h>
 
@@ -14,4 +14,4 @@ void DoBlur(
     i32 blueAdjust
 );
 
-#endif
+#endif // HOMM2_BASE_BLUR_H

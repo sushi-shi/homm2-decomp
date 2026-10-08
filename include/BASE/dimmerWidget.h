@@ -27,4 +27,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(dimmerWidget, 0x20);
-#endif
+#endif // HOMM2_BASE_DIMMERWIDGET_H

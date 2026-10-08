@@ -27,4 +27,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(palette, 0x14);
-#endif
+#endif // HOMM2_BASE_PALETTE_H

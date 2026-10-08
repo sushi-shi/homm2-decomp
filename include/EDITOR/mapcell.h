@@ -191,4 +191,4 @@ struct oldMapCellExtra {
 SIZE(oldMapCell, 20);
 SIZE(oldMapCellExtra, 15);
 #endif
-#endif
+#endif // HOMM2_EDITOR_MAPCELL_H

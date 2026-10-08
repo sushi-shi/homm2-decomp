@@ -1,5 +1,5 @@
-#ifndef HOMM2_REMOTE_SAVE_H
-#define HOMM2_REMOTE_SAVE_H
+#ifndef HOMM2_SOURCE_REMOTE_SAVE_H
+#define HOMM2_SOURCE_REMOTE_SAVE_H
 
 #include <match.h>
 #include <Domains.h>
@@ -40,4 +40,4 @@ SIZE(RemoteSaveChunk, REMOTE_MESSAGE_PAYLOAD_SIZE);
 SIZE(RemoteSaveBuffer, REMOTE_SAVE_BUFFER_SIZE);
 SIZE(RemoteSaveMessage, REMOTE_MESSAGE_SIZE);
 
-#endif
+#endif // HOMM2_SOURCE_REMOTE_SAVE_H

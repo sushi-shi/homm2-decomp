@@ -143,4 +143,4 @@ public:
 SIZE(searchArray, 0x2518);
 extern u8 bIsMoatSlowed[COMBAT_HEX_COUNT];
 
-#endif
+#endif // HOMM2_SOURCE_SEARCHARRAY_H

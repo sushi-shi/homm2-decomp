@@ -124,4 +124,4 @@ public:
 SIZE(town, 100);
 extern b32 bEnteringTown;
 
-#endif
+#endif // HOMM2_SOURCE_TOWN_H

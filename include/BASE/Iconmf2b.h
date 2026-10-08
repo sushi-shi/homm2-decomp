@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICONMF2B_H
-#define HOMM2_ICONMF2B_H
+#ifndef HOMM2_BASE_ICONMF2B_H
+#define HOMM2_BASE_ICONMF2B_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -21,4 +21,4 @@ void FlipMonoIconToBitmap(
     i32 clipH
 );
 
-#endif
+#endif // HOMM2_BASE_ICONMF2B_H

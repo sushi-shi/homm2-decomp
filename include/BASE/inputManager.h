@@ -175,4 +175,4 @@ void CheckChangeCursor(i32 x, i32 y, i32 force);
 // Maps a key event's code through Buka's CP1251 character table.
 void TranslateInputCharacterCp1251(struct tag_message& event);
 
-#endif
+#endif // HOMM2_BASE_INPUTMANAGER_H

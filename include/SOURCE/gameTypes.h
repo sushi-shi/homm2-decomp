@@ -181,4 +181,4 @@ H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_AMBIENT_MUSIC       = MUSIC_TRACK_NEW_MONTH
 H2_ENUM_END(GameWaitConstant)
 
-#endif
+#endif // HOMM2_SOURCE_GAMETYPES_H

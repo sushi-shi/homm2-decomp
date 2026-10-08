@@ -52,4 +52,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(swapManager, 0x5a);
-#endif
+#endif // HOMM2_SOURCE_SWAPMANAGER_H

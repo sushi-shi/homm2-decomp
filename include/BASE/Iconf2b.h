@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICONF2B_H
-#define HOMM2_ICONF2B_H
+#ifndef HOMM2_BASE_ICONF2B_H
+#define HOMM2_BASE_ICONF2B_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -21,4 +21,4 @@ void FlipIconToBitmap(
     i32 color
 );
 
-#endif
+#endif // HOMM2_BASE_ICONF2B_H

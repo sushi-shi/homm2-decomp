@@ -1,5 +1,5 @@
-#ifndef HOMM2_MISC_H
-#define HOMM2_MISC_H
+#ifndef HOMM2_BASE_MISC_H
+#define HOMM2_BASE_MISC_H
 
 #include <match.h>
 #include <Domains.h>
@@ -182,4 +182,4 @@ extern i32 iMemEntries;
 extern i32 inBoxX;
 extern i32 inBoxY;
 
-#endif
+#endif // HOMM2_BASE_MISC_H

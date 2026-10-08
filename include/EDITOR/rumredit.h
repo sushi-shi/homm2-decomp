@@ -15,4 +15,4 @@ extern char* gRumourText;
 
 MessageDispatchResult EditRumourHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_RUMREDIT_H

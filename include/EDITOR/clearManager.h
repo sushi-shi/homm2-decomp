@@ -43,4 +43,4 @@ extern i32 gClearBrush;
 // Pointer moves since the brush outline was last redrawn.
 extern i32 gClearCursorMoves;
 
-#endif
+#endif // HOMM2_EDITOR_CLEARMANAGER_H

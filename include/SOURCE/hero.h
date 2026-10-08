@@ -235,4 +235,4 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut);
 void SetupHeroView(void);
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot);
 
-#endif
+#endif // HOMM2_SOURCE_HERO_H

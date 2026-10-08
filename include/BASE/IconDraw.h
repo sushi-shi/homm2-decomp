@@ -18,4 +18,4 @@ H2_ENUM_CLASS_BEGIN(IconDrawResult)
     ICON_DRAW_COMPLETED = 1
 H2_ENUM_CLASS_END(IconDrawResult)
 
-#endif
+#endif // HOMM2_BASE_ICONDRAW_H

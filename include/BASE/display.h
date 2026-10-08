@@ -25,4 +25,4 @@ H2_ENUM_BEGIN(PaletteFormatConstant)
     PALETTE_CHANNEL_MAX = PALETTE_LEVEL_COUNT - 1,
 H2_ENUM_END(PaletteFormatConstant)
 
-#endif
+#endif // HOMM2_BASE_DISPLAY_H

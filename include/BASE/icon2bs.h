@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICON2BS_H
-#define HOMM2_ICON2BS_H
+#ifndef HOMM2_BASE_ICON2BS_H
+#define HOMM2_BASE_ICON2BS_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -21,4 +21,4 @@ void IconToBitmapScale(
     i32 scale
 );
 
-#endif
+#endif // HOMM2_BASE_ICON2BS_H

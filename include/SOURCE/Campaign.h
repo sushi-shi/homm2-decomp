@@ -1,5 +1,5 @@
-#ifndef HOMM2_CAMPAIGN_H
-#define HOMM2_CAMPAIGN_H
+#ifndef HOMM2_SOURCE_CAMPAIGN_H
+#define HOMM2_SOURCE_CAMPAIGN_H
 
 #include <BASE/dialog.h>
 #include <Domains.h>
@@ -79,4 +79,4 @@ H2_ENUM_END(CampaignDisplayConstant)
 
 MessageDispatchResult CampaignHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_SOURCE_CAMPAIGN_H

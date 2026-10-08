@@ -318,4 +318,4 @@ extern SMonFrameInfo sViewArmyMonFrameInfo;
 void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing);
 void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType);
 
-#endif
+#endif // HOMM2_SOURCE_ARMY_H

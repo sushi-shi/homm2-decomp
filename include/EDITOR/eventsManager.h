@@ -236,4 +236,4 @@ extern iconWidget* gDensityKnobs[RANDOM_MAP_DENSITY_COUNT];
 extern iconWidget* gTerrainTracks[RANDOM_MAP_TERRAIN_COUNT];
 extern heroWindow* gNewMapWindow;
 
-#endif
+#endif // HOMM2_EDITOR_EVENTSMANAGER_H

@@ -70,4 +70,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(textEntryWidget, 0x4e);
-#endif
+#endif // HOMM2_BASE_TEXTENTRYWIDGET_H

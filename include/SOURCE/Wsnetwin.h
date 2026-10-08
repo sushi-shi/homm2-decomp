@@ -1,5 +1,5 @@
-#ifndef HOMM2_WSNETWIN_H
-#define HOMM2_WSNETWIN_H
+#ifndef HOMM2_SOURCE_WSNETWIN_H
+#define HOMM2_SOURCE_WSNETWIN_H
 
 #include <match.h>
 #include <Domains.h>
@@ -51,4 +51,4 @@ extern struct in_addr gIn_addrIP;
 extern struct sockaddr_in saddr_remote;
 extern i32 iAddrLen;
 
-#endif
+#endif // HOMM2_SOURCE_WSNETWIN_H

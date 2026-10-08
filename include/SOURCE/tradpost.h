@@ -1,5 +1,5 @@
-#ifndef HOMM2_TRADPOST_H
-#define HOMM2_TRADPOST_H
+#ifndef HOMM2_SOURCE_TRADPOST_H
+#define HOMM2_SOURCE_TRADPOST_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -49,4 +49,4 @@ extern i32 rightResource;
 extern i32 iMaxUnitsToTrade;
 extern i32 maxUnitsToTrade;
 
-#endif
+#endif // HOMM2_SOURCE_TRADPOST_H

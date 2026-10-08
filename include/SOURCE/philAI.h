@@ -244,4 +244,4 @@ extern i16 giUARadius;
 extern i8 gbNGPlayerPos[];
 extern i32 viewArmyFacingWIPXMod;
 
-#endif
+#endif // HOMM2_SOURCE_PHILAI_H

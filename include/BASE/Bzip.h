@@ -136,4 +136,4 @@ extern i32 opMode;
 extern char progNameReally[0x400];
 extern i32 keepInputFiles;
 
-#endif
+#endif // HOMM2_BASE_BZIP_H

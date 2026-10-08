@@ -83,4 +83,4 @@ extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];
 
-#endif
+#endif // HOMM2_BASE_RESOURCEMANAGER_H

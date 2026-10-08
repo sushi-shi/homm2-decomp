@@ -140,4 +140,4 @@ extern float fGutterMinY;
 extern float fGutterTravelLength;
 extern i32 iMaxListSize;
 
-#endif
+#endif // HOMM2_SOURCE_FILEREQUESTER_H

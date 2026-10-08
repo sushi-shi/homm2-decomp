@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICONF2BY_H
-#define HOMM2_ICONF2BY_H
+#ifndef HOMM2_BASE_ICONF2BY_H
+#define HOMM2_BASE_ICONF2BY_H
 
 #include <Domains.h>
 
@@ -25,4 +25,4 @@ void FlipIconToBitmapYModify(
     i8* shear
 );
 
-#endif
+#endif // HOMM2_BASE_ICONF2BY_H

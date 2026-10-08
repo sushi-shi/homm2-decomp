@@ -60,4 +60,4 @@ public:
 SIZE(button, 0x30);
 extern MessageModifier iLeftRightSave;
 
-#endif
+#endif // HOMM2_BASE_BUTTON_H

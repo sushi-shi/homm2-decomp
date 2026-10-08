@@ -1,5 +1,5 @@
-#ifndef HOMM2_BASE_EXEC_TYPES_H
-#define HOMM2_BASE_EXEC_TYPES_H
+#ifndef HOMM2_BASE_EXECUTIVETYPES_H
+#define HOMM2_BASE_EXECUTIVETYPES_H
 
 #include <match.h>
 #include <Domains.h>
@@ -41,4 +41,4 @@ typedef struct SExecutiveText {
 
 SIZE(SExecutiveText, 0x25c);
 
-#endif
+#endif // HOMM2_BASE_EXECUTIVETYPES_H

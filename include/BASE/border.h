@@ -34,4 +34,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(border, 0x2a);
-#endif
+#endif // HOMM2_BASE_BORDER_H

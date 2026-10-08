@@ -49,4 +49,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(baseManager, 0x36);
-#endif
+#endif // HOMM2_BASE_BASEMANAGER_H

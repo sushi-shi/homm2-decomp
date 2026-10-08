@@ -103,4 +103,4 @@ void PlayAudiereMusic(
     i32 track
 );
 
-#endif
+#endif // HOMM2_BASE_SOUNDBACKENDS_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_OVERVIEW_H
-#define HOMM2_OVERVIEW_H
+#ifndef HOMM2_SOURCE_OVERVIEW_H
+#define HOMM2_SOURCE_OVERVIEW_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -35,4 +35,4 @@ typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
 MessageDispatchResult OverviewHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_SOURCE_OVERVIEW_H

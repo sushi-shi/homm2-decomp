@@ -102,4 +102,4 @@ extern u8* cColorBits[MOUSE_CURSOR_COUNT];
 extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
 extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
-#endif
+#endif // HOMM2_BASE_MOUSEMANAGER_H

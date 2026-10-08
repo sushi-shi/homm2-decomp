@@ -1,5 +1,5 @@
-#ifndef HOMM2_REMOTE_TYPES_H
-#define HOMM2_REMOTE_TYPES_H
+#ifndef HOMM2_SOURCE_REMOTETYPES_H
+#define HOMM2_SOURCE_REMOTETYPES_H
 
 #include <match.h>
 #include <Domains.h>
@@ -81,4 +81,4 @@ H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     REMOTE_PROTOCOL_DIRECT_CONNECT = 4
 H2_ENUM_CLASS_END(RemoteNetworkProtocol)
 
-#endif
+#endif // HOMM2_SOURCE_REMOTETYPES_H

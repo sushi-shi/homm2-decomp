@@ -1,5 +1,5 @@
-#ifndef HOMM2_DPNETWIN_H
-#define HOMM2_DPNETWIN_H
+#ifndef HOMM2_SOURCE_DPNETWIN_H
+#define HOMM2_SOURCE_DPNETWIN_H
 
 #include <Domains.h>
 #include <windows.h>
@@ -124,4 +124,4 @@ inline void DisposeTransportReceiveStorage(void) {
     piDPRcvBufferSize = NULL;
 }
 
-#endif
+#endif // HOMM2_SOURCE_DPNETWIN_H

@@ -48,4 +48,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(bitmap, 0x1a);
-#endif
+#endif // HOMM2_BASE_BITMAP_H

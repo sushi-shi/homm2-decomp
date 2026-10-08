@@ -25,4 +25,4 @@ inline u8 ReadIconRleByte(u8*& cursor) {
     return cursor[-1];
 }
 
-#endif
+#endif // HOMM2_BASE_ICONRLE_H

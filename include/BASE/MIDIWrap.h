@@ -15,4 +15,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(MIDIWrap, 0x14);
-#endif
+#endif // HOMM2_BASE_MIDIWRAP_H

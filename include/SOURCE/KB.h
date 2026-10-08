@@ -1,5 +1,5 @@
-#ifndef HOMM2_KB_H
-#define HOMM2_KB_H
+#ifndef HOMM2_SOURCE_KB_H
+#define HOMM2_SOURCE_KB_H
 
 #include <Domains.h>
 #include <windows.h>
@@ -705,4 +705,4 @@ extern i16* pwSizeOfMapExtra;
 extern font* smallFont;
 extern u8 iGetSSByAlignment[IDX(HERO_SKILL_COUNT)][IDX(FACTION_COUNT)];
 
-#endif
+#endif // HOMM2_SOURCE_KB_H

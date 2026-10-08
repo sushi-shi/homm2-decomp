@@ -26,4 +26,4 @@ public:
 #pragma pack(pop)
 SIZE(executive, 0x10);
 
-#endif
+#endif // HOMM2_BASE_EXECUTIVE_H

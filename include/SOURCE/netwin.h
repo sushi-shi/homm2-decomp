@@ -1,5 +1,5 @@
-#ifndef HOMM2_NETWIN_H
-#define HOMM2_NETWIN_H
+#ifndef HOMM2_SOURCE_NETWIN_H
+#define HOMM2_SOURCE_NETWIN_H
 
 #include <match.h>
 #include <Domains.h>
@@ -133,4 +133,4 @@ H2_C_LINKAGE u16 __cdecl nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) ope
 H2_C_LINKAGE char __cdecl nb_stat(i16 session);
 void nb_thr_ctl(void);
 
-#endif
+#endif // HOMM2_SOURCE_NETWIN_H

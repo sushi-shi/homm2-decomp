@@ -1,5 +1,5 @@
-#ifndef HOMM2_COMWIN_H
-#define HOMM2_COMWIN_H
+#ifndef HOMM2_SOURCE_COMWIN_H
+#define HOMM2_SOURCE_COMWIN_H
 
 #include <windows.h>
 #include <match.h>
@@ -65,4 +65,4 @@ i16 __cdecl com_sess(i32, i32, ...);
 u8 com_stat(i16 portIndex, u16);
 void comm_wrt_task(void);
 
-#endif
+#endif // HOMM2_SOURCE_COMWIN_H

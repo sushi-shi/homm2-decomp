@@ -72,4 +72,4 @@ public:
 };
 SIZE(fullMap, 20);
 
-#endif
+#endif // HOMM2_EDITOR_FULLMAP_H

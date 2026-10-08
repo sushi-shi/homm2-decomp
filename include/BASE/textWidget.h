@@ -41,4 +41,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(textWidget, 0x2b);
-#endif
+#endif // HOMM2_BASE_TEXTWIDGET_H

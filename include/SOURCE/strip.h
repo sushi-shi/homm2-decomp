@@ -67,4 +67,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(strip, 0x84);
-#endif
+#endif // HOMM2_SOURCE_STRIP_H

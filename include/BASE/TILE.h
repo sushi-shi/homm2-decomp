@@ -1,5 +1,5 @@
-#ifndef HOMM2_TILE_H
-#define HOMM2_TILE_H
+#ifndef HOMM2_BASE_TILE_H
+#define HOMM2_BASE_TILE_H
 
 #include <Domains.h>
 
@@ -14,4 +14,4 @@ H2_ENUM_END(TileFlag)
 
 extern "C" void __cdecl TileToBitmap(tileset* source, u32 flags, bitmap* destination, i32 x, i32 y);
 
-#endif
+#endif // HOMM2_BASE_TILE_H

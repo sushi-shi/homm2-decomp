@@ -182,4 +182,4 @@ SIZE(tag_message, 0x1c);
      (messageValue).payload.widget.command = (commandValue),                                       \
      (messageValue).payload.widget.id = (idValue))
 
-#endif
+#endif // HOMM2_BASE_MESSAGE_H

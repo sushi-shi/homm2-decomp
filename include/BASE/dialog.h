@@ -17,4 +17,4 @@ H2_ENUM_BEGIN(DialogButtonId)
     DIALOG_BUTTON_8 = 0x7808,
 H2_ENUM_END(DialogButtonId)
 
-#endif
+#endif // HOMM2_BASE_DIALOG_H

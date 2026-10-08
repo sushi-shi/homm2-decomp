@@ -50,4 +50,4 @@ public:
 SIZE(recruitUnit, 0x7e);
 extern HMENU hmnuRecruitSave;
 
-#endif
+#endif // HOMM2_SOURCE_RECRUITUNIT_H

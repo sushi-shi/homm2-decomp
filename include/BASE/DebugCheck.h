@@ -1,7 +1,7 @@
-#ifndef HOMM2_DEBUGCHECK_H
-#define HOMM2_DEBUGCHECK_H
+#ifndef HOMM2_BASE_DEBUGCHECK_H
+#define HOMM2_BASE_DEBUGCHECK_H
 
 inline void DebugCheck(void) {
 }
 
-#endif
+#endif // HOMM2_BASE_DEBUGCHECK_H

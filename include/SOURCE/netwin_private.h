@@ -1,5 +1,5 @@
-#ifndef HOMM2_NETWIN_PRIVATE_H
-#define HOMM2_NETWIN_PRIVATE_H
+#ifndef HOMM2_SOURCE_NETWIN_PRIVATE_H
+#define HOMM2_SOURCE_NETWIN_PRIVATE_H
 
 #include <Domains.h>
 
@@ -19,4 +19,4 @@ static void __fastcall nb_format_name(char* source, u8* destination);
 
 extern "C" H2_ENUM_PARAM(NetbiosResult, u8) __stdcall Netbios(NetbiosControlBlock* controlBlock);
 
-#endif
+#endif // HOMM2_SOURCE_NETWIN_PRIVATE_H

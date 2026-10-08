@@ -1,5 +1,5 @@
-#ifndef HOMM2_EVENTS_TYPES_H
-#define HOMM2_EVENTS_TYPES_H
+#ifndef HOMM2_SOURCE_EVENTSTYPES_H
+#define HOMM2_SOURCE_EVENTSTYPES_H
 
 #include <match.h>
 #include <Domains.h>
@@ -41,4 +41,4 @@ struct combatRemoteHeroFragment {
 SIZE(combatRemoteData, COMBAT_REMOTE_HEADER_SIZE);
 SIZE(combatRemoteHeroFragment, COMBAT_REMOTE_HERO_FIRST_SIZE + 1);
 
-#endif
+#endif // HOMM2_SOURCE_EVENTSTYPES_H

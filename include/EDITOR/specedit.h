@@ -31,4 +31,4 @@ void EditMapRumour(void);
 void DeleteMapRumour(void);
 MessageDispatchResult SpecificationsHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_SPECEDIT_H

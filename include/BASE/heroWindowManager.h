@@ -104,4 +104,4 @@ void CreateFizzleTables(void);
 void CreateColorTables(void);
 void CreateColorLookupTables(void);
 
-#endif
+#endif // HOMM2_BASE_HEROWINDOWMANAGER_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_MISC_ENUMS_H
-#define HOMM2_MISC_ENUMS_H
+#ifndef HOMM2_BASE_MISCENUMS_H
+#define HOMM2_BASE_MISCENUMS_H
 
 #include <Domains.h>
 
@@ -11,4 +11,4 @@ H2_ENUM_CLASS_BEGIN(CDRomSetupResult)
     CD_ROM_DATA_FILES_MISSING     = 4
 H2_ENUM_CLASS_END(CDRomSetupResult)
 
-#endif
+#endif // HOMM2_BASE_MISCENUMS_H

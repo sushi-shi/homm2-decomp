@@ -19,4 +19,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(bankBox, 0xc);
-#endif
+#endif // HOMM2_SOURCE_BANKBOX_H

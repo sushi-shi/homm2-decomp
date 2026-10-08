@@ -1,5 +1,5 @@
-#ifndef HOMM2_EVENTS_H
-#define HOMM2_EVENTS_H
+#ifndef HOMM2_SOURCE_EVENTS_H
+#define HOMM2_SOURCE_EVENTS_H
 
 #include <Domains.h>
 #include <SOURCE/kbTypes.h>
@@ -334,4 +334,4 @@ H2_ENUM_BEGIN(ArtifactEventMode)
     ARTIFACT_EVENT_MODE_UNKNOWN_2  = 2,
 H2_ENUM_END(ArtifactEventMode)
 
-#endif
+#endif // HOMM2_SOURCE_EVENTS_H

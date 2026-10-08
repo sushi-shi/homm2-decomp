@@ -50,4 +50,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(iconWidget, 0x2d);
-#endif
+#endif // HOMM2_BASE_ICONWIDGET_H

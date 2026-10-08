@@ -1,5 +1,5 @@
-#ifndef HOMM2_RECRUIT_H
-#define HOMM2_RECRUIT_H
+#ifndef HOMM2_SOURCE_RECRUIT_H
+#define HOMM2_SOURCE_RECRUIT_H
 
 #include <Domains.h>
 #include <SOURCE/kbTypes.h>
@@ -17,4 +17,4 @@ void SetupRecruitWin(
 );
 void QuickViewRecruit(class town* townData, i32 dwelling);
 
-#endif
+#endif // HOMM2_SOURCE_RECRUIT_H

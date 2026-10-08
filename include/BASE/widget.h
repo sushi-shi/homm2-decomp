@@ -66,4 +66,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(widget, 0x20);
-#endif
+#endif // HOMM2_BASE_WIDGET_H

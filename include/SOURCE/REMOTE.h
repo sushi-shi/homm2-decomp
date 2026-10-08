@@ -1,5 +1,5 @@
-#ifndef HOMM2_REMOTE_H
-#define HOMM2_REMOTE_H
+#ifndef HOMM2_SOURCE_REMOTE_H
+#define HOMM2_SOURCE_REMOTE_H
 
 #include <match.h>
 #include <Domains.h>
@@ -149,4 +149,4 @@ extern char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 extern b32 bGotGameType;
 extern SNetPlayerInfo gsThisNetPlayerInfo;
 
-#endif
+#endif // HOMM2_SOURCE_REMOTE_H

@@ -91,4 +91,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(font, 0x20);
-#endif
+#endif // HOMM2_BASE_FONT_H

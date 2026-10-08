@@ -455,4 +455,4 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message);
 // artifact or object only the expansion has): it then saves as .MX2.
 b8 UsesExpansionObjects(void);
 
-#endif
+#endif // HOMM2_EDITOR_EDITMANAGER_H

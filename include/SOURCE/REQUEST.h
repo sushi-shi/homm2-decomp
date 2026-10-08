@@ -1,5 +1,5 @@
-#ifndef HOMM2_REQUEST_H
-#define HOMM2_REQUEST_H
+#ifndef HOMM2_SOURCE_REQUEST_H
+#define HOMM2_SOURCE_REQUEST_H
 
 #include <match.h>
 #include <Domains.h>
@@ -89,4 +89,4 @@ i32 CheckSumIsDemoOK(char*);
 i32 ShowThisMapGame(char* filename);
 i32 ShowThisMap(char*);
 
-#endif
+#endif // HOMM2_SOURCE_REQUEST_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_WINGRAPH_H
-#define HOMM2_WINGRAPH_H
+#ifndef HOMM2_SOURCE_WINGRAPH_H
+#define HOMM2_SOURCE_WINGRAPH_H
 
 #include <windows.h>
 #include <ddraw.h>
@@ -107,4 +107,4 @@ extern HINSTANCE hDDrawLibrary;
 extern i32l lDelayRefresh;
 extern i32l lPaintStart;
 
-#endif
+#endif // HOMM2_SOURCE_WINGRAPH_H

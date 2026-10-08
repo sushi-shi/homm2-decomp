@@ -15,4 +15,4 @@ u8 GetMusicFlagA(void);
 u8 GetMusicFlagB(void);
 u8 MusicFlagsActive(void);
 
-#endif
+#endif // HOMM2_BASE_MUSICFLAGS_H

@@ -51,4 +51,4 @@ void SetLineTile(i32 x, i32 y, TilesetId tileset, i32 index, i32 variant);
 // Rebuilds the roads and then the streams around an edited area.
 void RedrawLines(i32 fromX, i32 fromY, i32 toX, i32 toY);
 
-#endif
+#endif // HOMM2_EDITOR_LINE_H

@@ -53,4 +53,4 @@ SIZE(armyGroup, 0xf);
 // Type-first query; use the signed quantity view, not the unsigned troop alias.
 #define ARMY_GROUP_HAS_POSITIVE_STACK(group, slot)                                                 \
     ((group).m_creatureTypes[slot] != CREATURE_NONE && (group).m_creatureCounts[slot] > 0)
-#endif
+#endif // HOMM2_SOURCE_ARMYGROUP_H

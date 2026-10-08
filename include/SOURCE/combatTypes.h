@@ -162,4 +162,4 @@ H2_ENUM_BEGIN(CombatDirectionMask)
     COMBAT_ALL_DIRECTIONS_BLOCKED = 255,
 H2_ENUM_END(CombatDirectionMask)
 
-#endif
+#endif // HOMM2_SOURCE_COMBATTYPES_H

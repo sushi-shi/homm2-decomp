@@ -145,4 +145,4 @@ SIZE(ExpCampaign, 0x4f);
 extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                                               [CAMPAIGN_BONUS_CHOICE_COUNT];
-#endif
+#endif // HOMM2_SOURCE_EXPCAMPAIGN_H

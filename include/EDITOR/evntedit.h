@@ -41,4 +41,4 @@ extern char* gEventMessage;
 
 MessageDispatchResult EditEventHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_EVNTEDIT_H

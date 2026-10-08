@@ -232,4 +232,4 @@ void GetCategoryStats(
 );
 void SortStats(i32l* const stats, i8* const order);
 
-#endif
+#endif // HOMM2_SOURCE_TOWNMANAGER_H

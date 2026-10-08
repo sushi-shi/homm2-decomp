@@ -88,4 +88,4 @@ extern H2_ENUM_STORAGE(BuildingSlotType, i32) gTownEditBuildings[TOWN_EDIT_BUILD
 
 MessageDispatchResult EditTownHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_TOWNEDIT_H

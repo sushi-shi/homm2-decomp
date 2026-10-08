@@ -30,4 +30,4 @@ MessageDispatchResult SetupMapSizeHandler(struct tag_message& message);
 MessageDispatchResult BaseSetupHandler(struct tag_message& message);
 MessageDispatchResult SetupMainHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_SETUP_H

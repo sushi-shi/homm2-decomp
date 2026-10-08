@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICOND2B_H
-#define HOMM2_ICOND2B_H
+#ifndef HOMM2_BASE_ICOND2B_H
+#define HOMM2_BASE_ICOND2B_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -21,4 +21,4 @@ void DimIconToBitmap(
     i32 clipH
 );
 
-#endif
+#endif // HOMM2_BASE_ICOND2B_H

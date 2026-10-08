@@ -1,5 +1,5 @@
-#ifndef HOMM2_SPELLS_H
-#define HOMM2_SPELLS_H
+#ifndef HOMM2_SOURCE_SPELLS_H
+#define HOMM2_SOURCE_SPELLS_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -195,4 +195,4 @@ H2_ENUM_BEGIN(SpellStatConstant)
     SPELL_HASTE_SPEED_BONUS = 2,
 H2_ENUM_END(SpellStatConstant)
 
-#endif
+#endif // HOMM2_SOURCE_SPELLS_H

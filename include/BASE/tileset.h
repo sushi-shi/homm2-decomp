@@ -17,4 +17,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(tileset, 0x1a);
-#endif
+#endif // HOMM2_BASE_TILESET_H

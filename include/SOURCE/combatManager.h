@@ -884,4 +884,4 @@ i32 ValidHex(i32 hex);
 void UpdateCombatSystemOptions(i32 initialDraw);
 MessageDispatchResult CombatSystemOptionsHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_SOURCE_COMBATMANAGER_H

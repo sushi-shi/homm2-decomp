@@ -1,5 +1,5 @@
-#ifndef HOMM2_CASTLE_H
-#define HOMM2_CASTLE_H
+#ifndef HOMM2_SOURCE_CASTLE_H
+#define HOMM2_SOURCE_CASTLE_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -19,4 +19,4 @@ extern H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT];
 extern class heroWindow* casWin;
 extern H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];
 
-#endif
+#endif // HOMM2_SOURCE_CASTLE_H

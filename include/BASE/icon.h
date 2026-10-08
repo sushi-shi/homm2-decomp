@@ -59,4 +59,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(icon, 0x16);
-#endif
+#endif // HOMM2_BASE_ICON_H

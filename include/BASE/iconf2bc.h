@@ -1,5 +1,5 @@
-#ifndef HOMM2_ICONF2BC_H
-#define HOMM2_ICONF2BC_H
+#ifndef HOMM2_BASE_ICONF2BC_H
+#define HOMM2_BASE_ICONF2BC_H
 
 #include <Domains.h>
 #include <BASE/IconDraw.h>
@@ -22,4 +22,4 @@ void FlipIconToBitmapColorTable(
     u8* colorTable
 );
 
-#endif
+#endif // HOMM2_BASE_ICONF2BC_H

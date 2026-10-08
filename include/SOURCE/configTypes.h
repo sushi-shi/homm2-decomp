@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_CONFIG_TYPES_H
-#define HOMM2_SOURCE_CONFIG_TYPES_H
+#ifndef HOMM2_SOURCE_CONFIGTYPES_H
+#define HOMM2_SOURCE_CONFIGTYPES_H
 
 #include <match.h>
 #include <Domains.h>
@@ -134,4 +134,4 @@ struct configStruct {
 SIZE(exeGfxConfig, CONFIG_GRAPHICS_SIZE);
 SIZE(configStruct, CONFIG_STRUCT_SIZE);
 
-#endif
+#endif // HOMM2_SOURCE_CONFIGTYPES_H

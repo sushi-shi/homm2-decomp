@@ -1,5 +1,5 @@
-#ifndef HOMM2_SMACKMGR_H
-#define HOMM2_SMACKMGR_H
+#ifndef HOMM2_SOURCE_SMACKMANAGER_H
+#define HOMM2_SOURCE_SMACKMANAGER_H
 
 #include <match.h>
 #include <Domains.h>
@@ -150,4 +150,4 @@ extern SmackSum smksum;
 extern b32 gbPlayedThrough;
 extern b8 bMainDone;
 
-#endif
+#endif // HOMM2_SOURCE_SMACKMANAGER_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_KBWIN_H
-#define HOMM2_KBWIN_H
+#ifndef HOMM2_SOURCE_KBWIN_H
+#define HOMM2_SOURCE_KBWIN_H
 
 #include <SOURCE/kbTypes.h>
 #include <Domains.h>
@@ -80,4 +80,4 @@ extern i32l lTemp;
 extern u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
 extern i32 iMainWinScreenWidth;
 
-#endif
+#endif // HOMM2_SOURCE_KBWIN_H

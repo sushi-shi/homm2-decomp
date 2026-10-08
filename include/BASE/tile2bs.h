@@ -1,5 +1,5 @@
-#ifndef HOMM2_TILE2BS_H
-#define HOMM2_TILE2BS_H
+#ifndef HOMM2_BASE_TILE2BS_H
+#define HOMM2_BASE_TILE2BS_H
 
 #include <H2/Ints.h>
 
@@ -10,4 +10,4 @@ class tileset;
 // BASE object the game does not link.
 void TileToBitmapScale(tileset* source, u32 flags, bitmap* destination, i32 x, i32 y, i32 scale);
 
-#endif
+#endif // HOMM2_BASE_TILE2BS_H

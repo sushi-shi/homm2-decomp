@@ -1,5 +1,5 @@
-#ifndef HOMM2_X_ARENA_H
-#define HOMM2_X_ARENA_H
+#ifndef HOMM2_SOURCE_X_ARENA_H
+#define HOMM2_SOURCE_X_ARENA_H
 
 #include <H2/Ints.h>
 #include <BASE/message.h>
@@ -14,4 +14,4 @@ extern i32 choice;
 extern class iconWidget* skillWidget[];
 extern class heroWindow* arenaWinPtr;
 
-#endif
+#endif // HOMM2_SOURCE_X_ARENA_H

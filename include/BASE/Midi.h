@@ -13,4 +13,4 @@ void MIDIStop(i32& currentTrack);
 bool MIDIIsPlaying(void);
 void MIDISetVolume(i32& fadeSteps);
 
-#endif
+#endif // HOMM2_BASE_MIDI_H

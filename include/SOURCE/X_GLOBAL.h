@@ -1,5 +1,5 @@
-#ifndef HOMM2_X_GLOBAL_H
-#define HOMM2_X_GLOBAL_H
+#ifndef HOMM2_SOURCE_X_GLOBAL_H
+#define HOMM2_SOURCE_X_GLOBAL_H
 
 #include <SOURCE/kbTypes.h>
 #include <SOURCE/configTypes.h>
@@ -598,4 +598,4 @@ extern i32 giMapChangeCtr;
 extern b32 gbWaitForRemoteReceive;
 extern u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 
-#endif
+#endif // HOMM2_SOURCE_X_GLOBAL_H

@@ -1,5 +1,5 @@
-#ifndef HOMM2_BMAP2_H
-#define HOMM2_BMAP2_H
+#ifndef HOMM2_BASE_BMAP2_H
+#define HOMM2_BASE_BMAP2_H
 
 #include <H2/Ints.h>
 
@@ -30,4 +30,4 @@ void BlitBitmap(
 );
 void DimBitmapArea(class bitmap* image, i32 x, i32 y, i32 width, i32 height, i32 level);
 
-#endif
+#endif // HOMM2_BASE_BMAP2_H

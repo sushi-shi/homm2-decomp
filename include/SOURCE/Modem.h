@@ -1,5 +1,5 @@
-#ifndef HOMM2_MODEM_H
-#define HOMM2_MODEM_H
+#ifndef HOMM2_SOURCE_MODEM_H
+#define HOMM2_SOURCE_MODEM_H
 
 #include <match.h>
 #include <Domains.h>
@@ -96,4 +96,4 @@ inline void TruncateModemResponse(void) {
     GUIMRresponse[MODEM_RESPONSE_TRUNCATE_INDEX] = 0;
 }
 
-#endif
+#endif // HOMM2_SOURCE_MODEM_H

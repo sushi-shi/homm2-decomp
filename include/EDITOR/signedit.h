@@ -15,4 +15,4 @@ extern char* gSignText;
 
 MessageDispatchResult EditSignHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_EDITOR_SIGNEDIT_H

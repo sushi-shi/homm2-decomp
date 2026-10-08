@@ -110,4 +110,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(listBoxWidget, 0x92);
-#endif
+#endif // HOMM2_BASE_LISTBOXWIDGET_H

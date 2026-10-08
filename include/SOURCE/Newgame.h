@@ -1,5 +1,5 @@
-#ifndef HOMM2_NEWGAME_H
-#define HOMM2_NEWGAME_H
+#ifndef HOMM2_SOURCE_NEWGAME_H
+#define HOMM2_SOURCE_NEWGAME_H
 
 #include <Domains.h>
 #include <BASE/message.h>
@@ -42,4 +42,4 @@ SIZE(NewGameRemotePacket, 0x100);
 
 MessageDispatchResult NewGameHandler(struct tag_message& message);
 
-#endif
+#endif // HOMM2_SOURCE_NEWGAME_H

@@ -634,4 +634,4 @@ extern b32 gbTroopReload;
 extern i32 giCurAIHeroLuck;
 extern b32 gbActualShipyardFound;
 
-#endif
+#endif // HOMM2_SOURCE_ADVMANAGER_H

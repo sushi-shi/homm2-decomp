@@ -16,4 +16,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(sample, 0x34);
-#endif
+#endif // HOMM2_BASE_SAMPLE_H

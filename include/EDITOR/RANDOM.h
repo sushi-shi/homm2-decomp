@@ -26,4 +26,4 @@ void ScaleByDensity(i32* count, i32 density);
 // The generator's running state.
 extern b32 gGeneratingRandomMap;
 
-#endif
+#endif // HOMM2_EDITOR_RANDOM_H

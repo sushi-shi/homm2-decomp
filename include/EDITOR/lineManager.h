@@ -32,4 +32,4 @@ public:
 #pragma pack(pop)
 SIZE(lineManager, 0x42);
 
-#endif
+#endif // HOMM2_EDITOR_LINEMANAGER_H

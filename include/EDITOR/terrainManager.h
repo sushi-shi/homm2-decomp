@@ -90,4 +90,4 @@ extern TerrainButtonPosition gTerrainButtonPositions[IDX(TERRAIN_COUNT)];
 extern H2_ENUM_STORAGE(TerrainType, i32) gTerrainChoice;
 extern i32 gTerrainCursorMoves;
 
-#endif
+#endif // HOMM2_EDITOR_TERRAINMANAGER_H

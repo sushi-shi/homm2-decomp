@@ -1,5 +1,5 @@
-#ifndef HOMM2_MISCWIN_H
-#define HOMM2_MISCWIN_H
+#ifndef HOMM2_BASE_MISCWIN_H
+#define HOMM2_BASE_MISCWIN_H
 
 #include <H2/Ints.h>
 
@@ -11,4 +11,4 @@ i16 AutoInitSVGA(void);
 struct tagPAINTSTRUCT;
 extern struct tagPAINTSTRUCT ps;
 
-#endif
+#endif // HOMM2_BASE_MISCWIN_H

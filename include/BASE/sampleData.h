@@ -33,4 +33,4 @@ struct SamplePlaybackData {
 #pragma pack(pop)
 SIZE(SamplePlaybackData, 0x24);
 
-#endif
+#endif // HOMM2_BASE_SAMPLEDATA_H

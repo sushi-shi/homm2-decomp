@@ -1,5 +1,5 @@
-#ifndef HOMM2_FINDPATH_H
-#define HOMM2_FINDPATH_H
+#ifndef HOMM2_SOURCE_FINDPATH_H
+#define HOMM2_SOURCE_FINDPATH_H
 
 #include <Domains.h>
 #include <SOURCE/kbTypes.h>
@@ -21,4 +21,4 @@ i32 CalcTerrainCost(
     i32 destinationHasRoad
 );
 
-#endif
+#endif // HOMM2_SOURCE_FINDPATH_H

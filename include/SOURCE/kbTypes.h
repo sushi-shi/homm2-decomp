@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_KB_TYPES_H
-#define HOMM2_SOURCE_KB_TYPES_H
+#ifndef HOMM2_SOURCE_KBTYPES_H
+#define HOMM2_SOURCE_KBTYPES_H
 
 #include <match.h>
 #include <Domains.h>
@@ -951,4 +951,4 @@ H2_ENUM_BEGIN(DwellingLayoutConstant)
     DWELLING_TYPE_COUNT = 12,
 H2_ENUM_END(DwellingLayoutConstant)
 
-#endif
+#endif // HOMM2_SOURCE_KBTYPES_H

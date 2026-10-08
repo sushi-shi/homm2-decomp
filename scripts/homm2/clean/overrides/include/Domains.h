@@ -435,4 +435,4 @@ private:
         return static_cast<i32>(value) + offset;                                                   \
     }
 
-#endif
+#endif // HOMM2_DOMAINS_H

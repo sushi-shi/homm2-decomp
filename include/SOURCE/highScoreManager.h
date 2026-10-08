@@ -67,4 +67,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(highScoreManager, 0x63);
-#endif
+#endif // HOMM2_SOURCE_HIGHSCOREMANAGER_H

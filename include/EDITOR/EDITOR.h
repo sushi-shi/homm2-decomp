@@ -225,4 +225,4 @@ void DelayTicks(i32 ticks);
 void ShowStatusText(H2_CONST char* text);
 void ClearStatusText(void);
 
-#endif
+#endif // HOMM2_EDITOR_EDITOR_H

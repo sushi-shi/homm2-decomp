@@ -23,4 +23,4 @@ public:
 };
 #pragma pack(pop)
 SIZE(townObject, 0x18);
-#endif
+#endif // HOMM2_SOURCE_TOWNOBJECT_H
