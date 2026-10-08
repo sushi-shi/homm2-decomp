@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_KB_TYPES_H
 #define HOMM2_SOURCE_KB_TYPES_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/combatTypes.h>
 
 class sample;

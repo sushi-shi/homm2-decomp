@@ -1,7 +1,9 @@
 #ifndef HOMM2_SOURCE_ADVMANAGER_H
 #define HOMM2_SOURCE_ADVMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <BASE/widget.h>
 #include <SOURCE/ADVMGR.h>

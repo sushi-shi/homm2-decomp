@@ -2,7 +2,7 @@
 #define HOMM2_KBWIN_H
 
 #include <SOURCE/KB_TYPES.h>
-#include <va.h>
+#include <Domains.h>
 #include <windows.h>
 
 H2_ENUM_BEGIN(KbWinConstant)

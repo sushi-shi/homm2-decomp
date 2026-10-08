@@ -1,7 +1,8 @@
 #ifndef HOMM2_CURSOR_H
 #define HOMM2_CURSOR_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_BEGIN(CursorConstant)

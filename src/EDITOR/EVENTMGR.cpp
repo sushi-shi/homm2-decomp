@@ -3,7 +3,7 @@
 // generator's settings. The unit name EVENTMGR is descriptive: no retail
 // assertion names it; Open stores the class name "eventsManager".
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/EVENTMGR.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>

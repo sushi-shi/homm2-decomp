@@ -135,7 +135,7 @@ Every entry point keeps `homm2.core.usage.logged` (`homm2 audit usage`).
   `class`, `struct`, `extern`, or forward declarations in `.cpp` files. A
   `typedef enum` used by exactly one TU is private and lives in that `.cpp`;
   shared enum domains live in the owner header.
-- Reconstructed game integers use `Ints.h` aliases from `i8`/`u8` through
+- Reconstructed game integers use `H2/Ints.h` aliases from `i8`/`u8` through
   `i64`/`u64`; plain `char` remains textual. Use `i32l`/`u32l` only where retail
   `long` type identity is proven to affect C++ ABI behavior, and keep native SDK
   aliases at external API boundaries. The build assertion rejects raw integer

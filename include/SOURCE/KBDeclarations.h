@@ -1,6 +1,7 @@
 #ifndef HOMM2_KB_DECLARATIONS_H
 #define HOMM2_KB_DECLARATIONS_H
 
+#include <Domains.h>
 #include <SOURCE/KBForward.h>
 #include <BASE/WINMGR.h>
 #include <BASE/dialog.h>

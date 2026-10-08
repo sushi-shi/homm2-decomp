@@ -1,7 +1,8 @@
 #ifndef HOMM2_GAME_H
 #define HOMM2_GAME_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/KB_TYPES.h>

@@ -258,7 +258,7 @@ the full rules.
   C++ cast explicitly.
 - Prefer repository naming over secondary projects. Use named constants instead of magic
   numbers.
-- Use the fixed-width aliases from `Ints.h` throughout reconstructed game code: `i8`/`u8`
+- Use the fixed-width aliases from `H2/Ints.h` throughout reconstructed game code: `i8`/`u8`
   through `i64`/`u64`. Plain `char` remains the text character type. Reserve `i32l`/`u32l`
   for proven retail `long` declarations whose distinct C++ type identity affects mangling or
   overload resolution, and retain SDK aliases such as `DWORD`, `WPARAM`, and `U32` at external

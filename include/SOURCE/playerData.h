@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/hero.h>
 

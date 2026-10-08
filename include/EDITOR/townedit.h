@@ -4,8 +4,8 @@
 // The town editor (src/EDITOR/townedit.cpp, townedit.bin):
 // eventsManager::EditTown, FillInTownEdit and the dialog handler.
 
-#include <va.h>
-#include <Ints.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/EVENTS.h>

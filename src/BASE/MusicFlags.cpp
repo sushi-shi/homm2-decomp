@@ -1,4 +1,4 @@
-#include <va.h>
+#include <match.h>
 #include <BASE/MusicFlags.h>
 
 DATA(0x0051f550) u8 gMusicFeatureEnabled = 1;

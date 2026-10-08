@@ -77,8 +77,8 @@ RETIRED = "-"
 _IDENTIFIER = re.compile(r"[A-Za-z_]\w*")
 _SOURCE_SUFFIXES = (".h", ".hpp", ".inl", ".c", ".cpp")
 
-#: Ints.h holds the H2_ENUM_* machinery; its macro parameters are not domains.
-_ENUM_MACHINERY = "include/Ints.h"
+#: Domains.h holds the H2_ENUM_* machinery; its macro parameters are not domains.
+_ENUM_MACHINERY = "include/Domains.h"
 _MACRO_BLOCK = re.compile(
     r"\bH2_ENUM_(BEGIN|CLASS_BEGIN_SPLIT|CLASS_BEGIN_T|CLASS_BEGIN)"
     r"\(\s*(\w+)\s*(?:,\s*(\w+)\s*)?\)(?P<body>.*?)"

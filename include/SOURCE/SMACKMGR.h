@@ -1,7 +1,8 @@
 #ifndef HOMM2_SMACKMGR_H
 #define HOMM2_SMACKMGR_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <smack.h>
 #include <mss.h>
 

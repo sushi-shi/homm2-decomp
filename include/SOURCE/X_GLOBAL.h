@@ -4,7 +4,8 @@
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/CONFIG_TYPES.h>
 #include <SOURCE/REMOTE_TYPES.h>
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/combatTypes.h>
 #include <SOURCE/dimPalette.h>

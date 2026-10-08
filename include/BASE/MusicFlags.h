@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_MUSICFLAGS_H
 #define HOMM2_BASE_MUSICFLAGS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 // Buka-added music-path state: Midi publishes these directly on startup and
 // shutdown, so they are module globals rather than MusicFlags-private state.

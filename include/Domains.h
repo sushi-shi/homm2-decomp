@@ -1,7 +1,9 @@
-#ifndef HOMM2_INTS_H
-#define HOMM2_INTS_H
+#ifndef HOMM2_DOMAINS_H
+#define HOMM2_DOMAINS_H
 
-// Modern compilers use real enum domains; retail MSVC 4.2 retains its integer ABI.
+#include <H2/Ints.h>
+
+// Modern compilers use real enum domains; retail VC6 retains its integer ABI.
 // Derive this from the required language support rather than a compiler name or build flag.
 #if defined(__cplusplus) && __cplusplus >= 202002L
 #define H2_STRICT_ENUMS 1
@@ -18,31 +20,6 @@
 #define H2_RETAIL_INLINE inline
 #define H2_ZERO_INIT {0}
 #endif
-
-typedef signed char i8;
-typedef unsigned char u8;
-typedef short i16;
-typedef unsigned short u16;
-typedef int i32;
-typedef unsigned int u32;
-typedef long i32l;
-typedef unsigned long u32l;
-typedef __int64 i64;
-typedef unsigned __int64 u64;
-
-#ifndef NULL
-#define NULL 0
-#endif
-
-// Boolean-int aliases for retail's integer boolean fields. VC6 has a real
-// `bool` with real `true`/`false` keywords, and the distinction is byte-visible:
-// an int-valued `c ? true : false` materialises a 32-bit temp (`xor reg,reg`
-// before the `setcc`), a bool-valued one materialises a byte.
-typedef i32 b32;
-typedef i8 b8;
-// Boolean storage whose proven retail C++ type is plain char. Unlike b8, this
-// preserves decorated global-symbol identity as well as byte width.
-typedef char bchar;
 
 // Modern builds type-check domains; the retail MSVC build keeps the integer ABI.
 #if H2_STRICT_ENUMS
@@ -536,4 +513,4 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_INDEX_OFFSET(name)
 #endif
 
-#endif
+#endif // HOMM2_DOMAINS_H

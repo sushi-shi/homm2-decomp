@@ -1,7 +1,7 @@
 #ifndef HOMM2_COMMAND_H
 #define HOMM2_COMMAND_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/REMOTE_TYPES.h>
 

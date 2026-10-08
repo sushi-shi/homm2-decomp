@@ -5,8 +5,7 @@
 // eventsManager::EditEvent, FillInEventEdit and the dialog handler. The
 // dialog shows a map event's rows (isMapEvent) or a time event's.
 
-#include <va.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 

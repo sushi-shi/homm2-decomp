@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_HEROWINDOW_H
 #define HOMM2_BASE_HEROWINDOW_H
 
-#include <va.h>
+#include <Domains.h>
 #include <BASE/message.h>
 
 class widget;

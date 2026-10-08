@@ -4,7 +4,8 @@
 #include <windows.h>
 #include <ddraw.h>
 #include <wing.h>
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/display.h>
 
 H2_ENUM_BEGIN(WingraphConstant)

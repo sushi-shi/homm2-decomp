@@ -1,7 +1,7 @@
 #ifndef HOMM2_ICONF2BY_H
 #define HOMM2_ICONF2BY_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 #if H2_STRICT_ENUMS
 #include <BASE/IconDraw.h>

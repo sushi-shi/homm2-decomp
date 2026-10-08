@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_MOUSEMANAGER_H
 #define HOMM2_BASE_MOUSEMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <windows.h>
 #include "baseManager.h"
 

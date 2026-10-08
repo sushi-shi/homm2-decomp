@@ -1,7 +1,7 @@
 #ifndef HOMM2_VIEW_H
 #define HOMM2_VIEW_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/combatTypes.h>
 

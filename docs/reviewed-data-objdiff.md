@@ -2,7 +2,7 @@
 
 ## The source `DATA()` claim channel
 
-`include/va.h` defines `DATA(addr)` beside `VA(addr, size)`: an absolute VA
+`include/match.h` defines `DATA(addr)` beside `VA(addr, size)`: an absolute VA
 (`RVA + 0x400000`, eight hex digits) written in front of the global's
 **definition** in its owner `.cpp`. Under the compiler it expands to nothing;
 under Clang it expands to an `annotate` attribute, purely so a marker written

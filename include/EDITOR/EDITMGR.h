@@ -5,7 +5,7 @@
 // EDITMGR.CPP): its free functions and data. The class itself is
 // editManager (editManager.h).
 
-#include <va.h>
+#include <Domains.h>
 #include <stdio.h>
 #include <BASE/message.h>
 #include <SOURCE/REQUEST.h>

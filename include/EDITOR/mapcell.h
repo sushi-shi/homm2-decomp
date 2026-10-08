@@ -1,8 +1,8 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
 
-#include <va.h>
-#include <Ints.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 // mapCell::m_flags: the ground tile's flips, the water cells along a shore

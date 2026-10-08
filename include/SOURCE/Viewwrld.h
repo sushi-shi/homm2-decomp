@@ -1,6 +1,7 @@
 #ifndef HOMM2_VIEWWRLD_H
 #define HOMM2_VIEWWRLD_H
 
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/KB_TYPES.h>
 

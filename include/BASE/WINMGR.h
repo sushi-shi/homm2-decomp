@@ -1,7 +1,7 @@
 #ifndef HOMM2_WINMGR_H
 #define HOMM2_WINMGR_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN(WindowColorCycleMode)
     WINDOW_COLOR_CYCLE_DEFAULT          = 0,

@@ -86,7 +86,7 @@ def _matching_token(tokens: list[Token], start: int, opening: str, closing: str)
 
 
 def parse_enum_declarations(path: Path, text: str | None = None) -> list[EnumDeclaration]:
-    if path.name == "Ints.h":
+    if path.name == "Domains.h":
         return []
     text = path.read_text(errors="replace") if text is None else text
     tokens = lex(text)

@@ -1,7 +1,7 @@
 #ifndef HOMM2_DPNETWIN_H
 #define HOMM2_DPNETWIN_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <windows.h>
 #include <dplay.h>
 #include <SOURCE/REMOTE_TYPES.h>

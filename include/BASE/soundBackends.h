@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_SOUNDBACKENDS_H
 #define HOMM2_BASE_SOUNDBACKENDS_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <audiere.h>
 
 class sample;

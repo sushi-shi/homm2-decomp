@@ -1,7 +1,7 @@
 #ifndef HOMM2_SETUP_H
 #define HOMM2_SETUP_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <BASE/dialog.h>
 #include <SOURCE/REMOTE_TYPES.h>

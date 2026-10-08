@@ -3,7 +3,7 @@
 // resource (x_spedit.bin); descriptive names: EditSpellScroll,
 // EditSpellScrollHandler, gSpellScrollChoice.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/x_spedit.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>

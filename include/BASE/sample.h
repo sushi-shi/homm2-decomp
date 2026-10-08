@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_SAMPLE_H
 #define HOMM2_BASE_SAMPLE_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/resource.h>
 #include <BASE/sampleData.h>
 

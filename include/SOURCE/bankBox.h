@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_BANKBOX_H
 #define HOMM2_SOURCE_BANKBOX_H
 
-#include <va.h>
+#include <match.h>
 
 class heroWindow;
 class playerData;

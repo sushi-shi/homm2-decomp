@@ -1,7 +1,9 @@
 #ifndef HOMM2_SOURCE_COMBATMANAGER_H
 #define HOMM2_SOURCE_COMBATMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <BASE/WINMGR.h>
 #include <BASE/icon.h>

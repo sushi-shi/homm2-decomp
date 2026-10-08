@@ -116,7 +116,7 @@ map, and normalization can make different raw identities comparable by design.
 ### 9. `fixed-width-ints` — explicit game integer widths
 
 Reconstructed code under `src/{SOURCE,BASE,EDITOR}` and
-`include/{SOURCE,BASE,EDITOR}` uses `i8`/`u8` through `i64`/`u64` from `Ints.h`
+`include/{SOURCE,BASE,EDITOR}` uses `i8`/`u8` through `i64`/`u64` from `H2/Ints.h`
 instead of raw signed and unsigned integer keywords. This makes storage and APIs retain their
 intended widths when the game is ported away from the 32-bit MSVC data model. Plain `char` remains
 the text character type. Win32, CRT, and vendored SDK headers retain their native ABI spellings and

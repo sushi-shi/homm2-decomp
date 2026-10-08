@@ -1,7 +1,7 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
 
-#include <va.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>

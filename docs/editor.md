@@ -37,7 +37,7 @@ through `config/retail/editor/placements.tsv`.
 
 A body only the editor compiles from a shared unit (an `#ifdef HOMM2_EDITOR`
 variant or an editor-only method) carries `VA_AT(editor, addr, size)` instead
-(`include/va.h`); the editor's labels take it ahead of placements. The game
+(`include/match.h`); the editor's labels take it ahead of placements. The game
 ignores those lines, the editor's retained maxima fingerprint them as its own
 `VA` markers, and the clean export drops them. Header walks (`globals-data`)
 follow only the `#include`s an image compiles (`homm2.manifest.image_lines`).

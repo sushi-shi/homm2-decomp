@@ -4,7 +4,7 @@
 // lists of time events and rumours. The unit name comes from its dialog
 // resource (specedit.bin); every name in it is descriptive.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/specedit.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>

@@ -1,7 +1,8 @@
 #ifndef HOMM2_REMOTE_SAVE_H
 #define HOMM2_REMOTE_SAVE_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
 H2_ENUM_BEGIN(RemoteSaveLayoutConstant)

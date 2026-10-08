@@ -1,7 +1,7 @@
 #ifndef HOMM2_HERO_H
 #define HOMM2_HERO_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 
 struct tag_message;

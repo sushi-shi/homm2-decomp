@@ -5,8 +5,7 @@
 // Editor\RANDOM.CPP): editManager methods that paint terrain, lay mountain
 // and tree chains and place towns, objects and treasure.
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 
 struct overlayType;
 

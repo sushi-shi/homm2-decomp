@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_PHILAI_H
 #define HOMM2_SOURCE_PHILAI_H
 
-#include <va.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/hero.h>
 

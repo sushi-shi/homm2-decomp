@@ -10,8 +10,9 @@ generator performs those expansions ahead of time and emits ordinary C++.
   overrides/        files macro expansion CANNOT produce, supplied verbatim
   project/          the build system the generated tree needs, copied verbatim
 
-overrides/ is small and load-bearing. include/Ints.h is the dual-build switch
+overrides/ is small and load-bearing. include/Domains.h is the dual-build switch
 itself, so it cannot select itself away; the override is single-branch C++20.
+include/H2/Ints.h takes the standard fixed-width types.
 The bit primitives and tile blitter are ordinary reconstructed C++ in the
 matching tree and pass through the normal generator.
 

@@ -100,9 +100,11 @@ DROPPED = "\x01"
 # See docs/clean-source.md.
 # --------------------------------------------------------------------------
 
-# Supplied verbatim rather than derived; va.h is pure annotation machinery.
+# Supplied verbatim rather than derived. match.h is pure annotation machinery
+# and H2/Macros.h holds macros the rules below resolve at each use; the tree
+# omits both, and every `#include` of them.
 OVERRIDE_DIR = REPO / "scripts/homm2/clean/overrides"
-DROP_FILES = {"include/va.h"}
+DROP_FILES = {"include/match.h", "include/H2/Macros.h"}
 
 # The frozen 1996 source path, and the `#line` markers that pinned the retail compiler's
 # /Gi __LINE__ variables to retail values.
@@ -174,7 +176,8 @@ CLEAN_IDENTIFIER_REWRITES = {
 
 # --------------------------------------------------------------------------
 # Rules: each maps a macro invocation to its production expansion or its strict
-# typed form. Keep in step with include/va.h and include/Ints.h.
+# typed form. Keep in step with include/match.h, include/Domains.h and
+# include/H2/Macros.h.
 # --------------------------------------------------------------------------
 
 def _drop(args: list[str]) -> str:
@@ -424,6 +427,7 @@ WORD_RULES = {
     "H2_RETAIL_INLINE": "",
     "H2_ZERO_INIT": "{}",
     "OVERRIDE": "override",
+    "H2_C_LINKAGE": 'extern "C"',
 
     "__cdecl": "__cdecl",
     "__stdcall": "__stdcall",
@@ -435,12 +439,14 @@ WORD_RULES = {
     "register": "",
 }
 
-# `va.h` supplies the annotation macros and, transitively, the integer aliases.
-# With the annotations gone only the aliases are still needed.
+# `match.h` supplies the annotation macros and, transitively, the integer
+# aliases. With the annotations gone only the aliases are still needed.
 INCLUDE_REWRITES = {
-    "<va.h>": "<Ints.h>",
-    '"va.h"': '"Ints.h"',
+    "<match.h>": "<H2/Ints.h>",
+    '"match.h"': '"H2/Ints.h"',
 }
+# H2/Macros.h has nothing left once its macros are resolved.
+INCLUDE_DROPS = {"<H2/Macros.h>", '"H2/Macros.h"'}
 
 
 # --------------------------------------------------------------------------
@@ -776,6 +782,9 @@ def rewrite_directives(text: str) -> str:
                 continue
 
             if name == "include":
+                if target in INCLUDE_DROPS:
+                    i += 1
+                    continue
                 for old, new in INCLUDE_REWRITES.items():
                     if old in line:
                         line = line.replace(old, new)
@@ -1115,7 +1124,7 @@ def classic_domains(schema_root: Path = REPO) -> dict[str, str]:
         for path in sorted((schema_root / tier).rglob("*")):
             if not path.is_file() or path.suffix not in (".h", ".cpp"):
                 continue
-            if path == schema_root / "include/Ints.h":
+            if path == schema_root / "include/Domains.h":
                 continue
             for macro, args in _macro_calls(path.read_text(), set(CLASSIC_DOMAIN_MACROS)):
                 name = args[0].strip()
@@ -1235,7 +1244,7 @@ def _classic_ints(text: str) -> str:
     start = text.find("template <typename T>\ninline constexpr bool H2IsMaskLike")
     end = text.rfind("#endif")
     if start < 0 or end < start:
-        raise SystemExit("include/Ints.h no longer has the expected strict type block")
+        raise SystemExit("include/Domains.h no longer has the expected strict type block")
     text = text[:start] + text[end:]
     text = text.replace("#include <type_traits>\n", "")
     return tidy(text).rstrip("\n") + "\n"
@@ -1330,7 +1339,7 @@ def classicize(
     relative: str = "",
     modern_enums: dict[str, tuple[str, tuple[str, ...]]] | None = None,
 ) -> str:
-    if relative == "include/Ints.h":
+    if relative == "include/Domains.h":
         return _classic_ints(text)
 
     for name, storage in sorted(domains.items(), key=lambda item: -len(item[0])):

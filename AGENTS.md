@@ -27,7 +27,7 @@ byte-identical to retail.
 
 - Ordinary C++ with real types. No decompiler output, byte blobs, naked
   assembly, dummy bodies, address masking, C-style casts, or compiler-state
-  steering in retained source; game code uses the `Ints.h` aliases.
+  steering in retained source; game code uses the `H2/Ints.h` aliases.
 - One TU is `src/<TIER>/<TU>.cpp` with its declarations in
   `include/<TIER>/<TU>.h`, functions in retail-RVA order, marked `VA(...)`,
   globals `DATA(...)`, vtables `VTBL`/`VTBL2`. Data identities, types and

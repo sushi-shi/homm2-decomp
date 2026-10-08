@@ -8,8 +8,9 @@
 // generator. Descriptive names: every member, function and datum but the
 // class name.
 
-#include <va.h>
-#include <Ints.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 
 class border;

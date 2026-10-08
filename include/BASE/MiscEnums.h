@@ -1,7 +1,7 @@
 #ifndef HOMM2_MISC_ENUMS_H
 #define HOMM2_MISC_ENUMS_H
 
-#include <va.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN(CDRomSetupResult)
     CD_ROM_READY                  = 0,

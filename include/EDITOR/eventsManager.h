@@ -10,7 +10,9 @@
 // (EVENTMGR.h). This header also holds the vocabulary every object dialog
 // shares.
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <BASE/dialog.h>
 #include <BASE/message.h>

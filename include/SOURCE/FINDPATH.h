@@ -1,7 +1,7 @@
 #ifndef HOMM2_FINDPATH_H
 #define HOMM2_FINDPATH_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 // MapDirection bit sets: a move north (north-west, north, north-east) leaves

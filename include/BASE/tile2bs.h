@@ -1,7 +1,7 @@
 #ifndef HOMM2_TILE2BS_H
 #define HOMM2_TILE2BS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 class bitmap;
 class tileset;

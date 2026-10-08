@@ -4,8 +4,7 @@
 // The rumour editor (src/EDITOR/rumredit.cpp, rumredit.bin):
 // eventsManager::EditRumour, its fill-in and its dialog handler.
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/EVENTS.h>
 

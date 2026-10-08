@@ -2,7 +2,8 @@
 #define HOMM2_TOWNMGR_H
 
 #include <BASE/dialog.h>
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>

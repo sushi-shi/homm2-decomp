@@ -11,7 +11,7 @@
 // gGenerateUnseen, gGeneratingMap, gRandomMapPlayers, the gUnusedData
 // holders of unreferenced retail storage, and the editor table names.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/EDITOR.h>
 #include <BASE/MiscEnums.h>
 #include <EDITOR/clearManager.h>

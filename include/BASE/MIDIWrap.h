@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_MIDIWRAP_H
 #define HOMM2_BASE_MIDIWRAP_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/resource.h>
 
 #pragma pack(push, 1)

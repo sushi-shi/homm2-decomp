@@ -4,7 +4,7 @@
 // gSphinx, gSphinxText. FillInSphinxEdit takes the name of the Price of
 // Loyalty editor's FillInEventEdit family.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/ridledit.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>

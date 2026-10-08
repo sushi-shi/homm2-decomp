@@ -3,7 +3,7 @@
 // the game's SETUP.cpp handlers. Descriptive names: SetupMapSize, the three
 // handlers but BaseSetupHandler, gNewMapSize, gNewRandomMap.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/setup.h>
 #include <EDITOR/EDITOR.h>
 #include <BASE/dialog.h>

@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_WIDGET_KIND_H
 #define HOMM2_BASE_WIDGET_KIND_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(WidgetKind, i16)
     WIDGET_KIND_NONE          = 0,

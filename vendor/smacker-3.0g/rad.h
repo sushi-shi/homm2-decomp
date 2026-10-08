@@ -42,8 +42,8 @@
 /*
  * RAD's fixed-width aliases.  The retail rad.h `#define`s these (u32 ==
  * `unsigned long`); we use benign typedefs whose UNDERLYING types are chosen
- * to be *identical* to include/Ints.h's (u8/u16/u32) so that both headers can
- * appear in one TU without a typedef-redefinition error (C++ permits an
+ * to be *identical* to include/H2/Ints.h's (u8/u16/u32) so that both headers
+ * can appear in one TU without a typedef-redefinition error (C++ permits an
  * identical typedef repeat, but not `#define u32 ...` over Ints.h's typedef).
  * On this target `unsigned int` == `unsigned long` (4 bytes) and every Smacker
  * export has C linkage, so the int-vs-long choice is codegen- and symbol-

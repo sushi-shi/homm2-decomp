@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_ICONWIDGET_H
 #define HOMM2_BASE_ICONWIDGET_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include "IconDraw.h"
 #include "widget.h"
 

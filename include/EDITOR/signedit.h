@@ -5,8 +5,7 @@
 // its fill-in and its dialog handler. It reuses the rumour dialog
 // (rumredit.bin).
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/EVENTS.h>
 

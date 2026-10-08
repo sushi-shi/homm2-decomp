@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_MIDI_H
 #define HOMM2_BASE_MIDI_H
 
-#include <va.h>
+#include <H2/Ints.h>
 
 // The MIDI backend mirrors the Audiere one in soundBackends.h: free functions
 // that take the sound manager's music-track and fade-step members by

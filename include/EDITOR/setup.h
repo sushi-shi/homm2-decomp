@@ -5,8 +5,7 @@
 // screen (stpemain.bin), the new-map choice (stpenew.bin) and its map size
 // (stpesize.bin). The unit began as a copy of the game's SETUP.cpp handlers.
 
-#include <va.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/SETUP.h>
 

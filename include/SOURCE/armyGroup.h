@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_ARMYGROUP_H
 #define HOMM2_SOURCE_ARMYGROUP_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 class hero;

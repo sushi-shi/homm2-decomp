@@ -1,7 +1,8 @@
 #ifndef HOMM2_WSNETWIN_H
 #define HOMM2_WSNETWIN_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/GAME.h>
 #include <winsock.h>
 #include <SOURCE/REMOTE_TYPES.h>

@@ -1,7 +1,7 @@
 #ifndef HOMM2_NETBIOS_H
 #define HOMM2_NETBIOS_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosSetupState, i8)
     SETUP_INITIALIZE          = 0,

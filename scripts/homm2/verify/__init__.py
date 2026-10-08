@@ -50,7 +50,7 @@ GATES = {
     "vtables": ([PY, "-m", "homm2.verify.vtables"],
                 "source-owned vtable identities"),
     "fixed-width-ints": ([PY, "-m", "homm2.verify.fixed_width_ints"],
-                         "game code uses the Ints.h aliases"),
+                         "game code uses the H2/Ints.h aliases"),
     "usage": ([PY, "-m", "homm2.audit.usage"],
               "every tooling entry point keeps usage logging"),
     "decls": ([PY, "-m", "homm2.verify.decls"],

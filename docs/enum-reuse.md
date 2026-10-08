@@ -12,7 +12,7 @@ A key is one named constant:
 - an enum member: every `H2_ENUM_BEGIN`, `H2_ENUM_CLASS_BEGIN`,
   `H2_ENUM_CLASS_BEGIN_T` and `H2_ENUM_CLASS_BEGIN_SPLIT` block and every raw
   `enum` block under `include/` and `src/{BASE,SOURCE,EDITOR}` (the macro
-  machinery in `include/Ints.h` is skipped);
+  machinery in `include/Domains.h` is skipped);
 - an object-like `#define` whose body is an integer constant expression; and
 - a `const` or `static const` integer (or enum-typed) variable with a constant
   initializer, at namespace, class or function scope.

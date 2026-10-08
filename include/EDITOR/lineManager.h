@@ -7,7 +7,8 @@
 // stream tile its marked neighbours call for (line.h). Open stores the
 // class name "lineManager".
 
-#include <va.h>
+#include <match.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <EDITOR/line.h>
 

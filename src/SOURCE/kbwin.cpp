@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <va.h>
+#include <match.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>

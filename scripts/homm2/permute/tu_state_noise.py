@@ -79,7 +79,7 @@ SAFE_SCALAR_TYPES = ("char", "unsigned char", "short", "unsigned short", "int", 
 SAFE_CALLING_CONVENTIONS = ("__cdecl", "__fastcall", "__stdcall")
 CURATED_INCLUDES = (
     "<stddef.h>", "<limits.h>", "<string.h>", "<stdlib.h>",
-    "<va.h>", "<Ints.h>", "<windows.h>", "<BASE/bitmap.h>",
+    "<match.h>", "<Domains.h>", "<windows.h>", "<BASE/bitmap.h>",
     "<BASE/IconEntry.h>", "<BASE/WINMGR.h>",
 )
 DEFAULT_COMPILE_TIMEOUT_SECONDS = 120.0

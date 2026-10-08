@@ -12,7 +12,7 @@ Measured on `advManager::RecruitSiteEvent` (RVA 0x42952) and `advManager::Generi
 (RVA 0x42256); the same three instructions are still visible in `philAI::EvaluateGenericSite`
 (RVA 0x8aacf), which uses the same macro.
 
-The macro is `H2_ENUM_DECODE_MASKED` from `include/Ints.h`; its production (non-strict)
+The macro is `H2_ENUM_DECODE_MASKED` from `include/Domains.h`; its production (non-strict)
 expansion is
 
 ```c

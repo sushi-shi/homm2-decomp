@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DISPLAY_H
 #define HOMM2_BASE_DISPLAY_H
 
-#include <va.h>
+#include <Domains.h>
 
 // Logical framebuffer coordinates, before scaling to the live client window.
 // Adventure/combat subviews retain their own clipping extents.

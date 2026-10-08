@@ -1,7 +1,7 @@
 // The eraser tool (clearManager). The unit name CLEARMGR is descriptive: no
 // retail assertion names it; Open stores the class name "clearManager".
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/clearManager.h>
 #include <EDITOR/editManager.h>
 #include <BASE/heroWindow.h>

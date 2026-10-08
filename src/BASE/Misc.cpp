@@ -1,5 +1,5 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
-#include <va.h>
+#include <match.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 #include <SOURCE/kbwin.h>

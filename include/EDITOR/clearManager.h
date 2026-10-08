@@ -5,7 +5,9 @@
 // manager while the eraser is selected. The unit name CLEARMGR is descriptive;
 // Open stores the class name "clearManager".
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <EDITOR/editManager.h>
 

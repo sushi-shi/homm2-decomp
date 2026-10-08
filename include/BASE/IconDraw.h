@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_ICONDRAW_H
 #define HOMM2_BASE_ICONDRAW_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN(IconDrawClipMode)
     ICON_DRAW_NO_CLIP = 0,

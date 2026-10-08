@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_EXECUTIVE_H
 #define HOMM2_BASE_EXECUTIVE_H
 
-#include <va.h>
+#include <match.h>
 
 class baseManager;
 

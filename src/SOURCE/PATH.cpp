@@ -1,4 +1,4 @@
-#include <va.h>
+#include <match.h>
 #include <SOURCE/army.h>
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>

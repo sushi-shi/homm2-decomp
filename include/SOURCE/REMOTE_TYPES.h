@@ -1,7 +1,8 @@
 #ifndef HOMM2_REMOTE_TYPES_H
 #define HOMM2_REMOTE_TYPES_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 
 H2_ENUM_BEGIN(RemoteMessageLayoutConstant)
     REMOTE_MESSAGE_SIZE         = 256,

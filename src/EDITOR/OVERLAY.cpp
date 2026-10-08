@@ -2,7 +2,7 @@
 // The unit name comes from the Price of Loyalty editor's assertion path
 // (overlay.cpp); Open stores the class name "overlayManager".
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/OVERLAY.h>
 #include <EDITOR/EDITMGR.h>
 #include <EDITOR/EDITOR.h>

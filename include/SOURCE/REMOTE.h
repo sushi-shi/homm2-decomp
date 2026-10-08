@@ -1,7 +1,8 @@
 #ifndef HOMM2_REMOTE_H
 #define HOMM2_REMOTE_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/REMOTE_TYPES.h>
 

@@ -6,7 +6,9 @@
 // for. InitMainClasses allocates 0xea2 bytes; the constructor, Open and Close
 // prove the member offsets.
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <EDITOR/EDITMGR.h>
 #include <EDITOR/EDITOR.h>

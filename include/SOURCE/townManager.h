@@ -1,7 +1,9 @@
 #ifndef HOMM2_SOURCE_TOWNMANAGER_H
 #define HOMM2_SOURCE_TOWNMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <SOURCE/KB_TYPES.h>
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reject raw integer type keywords in reconstructed game code.
 
-The project uses Ints.h aliases so recovered storage and APIs retain explicit widths
+The project uses H2/Ints.h aliases so recovered storage and APIs retain explicit widths
 when the game is ported away from 32-bit MSVC. SDK headers keep their native ABI
 spellings, and plain char remains the text/byte-string character type.
 """
@@ -137,7 +137,7 @@ def main(argv=None):
         print("\nFIXED-WIDTH INTEGER FAIL: %d raw spelling(s) in %d game file(s); "
               "use i8/u8 through i64/u64." % (total, bad_files))
         return 1
-    print("fixed-width integers OK: reconstructed game code uses Ints.h aliases.")
+    print("fixed-width integers OK: reconstructed game code uses H2/Ints.h aliases.")
     return 0
 
 

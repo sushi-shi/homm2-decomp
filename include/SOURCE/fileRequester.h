@@ -2,7 +2,9 @@
 #define HOMM2_SOURCE_FILEREQUESTER_H
 
 #include <BASE/dialog.h>
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <windows.h>
 #include <BASE/baseManager.h>
 

@@ -5,8 +5,7 @@
 // line.cpp): the line map the tools mark and the tiles each marked cell
 // takes. The tool manager itself is lineManager (lineManager.h).
 
-#include <va.h>
-#include <Ints.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_FORWARD_SPLIT(TilesetId, u8);
 

@@ -1,7 +1,7 @@
 #ifndef HOMM2_PHILAI_TU_H
 #define HOMM2_PHILAI_TU_H
 
-#include <va.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/GAME.h>
 

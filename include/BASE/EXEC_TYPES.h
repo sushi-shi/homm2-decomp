@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_EXEC_TYPES_H
 #define HOMM2_BASE_EXEC_TYPES_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 
 H2_ENUM_BEGIN(ExecutiveTextSlotSize)
     EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE = 0x3c,

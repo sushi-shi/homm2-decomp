@@ -1,7 +1,7 @@
 #ifndef HOMM2_KB_FORWARD_H
 #define HOMM2_KB_FORWARD_H
 
-#include <va.h>
+#include <Domains.h>
 #include <windows.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>

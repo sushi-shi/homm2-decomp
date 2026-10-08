@@ -1,7 +1,8 @@
 #ifndef HOMM2_EVENTS_TYPES_H
 #define HOMM2_EVENTS_TYPES_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <SOURCE/combatTypes.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/armyGroup.h>

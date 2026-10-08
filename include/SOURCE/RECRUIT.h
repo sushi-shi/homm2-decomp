@@ -1,7 +1,7 @@
 #ifndef HOMM2_RECRUIT_H
 #define HOMM2_RECRUIT_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 class heroWindow;

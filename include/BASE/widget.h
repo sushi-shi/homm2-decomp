@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_WIDGET_H
 #define HOMM2_BASE_WIDGET_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <BASE/widgetKind.h>
 

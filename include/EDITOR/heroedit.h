@@ -6,8 +6,8 @@
 // hero's dialog offers the hero's class where a free hero's offers its
 // patrol radius.
 
-#include <va.h>
-#include <Ints.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/ARMY.h>
 #include <SOURCE/EVENTS.h>

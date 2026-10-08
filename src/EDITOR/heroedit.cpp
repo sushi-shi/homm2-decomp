@@ -2,7 +2,7 @@
 // fill-in and its handler. The unit name is descriptive: the dialog
 // resource names it.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/heroedit.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>

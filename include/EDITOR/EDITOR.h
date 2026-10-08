@@ -6,8 +6,7 @@
 // and the application-menu hooks kbwin calls. It began as a copy of the
 // game's KB.cpp and keeps its names for what both programs define.
 
-#include <va.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/GAME.h>

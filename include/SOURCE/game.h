@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_GAME_H
 #define HOMM2_SOURCE_GAME_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>

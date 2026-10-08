@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_CONFIG_TYPES_H
 #define HOMM2_SOURCE_CONFIG_TYPES_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 
 #pragma pack(push, 1)
 struct exeGfxConfig {

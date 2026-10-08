@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_COMBATTYPES_H
 #define HOMM2_SOURCE_COMBATTYPES_H
 
-#include <va.h>
+#include <Domains.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CombatSide, i8)
     COMBAT_SIDE_NONE        = -1,

@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_BITMAP_H
 #define HOMM2_BASE_BITMAP_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/resource.h>
 
 H2_ENUM_CLASS_BEGIN_T(BitmapType, i16)

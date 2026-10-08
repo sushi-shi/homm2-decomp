@@ -60,7 +60,7 @@ static inline u32& FadeSavedUpdate(void) {
 }
 
 #undef DATA
-#include <va.h>
+#include <match.h>
 
 
 DATA(0x0053495c) i32 iCombatCycleFrame = 0;

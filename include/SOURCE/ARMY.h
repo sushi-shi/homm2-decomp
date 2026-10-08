@@ -1,7 +1,7 @@
 #ifndef HOMM2_ARMY_H
 #define HOMM2_ARMY_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)

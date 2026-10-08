@@ -31,8 +31,10 @@ homm2 clean \
 Metadata and codegen-steering rules reproduce the *production* expansion of
 their macros — the expansion the pinned MSVC already performs when building matching
 objects. The enum rules deliberately select the strict typed branch. Keep the
-rule table and its regression tests in step with `include/va.h` and
-`include/Ints.h`.
+rule table and its regression tests in step with `include/match.h`,
+`include/Domains.h` and `include/H2/Macros.h`. The tree omits `match.h` and
+`H2/Macros.h` and every `#include` of them; an `#include <match.h>` becomes
+`#include <H2/Ints.h>`, which keeps the integer aliases.
 
 Selecting the typed branch is the one choice the generator makes. Generated
 conversions in `GENERATED_PATCHES` bridge the few integer-only expressions

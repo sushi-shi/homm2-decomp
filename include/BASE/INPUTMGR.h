@@ -1,7 +1,7 @@
 #ifndef HOMM2_INPUTMGR_H
 #define HOMM2_INPUTMGR_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData);
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData);

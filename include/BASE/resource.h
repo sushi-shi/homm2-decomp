@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_RESOURCE_H
 #define HOMM2_BASE_RESOURCE_H
 
-#include <va.h>
+#include <Domains.h>
 
 #pragma pack(push, 1)
 H2_ENUM_CLASS_BEGIN_T(ResourceCategory, i16)

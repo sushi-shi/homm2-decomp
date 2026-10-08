@@ -1,7 +1,7 @@
 #ifndef HOMM2_EVENTS_H
 #define HOMM2_EVENTS_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <SOURCE/KB_TYPES.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/armyGroup.h>

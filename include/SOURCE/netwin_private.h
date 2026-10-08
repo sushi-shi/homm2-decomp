@@ -1,7 +1,7 @@
 #ifndef HOMM2_NETWIN_PRIVATE_H
 #define HOMM2_NETWIN_PRIVATE_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 #include <SOURCE/netwin.h>
 

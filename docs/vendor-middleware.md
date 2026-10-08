@@ -191,8 +191,8 @@ take only `Smack*`/`SmackSum*`/scalar args. The Win32-GDI-dependent `SmackBuffer
 `SmackBlit..` families (not imported by the EXE) are omitted so the header needs no
 `<windows.h>`. `rad.h` is a minimal Win32/MSVC slice of RAD's shared macros (`RADEXPFUNC`,
 `RADEXPLINK`, `u8`/`u16`/`u32`, …); its `u8`/`u16`/`u32` are benign typedefs whose
-underlying types match `include/Ints.h` so both can appear in one TU (the retail `rad.h`
-`#define`s them, which would collide with `Ints.h`'s typedefs).
+underlying types match `include/H2/Ints.h` so both can appear in one TU (the retail `rad.h`
+`#define`s them, which would collide with `H2/Ints.h`'s typedefs).
 
 ---
 
@@ -254,7 +254,7 @@ relationships are not expressible by the named C-stub technique. They are recons
 inputs, not a claim that the game developers linked an authored `.def` file. Every
 generated library remains a reproducible build product and is checked against retail.
 
-**Verification.** A scratch TU including all three headers alongside `Ints.h` and
+**Verification.** A scratch TU including all three headers alongside `H2/Ints.h` and
 `win/windows.h` compiles cleanly under the pinned MSVC (no typedef clashes, all signatures parse)
 and parses cleanly under clang in the editor dialect (originally verified on the PoL line
 with `--target=i386-pc-windows-msvc -fms-compatibility-version=10.20 -fms-extensions`;

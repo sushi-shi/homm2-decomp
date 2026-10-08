@@ -1,7 +1,8 @@
 #ifndef HOMM2_MISC_H
 #define HOMM2_MISC_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/message.h>
 
 H2_ENUM_CLASS_FORWARD(CDRomSetupResult);

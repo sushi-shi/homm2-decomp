@@ -5,8 +5,7 @@
 // map's name and description, difficulty, players, victory and loss
 // conditions, time events and rumours.
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 
 class heroWindow;

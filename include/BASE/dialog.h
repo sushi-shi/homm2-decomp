@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DIALOG_H
 #define HOMM2_BASE_DIALOG_H
 
-#include <va.h>
+#include <Domains.h>
 
 // Reserved window-record button slots. Each dialog assigns its own meaning
 // (close, cancel, accept, etc.); these IDs pass unchanged through widget messages.

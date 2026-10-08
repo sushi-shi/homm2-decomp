@@ -4,7 +4,7 @@
 // gRumour, gRumourText. FillInRumourEdit takes the name of the Price of
 // Loyalty editor's FillInEventEdit family.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/rumredit.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>

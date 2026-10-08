@@ -4,8 +4,7 @@
 // The spell scroll editor (src/EDITOR/x_spedit.cpp, x_spedit.bin):
 // eventsManager::EditSpellScroll and its dialog handler.
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 
 // The spell the open dialog's list has selected.

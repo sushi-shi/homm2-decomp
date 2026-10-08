@@ -2,7 +2,7 @@
 // fill-in and its handler. Retail evidence: the editor's evntedit.bin
 // resource and the Price of Loyalty editor's evntedit.cpp.
 
-#include <va.h>
+#include <match.h>
 #include <EDITOR/evntedit.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>

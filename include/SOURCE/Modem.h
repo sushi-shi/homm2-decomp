@@ -1,7 +1,8 @@
 #ifndef HOMM2_MODEM_H
 #define HOMM2_MODEM_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 
 void ModemSetup(i32 mode);
 i32l Dial(void);

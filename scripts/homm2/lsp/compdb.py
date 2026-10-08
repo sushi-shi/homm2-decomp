@@ -11,7 +11,7 @@ those headers as plain files - no wine, parse-only, never a real compile.
 
 Output: build/clangd/compile_commands.json   (git-ignored). The committed .clangd
 points clangd here via CompileFlags.CompilationDatabase. Each C++ [[unit]] in
-config/units.toml gets one entry; the entry supplies `/I include` (so `<va.h>` /
+config/units.toml gets one entry; the entry supplies `/I include` (so `<match.h>` /
 `<EDITOR/fullMap.h>` resolve) and `/imsvc` for the MSVC system headers.
 
 Run inside `nix develop .#build` (sets MSVC_DIR), or with MSVC_DIR pointed at the
@@ -109,7 +109,7 @@ def project_include_flags(repo: Path) -> list[str]:
 def base_flags(msvc_inc: Path, msvc_low: Path):
     """clang-cl flags shared by every unit. `/imsvc` = system header (diagnostics
     inside MSVC headers are silenced); `/I include` keeps OUR headers non-system so
-    real diagnostics in src/ still surface, and resolves `<va.h>`."""
+    real diagnostics in src/ still surface, and resolves `<match.h>`."""
     return [
         f"--target={TARGET}",
         f"-fms-compatibility-version={MSC_COMPAT}",
@@ -147,7 +147,7 @@ def main():
     OUT_FILE.write_text(json.dumps(entries, indent=2) + "\n")
     print(f"[clangd] wrote {OUT_FILE.relative_to(REPO)} ({len(entries)} units)")
     print(f"[clangd] MSVC headers: {msvc_inc}  (+ lowercase mirror {MIRROR_DIR}/msvc)")
-    print(f"[clangd] our headers : {REPO / 'include'}  (resolves <va.h>)")
+    print(f"[clangd] our headers : {REPO / 'include'}  (resolves <match.h>)")
     return 0
 
 

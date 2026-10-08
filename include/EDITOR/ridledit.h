@@ -4,8 +4,7 @@
 // The sphinx editor (src/EDITOR/ridledit.cpp, ridledit.bin):
 // eventsManager::EditSphinx, its fill-in and its dialog handler.
 
-#include <va.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/EVENTS.h>
 

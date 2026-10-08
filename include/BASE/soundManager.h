@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_SOUNDMANAGER_H
 #define HOMM2_BASE_SOUNDMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <stdio.h>
 #include "baseManager.h"
 

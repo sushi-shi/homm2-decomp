@@ -5,7 +5,9 @@
 // the tool manager while the terrain tool is selected. Open stores the class
 // name "terrainManager".
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <SOURCE/KB_TYPES.h>
 #include <EDITOR/editManager.h>

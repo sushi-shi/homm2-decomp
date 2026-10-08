@@ -1,7 +1,9 @@
 #ifndef HOMM2_BASE_INPUTMANAGER_H
 #define HOMM2_BASE_INPUTMANAGER_H
 
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
+#include <H2/Macros.h>
 #include "baseManager.h"
 #include <BASE/message.h>
 #include <BASE/display.h>

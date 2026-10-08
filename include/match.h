@@ -1,7 +1,13 @@
-#ifndef HOMM2_VA_H
-#define HOMM2_VA_H
+#ifndef HOMM2_MATCH_H
+#define HOMM2_MATCH_H
 
-#include <Ints.h>
+// Fixed-width integer aliases (H2/Ints.h). Every translation unit opens this
+// header first, so they are reachable everywhere.
+#include <H2/Ints.h>
+
+#ifndef NULL
+#define NULL 0
+#endif
 
 #if defined(_MSC_VER) && _MSC_VER == 1200 && !defined(__clang__)
 #define H2_RETAIL_COMPILER 1
@@ -37,7 +43,6 @@
     __attribute__((annotate("vtbl:" #cls " " #addr))) extern const char cls##_vt;
 #define VTBL2(cls, base, addr)                                                                     \
     __attribute__((annotate("vtbl2:" #cls " " #base " " #addr))) extern const char cls##_vt_##base;
-#define OVERRIDE override
 #define SIZE(type, bytes) static_assert(sizeof(type) == (bytes), "sizeof(" #type ") != " #bytes)
 
 // Where the same thing sits in the Buka target. Gold 2.1 moved code, data and
@@ -56,7 +61,6 @@
 #define DATA_COMPGEN_GUARD(addr, name, owner)
 #define VTBL(cls, addr)
 #define VTBL2(cls, base, addr)
-#define OVERRIDE
 
 #define SIZE(type, bytes)
 
@@ -65,4 +69,4 @@
 
 #endif
 
-#endif
+#endif // HOMM2_MATCH_H

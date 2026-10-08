@@ -1,7 +1,7 @@
 #ifndef HOMM2_CMBTMGR_H
 #define HOMM2_CMBTMGR_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 
 struct tag_message;

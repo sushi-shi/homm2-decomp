@@ -2,7 +2,8 @@
 #define HOMM2_COMWIN_H
 
 #include <windows.h>
-#include <va.h>
+#include <match.h>
+#include <Domains.h>
 #include <BASE/Misc.h>
 
 H2_ENUM_BEGIN(ComPortConstant)
