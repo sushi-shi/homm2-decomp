@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/evntedit.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>
@@ -10,7 +10,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <stdio.h>

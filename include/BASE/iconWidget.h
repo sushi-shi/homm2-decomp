@@ -1,9 +1,10 @@
 #ifndef HOMM2_BASE_ICONWIDGET_H
 #define HOMM2_BASE_ICONWIDGET_H
 
-#include <Ints.h>
-#include "IconDraw.h"
-#include "widget.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/IconDraw.h>
+#include <BASE/widget.h>
 
 struct tag_message;
 

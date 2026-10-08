@@ -1,10 +1,10 @@
-#ifndef HOMM2_DPNETWIN_H
-#define HOMM2_DPNETWIN_H
+#ifndef HOMM2_SOURCE_DPNETWIN_H
+#define HOMM2_SOURCE_DPNETWIN_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <windows.h>
 #include <dplay.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <BASE/Misc.h>
 #include <string.h>
 

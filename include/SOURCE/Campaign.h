@@ -1,8 +1,8 @@
-#ifndef HOMM2_CAMPAIGN_H
-#define HOMM2_CAMPAIGN_H
+#ifndef HOMM2_SOURCE_CAMPAIGN_H
+#define HOMM2_SOURCE_CAMPAIGN_H
 
 #include <BASE/dialog.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/KB.h>
 

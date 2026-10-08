@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/mapcell.h>
 #include <EDITOR/fullMap.h>
 #include <BASE/Misc.h>

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/bitmap.h>
@@ -13,8 +13,8 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/SMACKMGR.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/smackManager.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>

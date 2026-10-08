@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_SAMPLEDATA_H
 #define HOMM2_BASE_SAMPLEDATA_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 enum class SampleAudioFormat : i32 {
     FORMAT_MONO   = 0,

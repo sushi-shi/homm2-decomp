@@ -1,8 +1,9 @@
 #ifndef HOMM2_BASE_DIMMERWIDGET_H
 #define HOMM2_BASE_DIMMERWIDGET_H
 
-#include <Ints.h>
-#include "widget.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/widget.h>
 
 struct tag_message;
 

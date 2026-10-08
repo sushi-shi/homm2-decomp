@@ -1,9 +1,10 @@
 #ifndef HOMM2_BASE_MOUSEMANAGER_H
 #define HOMM2_BASE_MOUSEMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <windows.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 struct tag_message;
 class bitmap;

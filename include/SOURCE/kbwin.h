@@ -1,8 +1,8 @@
-#ifndef HOMM2_KBWIN_H
-#define HOMM2_KBWIN_H
+#ifndef HOMM2_SOURCE_KBWIN_H
+#define HOMM2_SOURCE_KBWIN_H
 
-#include <SOURCE/KB_TYPES.h>
-#include <Ints.h>
+#include <SOURCE/kbTypes.h>
+#include <Domains.h>
 #include <windows.h>
 
 typedef enum KbWinConstant {

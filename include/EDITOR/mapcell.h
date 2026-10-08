@@ -1,9 +1,9 @@
 #ifndef HOMM2_EDITOR_MAPCELL_H
 #define HOMM2_EDITOR_MAPCELL_H
 
-#include <Ints.h>
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 
 
 enum class MapCellFlag : i32 {

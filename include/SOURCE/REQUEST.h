@@ -1,8 +1,9 @@
-#ifndef HOMM2_REQUEST_H
-#define HOMM2_REQUEST_H
+#ifndef HOMM2_SOURCE_REQUEST_H
+#define HOMM2_SOURCE_REQUEST_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 
 typedef enum MapHeaderConstant {
     MAP_HEADER_SIZE                 = 0x1a4,

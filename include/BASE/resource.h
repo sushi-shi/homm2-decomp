@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_RESOURCE_H
 #define HOMM2_BASE_RESOURCE_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 #pragma pack(push, 1)
 enum class ResourceCategory : i16 {

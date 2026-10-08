@@ -1,7 +1,7 @@
-#ifndef HOMM2_NETBIOS_H
-#define HOMM2_NETBIOS_H
+#ifndef HOMM2_SOURCE_NETBIOS_H
+#define HOMM2_SOURCE_NETBIOS_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum class NetbiosSetupState : i8 {
     SETUP_INITIALIZE          = 0,

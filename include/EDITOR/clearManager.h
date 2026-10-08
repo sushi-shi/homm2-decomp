@@ -2,7 +2,8 @@
 #define HOMM2_EDITOR_CLEARMANAGER_H
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
 #include <EDITOR/editManager.h>
 

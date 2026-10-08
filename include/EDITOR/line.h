@@ -2,8 +2,7 @@
 #define HOMM2_EDITOR_LINE_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <Domains.h>
 
 enum class TilesetId : u8;
 

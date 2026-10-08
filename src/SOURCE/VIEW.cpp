@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/hero.h>
 #include <BASE/message.h>
 #include <stdio.h>

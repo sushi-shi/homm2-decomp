@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #define NCB_INCLUDED
 #include <windows.h>
 #include <stdarg.h>

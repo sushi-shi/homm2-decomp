@@ -2,8 +2,8 @@
 #define HOMM2_EDITOR_OVERLAY_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
 
 class border;

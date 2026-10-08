@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/icon.h>
 #include <BASE/IconDraw.h>
 #include <BASE/resource.h>

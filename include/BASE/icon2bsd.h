@@ -1,6 +1,7 @@
-#ifndef HOMM2_ICON2BSD_H
-#define HOMM2_ICON2BSD_H
+#ifndef HOMM2_BASE_ICON2BSD_H
+#define HOMM2_BASE_ICON2BSD_H
 
+#include <Domains.h>
 #include <BASE/IconDraw.h>
 
 class bitmap;

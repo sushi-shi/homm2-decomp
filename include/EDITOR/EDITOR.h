@@ -2,11 +2,10 @@
 #define HOMM2_EDITOR_EDITOR_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 typedef enum EditorStatusBar {
 

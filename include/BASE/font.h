@@ -1,7 +1,8 @@
 #ifndef HOMM2_BASE_FONT_H
 #define HOMM2_BASE_FONT_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/resource.h>
 
 class icon;

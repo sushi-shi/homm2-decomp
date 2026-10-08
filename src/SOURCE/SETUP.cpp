@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
@@ -9,7 +9,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>

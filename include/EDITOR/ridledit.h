@@ -2,8 +2,7 @@
 #define HOMM2_EDITOR_RIDLEDIT_H
 
 
-#include <Ints.h>
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/EVENTS.h>
 

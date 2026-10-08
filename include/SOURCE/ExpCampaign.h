@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_EXPCAMPAIGN_H
 #define HOMM2_SOURCE_EXPCAMPAIGN_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/message.h>
 #include <SOURCE/Campaign.h>
 #include <SOURCE/KB.h>

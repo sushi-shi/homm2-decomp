@@ -1,6 +1,6 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/townedit.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>

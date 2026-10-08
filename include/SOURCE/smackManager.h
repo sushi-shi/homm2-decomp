@@ -1,7 +1,8 @@
-#ifndef HOMM2_SMACKMGR_H
-#define HOMM2_SMACKMGR_H
+#ifndef HOMM2_SOURCE_SMACKMANAGER_H
+#define HOMM2_SOURCE_SMACKMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <smack.h>
 #include <mss.h>
 

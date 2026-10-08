@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_SWAPMANAGER_H
 #define HOMM2_SOURCE_SWAPMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
 
 class hero;

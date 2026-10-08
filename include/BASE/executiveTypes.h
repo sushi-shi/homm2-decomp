@@ -1,7 +1,8 @@
-#ifndef HOMM2_BASE_EXEC_TYPES_H
-#define HOMM2_BASE_EXEC_TYPES_H
+#ifndef HOMM2_BASE_EXECUTIVETYPES_H
+#define HOMM2_BASE_EXECUTIVETYPES_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 typedef enum ExecutiveTextSlotSize {
     EXEC_TEXT_RESOURCE_INIT_SLOT_SIZE = 0x3c,

@@ -1,8 +1,7 @@
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/OVERLAY.h>
-#include <EDITOR/EDITMGR.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/eventsManager.h>
@@ -25,9 +24,9 @@
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <BASE/widgetKind.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/hero.h>

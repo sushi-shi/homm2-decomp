@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_MUSICFLAGS_H
 #define HOMM2_BASE_MUSICFLAGS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 
 extern u8 gMusicFlagA;

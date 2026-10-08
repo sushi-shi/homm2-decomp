@@ -1,7 +1,7 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/army.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,14 +19,11 @@
 #include <BASE/resourceManager.h>
 #include <BASE/sample.h>
 #include <BASE/soundManager.h>
-#include <BASE/WINMGR.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/combatManager.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>

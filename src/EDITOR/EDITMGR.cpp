@@ -1,7 +1,6 @@
 
 
-#include <Ints.h>
-#include <EDITOR/EDITMGR.h>
+#include <H2/Ints.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
@@ -18,9 +17,9 @@
 #include <EDITOR/RANDOM.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/kbwin.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 #include <BASE/bitmap.h>
 #include <BASE/font.h>
 #include <BASE/bmap2.h>

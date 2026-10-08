@@ -2,9 +2,10 @@
 #define HOMM2_EDITOR_TERRAINMANAGER_H
 
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <EDITOR/editManager.h>
 
 class border;

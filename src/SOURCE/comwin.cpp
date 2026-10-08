@@ -1,12 +1,12 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
-#include <Ints.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/comwin.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 
 typedef enum ComConstant {
     PORT_COUNT           = 2,

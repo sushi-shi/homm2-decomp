@@ -1,7 +1,8 @@
 #ifndef HOMM2_SOURCE_HEXCELL_H
 #define HOMM2_SOURCE_HEXCELL_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/icon.h>
 #include <SOURCE/combatTypes.h>
 

@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_ICONRLE_H
 #define HOMM2_BASE_ICONRLE_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 typedef enum IconRleCommandConstant {
     ICON_RLE_COMMAND_RUN_MASK         = 0x3f,

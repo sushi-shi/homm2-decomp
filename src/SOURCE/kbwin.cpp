@@ -1,8 +1,8 @@
+#include <H2/Ints.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <Ints.h>
-#include <BASE/INPUTMGR.h>
+#include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>
@@ -10,7 +10,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 #ifdef HOMM2_EDITOR

@@ -1,7 +1,8 @@
-#ifndef HOMM2_REMOTE_TYPES_H
-#define HOMM2_REMOTE_TYPES_H
+#ifndef HOMM2_SOURCE_REMOTETYPES_H
+#define HOMM2_SOURCE_REMOTETYPES_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 typedef enum RemoteMessageLayoutConstant {
     REMOTE_MESSAGE_SIZE         = 256,

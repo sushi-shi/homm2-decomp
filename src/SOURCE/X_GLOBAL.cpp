@@ -1,7 +1,7 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 
 const char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT] = {

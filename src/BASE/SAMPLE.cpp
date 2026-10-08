@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>

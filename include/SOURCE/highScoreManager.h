@@ -2,9 +2,10 @@
 #define HOMM2_SOURCE_HIGHSCOREMANAGER_H
 
 #include <BASE/dialog.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/baseManager.h>
-#include <SOURCE/KBDeclarations.h>
+#include <SOURCE/KB.h>
 
 struct tag_message;
 class heroWindow;

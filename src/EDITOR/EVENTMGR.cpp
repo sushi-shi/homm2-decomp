@@ -1,7 +1,6 @@
 
 
-#include <Ints.h>
-#include <EDITOR/EVENTMGR.h>
+#include <H2/Ints.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>

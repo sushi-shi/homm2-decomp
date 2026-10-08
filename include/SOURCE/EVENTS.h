@@ -1,9 +1,9 @@
-#ifndef HOMM2_EVENTS_H
-#define HOMM2_EVENTS_H
+#ifndef HOMM2_SOURCE_EVENTS_H
+#define HOMM2_SOURCE_EVENTS_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/GAME.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/armyGroup.h>
 #include <BASE/message.h>
 #include <BASE/Misc.h>
@@ -16,19 +16,15 @@
 #include <BASE/soundManager.h>
 #include <BASE/textWidget.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/Castle.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/bankBox.h>
 #include <SOURCE/game.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>
@@ -38,7 +34,6 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townObject.h>
 #include <SOURCE/townManager.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/tradpost.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,7 +41,7 @@
 #include <BASE/dialog.h>
 #include <BASE/display.h>
 #include <BASE/widget.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 namespace {
 

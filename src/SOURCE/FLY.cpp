@@ -1,5 +1,5 @@
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 #include <math.h>
 #include <BASE/bitmap.h>
 #include <BASE/heroWindowManager.h>
@@ -7,7 +7,6 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
 #include <BASE/Misc.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>

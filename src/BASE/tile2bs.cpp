@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/tile2bs.h>
 #include <BASE/TILE.h>
 #include <BASE/tileset.h>

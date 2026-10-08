@@ -1,7 +1,7 @@
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/executive.h>
 #include <BASE/heroWindow.h>
@@ -19,8 +19,8 @@
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
 #include <BASE/dialog.h>
-#include <SOURCE/KB_TYPES.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/advManager.h>
 
 typedef enum RecruitConstant {
     WINDOW_X                    = 0x8f,

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <windows.h>
 #include <dplay.h>
 #include <string.h>

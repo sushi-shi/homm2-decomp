@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_DISPLAY_H
 #define HOMM2_BASE_DISPLAY_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 
 typedef enum LogicalScreenConstant {

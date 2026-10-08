@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/kbwin.h>

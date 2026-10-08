@@ -1,10 +1,11 @@
-#ifndef HOMM2_WINGRAPH_H
-#define HOMM2_WINGRAPH_H
+#ifndef HOMM2_SOURCE_WINGRAPH_H
+#define HOMM2_SOURCE_WINGRAPH_H
 
 #include <windows.h>
 #include <ddraw.h>
 #include <wing.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/display.h>
 
 typedef enum WingraphConstant {
