@@ -552,9 +552,9 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00048840	0x62	func	?WaitForAudiereSample@@YIXPAVsample@@@Z	BASE/AudiereEffects	0x000ccdb0	masked game body (98 bytes, 4 fields masked) unique at a census start
 0x000488b0	0x77	func	?StopAllAudiereSamples@@YIXXZ	BASE/AudiereEffects	0x000cce20	masked game body (119 bytes, 3 fields masked) unique at a census start
 0x00048930	0x6b	func	?SetAllAudiereSampleVolumes@@YIXH@Z	BASE/AudiereEffects	0x000ccea0	masked game body (107 bytes, 4 fields masked) unique at a census start
-0x000489a0	0x12	func	?BeginAudiereSampleIteration@@YIXXZ	BASE/AudiereEffects	0x000ccf10	masked game body (18 bytes, 2 fields masked) unique at a census start
-0x000489c0	0x12	func	?EndAudiereSampleIteration@@YIXXZ	BASE/AudiereEffects	0x000ccf30	masked game body (18 bytes, 2 fields masked) unique at a census start
-0x000489e0	0x11	func	?AudiereSampleIterationActive@@YI_NXZ	BASE/AudiereEffects	0x000ccf50	masked game body (17 bytes, 1 fields masked) unique at a census start
+0x000489a0	0x12	func	?LockAudiereSamples@@YIXXZ	BASE/AudiereEffects	0x000ccf10	masked game body (18 bytes, 2 fields masked) unique at a census start
+0x000489c0	0x12	func	?UnlockAudiereSamples@@YIXXZ	BASE/AudiereEffects	0x000ccf30	masked game body (18 bytes, 2 fields masked) unique at a census start
+0x000489e0	0x11	func	?AudiereSamplesLocked@@YI_NXZ	BASE/AudiereEffects	0x000ccf50	masked game body (17 bytes, 1 fields masked) unique at a census start
 0x00048a00	0x2c	func	??1?$RefPtr@VOutputStream@audiere@@@audiere@@QAE@XZ	BASE/AudiereEffects	0x000ccf70	masked game body (44 bytes) at its unit's block offset, shared by 17 bodies (4 occurrence(s))
 0x00048a30	0x51	func	??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z	BASE/AudiereEffects	0x000ccfa0	masked game body (81 bytes) at its unit's block offset, shared by 17 bodies (2 occurrence(s))
 0x00048a90	0x27	func	_$E21	BASE/AudiereEffects	0x000cd000	masked game body (39 bytes) at its unit's block offset, shared by 17 bodies (65 occurrence(s))
@@ -592,9 +592,9 @@ rva	size	kind	name	unit	game_rva	evidence
 0x00049a60	0x6d	func	?AdjustMilesSampleVolumes@@YIXXZ	BASE/MilesSound	0x000cdfd0	masked game body (109 bytes, 7 fields masked) unique at a census start
 0x00049ad0	0x27	func	_$E21	BASE/MilesSound	0x000ce040	masked game body (39 bytes) at its unit's block offset, shared by 13 bodies (65 occurrence(s))
 0x00049b00	0x12	func	_$E20	BASE/MilesSound	0x000ce070	masked game body (18 bytes) at its unit's block offset, shared by 13 bodies (68 occurrence(s))
-0x00049b20	0xa	func	?GetMusicFlagA@@YIEXZ	BASE/Midi	0x000c5770	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
-0x00049b30	0x32	func	?MusicFlagsActive@@YIEXZ	BASE/Midi	0x000c5780	masked game body (50 bytes, 2 fields masked) unique at a census start
-0x00049b70	0xa	func	?GetMusicFlagB@@YIEXZ	BASE/Midi	0x000c57c0	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
+0x00049b20	0xa	func	?MidiReady@@YIEXZ	BASE/Midi	0x000c5770	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
+0x00049b30	0x32	func	?MidiUnavailable@@YIEXZ	BASE/Midi	0x000c5780	masked game body (50 bytes, 2 fields masked) unique at a census start
+0x00049b70	0xa	func	?MidiStarted@@YIEXZ	BASE/Midi	0x000c57c0	masked game body (10 bytes) at its unit's block offset, shared by 3 bodies (2 occurrence(s))
 0x00049b80	0x51	func	?MIDIStartup@@YI_NXZ	BASE/Midi	0x000c57d0	masked game body (81 bytes, 8 fields masked) unique at a census start
 0x00049be0	0xf0	func	?MIDIShutdown@@YIXXZ	BASE/Midi	0x000c5830	masked game body (240 bytes, 19 fields masked) unique at a census start
 0x00049cd0	0x17b	func	?MIDIPlay@@YIXAAH0H@Z	BASE/Midi	0x000c5920	masked game body (379 bytes, 37 fields masked) unique at a census start
@@ -1493,7 +1493,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x0009bd24	0x30	data	_gAudiereMusicVolumes	BASE/AudiereMusic	0x00120134	1 field(s) of placed bodies
 0x0009bd54	0x0	data	$anon_str_563c4a866a9d79e0b86ee35885bb31d17b306e996833974bb698cd63e1c3dce8_0	_const	0x00120164	1 field(s) of placed bodies
 0x0009bd78	0x30	data	?SCS@@3PAUSampleChannelStruct@@A	BASE/MilesSound	0x00120188	1 field(s) of placed bodies
-0x0009bda8	0x1	data	?gMusicFeatureEnabled@@3EA	BASE/Midi	0x0011f550	2 field(s) of placed bodies
+0x0009bda8	0x1	data	?gMidiOpenFailed@@3EA	BASE/Midi	0x0011f550	2 field(s) of placed bodies
 0x0009bdac	0x4	data	?CurrentMidiFile@@3HA	BASE/Midi	0x0011f554	15 field(s) of placed bodies
 0x0009bdb0	0x3c	data	?bGotMidi@@3PAEA	BASE/Midi	0x0011f558	1 field(s) of placed bodies
 0x0009bdec	0xd	data	_gMidiFilenameFormat	BASE/Midi	0x0011f594	1 field(s) of placed bodies
@@ -1831,7 +1831,7 @@ rva	size	kind	name	unit	game_rva	evidence
 0x000a7a50	0x40	data	_gMilesSampleVolumes	BASE/MilesSound	0x00139720	4 field(s) of placed bodies
 0x000a7a90	0xf0	data	?hSequence@@3PAPAU_SEQUENCE@@A	BASE/Midi	0x001361a0	19 field(s) of placed bodies
 0x000a7b80	0xf0	data	?pMIDIWrap@@3PAPAVMIDIWrap@@A	BASE/Midi	0x00136290	8 field(s) of placed bodies
-0x000a7c70	0x1	data	?gMusicFlagA@@3EA	BASE/Midi	0x00136380	4 field(s) of placed bodies
-0x000a7c71	0x1	data	?gMusicFlagB@@3EA	BASE/Midi	0x00136381	3 field(s) of placed bodies
+0x000a7c70	0x1	data	?gMidiReady@@3EA	BASE/Midi	0x00136380	4 field(s) of placed bodies
+0x000a7c71	0x1	data	?gMidiStarted@@3EA	BASE/Midi	0x00136381	3 field(s) of placed bodies
 0x000a7c74	0x4	data	?hMDI@@3PAU_MDI_DRIVER@@A	BASE/Midi	0x00136384	5 field(s) of placed bodies
 0x000a7ff8	0x1	data	??_B?1???id@?$ctype@G@std@@$D@@9@51	_data	0x00139c80	135 field(s) of placed bodies

@@ -347,7 +347,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
                 break;
         }
     }
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 
 VA(0x004226d2, 0x40a)

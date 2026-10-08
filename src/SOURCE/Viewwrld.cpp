@@ -105,11 +105,11 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     iVWWhatToDraw = whatToDraw;
     iVWDrawAllObjs = drawAllObjects;
     iVWDrawAllTerrains = drawAllTerrains;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     giCycleType = WINDOW_COLOR_CYCLE_WORLD_VIEW;
     VWInit(m_mapOriginX + INITIAL_CENTER_OFFSET, m_mapOriginY + INITIAL_CENTER_OFFSET);
     VWCompleteDraw();
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 
     sprintf(
         gText,
@@ -149,10 +149,10 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     UpdateRadar(1, 0);
     VWCleanup();
     gbInViewWorld = false;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     RedrawAdvScreen(1, 0);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     SetPalette(palette, 1);
 }
 

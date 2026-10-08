@@ -39,7 +39,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_items = NULL;
     m_selectedIndex = LIST_BOX_NO_SELECTION;
     m_lastSelectedIndex = LIST_BOX_NO_SELECTION;
-    m_scrollbar = NULL;
+    m_unusedBitmap = NULL;
 }
 
 VA(0x004ce730, 0x105)
@@ -47,8 +47,8 @@ listBoxWidget::~listBoxWidget() {
     i32 i;
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
-    if (m_scrollbar != NULL)
-        delete m_scrollbar;
+    if (m_unusedBitmap != NULL)
+        delete m_unusedBitmap;
     for (i = 0; i < m_itemCount; i++)
 #line 25
         H2_FREE(m_items[i]);

@@ -86,11 +86,11 @@ struct tag_messageKeyboardPayload {
         i32 keyCode;
         u8 keyByte;
     };
-    i32 unknown0x08;
+    i32 unused08;
     MessageModifier modifiers;
-    i32 unknown0x10;
-    i32 unknown0x14;
-    i32 unknown0x18;
+    i32 unused10;
+    i32 unused14;
+    i32 unused18;
 };
 SIZE(tag_messageKeyboardPayload, 0x18);
 
@@ -100,17 +100,17 @@ struct tag_messageMousePayload {
     MessageModifier modifiers;
     i32 screenX;
     i32 screenY;
-    i32 unknown0x18;
+    i32 unused18;
 };
 SIZE(tag_messageMousePayload, 0x18);
 
 struct tag_messageHoverPayload {
     i32 x;
     i32 id;
-    i32 subId;
+    i32 modifiers;
     i32 screenX;
     i32 screenY;
-    i32 unknown0x18;
+    i32 unused18;
 };
 SIZE(tag_messageHoverPayload, 0x18);
 
@@ -141,23 +141,23 @@ H2_ENUM_CLASS_END(ExecutiveCommand)
 
 struct tag_messageExecutivePayload {
     ExecutiveCommand command;
-    i32 unknown0x08;
-    i32 unknown0x0c;
-    i32 unknown0x10;
-    i32 unknown0x14;
+    i32 unused08;
+    i32 unused0c;
+    i32 unused10;
+    i32 unused14;
     i32 result;
 };
 SIZE(tag_messageExecutivePayload, 0x18);
 
-struct tag_messageUnknownPayload {
-    i32 unknown0x04;
-    i32 unknown0x08;
-    i32 unknown0x0c;
-    i32 unknown0x10;
-    i32 unknown0x14;
-    i32 unknown0x18;
+struct tag_messageUnusedPayload {
+    i32 unused04;
+    i32 unused08;
+    i32 unused0c;
+    i32 unused10;
+    i32 unused14;
+    i32 unused18;
 };
-SIZE(tag_messageUnknownPayload, 0x18);
+SIZE(tag_messageUnusedPayload, 0x18);
 
 union tag_messagePayload {
     tag_messageKeyboardPayload keyboard;
@@ -165,7 +165,7 @@ union tag_messagePayload {
     tag_messageHoverPayload hover;
     tag_messageWidgetPayload widget;
     tag_messageExecutivePayload executive;
-    tag_messageUnknownPayload unknown;
+    tag_messageUnusedPayload unused;
 };
 SIZE(tag_messagePayload, 0x18);
 

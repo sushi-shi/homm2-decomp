@@ -1625,7 +1625,7 @@ void combatManager::Armageddon(void) {
         i32 pass;
         i32 color;
 
-        gpWindowManager->m_updateFlags = 0;
+        gpWindowManager->m_colorCycling = 0;
         originalPalette = gpResourceManager->GetPalette("kb.pal");
         effectPalette = new palette;
         if (!effectPalette)
@@ -1782,7 +1782,7 @@ void combatManager::Armageddon(void) {
         );
     }
     SetPalette(originalPalette->Data(), 1);
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     gpResourceManager->Dispose(originalPalette);
     delete effectPalette;
     gpMouseManager->ShowColorPointer();
@@ -2313,7 +2313,7 @@ void combatManager::DoBolt(
     drawPassCount = (angleDistance - 1) / drawDistance + 1;
     branchChance = branchDistance * BOLT_ANGLE_PERCENT_SCALE / angleDistance;
     deadline = KBTickCount();
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
 
     originalPalette = NULL;
     effectPalette = NULL;
@@ -2514,7 +2514,7 @@ boltsDone:
         gpResourceManager->Dispose(originalPalette);
         delete effectPalette;
     }
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 #if H2_RETAIL_COMPILER
 #undef allFinished
@@ -3123,7 +3123,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     target = NULL;
     effect = gsSpellInfo[IDX(spell)].combatEffect;
     animateCreatures = false;
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     ShowSpellMessage(0, spell, NULL);
     memset(affected, 0, sizeof(affected));
 
@@ -3277,7 +3277,7 @@ applySpellInfluence:
         }
     }
     DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 #if H2_RETAIL_COMPILER
 #undef affected

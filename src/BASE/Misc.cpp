@@ -36,8 +36,7 @@ H2_ENUM_BEGIN(DataEntryLayout)
     TEXT_FIELD_ICON_FRAME       = 3,
     TEXT_FIELD_HORIZONTAL_INSET = 10,
     TEXT_FIELD_VERTICAL_INSET   = 3,
-    INPUT_BOX_X                 = 213,
-    REDRAW_OFFSET               = 10
+    INPUT_BOX_X                 = 213
 H2_ENUM_END(DataEntryLayout)
 
 H2_ENUM_BEGIN(DataEntryWidgetId)
@@ -1043,6 +1042,7 @@ void ReadPrefsFromRegistry(void) {
             CURRENT_GRAPHICS_CONFIG.width = MINIMUM_WINDOW_WIDTH;
         if (CURRENT_GRAPHICS_CONFIG.height <= 0)
             CURRENT_GRAPHICS_CONFIG.height = MINIMUM_WINDOW_HEIGHT;
+        // Retail clamps x against the screen height and y against its width.
         if (CURRENT_GRAPHICS_CONFIG.x < 0)
             CURRENT_GRAPHICS_CONFIG.x = 0;
         if (CURRENT_GRAPHICS_CONFIG.x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
@@ -1856,21 +1856,22 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
 #endif
 
 #if H2_RETAIL_COMPILER
-#define currentColorTable p
+#define screenPixel p
 #define paletteData pal
+#define savedColorCycling savedFlags
 #endif
 VA(0x004bfee0, 0x163)
 void FadeToColorTable(u8* colorTable, i32 increment) {
-    u8* currentColorTable;
+    u8* screenPixel;
     i32 x;
     i32 i;
     i32 y;
     u8 tempPal[PALETTE_DATA_SIZE];
     i8* paletteData;
-    i32 savedFlags;
+    i32 savedColorCycling;
 
-    savedFlags = gpWindowManager->m_updateFlags;
-    gpWindowManager->m_updateFlags = 0;
+    savedColorCycling = gpWindowManager->m_colorCycling;
+    gpWindowManager->m_colorCycling = 0;
     paletteData = gpBufferPalette->m_data;
     for (i = 0; i < PALETTE_COLOR_COUNT; ++i) {
         tempPal[i * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_RED)] =
@@ -1881,20 +1882,21 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
             paletteData[colorTable[i] * IDX(PALETTE_CHANNEL_COUNT) + IDX(PALETTE_CHANNEL_BLUE)];
     }
     FadeTo(reinterpret_cast<u8*>(paletteData), tempPal, increment);
-    currentColorTable = gpWindowManager->m_screen->m_pixels;
+    screenPixel = gpWindowManager->m_screen->m_pixels;
     for (y = 0; y < LOGICAL_SCREEN_HEIGHT; ++y) {
         for (x = 0; x < LOGICAL_SCREEN_WIDTH; ++x) {
-            *currentColorTable = colorTable[*currentColorTable];
-            ++currentColorTable;
+            *screenPixel = colorTable[*screenPixel];
+            ++screenPixel;
         }
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(paletteData);
-    gpWindowManager->m_updateFlags = savedFlags;
+    gpWindowManager->m_colorCycling = savedColorCycling;
 }
 #if H2_RETAIL_COMPILER
-#undef currentColorTable
+#undef screenPixel
 #undef paletteData
+#undef savedColorCycling
 #endif
 
 VA(0x004c0050, 0x44)
@@ -2080,6 +2082,8 @@ i32 MemSize(i32) {
 #define message msg
 #define textBuffer cBuf
 #define widgetId wId
+#define savedCursorFrame nFrame
+#define editImmediately useImmediateHandler
 #endif
 VA(0x004c05e0, 0x464)
 void GetDataEntry(
@@ -2088,7 +2092,7 @@ void GetDataEntry(
     i32 maximumLength,
     H2_CONST char* initialText,
     i32 showCancel,
-    i32 useImmediateHandler
+    i32 editImmediately
 ) {
     MouseCursorType savedCursorType;
     i16 H2_UNUSED(widgetId);
@@ -2100,11 +2104,11 @@ void GetDataEntry(
     char textBuffer[TEXT_BUFFER_CAPACITY];
     textEntryWidget* pText;
     tag_message message;
-    i32 nFrame;
+    i32 savedCursorFrame;
 
     widgetId = ENTRY_TEXT_WIDGET;
     savedCursorType = gpMouseManager->m_cursorType;
-    nFrame = gpMouseManager->m_cursorFrame;
+    savedCursorFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
@@ -2188,7 +2192,7 @@ void GetDataEntry(
     inBoxY = entryY + INPUT_BOX_Y_OFFSET;
     DataEntryWin->AddWidget(pText, WINDOW_Z_ORDER_TOP);
 
-    if (useImmediateHandler != 0) {
+    if (editImmediately != 0) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = false;
     } else
@@ -2197,7 +2201,7 @@ void GetDataEntry(
     delete DataEntryWin;
     gpMouseManager->SetPointer(
         "",
-        nFrame,
+        savedCursorFrame,
         savedCursorType
     );
     gbAllowTextEntryEscape = true;
@@ -2206,6 +2210,8 @@ void GetDataEntry(
 #undef message
 #undef textBuffer
 #undef widgetId
+#undef savedCursorFrame
+#undef editImmediately
 #endif
 
 #if H2_RETAIL_COMPILER
@@ -2254,7 +2260,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, ENTRY_TEXT_WIDGET);
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
-                        DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, REDRAW_OFFSET, REDRAW_OFFSET);
+                        DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, ENTRY_TEXT_WIDGET, ENTRY_TEXT_WIDGET);
                         if (gbTextEntryEscaped != 0)
                             break;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;

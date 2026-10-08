@@ -98,7 +98,7 @@ public:
     u8 m_scrollDownPressed;
     u8 m_scrollThumbDragging;
     u8 m_itemSelectionTracking;
-    bitmap* m_scrollbar;
+    bitmap* m_unusedBitmap;
     listBoxWidget(void);
     virtual ~listBoxWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;

@@ -57,7 +57,7 @@ struct AudiereEffectsState {
     i32 sampleRate;
     audiere::SampleFormat sampleFormat;
     AudiereSampleNode* sampleList;
-    i32 sampleIterationDepth;
+    i32 lockDepth;
 };
 SIZE(AudiereEffectsState, 0x1c);
 
@@ -86,9 +86,9 @@ void SetAudiereSampleVolume(class sample* sampleResource, i32 volume);
 void WaitForAudiereSample(class sample* sampleResource);
 void StopAllAudiereSamples(void);
 void SetAllAudiereSampleVolumes(i32 volume);
-void BeginAudiereSampleIteration(void);
-void EndAudiereSampleIteration(void);
-bool AudiereSampleIterationActive(void);
+void LockAudiereSamples(void);
+void UnlockAudiereSamples(void);
+bool AudiereSamplesLocked(void);
 
 void StopAudiereMusic(i32& currentTrack);
 bool AudiereMusicAvailable(void);

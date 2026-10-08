@@ -171,7 +171,7 @@ public:
     bankBox* m_bankBox;
     char m_statusText[TOWN_MANAGER_STATUS_TEXT_SIZE];
     i32 m_lastHoverId;
-    i32 m_lastHoverSubId;
+    i32 m_lastHoverModifiers;
     TownManagerArmyCommand m_command;
     b32 m_recruitResult;
     u32l m_affordableBuildings;

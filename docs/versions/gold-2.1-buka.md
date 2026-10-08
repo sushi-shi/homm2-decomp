@@ -146,7 +146,7 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   class-static stream/source RefPtrs with guarded atexit teardowns), and the
   refactored Miles wrapper `BASE/MilesSound` (11 functions).
 - **[Buka] Music-state accessors** — three /Od functions immediately before
-  MIDIStartup (`GetMusicFlagA`, `MusicFlagsActive`, `GetMusicFlagB`): the
+  MIDIStartup (`MidiReady`, `MidiUnavailable`, `MidiStarted`): the
   game's `BASE/MusicFlags` object (its one C++ object without a ctype
   registration); the editor's BASE library compiled them as Midi's prefix.
 - **[Buka] The Cyrillic text engine** in `BASE/FONT`:

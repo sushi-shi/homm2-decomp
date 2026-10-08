@@ -9928,7 +9928,7 @@ MessageDispatchResult EditorSystemOptionsHandler(struct tag_message& message) {
                             break;
                         case EDIT_OPTIONS_CYCLING_BUTTON:
                             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
-                            gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+                            gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
                             redraw = true;
                             gPrefsChanged = true;
                             break;

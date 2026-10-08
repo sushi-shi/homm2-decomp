@@ -18,14 +18,14 @@ typedef enum FontConstant {
 } FontConstant;
 
 #if H2_RETAIL_COMPILER
-#define fileDescriptor h
+#define glyphOffsetY h
 #endif
 VA(0x004c3620, 0xe5)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
-    i32 H2_UNUSED(fileDescriptor) = gpResourceManager->ReadWord();
+    i32 H2_UNUSED(glyphOffsetY) = gpResourceManager->ReadWord();
     if (m_height >= LARGE_FONT_HEIGHT_THRESHOLD)
         m_isLarge = true;
     else
@@ -36,7 +36,7 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = false;
 }
 #if H2_RETAIL_COMPILER
-#undef fileDescriptor
+#undef glyphOffsetY
 #endif
 
 VA(0x004c3740, 0x5b)
@@ -87,11 +87,11 @@ void font::DrawStringExecute(
             goto next;
         }
         if (character == '{') {
-            m_suppressDraw = true;
+            m_highlight = true;
             goto next;
         }
         if (character == '}') {
-            m_suppressDraw = false;
+            m_highlight = false;
             goto next;
         }
         // The same glyph remap GetCharacterWidth performs, open-coded; the
@@ -105,7 +105,7 @@ void font::DrawStringExecute(
         }
         character -= ' ';
         if (character != 0) {
-            if (mode == FONT_DRAW_DEFAULT && m_suppressDraw == 0)
+            if (mode == FONT_DRAW_DEFAULT && m_highlight == 0)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -120,7 +120,7 @@ void font::DrawStringExecute(
                     0
                 );
             else if (mode == FONT_DRAW_YELLOW
-                     || (mode == FONT_DRAW_DEFAULT && m_suppressDraw != 0))
+                     || (mode == FONT_DRAW_DEFAULT && m_highlight != 0))
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -185,7 +185,7 @@ void font::DrawStringExecute(
 #endif
 VA(0x004c3a30, 0x3d)
 void font::DrawString(H2_CONST char* text, i32 x, i32 y, FontDrawMode mode) {
-    m_suppressDraw = false;
+    m_highlight = false;
     DrawStringExecute(text, x, y, mode, 0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
 }
 #if H2_RETAIL_COMPILER
@@ -404,7 +404,7 @@ void font::DrawBoundedString(
         if (totalH < height)
             yPosition = (height - totalH) / CENTER_DIVISOR;
     }
-    m_suppressDraw = false;
+    m_highlight = false;
     while (position < length && line[position] != 0 && (yPosition + m_height <= height || yPosition == 0)) {
         if (yPosition + m_height * WRAP_HEIGHT_LINE_COUNT > height)
             ExtractLine(text, line, &position, width, &lineWidth, 1);
@@ -476,31 +476,32 @@ i32 font::LineLength(H2_CONST char* text, i32 maxW) {
 #endif
 
 #if H2_RETAIL_COMPILER
-#define character p
-#define characterWidth w
+#define cursor p
+#define lineWidth w
 #define index idx
 #define text str
-#define width s
+#define length s
 #endif
 VA(0x004c4e40, 0x8b)
 i32 font::LineWidth(H2_CONST char* text) {
-    i32 width = strlen(text);
-    i32 index = 0, characterWidth = 0;
-    H2_CONST char* character = text;
-    while (index < width && character[index] != 0) {
-        while (character[index] != 0 && character[index] != '\n') {
-            characterWidth += GetCharacterWidth(character[index]);
+    i32 length = strlen(text);
+    i32 index = 0, lineWidth = 0;
+    H2_CONST char* cursor = text;
+    // Retail never steps past a '\n': text with a line break loops forever.
+    while (index < length && cursor[index] != 0) {
+        while (cursor[index] != 0 && cursor[index] != '\n') {
+            lineWidth += GetCharacterWidth(cursor[index]);
             index++;
         }
     }
-    return characterWidth;
+    return lineWidth;
 }
 #if H2_RETAIL_COMPILER
-#undef character
-#undef characterWidth
+#undef cursor
+#undef lineWidth
 #undef index
 #undef text
-#undef width
+#undef length
 #endif
 
 // Compiler-emitted vtables; the markers are census claims, not definitions.

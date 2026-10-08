@@ -519,7 +519,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(record->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + TOWN_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
@@ -608,7 +608,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(gDwellingType[IDX(record->m_type)][building]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + building + TOWN_DWELLING_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {
@@ -770,7 +770,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(curHero->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + HERO_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (OVERVIEW_ICON_WIDGET(rowIndex, icons) == NULL) {

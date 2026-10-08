@@ -447,7 +447,7 @@ VA(0x004269fe, 0x427)
 i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, PALETTE_DATA_SIZE);
-    gpMouseManager->m_forcePointerUpdate = true;
+    gpMouseManager->m_pointerLocked = true;
     i32 savedMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
@@ -476,7 +476,7 @@ i32 combatManager::Open(i32 openFlags) {
     CycleColors(1);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
-    gpMouseManager->m_forcePointerUpdate = false;
+    gpMouseManager->m_pointerLocked = false;
     gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();

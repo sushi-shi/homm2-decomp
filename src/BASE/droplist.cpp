@@ -97,12 +97,12 @@ void dropListWidget::Read(void) {
     m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
 
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_closedContentFrame;
-    m_iconX = m_x;
-    m_iconY = m_y;
+    m_closedContentX = m_x;
+    m_closedContentY = m_y;
     m_closedContentWidth = entry->w;
     m_closedContentHeight = entry->h;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_dropButtonFrame;
-    m_dropButtonX = m_iconX + m_closedContentWidth;
+    m_dropButtonX = m_closedContentX + m_closedContentWidth;
     m_dropButtonY = m_y;
     m_dropButtonWidth = entry->w;
     m_dropButtonHeight = entry->h;
@@ -233,8 +233,8 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
 VA(0x004d07b0, 0x11c)
 void dropListWidget::Draw(void) {
     m_icon->DrawToBuffer(
-        m_owner->m_posX + m_iconX,
-        m_owner->m_posY + m_iconY,
+        m_owner->m_posX + m_closedContentX,
+        m_owner->m_posY + m_closedContentY,
         m_closedContentFrame,
         ICON_DRAW_NORMAL
     );
@@ -397,8 +397,8 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_middleRowHeight = entry->h;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_lastRowFrame;
     m_lastRowHeight = entry->h;
-    m_listX = m_iconX;
-    m_listY = m_iconY + m_closedContentHeight;
+    m_listX = m_closedContentX;
+    m_listY = m_closedContentY + m_closedContentHeight;
     entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
     m_listWidth = entry->w;
     m_listHeight = (m_visibleItemCount - LIST_BOX_EDGE_ROW_COUNT) * m_middleRowHeight

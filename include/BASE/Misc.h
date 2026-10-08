@@ -163,7 +163,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(H2_CONST char* prompt, char* destination, i32 maximumLength, H2_CONST char* initialText, i32 showCancel, i32 useImmediateHandler);
+void GetDataEntry(H2_CONST char* prompt, char* destination, i32 maximumLength, H2_CONST char* initialText, i32 showCancel, i32 editImmediately);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 H2_ENUM_CLASS_BEGIN(DataEntryPhase)

@@ -238,7 +238,7 @@ i32 soundManager::Open(i32) {
     if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
         if (!CDStartup()) {
             StartupMilesBackend();
-            if (MusicFlagsActive()) {
+            if (MidiUnavailable()) {
                 gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
             } else {
@@ -248,7 +248,7 @@ i32 soundManager::Open(i32) {
         }
     } else {
         StartupMilesBackend();
-        if (MusicFlagsActive()) {
+        if (MidiUnavailable()) {
             if (CDStartup()) {
                 gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
                 WritePrefs();
@@ -518,7 +518,7 @@ i32 soundManager::MusicPlaying(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return AudiereMusicPlaying();
     if (m_backend == SOUND_BACKEND_MILES) {
-        if (MusicFlagsActive())
+        if (MidiUnavailable())
             return false;
         return MIDIIsPlaying();
     }

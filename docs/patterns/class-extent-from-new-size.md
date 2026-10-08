@@ -44,7 +44,7 @@ A field modelled past the boundary is one of four things; all four appeared here
 | :-- | :-- |
 | a **global** | the use sites carry a DIR32 to a fixed address instead of `disp(%reg)`. `m_samplesReady` (26 sites in ADVMGR/GAME/SMACKMGR) is the byte at 0x5348f1 — the reloc count per function matched our member-read count exactly, 5/20/1. |
 | an **existing member under another name** | the reference args of a free function pin it: `PlayAmbientMusic` passes `this+0x4e` in ecx and `this+0x4a` in edx to `MIDIPlay`, so `m_currentTrack`/`m_fadeSteps` were never separate from `m_musicTrack`/`m_musicFadeSteps`. |
-| **replaced by other machinery** | `m_midiReady` reads are `call ?GetMusicFlagA@@YIEXZ`; `m_midiReady == 0` is `call ?MusicFlagsActive@@YIEXZ`; `m_cdReady == 0`/`m_cdStarted == 0` collapsed into `if (!CDStartup())`. |
+| **replaced by other machinery** | `m_midiReady` reads are `call ?MidiReady@@YIEXZ`; `m_midiReady == 0` is `call ?MidiUnavailable@@YIEXZ`; `m_cdReady == 0`/`m_cdStarted == 0` collapsed into `if (!CDStartup())`. |
 | **dead with its subsystem** | only `// @remove` bodies read it. Park those as file statics in the owning `.cpp`; nothing retail references them. |
 
 ## What made it match

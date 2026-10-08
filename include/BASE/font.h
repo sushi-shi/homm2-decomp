@@ -73,7 +73,7 @@ class font : public resource {
 public:
     i32 m_height;
     b32 m_isLarge;
-    b32 m_suppressDraw;
+    b32 m_highlight;
     icon* m_glyphIcon;
     font(u32l id);
     virtual ~font();
@@ -86,6 +86,7 @@ public:
     i32 GetCharacterWidth(u8 character);
     void ExtractLine(H2_CONST char* text, char* line, i32* position, i32 maxWidth, i32* lineWidth, u8 lastLine);
     void DrawBoundedString(H2_CONST char* text, i32 x, i32 y, i32 width, i32 height, FontDrawMode mode, FontAlignment align);
+    // The number of lines text wraps to at maxW, not a length.
     i32 LineLength(H2_CONST char* text, i32 maxW);
     i32 LineWidth(H2_CONST char* text);
 };

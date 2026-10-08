@@ -1805,7 +1805,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         gsSpellInfo[IDX(newSpell)].iconIndex,
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
-        WIDGET_KIND_ICON_CENTERED,
+        WIDGET_KIND_ICON_BOTTOM_CENTERED,
         1
     );
     if (m_winLoseBottomWidgets[1] == NULL)

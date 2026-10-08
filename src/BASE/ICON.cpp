@@ -20,8 +20,8 @@
 #include <BASE/display.h>
 
 H2_ENUM_CLASS_BEGIN(IconColorTableMode)
-    COLOR_TABLE_SKIP_DIM  = 0,
-    COLOR_TABLE_APPLY_DIM = 1
+    COLOR_TABLE_SKIP_SHADOWS  = 0,
+    COLOR_TABLE_DRAW_SHADOWS = 1
 H2_ENUM_CLASS_END(IconColorTableMode)
 
 H2_ENUM_BEGIN(IconDrawExtentConstant)
@@ -90,9 +90,9 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     i32 frame,
     struct SLimitData* limits,
     H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
-    i32 offset,
+    i32 outlineColor,
     u8* colorTable,
-    i8* yModify
+    i8* shear
 ) {
     if (gbComputeExtent != 0) {
         if (orientation != ICON_DRAW_NORMAL) {
@@ -125,7 +125,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
         return ICON_DRAW_SKIPPED;
 
-    if (yModify != NULL) {
+    if (shear != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
             IconToBitmapYModify(
                 this,
@@ -138,8 +138,8 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 0,
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
-                offset,
-                yModify
+                outlineColor,
+                shear
             );
         else
             FlipIconToBitmapYModify(
@@ -153,8 +153,8 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 0,
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
-                offset,
-                yModify
+                outlineColor,
+                shear
             );
     } else if (colorTable != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
@@ -169,9 +169,9 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 0,
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
-                offset,
+                outlineColor,
                 colorTable,
-                IDX(COLOR_TABLE_APPLY_DIM)
+                IDX(COLOR_TABLE_DRAW_SHADOWS)
             );
         else
             FlipIconToBitmapColorTable(
@@ -185,7 +185,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 0,
                 LOGICAL_SCREEN_WIDTH,
                 DRAW_COMBAT_HEIGHT,
-                offset,
+                outlineColor,
                 colorTable
             );
     } else if (gbLimitToExtent != 0) {
@@ -201,7 +201,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 giMinExtentY,
                 giMaxExtentX - giMinExtentX + 1,
                 giMaxExtentY - giMinExtentY + 1,
-                offset
+                outlineColor
             );
         else
             FlipIconToBitmap(
@@ -215,7 +215,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 giMinExtentY,
                 giMaxExtentX - giMinExtentX + 1,
                 giMaxExtentY - giMinExtentY + 1,
-                offset
+                outlineColor
             );
     } else if (orientation == ICON_DRAW_NORMAL) {
         IconToBitmap(
@@ -229,7 +229,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             0,
             LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
-            offset
+            outlineColor
         );
     } else {
         FlipIconToBitmap(
@@ -243,7 +243,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             0,
             LOGICAL_SCREEN_WIDTH,
             DRAW_COMBAT_HEIGHT,
-            offset
+            outlineColor
         );
     }
     return ICON_DRAW_COMPLETED;

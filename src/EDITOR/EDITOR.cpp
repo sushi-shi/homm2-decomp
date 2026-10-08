@@ -3645,7 +3645,7 @@ i32 oldmain(void) {
     gEditManager->DrawMap();
     gEditManager->UpdateMapView();
     gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-    gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+    gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
     gpExec->MainLoop();
     gpExec->RemoveManager(gEditManager);
     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_FINE, gPalette);
@@ -4117,7 +4117,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     switch (command) {
         case EDITOR_MENU_PALETTE_CYCLING:
             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
-            gpWindowManager->m_updateFlags = gConfig.editorPaletteCycling;
+            gpWindowManager->m_colorCycling = gConfig.editorPaletteCycling;
             WritePrefs();
             break;
         case EDITOR_MENU_SCREEN_ANIMATION:

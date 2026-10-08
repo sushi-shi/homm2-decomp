@@ -34,7 +34,7 @@ void IconToBitmapScaleDouble(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 scale
+    i32 cellSize
 ) {
     u8* sourceOrigin;
     u8* destinationOrigin;
@@ -48,13 +48,13 @@ void IconToBitmapScaleDouble(
     class bitmap* temp;
     i32 sourceBase;
 
-    if (scale == SCALE_DOUBLE_NATIVE_SIZE) {
+    if (cellSize == SCALE_DOUBLE_NATIVE_SIZE) {
         IconToBitmap(sourceIcon, destination, destinationX, destinationY, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    steps = scale * SCALE_DOUBLE_CELLS;
-    increment = SCALE_DOUBLE_NATIVE_SIZE / scale;
-    sourceBase = (SCALE_DOUBLE_NATIVE_SIZE - (scale - 1) * increment) >> 1;
+    steps = cellSize * SCALE_DOUBLE_CELLS;
+    increment = SCALE_DOUBLE_NATIVE_SIZE / cellSize;
+    sourceBase = (SCALE_DOUBLE_NATIVE_SIZE - (cellSize - 1) * increment) >> 1;
     lineStep = increment * SCALE_DOUBLE_FRAME_SIZE;
     temp = new bitmap(BITMAP_TYPE_NONE, SCALE_DOUBLE_FRAME_SIZE, SCALE_DOUBLE_FRAME_SIZE);
     memset(temp->m_pixels, 0, SCALE_DOUBLE_WORK_BYTES);

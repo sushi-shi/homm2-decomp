@@ -30,9 +30,9 @@ public:
         i32 frame,
         struct SLimitData* limits,
         H2_ENUM_PARAM(IconDrawOrientation, i32) orientation,
-        i32 offset = 0,
+        i32 outlineColor = 0,
         u8* colorTable = NULL,
-        i8* yModify = NULL
+        i8* shear = NULL
     );
     void ClipFillToBuffer(
         i32 x,

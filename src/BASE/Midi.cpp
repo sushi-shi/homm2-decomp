@@ -41,19 +41,19 @@ DATA(0x0051f594) static char gMidiFilenameFormat[] = "MIDI%04d.XMI";
 
 VA(0x004c57d0, 0x51)
 bool MIDIStartup(void) {
-    if (MusicFlagsActive())
+    if (MidiUnavailable())
         return true;
     MIDIShutdown();
-    gMusicFlagA = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER) == 0 ? true : false;
-    gMusicFlagB = 1;
-    gMusicFeatureEnabled = !gMusicFlagA;
+    gMidiReady = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER) == 0 ? true : false;
+    gMidiStarted = 1;
+    gMidiOpenFailed = !gMidiReady;
     return true;
 }
 
 VA(0x004c5830, 0xf0)
 void MIDIShutdown(void) {
     i32 i;
-    if (!GetMusicFlagA())
+    if (!MidiReady())
         return;
     for (i = 0; i < MIDI_TRACK_COUNT; i++) {
         if (hSequence[i] != NULL) {
@@ -65,7 +65,7 @@ void MIDIShutdown(void) {
     }
     AIL_midiOutClose(hMDI);
     hMDI = NULL;
-    gMusicFlagA = 0;
+    gMidiReady = 0;
     for (i = 0; i < MIDI_TRACK_COUNT; i++) {
         if (pMIDIWrap[i] != NULL) {
             gpResourceManager->Dispose(pMIDIWrap[i]);
@@ -76,7 +76,7 @@ void MIDIShutdown(void) {
 
 VA(0x004c5920, 0x17b)
 void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
-    if (!GetMusicFlagA())
+    if (!MidiReady())
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
@@ -116,7 +116,7 @@ void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
 
 VA(0x004c5aa0, 0xe7)
 void MIDIStop(i32& currentTrack) {
-    if (!GetMusicFlagA())
+    if (!MidiReady())
         return;
     if (CurrentMidiFile < 0)
         return;
@@ -136,7 +136,7 @@ void MIDIStop(i32& currentTrack) {
 
 VA(0x004c5b90, 0x56)
 bool MIDIIsPlaying(void) {
-    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED || !GetMusicFlagA()
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED || !MidiReady()
         || CurrentMidiFile < 0 || hSequence[CurrentMidiFile] == NULL)
         return false;
     return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
@@ -144,7 +144,7 @@ bool MIDIIsPlaying(void) {
 
 VA(0x004c5bf0, 0x8f)
 void MIDISetVolume(i32& fadeSteps) {
-    if (!GetMusicFlagA())
+    if (!MidiReady())
         return;
     i32 volume = SOUND_VOLUME_FULL;
     if (fadeSteps > 0) {
@@ -159,6 +159,6 @@ void MIDISetVolume(i32& fadeSteps) {
 
 DATA(0x005361a0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT] = {NULL};
 DATA(0x00536290) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT] = {NULL};
-DATA(0x00536380) u8 gMusicFlagA = 0;
-DATA(0x00536381) u8 gMusicFlagB = 0;
+DATA(0x00536380) u8 gMidiReady = 0;
+DATA(0x00536381) u8 gMidiStarted = 0;
 DATA(0x00536384) struct _MDI_DRIVER* hMDI = NULL;

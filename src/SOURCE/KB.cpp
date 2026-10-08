@@ -438,7 +438,7 @@ i32 EarlySetup(void) {
 #define netPlayer netPlayer_k
 #define player player_h
 #define result result_i
-#define savedUpdateFlags savedUpdateFlags_l
+#define savedColorCycling savedUpdateFlags_l
 #define transmissionResult transmissionResult_d
 #define unusedMainState unusedMainState_o
 #define unusedPlayerState unusedPlayerState_f
@@ -449,7 +449,7 @@ i32 oldmain(void) {
     b32 quit;
     b32 mainScreenLoaded;
     b32 firstMainScreen;
-    i32 savedUpdateFlags;
+    i32 savedColorCycling;
     i32 player;
     i32 H2_UNUSED(unusedMainState);
     i32 H2_UNUSED(unusedMenuState);
@@ -473,7 +473,7 @@ i32 oldmain(void) {
     LogStr("OM3");
     KBChangeMenu(hmnuDflt);
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
     gpMouseManager->SetPointer(
@@ -510,13 +510,13 @@ i32 oldmain(void) {
             0
         );
         if (!gbSkipIntro) {
-            savedUpdateFlags = gpWindowManager->m_updateFlags;
-            gpWindowManager->m_updateFlags = 0;
+            savedColorCycling = gpWindowManager->m_colorCycling;
+            gpWindowManager->m_colorCycling = 0;
             if (PlaySmacker(OLD_MAIN_INTRO_PUBLISHER_VIDEO)
                 && PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO)
                 && PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO))
                 PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
-            gpWindowManager->m_updateFlags = savedUpdateFlags;
+            gpWindowManager->m_colorCycling = savedColorCycling;
         }
     }
 
@@ -559,7 +559,7 @@ i32 oldmain(void) {
         }
         mainScreenLoaded = true;
         if (gGameCommand != OLD_MAIN_EXIT)
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
 
         if (giTCPHostStatus != -1 && gbTCPFirstTime) {
             gbTCPFirstTime = false;
@@ -837,7 +837,7 @@ i32 oldmain(void) {
             }
 
         initialize_game:
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
             if (gShingleAnim)
                 gpResourceManager->Dispose(gShingleAnim);
             gShingleAnim = NULL;
@@ -913,7 +913,7 @@ i32 oldmain(void) {
             );
 
             if (giEndSequence != 1) {
-                gpWindowManager->m_updateFlags = 0;
+                gpWindowManager->m_colorCycling = 0;
                 if (xIsExpansionMap)
                     PlaySmacker(EXPANSION_DEFEAT_VIDEO);
                 else
@@ -927,7 +927,7 @@ i32 oldmain(void) {
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-                gpWindowManager->m_updateFlags = 1;
+                gpWindowManager->m_colorCycling = 1;
                 mainScreenLoaded = true;
                 gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
             } else {
@@ -1005,7 +1005,7 @@ i32 oldmain(void) {
                             LOGICAL_SCREEN_HEIGHT
                         );
                         gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
-                        gpWindowManager->m_updateFlags = 1;
+                        gpWindowManager->m_colorCycling = 1;
                         mainScreenLoaded = true;
                         gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                     } else {
@@ -1053,7 +1053,7 @@ i32 oldmain(void) {
 #undef netPlayer
 #undef player
 #undef result
-#undef savedUpdateFlags
+#undef savedColorCycling
 #undef transmissionResult
 #undef unusedMainState
 #undef unusedPlayerState
@@ -3642,7 +3642,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 
     gpMouseManager->HideColorPointer();
     memcpy(palette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
     realScore = baseScore * gpGame->m_difficultyRating / CONGRATS_DIFFICULTY_SCALE;
@@ -3700,7 +3700,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     );
     H2_FREE(congratsText);
     congratsText = NULL;
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
 }
 
@@ -5548,7 +5548,7 @@ void NormalDialog(
             resourceFrame,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_BOTTOM_CENTERED
                                                                   : WIDGET_KIND_ICON_DIRECT,
             1
         );

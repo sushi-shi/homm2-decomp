@@ -1018,7 +1018,7 @@ void ExpCampaign::ReplaySmacker(void) {
             ReplaySmacker4();
             break;
     }
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
 }
 
 VA(0x004b4b80, 0xcc)

@@ -10139,10 +10139,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
-                                if (!MusicFlagsActive()) {
+                                if (!MidiUnavailable()) {
                                     gpSoundManager->StartupMilesBackend();
                                 }
-                                if (GetMusicFlagA() == 0) {
+                                if (MidiReady() == 0) {
                                     gConfig.useOpera =
                                         static_cast<ConfigOperaMode>(1 - IDX(gConfig.useOpera));
                                 } else {

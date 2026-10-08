@@ -656,8 +656,8 @@ i32 PlaySmacker(i32 smackNumber) {
     gbInSmackMgr = true;
     gbPlayedThrough = false;
     memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    oldUpdateFlags = gpWindowManager->m_updateFlags;
-    gpWindowManager->m_updateFlags = 0;
+    oldUpdateFlags = gpWindowManager->m_colorCycling;
+    gpWindowManager->m_colorCycling = 0;
     if (smackNumber != EXPANSION_CAMPAIGN) {
         gSoundBackendsReady = 1;
         gpSoundManager->PlayAmbientMusic(-1);
@@ -676,7 +676,7 @@ i32 PlaySmacker(i32 smackNumber) {
     bSmackNum = smackNumber;
     SmackManagerMain();
     memcpy(gpBufferPalette->m_data, savedPalette, PALETTE_DATA_SIZE);
-    gpWindowManager->m_updateFlags = oldUpdateFlags;
+    gpWindowManager->m_colorCycling = oldUpdateFlags;
     gbInSmackMgr = false;
     return gbPlayedThrough;
 }

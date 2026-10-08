@@ -665,7 +665,7 @@ i32 townManager::Open(i32 id) {
     m_castleDialogActive = false;
     m_recruitResult = false;
     m_lastHoverId = TOWN_HOVER_NONE;
-    m_lastHoverSubId = 0;
+    m_lastHoverModifiers = 0;
     m_townObjectCount = 0;
     m_unknownC6 = 0;
     m_garrisonStrip = NULL;
@@ -1763,10 +1763,10 @@ MessageDispatchResult townManager::Main(tag_message& message) {
         case MESSAGE_MOUSE_MOVE:
             gpWindowManager->ConvertToHover(message);
             if (message.payload.hover.id == m_lastHoverId
-                && message.payload.hover.subId == m_lastHoverSubId)
+                && message.payload.hover.modifiers == m_lastHoverModifiers)
                 return MESSAGE_DISPATCH_CONSUME;
             m_lastHoverId = message.payload.hover.id;
-            m_lastHoverSubId = message.payload.hover.subId;
+            m_lastHoverModifiers = message.payload.hover.modifiers;
             SetCommandAndText(message);
             return MESSAGE_DISPATCH_CONSUME;
 
@@ -3651,7 +3651,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                                 static_cast<i16>(strongestCreature),
                                 ICON_DRAW_NORMAL,
                                 -1,
-                                WIDGET_KIND_ICON_CENTERED,
+                                WIDGET_KIND_ICON_BOTTOM_CENTERED,
                                 1
                             );
                             if (iconControl == NULL)

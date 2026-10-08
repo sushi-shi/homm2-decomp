@@ -8228,7 +8228,7 @@ CombatResult advManager::AutoResolveCombat(
     savedShowIt = bShowIt;
     bShowIt = false;
     gpMouseManager->SetPointer(0);
-    gpMouseManager->m_forcePointerUpdate = true;
+    gpMouseManager->m_pointerLocked = true;
     message.type = MESSAGE_NONE;
     DemobilizeCurrHero();
     gpCombatManager->SetupCombat(
@@ -8284,7 +8284,7 @@ CombatResult advManager::AutoResolveCombat(
     if (processLosses)
         gbRetreatWin = false;
     gbInCombat = false;
-    gpMouseManager->m_forcePointerUpdate = false;
+    gpMouseManager->m_pointerLocked = false;
     return gpCombatManager->m_combatResult;
 }
 
