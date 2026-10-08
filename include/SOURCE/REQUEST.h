@@ -1,8 +1,9 @@
-#ifndef HOMM2_REQUEST_H
-#define HOMM2_REQUEST_H
+#ifndef HOMM2_SOURCE_REQUEST_H
+#define HOMM2_SOURCE_REQUEST_H
 
-#include <Ints.h>
-#include <SOURCE/GAME.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/LegacyText.h>
 
 typedef enum MapHeaderConstant {
@@ -11,7 +12,7 @@ typedef enum MapHeaderConstant {
     MAP_HEADER_PLAYER_DATA_SIZE     = 0x12,
     MAP_HEADER_VICTORY_DATA_SIZE    = 4,
     MAP_HEADER_CONDITION_DATA_SIZE  = 0x17,
-    MAP_HEADER_RESERVED_SIZE        = 8,
+    MAP_HEADER_RESERVED_SIZE        = 6,
     MAP_HEADER_NAME_SIZE            = 0x3c,
     MAP_HEADER_DESCRIPTION_OFFSET   = 0x76,
     MAP_HEADER_DESCRIPTION_SIZE     = 300,
@@ -48,7 +49,8 @@ using enum MapLossCondition;
 struct SMapHeader {
     u32 magic;
     H2EnumStorage<GameDifficulty, u8> difficulty;
-    u8 unknown5;
+
+    u8 reserved5;
     u8 width;
     u8 height;
     u8 playerEnabled[GAME_PLAYER_COUNT];
@@ -63,12 +65,19 @@ struct SMapHeader {
     u16 victoryConditionValue;
     MapLossCondition lossCondition;
     u16 lossConditionValue;
-    u8 unknown25;
+
+
+    u8 noStartingHero;
     H2EnumStorage<FactionType, i8> playerRace[GAME_PLAYER_COUNT];
-    u16 victoryTownY;
-    u16 lossTownY;
+    u16 victoryConditionY;
+    u16 lossConditionY;
     u16 victorySideThreshold;
+
     u8 reserved32[MAP_HEADER_RESERVED_SIZE];
+
+
+    u8 townNameIndex;
+    u8 nameFileOnSave;
     char name[MAP_HEADER_NAME_SIZE];
     char description[MAP_HEADER_DESCRIPTION_SIZE];
     u8 rumourCount;

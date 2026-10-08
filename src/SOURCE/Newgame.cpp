@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/message.h>
@@ -20,6 +20,7 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SETUP.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
@@ -27,7 +28,6 @@
 #include <PLATFORM/Strings.h>
 #include <IRONFIST/prefs.h>
 #include <SOURCE/Newgame.h>
-#include <SOURCE/GAME.h>
 #include <BASE/dialog.h>
 #include <BASE/widget.h>
 
@@ -38,7 +38,6 @@
 typedef enum NewGameConstant {
     GAME_DIALOG_OK                        = DIALOG_BUTTON_2,
     GAME_DIALOG_CANCEL                    = DIALOG_BUTTON_1,
-    GAME_TEXT_BUFFER_COUNT                = 3,
     GAME_TEXT_BUFFER_SIZE                 = 0x65,
     GAME_KEY_BUFFER_SIZE                  = 0x69,
     GAME_MAP_PACKET_SIZE                  = 0x74,
@@ -48,16 +47,8 @@ typedef enum NewGameConstant {
     GAME_SETUP_BUFFER_SIZE                = 240,
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
-    GAME_REMOTE_CHANNEL                   = 0x7f,
-    GAME_REMOTE_CHAT                      = 0x0b,
-    GAME_REMOTE_SETUP                     = 0x33,
-    GAME_REMOTE_MAP_HEADER                = 0x34,
-    GAME_REMOTE_START                     = 0x35,
-    GAME_REMOTE_CANCEL                    = 0x36,
-    GAME_REMOTE_PLAYER_INFO               = 0x37,
     GAME_NETWORK_PLAYER_NONE              = -1,
-    GAME_MAP_OPTIONS_CONTROL              = 0x36,
-    GAME_CHAT_LINE_COUNT                  = 3,
+    GAME_SELECT_SCENARIO_BUTTON              = 0x36,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
     GAME_COMPUTER_COLOR_UNLOCKED_FRAME    = 3,
@@ -124,16 +115,9 @@ static const i32 factionPortraitIconIdx[KB_FACTION_TABLE_CAPACITY][GAME_PORTRAIT
 };
 
 typedef enum NewGamePlayerSetupType {
-    GAME_PLAYER_DEFAULT = 0,
+    GAME_PLAYER_FIXED = 0,
     GAME_PLAYER_FLEXIBLE = 1
 } NewGamePlayerSetupType;
-
-enum class NewGameKeyCode : i32 {
-    GAME_KEY_ENTER          = 10,
-    GAME_KEY_BACKSPACE      = 0x7f,
-    GAME_KEY_FIRST_EXTENDED = 0x100,
-};
-using enum NewGameKeyCode;
 
 typedef enum NewGameStorageConstant {
     FILE_MASK_CAPACITY      = 16,
@@ -144,8 +128,6 @@ typedef enum NewGameStorageConstant {
 typedef enum NewGameDialogConstant {
     MAP_REQUESTER_X           = 212,
     MAP_REQUESTER_Y           = 9,
-    MAP_CHOICE_WINDOW_X       = 405,
-    MAP_CHOICE_WINDOW_Y       = 8,
     NEW_GAME_WINDOW_X         = 190,
     NEW_GAME_NETWORK_WINDOW_Y = 4,
     NEW_GAME_SINGLE_WINDOW_Y  = 33,
@@ -153,13 +135,12 @@ typedef enum NewGameDialogConstant {
     BROKENA_MAX_HUMAN_PLAYERS = 3,
     SCENARIO_WINDOW_X         = 90,
     SCENARIO_WINDOW_Y         = 4,
-    NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
 } NewGameDialogConstant;
 
 enum class NewGameMapChoice : i32 {
-    MAP_CHOICE_CANCEL    = DIALOG_BUTTON_1,
-    MAP_CHOICE_STANDARD  = 1,
-    MAP_CHOICE_EXPANSION = 2,
+    MAP_CHOICE_CANCEL    = DIALOG_CANCEL,
+    MAP_CHOICE_STANDARD  = CHOICE_ONE,
+    MAP_CHOICE_EXPANSION = CHOICE_TWO,
 };
 using enum NewGameMapChoice;
 
@@ -244,11 +225,6 @@ typedef enum NewGamePlayerLayout {
     SCENARIO_PLAYER_RACE_CYCLE_Y      = PLAYER_RACE_CYCLE_Y - SCENARIO_PLAYER_Y_OFFSET
 } NewGamePlayerLayout;
 
-typedef enum NewGameKeyEncoding {
-    KEY_SCAN_CODE_SHIFT = 8,
-    KEY_SCAN_CODE_MASK  = 0xff00,
-    KEY_ASCII_MASK      = 0xff
-} NewGameKeyEncoding;
 
 void game::GetMap(void) {
 
@@ -274,7 +250,7 @@ void game::GetMap(void) {
     requesterResult = new fileRequester(
         MAP_REQUESTER_X,
         MAP_REQUESTER_Y,
-        FILE_REQUESTER_MAP_GAME,
+        FILE_REQUESTER_NEW_GAME_MAP,
         fileMask,
         gcMapPath,
         fileMask + 1
@@ -377,13 +353,13 @@ void game::InitNewGame(struct SMapHeader* header) {
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                 && !m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
-                m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
+                m_setupPlayerType[player] = GAME_PLAYER_FIXED;
                 m_setupPlayerNetworkId[player] = humanCount;
                 ++humanCount;
             } else if (!m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                        && m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
-                m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
+                m_setupPlayerType[player] = GAME_PLAYER_FIXED;
                 ++computerCount;
             }
         }
@@ -392,7 +368,7 @@ void game::InitNewGame(struct SMapHeader* header) {
             && computerCount < m_mapHeader.playerCount - giNumHumanPlayers)
             playerType = GAME_PLAYER_FLEXIBLE;
         else
-            playerType = GAME_PLAYER_DEFAULT;
+            playerType = GAME_PLAYER_FIXED;
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerType[player] == GAME_NETWORK_PLAYER_NONE)
@@ -437,7 +413,7 @@ i32 game::NewGame(void) {
     NewGameRemotePacket* remoteBuffer;
     heroWindow* choiceWindow;
     b32 result;
-    b8 wrongExpansionType;
+    b8 mapMatchesType;
     char* mapExt;
     i32 mapHeaderRead;
     i32 textBufferIndex;
@@ -447,7 +423,7 @@ i32 game::NewGame(void) {
     m_newGameWindow = NULL;
 
     if ((!gbRemoteOn || giThisNetPos == 0) && (!gbRemoteOn || !xNetHasOldPlayers)) {
-        choiceWindow = new heroWindow(MAP_CHOICE_WINDOW_X, MAP_CHOICE_WINDOW_Y, "x_mapmnu.bin");
+        choiceWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (choiceWindow == NULL)
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
@@ -465,8 +441,8 @@ i32 game::NewGame(void) {
     }
 
     SetupNetPlayerNames();
-    glTimers[0] = 0;
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = 0;
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
             static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
         strcpy(
@@ -489,12 +465,12 @@ i32 game::NewGame(void) {
             remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
             if (remoteBuffer != NULL && remoteBuffer->type == REMOTE_MESSAGE_RELIABLE) {
                 switch (remoteBuffer->command) {
-                    case GAME_REMOTE_MAP_HEADER:
+                    case REMOTE_COMMAND_MAP_HEADER:
                         memset(&m_mapHeader, 0, sizeof(m_mapHeader));
                         memcpy(&m_mapHeader, remoteBuffer->payload, GAME_MAP_PACKET_SIZE);
                         mapHeaderOk = true;
                         break;
-                    case GAME_REMOTE_PLAYER_INFO:
+                    case REMOTE_COMMAND_PLAYER_INFO:
                         memcpy(
                             gsNetPlayerInfo,
                             remoteBuffer->payload,
@@ -512,7 +488,7 @@ i32 game::NewGame(void) {
                     UpdateNewGameWindow();
 
                     windowMessage.type = MESSAGE_WIDGET;
-                    windowMessage.payload.widget.id = GAME_MAP_OPTIONS_CONTROL;
+                    windowMessage.payload.widget.id = GAME_SELECT_SCENARIO_BUTTON;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                     windowMessage.payload.widget.data.value = H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
@@ -550,15 +526,15 @@ i32 game::NewGame(void) {
         }
     } else {
         while (true) {
-            wrongExpansionType = false;
+            mapMatchesType = false;
             mapExt = FindLastToken(m_mapFilename, '.');
             if (mapExt != NULL) {
                 if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
-                    wrongExpansionType = true;
+                    mapMatchesType = true;
                 if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
-                    wrongExpansionType = true;
+                    mapMatchesType = true;
             }
-            if (!wrongExpansionType) {
+            if (!mapMatchesType) {
                 if (xIsExpansionMap)
                     strcpy(gpGame->m_mapFilename, "arrax.mx2");
                 else
@@ -585,9 +561,9 @@ i32 game::NewGame(void) {
             memcpy(mapInfo, &gpGame->m_mapHeader, GAME_MAP_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 mapInfo,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_MAP_PACKET_SIZE,
-                GAME_REMOTE_MAP_HEADER,
+                REMOTE_COMMAND_MAP_HEADER,
                 1
             );
             if (!transmitResult)
@@ -595,9 +571,9 @@ i32 game::NewGame(void) {
             memcpy(netPlayerPacket, gsNetPlayerInfo, GAME_PLAYER_INFO_PACKET_SIZE);
             transmitResult = TransmitRemoteData(
                 netPlayerPacket,
-                GAME_REMOTE_CHANNEL,
+                REMOTE_BROADCAST_PLAYER,
                 GAME_PLAYER_INFO_PACKET_SIZE,
-                GAME_REMOTE_PLAYER_INFO,
+                REMOTE_COMMAND_PLAYER_INFO,
                 1
             );
             if (!transmitResult)
@@ -641,7 +617,7 @@ i32 game::NewGame(void) {
     }
 
 cleanup:
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+    for (textBufferIndex = 0; textBufferIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         H2_FREE(cTextReceivedBuffer[textBufferIndex]);
     }
     H2_FREE(cNGKPCore);
@@ -654,14 +630,14 @@ cleanup:
         i32 player;
 
         for (player = 0; player < GAME_PLAYER_COUNT; ++player) {
-            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_OPPONENT_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_SELECT_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_COLOR_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_NAME_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_ICON_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_CYCLE_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_NAME_FIRST);
-            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_HUMAN_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_LABEL_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_FIRST);
         }
     }
@@ -701,7 +677,7 @@ cleanup:
                     "ngextra.icn",
                     PLAYER_HUMAN_FRAME,
                     ICON_DRAW_NORMAL,
-                    playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
+                    playerCounter + NEW_GAME_HANDICAP_LABEL_FIRST,
                     WIDGET_KIND_ICON_DIRECT,
                     PLAYER_WIDGET_FILL_COLOR
                 );
@@ -737,7 +713,7 @@ cleanup:
                 giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
                                           : GAME_RACE_WIDGET_SINGLE_FRAME,
                 ICON_DRAW_NORMAL,
-                playerCounter + NEW_GAME_RACE_FIRST,
+                playerCounter + NEW_GAME_OPPONENT_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -881,15 +857,15 @@ cleanup:
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
         for (playerIndex = 0; playerIndex < H2EnumIndex(DIFFICULTY_COUNT); ++playerIndex) {
-            message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
+            message.payload.widget.id = NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + playerIndex;
             m_newGameWindow->BroadcastMessage(message);
         }
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(m_difficulty);
+        message.payload.widget.id = NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(m_difficulty);
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
-            for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
+            for (playerIndex = 0; playerIndex < GAME_RECEIVED_TEXT_BUFFER_COUNT; ++playerIndex) {
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cTextReceivedBuffer[playerIndex]);
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                 message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
@@ -918,7 +894,7 @@ cleanup:
             message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
             m_newGameWindow->BroadcastMessage(message);
 
-            if (m_setupPlayerType[playerIndex] != GAME_PLAYER_DEFAULT
+            if (m_setupPlayerType[playerIndex] != GAME_PLAYER_FIXED
                 || (giNumHumanPlayers > 1
                     && m_setupPlayerNetworkId[playerIndex] != GAME_COMPUTER_PLAYER))
                 playerLockedValue = false;
@@ -997,7 +973,7 @@ cleanup:
         i32 sendResult;
         i32 oldNetworkId;
         i32 swapPlayerTemp;
-        i32 currentPlayerLocal;
+        i32 setupSlot;
         tag_message windowMessage;
         b32 redraw = false;
         b32 needSync = false;
@@ -1005,7 +981,7 @@ cleanup:
         NewGameRemotePacket* remotePacketResult;
         i32 sender;
         char mapPacketLocal[GAME_MAP_PACKET_SIZE];
-        tag_message mapWindowMessageTemp;
+        tag_message cancelButtonMessage;
         i32 helpDialogIndexLocal;
 
         char mapNamePacket[H2EnumIndex( MAP_HEADER_NAME_SIZE) + GAME_SETUP_BUFFER_SIZE ];
@@ -1023,7 +999,7 @@ cleanup:
                 && (remotePacketResult->type == REMOTE_MESSAGE_RELIABLE
                     || remotePacketResult->type == REMOTE_MESSAGE_UNRELIABLE)) {
                 switch (remotePacketResult->command) {
-                    case GAME_REMOTE_START:
+                    case REMOTE_COMMAND_GAME_START:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
                         message.type = MESSAGE_WIDGET;
@@ -1031,12 +1007,12 @@ cleanup:
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         return MESSAGE_DISPATCH_FORWARD;
 
-                    case GAME_REMOTE_CANCEL:
+                    case REMOTE_COMMAND_GAME_CANCEL:
                         NormalDialog(localization::Tr("network.host.canceled_game"), NORMAL_DIALOG_INFO);
                         ShutDown(NULL);
                         break;
 
-                    case GAME_REMOTE_SETUP:
+                    case REMOTE_COMMAND_GAME_SETUP:
                         if (strcmp(remotePacketResult->payload, gpGame->m_mapHeader.name) != 0)
                             break;
                         memcpy(
@@ -1047,7 +1023,7 @@ cleanup:
                         redraw = true;
                         break;
 
-                    case GAME_REMOTE_MAP_HEADER:
+                    case REMOTE_COMMAND_MAP_HEADER:
                         memset(&mapHeader, 0, sizeof(mapHeader));
                         memcpy(
                             &mapHeader,
@@ -1057,7 +1033,7 @@ cleanup:
                         gpGame->ProcessNewMap(&mapHeader);
                         break;
 
-                    case GAME_REMOTE_CHAT:
+                    case REMOTE_COMMAND_POP_NET_BOX:
                         redraw = true;
                         sender = remotePacketResult->sender;
                         if (sender >= 0) {
@@ -1071,18 +1047,18 @@ cleanup:
 
                         }
                         gText[GAME_CHAT_TEXT_LIMIT] = 0;
-                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
-                             ++currentPlayerLocal) {
+                        for (setupSlot = 0; setupSlot < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
+                             ++setupSlot) {
                             strcpy(
-                                cTextReceivedBuffer[currentPlayerLocal],
-                                cTextReceivedBuffer[currentPlayerLocal + 1]
+                                cTextReceivedBuffer[setupSlot],
+                                cTextReceivedBuffer[setupSlot + 1]
                             );
                         }
-                        strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], gText);
+                        strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], gText);
                         break;
                 }
             }
-            if (static_cast<i32>(platform::Ticks()) > glTimers[0]) {
+            if (static_cast<i32>(platform::Ticks()) > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
                 gpGame->DrawNGKPDisplayString(1);
             }
@@ -1092,14 +1068,14 @@ cleanup:
             && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
             redraw = true;
-            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
-                 ++currentPlayerLocal) {
+            for (setupSlot = 0; setupSlot < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
+                 ++setupSlot) {
                 strcpy(
-                    cTextReceivedBuffer[currentPlayerLocal],
-                    cTextReceivedBuffer[currentPlayerLocal + 1]
+                    cTextReceivedBuffer[setupSlot],
+                    cTextReceivedBuffer[setupSlot + 1]
                 );
             }
-            strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
+            strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], cNGKPCore);
             strcpy(
                 cNGKPCore,
                 ""
@@ -1110,10 +1086,10 @@ cleanup:
             );
             NGKPcursorIndex = 0;
             sendResult = TransmitRemoteData(
-                cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1],
-                GAME_REMOTE_CHANNEL,
-                strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
-                GAME_REMOTE_CHAT,
+                cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1],
+                REMOTE_BROADCAST_PLAYER,
+                strlen(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1]) + 1,
+                REMOTE_COMMAND_POP_NET_BOX,
                 1
             );
             if (!sendResult)
@@ -1124,27 +1100,27 @@ cleanup:
             if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 if (IS_WIDGET_SELECTION_NOTIFICATION(message.payload.widget.command)) {
                     helpDialogIndexLocal = -1;
-                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
+                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_BUTTON_FIRST
                          && message.payload.widget.id
-                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
+                                <= NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1))
+                                   <= NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_COUNT) - 1))
                         helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
                     if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
                          && message.payload.widget.id
                                 <= NEW_GAME_HANDICAP_FIRST + H2EnumIndex(GAME_PLAYER_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
-                            && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST
+                        || (message.payload.widget.id >= NEW_GAME_HANDICAP_LABEL_FIRST
+                            && message.payload.widget.id <= NEW_GAME_HANDICAP_LABEL_FIRST
                                                                 + H2EnumIndex(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_HANDICAP;
                     if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
                          && message.payload.widget.id
                                 <= NEW_GAME_COLOR_FIRST + H2EnumIndex(GAME_PLAYER_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
+                        || (message.payload.widget.id >= NEW_GAME_OPPONENT_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_RACE_FIRST + H2EnumIndex(GAME_PLAYER_COUNT) - 1)
+                                   <= NEW_GAME_OPPONENT_FIRST + H2EnumIndex(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
@@ -1158,7 +1134,7 @@ cleanup:
                                                                 + H2EnumIndex(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_RACE;
-                    if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
+                    if (message.payload.widget.id == GAME_SELECT_SCENARIO_BUTTON
                         || message.payload.widget.id == NEW_GAME_MAP_SELECT
                         || message.payload.widget.id == NEW_GAME_SCENARIO_NAME)
                         helpDialogIndexLocal = GAME_HELP_MAP;
@@ -1169,7 +1145,7 @@ cleanup:
                     if (message.payload.widget.id == GAME_DIALOG_CANCEL)
                         helpDialogIndexLocal = GAME_HELP_CANCEL;
                     if (helpDialogIndexLocal != -1)
-                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NEW_GAME_HELP_DIALOG_TYPE);
+                        NormalDialog(gNewGameHelp[helpDialogIndexLocal], NORMAL_DIALOG_QUICK_VIEW);
                 }
             } else {
                 switch (message.payload.widget.command) {
@@ -1179,9 +1155,9 @@ cleanup:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
-                                        GAME_REMOTE_START,
+                                        REMOTE_COMMAND_GAME_START,
                                         1
                                     );
                                 }
@@ -1195,9 +1171,9 @@ cleanup:
                                 if (gbRemoteOn) {
                                     sendResult = TransmitRemoteData(
                                         NULL,
-                                        GAME_REMOTE_CHANNEL,
+                                        REMOTE_BROADCAST_PLAYER,
                                         0,
-                                        GAME_REMOTE_CANCEL,
+                                        REMOTE_COMMAND_GAME_CANCEL,
                                         1
                                     );
                                     ShutDown(NULL);
@@ -1208,7 +1184,7 @@ cleanup:
                                 gbNewGameDialogOver = true;
                                 return MESSAGE_DISPATCH_FORWARD;
 
-                            case GAME_MAP_OPTIONS_CONTROL:
+                            case GAME_SELECT_SCENARIO_BUTTON:
                                 goto chooseMap;
 
                             default:
@@ -1218,25 +1194,25 @@ cleanup:
 
                     case WIDGET_NOTIFY_SELECT:
                         switch (message.payload.widget.id) {
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_HELP_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_BUTTON_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_BUTTON_FIRST;
                                 goto setDifficulty;
 
-                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + H2EnumIndex(DIFFICULTY_IMPOSSIBLE):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST;
                             setDifficulty:
                                 gpGame->m_difficulty =
-                                    GameDifficultyFromCode(currentPlayerLocal);
+                                    GameDifficultyFromCode(setupSlot);
                                 needSync = true;
                                 redraw = true;
                                 break;
@@ -1247,38 +1223,38 @@ cleanup:
                             case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_HANDICAP_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
                                 goto cycleHandicap;
 
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_HANDICAP_LABEL_FIRST;
                             cycleHandicap:
                                 needSync = true;
                                 redraw = true;
-                                if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                if (gpGame->m_setupPlayerNetworkId[setupSlot]
                                     != GAME_COMPUTER_PLAYER) {
-                                    gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
-                                        (H2EnumIndex(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
+                                    gpGame->m_playerHandicap[setupSlot] = PlayerHandicap(
+                                        (H2EnumIndex(gpGame->m_playerHandicap[setupSlot]) + 1)
                                         % H2EnumIndex(PLAYER_HANDICAP_COUNT)
                                     );
                                 }
                                 break;
 
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_RACE_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_RACE_FIRST;
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_OPPONENT_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_OPPONENT_FIRST;
                                 goto selectPlayer;
 
                             case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FIRST):
@@ -1287,7 +1263,7 @@ cleanup:
                             case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_COLOR_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_COLOR_FIRST;
                                 goto selectPlayer;
 
@@ -1297,7 +1273,7 @@ cleanup:
                             case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_PLAYER_SELECT_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
                                 goto selectPlayer;
 
@@ -1307,18 +1283,18 @@ cleanup:
                             case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_PLAYER_NAME_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
                             selectPlayer:
                                 needSync = true;
                                 redraw = true;
-                                if (gpGame->m_setupPlayerType[currentPlayerLocal]
-                                        != GAME_PLAYER_DEFAULT
+                                if (gpGame->m_setupPlayerType[setupSlot]
+                                        != GAME_PLAYER_FIXED
                                     || (giNumHumanPlayers > 1
-                                        && gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                        && gpGame->m_setupPlayerNetworkId[setupSlot]
                                                != GAME_COMPUTER_PLAYER)) {
                                     if (giNumHumanPlayers == 1) {
-                                        if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                        if (gpGame->m_setupPlayerNetworkId[setupSlot]
                                             == GAME_COMPUTER_PLAYER) {
                                             for (swapPlayerTemp = 0;
                                                  swapPlayerTemp < gpGame->m_mapHeader.playerCount;
@@ -1329,9 +1305,9 @@ cleanup:
                                                                        [swapPlayerTemp];
                                                     gpGame->m_setupPlayerNetworkId[swapPlayerTemp] =
                                                         gpGame->m_setupPlayerNetworkId
-                                                            [currentPlayerLocal];
+                                                            [setupSlot];
                                                     gpGame->m_setupPlayerNetworkId
-                                                        [currentPlayerLocal] = oldNetworkId;
+                                                        [setupSlot] = oldNetworkId;
                                                     swapPlayerTemp = GAME_SWAP_SEARCH_DONE;
                                                 }
                                             }
@@ -1339,29 +1315,29 @@ cleanup:
                                     } else if (gpGame->m_selectedSetupPlayer
                                                == GAME_NETWORK_PLAYER_NONE) {
                                         gpGame->m_selectedSetupPlayer =
-                                            currentPlayerLocal;
-                                    } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal
+                                            setupSlot;
+                                    } else if (gpGame->m_selectedSetupPlayer == setupSlot
                                                || (gpGame->m_setupPlayerNetworkId
-                                                           [currentPlayerLocal]
+                                                           [setupSlot]
                                                        == GAME_COMPUTER_PLAYER
                                                    && gpGame->m_setupPlayerNetworkId
                                                               [gpGame->m_selectedSetupPlayer]
                                                           == GAME_COMPUTER_PLAYER)) {
                                         gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
                                     } else {
-                                        if ((gpGame->m_setupPlayerType[currentPlayerLocal]
-                                                 != GAME_PLAYER_DEFAULT
+                                        if ((gpGame->m_setupPlayerType[setupSlot]
+                                                 != GAME_PLAYER_FIXED
                                              && gpGame->m_setupPlayerType
                                                         [gpGame->m_selectedSetupPlayer]
-                                                    != GAME_PLAYER_DEFAULT)
-                                            || (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                                    != GAME_PLAYER_FIXED)
+                                            || (gpGame->m_setupPlayerNetworkId[setupSlot]
                                                     != GAME_COMPUTER_PLAYER
                                                 && gpGame->m_setupPlayerNetworkId
                                                            [gpGame->m_selectedSetupPlayer]
                                                        != GAME_COMPUTER_PLAYER)) {
                                             swapPlayerTemp =
-                                                gpGame->m_setupPlayerNetworkId[currentPlayerLocal];
-                                            gpGame->m_setupPlayerNetworkId[currentPlayerLocal] =
+                                                gpGame->m_setupPlayerNetworkId[setupSlot];
+                                            gpGame->m_setupPlayerNetworkId[setupSlot] =
                                                 gpGame->m_setupPlayerNetworkId
                                                     [gpGame->m_selectedSetupPlayer];
                                             gpGame->m_setupPlayerNetworkId
@@ -1381,7 +1357,7 @@ cleanup:
                             case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_RACE_CYCLE_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
                                 goto cycleRace;
 
@@ -1391,32 +1367,32 @@ cleanup:
                             case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_RACE_ICON_FIRST + H2EnumIndex(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
                             cycleRace:
                                 if (gpGame->m_mapHeader
-                                        .playerRace[gpGame->m_setupPlayerColor[currentPlayerLocal]]
+                                        .playerRace[gpGame->m_setupPlayerColor[setupSlot]]
                                     == FACTION_RANDOM) {
-                                    if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                    if (gpGame->m_setupPlayerRace[setupSlot]
                                         == FACTION_RANDOM)
-                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                        gpGame->m_setupPlayerRace[setupSlot] =
                                             FACTION_KNIGHT;
-                                    else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                    else if (gpGame->m_setupPlayerRace[setupSlot]
                                              == FACTION_NECROMANCER)
-                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                        gpGame->m_setupPlayerRace[setupSlot] =
                                             FACTION_CYBORG;
-                                    else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                    else if (gpGame->m_setupPlayerRace[setupSlot]
                                              == FACTION_CYBORG)
-                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                        gpGame->m_setupPlayerRace[setupSlot] =
                                             FACTION_RANDOM;
                                     else
-                                        ++gpGame->m_setupPlayerRace[currentPlayerLocal];
+                                        ++gpGame->m_setupPlayerRace[setupSlot];
                                     needSync = true;
                                     redraw = true;
                                 }
                                 break;
 
-                            case GAME_MAP_OPTIONS_CONTROL:
+                            case GAME_SELECT_SCENARIO_BUTTON:
                                 break;
 
                             case NEW_GAME_SCENARIO_NAME:
@@ -1425,21 +1401,21 @@ cleanup:
                                 if (gbRemoteOn && giThisNetPos != 0)
                                     break;
                                 {
-                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                                    mapWindowMessageTemp.payload.widget.command =
+                                    cancelButtonMessage.type = MESSAGE_WIDGET;
+                                    cancelButtonMessage.payload.widget.command =
                                         WIDGET_COMMAND_CLEAR_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                                    mapWindowMessageTemp.payload.widget.data.value =
+                                    cancelButtonMessage.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    cancelButtonMessage.payload.widget.data.value =
                                         H2EnumIndex(WIDGET_FLAG_ENABLED);
-                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    gpGame->m_newGameWindow->BroadcastMessage(cancelButtonMessage);
                                     gpGame->GetMap();
-                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                                    mapWindowMessageTemp.payload.widget.command =
+                                    cancelButtonMessage.type = MESSAGE_WIDGET;
+                                    cancelButtonMessage.payload.widget.command =
                                         WIDGET_COMMAND_SET_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                                    mapWindowMessageTemp.payload.widget.data.value =
+                                    cancelButtonMessage.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    cancelButtonMessage.payload.widget.data.value =
                                         H2EnumIndex(WIDGET_FLAG_ENABLED);
-                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    gpGame->m_newGameWindow->BroadcastMessage(cancelButtonMessage);
                                     if (gbRemoteOn) {
                                         memcpy(
                                             mapPacketLocal,
@@ -1448,9 +1424,9 @@ cleanup:
                                         );
                                         sendResult = TransmitRemoteData(
                                             mapPacketLocal,
-                                            GAME_REMOTE_CHANNEL,
+                                            REMOTE_BROADCAST_PLAYER,
                                             GAME_MAP_PACKET_SIZE,
-                                            GAME_REMOTE_MAP_HEADER,
+                                            REMOTE_COMMAND_MAP_HEADER,
                                             1
                                         );
                                     }
@@ -1477,9 +1453,9 @@ cleanup:
         memcpy(mapNamePacket + MAP_HEADER_NAME_SIZE, gpGame->m_setupPlayerColor, GAME_SETUP_DATA_SIZE);
         sendResult = TransmitRemoteData(
             mapNamePacket,
-            GAME_REMOTE_CHANNEL,
+            REMOTE_BROADCAST_PLAYER,
             GAME_SETUP_PACKET_SIZE,
-            GAME_REMOTE_SETUP,
+            REMOTE_COMMAND_GAME_SETUP,
             1
         );
         if (!sendResult)
@@ -1584,9 +1560,9 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (static_cast<i32>(platform::Ticks()) > glTimers[0]) {
+    if (static_cast<i32>(platform::Ticks()) > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
-        glTimers[0] = platform::Ticks() + GAME_CURSOR_FLASH_TICKS;
+        glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = platform::Ticks() + GAME_CURSOR_FLASH_TICKS;
     }
 
     if (cursor > 0)
@@ -1657,7 +1633,7 @@ void game::ShowScenInfo(void) {
     const std::string mapDescription =
         localization::DecodeExternalText(localization::TextField(m_mapHeader.description), mapEncoding);
 
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     window = new heroWindow(SCENARIO_WINDOW_X, SCENARIO_WINDOW_Y, "sceninfo.bin");
     if (window == NULL)
         MemError();
@@ -1721,7 +1697,7 @@ void game::ShowScenInfo(void) {
                 "ngextra.icn",
                 PLAYER_HUMAN_FRAME,
                 ICON_DRAW_NORMAL,
-                playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
+                playerCounter + NEW_GAME_HANDICAP_LABEL_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -1756,7 +1732,7 @@ void game::ShowScenInfo(void) {
             giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
                                       : GAME_RACE_WIDGET_SINGLE_FRAME,
             ICON_DRAW_NORMAL,
-            playerCounter + NEW_GAME_RACE_FIRST,
+            playerCounter + NEW_GAME_OPPONENT_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
@@ -1885,7 +1861,7 @@ void game::ShowScenInfo(void) {
         message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message);
 
-        if (m_setupPlayerType[playerCounter] != GAME_PLAYER_DEFAULT
+        if (m_setupPlayerType[playerCounter] != GAME_PLAYER_FIXED
             || (giNumHumanPlayers > 1
                 && m_setupPlayerNetworkId[playerCounter] != GAME_COMPUTER_PLAYER))
             locked = false;
@@ -1959,7 +1935,7 @@ void game::GetLossConditionText(char* text) {
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
             case MAP_LOSS_TOWN:
-                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
+                townId = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossConditionY);
                 city = GetTown(townId);
                 utf8::Format(
                     text,
@@ -2019,7 +1995,7 @@ void game::GetVictoryConditionText(char* text) {
         switch (m_mapHeader.victoryCondition) {
             case MAP_VICTORY_CAPTURE_TOWN:
                 targetTown = GetTown(
-                    GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY)
+                    GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryConditionY)
                 );
                 utf8::Format(
                     text,
@@ -2187,7 +2163,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             localPlayer = i;
     }
 
-    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer ? 1 : 0;
+    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer;
     sideCount = lastPlayer - firstPlayer + 1;
     otherPlayerCount = sideCount - (onSide != 0);
 
@@ -2242,5 +2218,5 @@ char* cNGKPDisplay;
 b32 gbNewGameShadowHidden;
 char* cNGKPCore;
 i32 NGKPcursorIndex;
-char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
+char* cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT];
 class icon* NGKPBkg;

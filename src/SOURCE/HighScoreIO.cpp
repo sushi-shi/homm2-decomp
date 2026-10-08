@@ -23,7 +23,7 @@ static_assert(sizeof(HighScoreEntry) == std::tuple_size_v<Record>);
 static_assert(offsetof(HighScoreEntry, scenarioName) == ScenarioNameOffset);
 static_assert(offsetof(HighScoreEntry, score) == ScoreOffset);
 static_assert(offsetof(HighScoreEntry, days) == DaysOffset);
-static_assert(offsetof(HighScoreEntry, scenario) == ScenarioOffset);
+static_assert(offsetof(HighScoreEntry, difficultyRating) == ScenarioOffset);
 static_assert(offsetof(HighScoreEntry, cheated) == CheatedOffset);
 static_assert(offsetof(HighScoreEntry, reserved) == ReservedOffset);
 static_assert(ReservedOffset + sizeof(HighScoreEntry::reserved) == std::tuple_size_v<Record>);
@@ -52,7 +52,7 @@ HighScoreReadResult ReadHighScoreEntry(i32 file, HighScoreEntry& entry) {
     std::memcpy(parsed.scenarioName, bytes.data() + ScenarioNameOffset, sizeof(parsed.scenarioName));
     parsed.score = ReadInteger(bytes, ScoreOffset);
     parsed.days = ReadInteger(bytes, DaysOffset);
-    parsed.scenario = ReadInteger(bytes, ScenarioOffset);
+    parsed.difficultyRating = ReadInteger(bytes, ScenarioOffset);
     parsed.cheated = static_cast<char>(bytes[CheatedOffset]);
     std::memcpy(parsed.reserved, bytes.data() + ReservedOffset, sizeof(parsed.reserved));
     if (parsed.score == HIGH_SCORE_EMPTY)
@@ -72,7 +72,7 @@ bool WriteHighScoreEntry(i32 file, const HighScoreEntry& entry) {
     // Conversion by value avoids binding a reference to a packed integer.
     platform::binary::WriteU32(bytes.data(), bytes.size(), ScoreOffset, static_cast<u32>(entry.score));
     platform::binary::WriteU32(bytes.data(), bytes.size(), DaysOffset, static_cast<u32>(entry.days));
-    platform::binary::WriteU32(bytes.data(), bytes.size(), ScenarioOffset, static_cast<u32>(entry.scenario));
+    platform::binary::WriteU32(bytes.data(), bytes.size(), ScenarioOffset, static_cast<u32>(entry.difficultyRating));
     bytes[CheatedOffset] = static_cast<u8>(entry.cheated);
     std::memcpy(bytes.data() + ReservedOffset, entry.reserved, sizeof(entry.reserved));
     return platform::FileWriteExact(file, bytes.data(), bytes.size());

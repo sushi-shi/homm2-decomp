@@ -1,10 +1,10 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/HighScoreIO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <BASE/executive.h>
 #include <BASE/mouseManager.h>
 #include <IRONFIST/campaigns.h>
@@ -15,21 +15,16 @@
 #include <IRONFIST/prefs.h>
 #include <IRONFIST/townconsts.h>
 #include <SOURCE/game.h>
-#include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
 #include <BASE/MiscGraphicsConstants.h>
-#include <BASE/WINMGR.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/CURSOR.h>
 #include <SOURCE/ExpCampaign.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/NOOPT.h>
 #include <PLATFORM/Network.h>
-#include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/SaveNames.h>
-#include <SOURCE/SMACKMGR.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
@@ -65,21 +60,14 @@
 #include <BASE/font.h>
 #include <BASE/textWidget.h>
 #include <BASE/border.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <BASE/dialog.h>
 #include <BASE/display.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <SOURCE/combatTypes.h>
 
-
-typedef enum CampaignChoiceValue {
-    CHOICE_VALUE_NONE = -1
-} CampaignChoiceValue;
-
 typedef enum CampaignChoiceAmount {
-    CHOICE_NO_AMOUNT = -1,
-    CHOICE_BASIC_SKILL = 1,
     CHOICE_RESOURCE_BONUS = 20,
     CHOICE_GOLD_BONUS = 2000
 } CampaignChoiceAmount;
@@ -90,7 +78,6 @@ typedef enum CheckEndGameConstants {
     END_GAME_TEXT_BUFFER_SIZE = 100,
     END_GAME_GOLD_SCALE = 1000,
     END_GAME_ULTIMATE_ARTIFACT = 0,
-    END_GAME_PLAYER_DIALOG_ICON = 9,
     END_GAME_REMOTE_DIALOG_TIME = 5000,
     END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20,
     END_GAME_SCENARIO_OFFSET = 1
@@ -169,7 +156,6 @@ typedef enum MoraleLuckInfoConstant {
 typedef enum NetBoxLocalConstant {
     BOX_WINDOW_Y = 0x19b,
     BOX_HEIGHT = 0x44,
-    BOX_WIDTH = 0x27f,
     BOX_INPUT_Y = 0x1d1,
     BOX_INPUT_HEIGHT = 0xc,
     BOX_TEXT_LENGTH = 150,
@@ -191,18 +177,10 @@ typedef enum NetBoxLocalConstant {
     BOX_FIRST_COLOR_ID = 0x14,
     BOX_INPUT_ID = 5,
     BOX_THIS_PLAYER_COLOR_ID = 0x18,
-    BOX_KEY_ESCAPE = 0x1b,
-    BOX_KEY_ENTER = 10,
-    BOX_KEY_BACKSPACE = 0x7f,
     BOX_KEY_F1 = 0x3b00,
     BOX_CURSOR_GLYPH = 0x1f,
-    BOX_PACKET_BUFFER_SIZE = 0x7f,
     BOX_FIRST_PRINTABLE = 0x20,
-    BOX_LAST_PRINTABLE = 0x7f,
-    BOX_REMOTE_MAP_CHANGE = 0x29,
-    BOX_REMOTE_SETUP = 0x20,
-    BOX_REMOTE_SAVE = 1,
-    BOX_REMOTE_CHAT = 0xb
+    BOX_LAST_PRINTABLE = 0x7f
 } NetBoxLocalConstant;
 
 typedef enum PollSoundConstant {
@@ -211,52 +189,37 @@ typedef enum PollSoundConstant {
     DEFAULT_COLOR_CYCLE_INTERVAL = 200,
     NON_PALETTED_COLOR_CYCLE_DELAY = 300,
     SOUND_POLL_INTERVAL = 30,
-    PALETTED_VIDEO_MODE_COLOR_DEPTH = 8
 } PollSoundConstant;
 
 typedef enum CongratsConstant {
     CONGRATS_TEXT_SIZE = 500,
     CONGRATS_RATING_LENGTH = 32,
-    CONGRATS_SMACKER = 2,
     CONGRATS_DIFFICULTY_SCALE = 100
 } CongratsConstant;
 
 typedef enum CommandLineConstant {
     LINE_TCP_TEXT_LENGTH = 20,
-    LINE_HELP_LINE_COUNT = 14,
     LINE_HUMAN_PLAYER_SLOTS = 4,
     LINE_TCP_MIN_PLAYERS = 2,
-    LINE_TCP_MAX_PLAYERS = 6,
     LINE_FRAME_STEP = 6,
-    LINE_TCP_TYPE_DEFAULT = 0,
-    LINE_TCP_TYPE_L = 1,
+    LINE_TCP_NEW_GAME = 0,
+    LINE_TCP_LOAD_GAME = 1,
     LINE_TCP_CLIENT = 0,
     LINE_TCP_HOST = 1,
     LINE_SINGLE_PLAYER = 1
 } CommandLineConstant;
 
 typedef enum InitMenuConstant {
-    MENU_HOTSPOT_COUNT = 5,
-    MENU_FIRST_COMMAND = 0x65,
-    MENU_NEW_GAME = 0x65,
-    MENU_LOAD_GAME = 0x66,
-    MENU_HIGH_SCORES = 0x67,
-    MENU_CREDITS = 0x68,
-    MENU_EXIT = 0x69,
+    MENU_FIRST_COMMAND = OLD_MAIN_NEW_GAME,
     MENU_LAST_ACTION = 0x6b,
-    MENU_MOVIE = 0x6b,
+    MENU_MM6_TRAILER = 0x6b,
     MENU_FIRST_WIDGET = 11,
     MENU_LAST_WIDGET = 15,
     MENU_WIDGET_OFFSET = 11,
-    MENU_DISABLE_MASK = 0x200,
-    MENU_HELP_DIALOG = 4,
-    MENU_MOVIE_SMACKER = 0x26,
-    MENU_MAIN_MUSIC = 0x2a,
     MENU_FRAME_STRIDE = 4,
     MENU_HOVER_FRAME = 3,
     MENU_IDLE_FRAME = 1,
     MENU_ACTIVE_FRAME = 2,
-    MENU_WIDGET_FRAME_BASE = 44,
     MENU_REDRAW_LEFT = 0,
     MENU_REDRAW_TOP = 105,
     MENU_REDRAW_WIDTH = 565,
@@ -270,7 +233,6 @@ typedef enum InitMenuConstant {
 
 typedef enum RecruitHeroConstant {
     RECRUIT_HERO_VIEW_BUTTON = 2,
-    RECRUIT_HERO_FADE_STEPS = 8
 } RecruitHeroConstant;
 
 typedef enum BuildingRuleConstant {
@@ -321,7 +283,7 @@ extern "C" void PollSound(void) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = platform::Ticks() + DEFAULT_COLOR_CYCLE_INTERVAL;
         bDoColorCycle = true;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
-            && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
+            && giMainVideoModeColorDepth != GRAPHICS_COLOR_DEPTH) {
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += NON_PALETTED_COLOR_CYCLE_DELAY;
             if (gbHeroMoving)
                 bDoColorCycle = false;
@@ -432,7 +394,7 @@ i32 oldmain(void) {
     b32 quit;
     b32 mainScreenLoaded;
     b32 firstMainScreen;
-    i32 savedUpdateFlags;
+    i32 savedColorCycling;
     i32 player;
 
     i32 netPlayer;
@@ -455,12 +417,12 @@ i32 oldmain(void) {
     LogStr("OM3");
     platform::ChangeMenu(hmnuDflt);
     gPalette = gpResourceManager->GetPalette("kb.pal");
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
     gpMouseManager->SetPointer(
         "advmice.mse",
-        0,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
     gpMouseManager->SetColorMice(CURRENT_GRAPHICS_CONFIG.colorMouseCursor);
@@ -491,13 +453,13 @@ i32 oldmain(void) {
             0
         );
         if (!gbSkipIntro) {
-            savedUpdateFlags = gpWindowManager->m_updateFlags;
-            gpWindowManager->m_updateFlags = 0;
+            savedColorCycling = gpWindowManager->m_colorCycling;
+            gpWindowManager->m_colorCycling = 0;
             if (PlaySmacker(OLD_MAIN_INTRO_PUBLISHER_VIDEO)
-                && PlaySmacker(OLD_MAIN_INTRO_PRIMARY_VIDEO)
-                && PlaySmacker(OLD_MAIN_INTRO_FALLBACK_VIDEO))
-                PlaySmacker(OLD_MAIN_INTRO_SECONDARY_VIDEO);
-            gpWindowManager->m_updateFlags = savedUpdateFlags;
+                && PlaySmacker(CYBERLORE_LOGO_VIDEO)
+                && PlaySmacker(NWC_LOGO_VIDEO))
+                PlaySmacker(EXPANSION_INTRO_VIDEO);
+            gpWindowManager->m_colorCycling = savedColorCycling;
         }
     }
 
@@ -515,7 +477,7 @@ i32 oldmain(void) {
                 "shnganim.icn"
             );
         if (gGameCommand != OLD_MAIN_EXIT)
-            gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+            gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_MAIN_MENU);
 
         if (!mainScreenLoaded) {
             if (gGameCommand != OLD_MAIN_EXIT) {
@@ -529,18 +491,18 @@ i32 oldmain(void) {
                 if (firstMainScreen)
                     SetPalette(gPalette->m_data, 1);
                 else
-                    gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                    gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 firstMainScreen = false;
             }
             gpMouseManager->SetPointer(
                 "advmice.mse",
-                0,
+                ADVENTURE_POINTER_DEFAULT,
                 MOUSE_AUTO_CURSOR_TYPE
             );
         }
         mainScreenLoaded = true;
         if (gGameCommand != OLD_MAIN_EXIT)
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
 
         if (giTCPHostStatus != -1 && gbTCPFirstTime) {
             gbTCPFirstTime = false;
@@ -573,34 +535,34 @@ i32 oldmain(void) {
             if (giMenuCommand != -1) {
             process_menu_command:
                 switch (giMenuCommand) {
-                    case APP_MENU_LOAD_0:
-                    case APP_MENU_LOAD_1:
-                    case APP_MENU_LOAD_2:
-                    case APP_MENU_LOAD_3:
-                    case APP_MENU_LOAD_4:
-                    case APP_MENU_LOAD_5:
-                    case APP_MENU_LOAD_6:
-                    case APP_MENU_LOAD_7:
-                    case APP_MENU_LOAD_8:
-                    case APP_MENU_LOAD_9:
-                    case APP_MENU_LOAD_10:
+                    case APP_MENU_LOAD_STANDARD_GAME:
+                    case APP_MENU_LOAD_CAMPAIGN_GAME:
+                    case APP_MENU_LOAD_HOT_SEAT_2:
+                    case APP_MENU_LOAD_HOT_SEAT_3:
+                    case APP_MENU_LOAD_HOT_SEAT_4:
+                    case APP_MENU_LOAD_NETWORK_HOST:
+                    case APP_MENU_LOAD_NETWORK_GUEST:
+                    case APP_MENU_LOAD_MODEM_HOST:
+                    case APP_MENU_LOAD_MODEM_GUEST:
+                    case APP_MENU_LOAD_DIRECT_HOST:
+                    case APP_MENU_LOAD_DIRECT_GUEST:
                         if (!gpGame->PickLoadGame())
                             goto main_menu;
                         break;
-                    case APP_MENU_RESTART_0:
-                    case APP_MENU_RESTART_1:
-                    case APP_MENU_RESTART_2:
-                    case APP_MENU_RESTART_3:
-                    case APP_MENU_RESTART_4:
-                    case APP_MENU_RESTART_5:
-                    case APP_MENU_RESTART_6:
-                    case APP_MENU_RESTART_7:
-                    case APP_MENU_RESTART_8:
-                    case APP_MENU_RESTART_9:
-                    case APP_MENU_RESTART_10:
-                    case APP_MENU_RESTART_11:
-                    case APP_MENU_RESTART_12:
-                    case APP_MENU_RESTART_13:
+                    case APP_MENU_NEW_STANDARD_GAME:
+                    case APP_MENU_NEW_CAMPAIGN_1:
+                    case APP_MENU_NEW_CAMPAIGN_2:
+                    case APP_MENU_NEW_CAMPAIGN_3:
+                    case APP_MENU_NEW_CAMPAIGN_4:
+                    case APP_MENU_NEW_HOT_SEAT_2:
+                    case APP_MENU_NEW_HOT_SEAT_3:
+                    case APP_MENU_NEW_HOT_SEAT_4:
+                    case APP_MENU_NEW_NETWORK_HOST:
+                    case APP_MENU_NEW_NETWORK_GUEST:
+                    case APP_MENU_NEW_MODEM_HOST:
+                    case APP_MENU_NEW_MODEM_GUEST:
+                    case APP_MENU_NEW_DIRECT_HOST:
+                    case APP_MENU_NEW_DIRECT_GUEST:
                         if (!gpGame->NewGame())
                             goto main_menu;
                         break;
@@ -653,7 +615,7 @@ i32 oldmain(void) {
                                 goto initialize_game;
                             } else {
                                 gpWindowManager
-                                    ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                    ->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                                 mainScreenLoaded = false;
                                 goto main_menu;
                             }
@@ -664,7 +626,7 @@ i32 oldmain(void) {
                                     goto initialize_game;
                                 } else {
                                     gpWindowManager
-                                        ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                        ->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                                     mainScreenLoaded = false;
                                     goto main_menu;
                                 }
@@ -692,12 +654,12 @@ i32 oldmain(void) {
                 mainScreenLoaded = false;
                 goto main_menu;
             case OLD_MAIN_CREDITS:
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                 PlaySmacker(OLD_MAIN_CREDITS_FIRST_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_SECOND_VIDEO);
                 PlaySmacker(OLD_MAIN_CREDITS_THIRD_VIDEO);
                 mainScreenLoaded = false;
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 goto main_menu;
             case OLD_MAIN_EXIT:
                 quit = true;
@@ -719,11 +681,11 @@ i32 oldmain(void) {
                         continue;
                     for (gamePlayer = 0; gamePlayer < GAME_PLAYER_COUNT; gamePlayer++) {
                         if (strlen(&gpGame->m_defaultPlayerNames
-                                        [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE])
+                                        [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE])
                                 == OLD_MAIN_DEFAULT_NAME_LENGTH
                             && !strcmp(
                                 &gpGame->m_defaultPlayerNames
-                                     [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                     [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE],
                                 gsNetPlayerInfo[netPlayer].uniqueSystemID
                             )
                             && !gpGame->m_playerDead[gamePlayer]
@@ -742,10 +704,12 @@ i32 oldmain(void) {
                     if (matchedNetPlayers[netPlayer])
                         continue;
                     if (gbHumanPlayer[netPlayer]) {
+
+
                         gbGamePosToNetPos[netPlayer] = static_cast<i8>(gamePlayer);
                         strcpy(
                             &gpGame->m_defaultPlayerNames
-                                 [gamePlayer * OLD_MAIN_DEFAULT_NAME_STRIDE],
+                                 [gamePlayer * GAME_DEFAULT_PLAYER_NAME_SIZE],
                             gsNetPlayerInfo[netPlayer].uniqueSystemID
                         );
                         gamePlayer++;
@@ -778,7 +742,7 @@ i32 oldmain(void) {
                         netBuffer.bytes,
                         player,
                         sizeof(OldMainNetSetup),
-                        OLD_MAIN_NETWORK_PACKET,
+                        REMOTE_COMMAND_NET_SETUP,
                         1,
                         1,
                         REMOTE_MESSAGE_DEFAULT
@@ -799,7 +763,7 @@ i32 oldmain(void) {
             if (gbRemoteOn && gbWaitForRemoteReceive) {
                 LogStr("DWM 5");
                 giWaitType = DIALOG_WAIT_OTHER_PLAYER;
-                NormalDialog(localization::Tr("network.data.waiting_to_receive"), OLD_MAIN_DIALOG_WAIT);
+                NormalDialog(localization::Tr("network.data.waiting_to_receive"), NORMAL_DIALOG_WAIT_CANCEL);
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
                 gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -809,7 +773,7 @@ i32 oldmain(void) {
             }
 
         initialize_game:
-            gpWindowManager->m_updateFlags = 1;
+            gpWindowManager->m_colorCycling = 1;
             if (gShingleAnim)
                 gpResourceManager->Dispose(gShingleAnim);
             gShingleAnim = NULL;
@@ -842,7 +806,7 @@ i32 oldmain(void) {
             gbGameInitialized = true;
             mainScreenLoaded = false;
             gpSoundManager->StopAllSamples(1);
-            gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, NULL);
+            gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
             gMapX = 0;
             gMapY = 0;
             giCurWatchPlayer = giCurPlayer;
@@ -871,7 +835,7 @@ i32 oldmain(void) {
                 gMapX = gpAdvManager->m_mapOriginX;
                 gMapY = gpAdvManager->m_mapOriginY;
                 gpExec->RemoveManager(gpAdvManager);
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
             }
         }
 
@@ -881,7 +845,7 @@ i32 oldmain(void) {
             bShowIt = true;
             gpMouseManager->SetPointer(
                 "advmice.mse",
-                0,
+                ADVENTURE_POINTER_DEFAULT,
                 MOUSE_AUTO_CURSOR_TYPE
             );
             utf8::Format(
@@ -891,12 +855,12 @@ i32 oldmain(void) {
             );
 
             if (giEndSequence != 1) {
-                gpWindowManager->m_updateFlags = 0;
+                gpWindowManager->m_colorCycling = 0;
                 if (xIsExpansionMap)
-                    PlaySmacker(OLD_MAIN_EXPANSION_VICTORY_VIDEO);
+                    PlaySmacker(EXPANSION_DEFEAT_VIDEO);
                 else
-                    PlaySmacker(OLD_MAIN_STANDARD_VICTORY_VIDEO);
-                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_LONG_FADE_SPEED, gPalette);
+                    PlaySmacker(DEFEAT_VIDEO);
+                gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_INSTANT, gPalette);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
                     gpWindowManager->m_screen,
@@ -904,27 +868,27 @@ i32 oldmain(void) {
                 );
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                gpWindowManager->m_updateFlags = 1;
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
+                gpWindowManager->m_colorCycling = 1;
                 mainScreenLoaded = true;
-                gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
             } else {
                 i32 campaignResult = 0;
                 if (gbInCampaign) {
                     campaignResult = gpGame->HandleCampaignWin();
                     if ((gpGame->m_campaignScenario + 1 == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER
                          && gpGame->m_campaignScenarioCompleted[H2EnumIndex(gpGame->m_campaignType)]
-                                                               [OLD_MAIN_ARCHIBALD_FINAL_SCENARIO])
+                                                               [CAMPAIGN_ARCHIBALD_FINAL_SCENARIO])
                         || (gpGame->m_campaignScenario + 1 == OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER
                             && gpGame->m_campaignType == CAMPAIGN_ROLAND
                             && gpGame
                                    ->m_campaignScenarioCompleted[H2EnumIndex(gpGame->m_campaignType)]
-                                                                [OLD_MAIN_ROLAND_FINAL_SCENARIO])) {
+                                                                [CAMPAIGN_ROLAND_FINAL_SCENARIO])) {
                         gbShowHighScore = true;
                         ShowCongrats(HIGH_SCORE_CAMPAIGN);
                         AddScoreToHighScore(
-                            gpGame->m_campaignScore,
-                            gpGame->m_campaignScore,
+                            gpGame->m_campaignTotalDays,
+                            gpGame->m_campaignTotalDays,
                             0,
                             HIGH_SCORE_CAMPAIGN,
                             gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
@@ -966,7 +930,7 @@ i32 oldmain(void) {
                 } else {
                     ShowCongrats(HIGH_SCORE_STANDARD);
                     if (!gbShowHighScore) {
-                        gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, gPalette);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
                             gpWindowManager->m_screen,
@@ -978,12 +942,12 @@ i32 oldmain(void) {
                             LOGICAL_SCREEN_WIDTH,
                             LOGICAL_SCREEN_HEIGHT
                         );
-                        gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
-                        gpWindowManager->m_updateFlags = 1;
+                        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
+                        gpWindowManager->m_colorCycling = 1;
                         mainScreenLoaded = true;
-                        gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                     } else {
-                        gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_HIGH_SCORE);
                     }
                 }
             }
@@ -996,7 +960,7 @@ i32 oldmain(void) {
                 gpExec->MainLoop();
                 gpExec->RemoveManager(gpHighScoreManager);
                 giHighScoreRank = -1;
-                gpSoundManager->SwitchAmbientMusic(OLD_MAIN_MAIN_MUSIC);
+                gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                 gpResourceManager->GetBackdrop(
                     "heroes.icn",
                     gpWindowManager->m_screen,
@@ -1004,7 +968,7 @@ i32 oldmain(void) {
                 );
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
+                gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 mainScreenLoaded = true;
             }
         }
@@ -1080,9 +1044,9 @@ i32 InterpretCommandLine(void) {
                         switch (toupper(gcCommandLine[i + 2])) {
                             case 'T':
                                 if (i + 3 < size && toupper(gcCommandLine[i + 3]) == 'L') {
-                                    giTCPType = LINE_TCP_TYPE_L;
+                                    giTCPType = LINE_TCP_LOAD_GAME;
                                 } else {
-                                    giTCPType = LINE_TCP_TYPE_DEFAULT;
+                                    giTCPType = LINE_TCP_NEW_GAME;
                                 }
                                 break;
                             case 'S':
@@ -1097,7 +1061,7 @@ i32 InterpretCommandLine(void) {
                                 if (i + 3 < size)
                                     count = gcCommandLine[i + 3] - '0';
                                 if (count >= LINE_TCP_MIN_PLAYERS
-                                    && count <= LINE_TCP_MAX_PLAYERS) {
+                                    && count <= GAME_PLAYER_COUNT) {
                                     giTCPNumPlayers = count;
                                 }
                                 break;
@@ -1141,7 +1105,7 @@ i32 InterpretCommandLine(void) {
 
     if (helpRequested) {
         gText[0] = 0;
-        for (i = 0; i < LINE_HELP_LINE_COUNT; i++)
+        for (i = 0; i < KB_COMMAND_LINE_HELP_COUNT; i++)
             strcat(gText, gcCommandLineHelp[i]);
         ShutDown(gText);
     }
@@ -1185,52 +1149,52 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
     i32 hoverIndex;
 
     PollSound();
-    if (message.payload.widget.parameter & MENU_DISABLE_MASK) {
+    if (message.payload.widget.parameter & H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
         if (message.payload.widget.command == WIDGET_NOTIFY_SELECT
             || message.payload.widget.command == WIDGET_NOTIFY_RIGHT_CLICK) {
             helpIndex = -1;
             switch (message.payload.widget.id) {
-                case MENU_NEW_GAME:
+                case OLD_MAIN_NEW_GAME:
                     helpIndex = MENU_HELP_NEW_GAME;
                     break;
-                case MENU_LOAD_GAME:
+                case OLD_MAIN_LOAD_GAME:
                     helpIndex = MENU_HELP_LOAD_GAME;
                     break;
-                case MENU_HIGH_SCORES:
+                case OLD_MAIN_HIGH_SCORES:
                     helpIndex = MENU_HELP_HIGH_SCORES;
                     break;
-                case MENU_CREDITS:
+                case OLD_MAIN_CREDITS:
                     helpIndex = MENU_HELP_CREDITS;
                     break;
-                case MENU_EXIT:
+                case OLD_MAIN_EXIT:
                     helpIndex = MENU_HELP_EXIT;
                     break;
             }
             if (helpIndex >= 0) {
-                NormalDialog(gInitMenuHelp[helpIndex], MENU_HELP_DIALOG);
+                NormalDialog(gInitMenuHelp[helpIndex], NORMAL_DIALOG_QUICK_VIEW);
             }
         }
     } else {
         if (message.type == MESSAGE_KEY_DOWN) {
             switch (message.payload.keyboard.keyCode) {
                 case H2EnumIndex(INPUT_SCAN_N):
-                    gpWindowManager->m_dialogResult = MENU_NEW_GAME;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_NEW_GAME;
                     handled = true;
                     break;
                 case H2EnumIndex(INPUT_SCAN_L):
-                    gpWindowManager->m_dialogResult = MENU_LOAD_GAME;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_LOAD_GAME;
                     handled = true;
                     break;
                 case H2EnumIndex(INPUT_SCAN_C):
-                    gpWindowManager->m_dialogResult = MENU_CREDITS;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_CREDITS;
                     handled = true;
                     break;
                 case H2EnumIndex(INPUT_SCAN_H):
-                    gpWindowManager->m_dialogResult = MENU_HIGH_SCORES;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_HIGH_SCORES;
                     handled = true;
                     break;
                 case H2EnumIndex(INPUT_SCAN_Q):
-                    gpWindowManager->m_dialogResult = MENU_EXIT;
+                    gpWindowManager->m_dialogResult = OLD_MAIN_EXIT;
                     handled = true;
                     break;
             }
@@ -1241,7 +1205,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
             switch (message.payload.widget.command) {
                 case WIDGET_NOTIFY_SELECT:
-                    if (message.payload.widget.id == MENU_MOVIE)
+                    if (message.payload.widget.id == MENU_MM6_TRAILER)
                         break;
                     menu = message.payload.widget.id - MENU_FIRST_COMMAND;
                     index = menu + MENU_WIDGET_OFFSET;
@@ -1259,8 +1223,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                     );
                     break;
                 case WIDGET_NOTIFY_DESELECT:
-                    if (message.payload.widget.id == MENU_MOVIE) {
-                        PlaySmacker(MENU_MOVIE_SMACKER);
+                    if (message.payload.widget.id == MENU_MM6_TRAILER) {
+                        PlaySmacker(MM6_TRAILER_VIDEO);
                         gpResourceManager->GetBackdrop(
                             "heroes.icn",
                             gpWindowManager->m_screen,
@@ -1269,7 +1233,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
                         gpInitWin->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                         gpWindowManager
                             ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
-                        gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
+                        gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                         break;
                     } else {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1298,7 +1262,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& message) {
             }
         } else if (message.type == MESSAGE_MOUSE_MOVE) {
             hoverIndex = -1;
-            for (index = 0; index < MENU_HOTSPOT_COUNT; index++) {
+            for (index = 0; index < KB_INIT_MENU_HOTSPOT_COUNT; index++) {
                 if (message.payload.mouse.screenX >= IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_X)]
                     && message.payload.mouse.screenY >= IMHotSpots[index][H2EnumIndex(INIT_MENU_HOTSPOT_Y)]
                     && message.payload.mouse.screenX
@@ -1379,9 +1343,9 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                     case RECRUIT_HERO_VIEW_BUTTON:
                         HeroView(gpTownManager->m_recruitHero->m_id, true, false);
                         gpTownManager->RedrawTownScreen();
-                        gpTownManager->m_heroWindow0->DrawWindow();
-                        gpTownManager->m_heroWindow1->DrawWindow();
-                        gpWindowManager->FadeScreen(FADE_IN, RECRUIT_HERO_FADE_STEPS, NULL);
+                        gpTownManager->m_buildingWindow->DrawWindow();
+                        gpTownManager->m_childWindow->DrawWindow();
+                        gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                         break;
                     default:
                         break;
@@ -1390,11 +1354,11 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case DIALOG_BUTTON_1:
-                        gpTownManager->m_recruitState = -1;
+                        gpTownManager->m_recruitSlot = -1;
                         shouldClose = true;
                         break;
                     case DIALOG_BUTTON_2:
-                        gpTownManager->m_recruitState = 0;
+                        gpTownManager->m_recruitSlot = 0;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         shouldClose = true;
                         break;
@@ -1412,7 +1376,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading) {
     char buffer[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_CYBORG && building == BUILDING_SLOT_MAGE_GUILD) {
         utf8::Format(
@@ -1449,7 +1413,7 @@ const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mod
         );
         return gText;
     }
-    if (mode) {
+    if (withHeading) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             "{%s}\n\n%s",
@@ -1547,7 +1511,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
     }
     if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
         return 0;
-    if (building == BUILDING_SLOT_UPGRADE_CASTLE || building == BUILDING_SLOT_DISABLED_FIRST
+    if (building == BUILDING_SLOT_TENT || building == BUILDING_SLOT_BOAT
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
         || building == BUILDING_SLOT_DISABLED_FOURTH || building == BUILDING_SLOT_DISABLED_LAST)
         return 0;
@@ -1583,7 +1547,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
         curMask |= H2EnumIndex(TOWN_BUILDING_DWELLING_6);
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
-            && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && townPointer->m_mageGuildLevel <= 1)
+            && building == BUILDING_SLOT_UPGRADE_FOURTH && townPointer->m_mageGuildLevel <= 1)
             return 0;
         return 1;
     }
@@ -1607,7 +1571,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
     if (raceIndex < 0 || raceIndex >= KB_FACTION_TABLE_CAPACITY)
         return 0;
 
-    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
+    if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_TENT)
         return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST) {
         if (building > BUILDING_SLOT_NEUTRAL_LAST)
@@ -1720,9 +1684,9 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 resType = NORMAL_DIALOG_NO_RESOURCE;
                 resExtra = NORMAL_DIALOG_NO_VALUE;
-                if (message.payload.widget.parameter & EVENT_WINDOW_RESOURCE_FLAG) {
+                if (message.payload.widget.parameter & H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                     switch (message.payload.widget.id) {
-                        case EVENT_WINDOW_FIRST_RESOURCE_WIDGET:
+                        case NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID:
                             resType = giResType1;
                             resExtra = giResExtra1;
                             break;
@@ -1732,19 +1696,19 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
                             break;
                     }
                     switch (resType) {
-                        case EVENT_WINDOW_LUCK:
+                        case NORMAL_DIALOG_LUCK_BONUS:
                             NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_BAD_LUCK:
+                        case NORMAL_DIALOG_LUCK_PENALTY:
                             NormalDialog(cLuckInfo[H2EnumIndex(LUCK_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_MORALE:
+                        case NORMAL_DIALOG_MORALE_BONUS:
                             NormalDialog(cMoraleInfo[H2EnumIndex(MORALE_INFO_GOOD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_BAD_MORALE:
+                        case NORMAL_DIALOG_MORALE_PENALTY:
                             NormalDialog(cMoraleInfo[H2EnumIndex(MORALE_INFO_BAD)], NORMAL_DIALOG_QUICK_VIEW);
                             break;
-                        case EVENT_WINDOW_EXPERIENCE:
+                        case NORMAL_DIALOG_EXPERIENCE:
                             NormalDialog(localization::Tr("help.experience"), NORMAL_DIALOG_QUICK_VIEW);
                             break;
                         case NORMAL_DIALOG_ARTIFACT:
@@ -1829,8 +1793,8 @@ void PlayerDead(i32 player) {
         GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
     }
     for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
-        if (gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] == WEEKLY_AVAILABLE_HERO)
-            gpGame->m_availableHeroes[currentPlayer->m_availableHeroIds[i]] = -1;
+        if (gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] == HERO_AVAILABILITY_FOR_HIRE)
+            gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] = -1;
     }
     if (gbRemoteOn) {
         if (gbHumanPlayer[player])
@@ -1878,7 +1842,7 @@ void CheckEndGame(
     hero* artifactHeroPointer;
     i32 artifactWinnerPerson;
     hero* lossHero;
-    hero* winningHeroEntry;
+    hero* victoryHero;
     i32 winnerPlayer;
     char campaignSaveName[END_GAME_CAMPAIGN_SAVE_NAME_SIZE];
     i32 campaignHeroIndex;
@@ -1906,7 +1870,7 @@ void CheckEndGame(
                 if (player == giThisGamePos) {
                     showedDialog = true;
                     utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.eliminated"));
-                    NormalDialog(gText, 1);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                 } else {
                     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.vanquished"), cPlayerNames[player]);
                     NormalDialog(
@@ -1914,7 +1878,7 @@ void CheckEndGame(
                         1,
                         -1,
                         -1,
-                        END_GAME_PLAYER_DIALOG_ICON,
+                        NORMAL_DIALOG_CREST,
                         gpGame->m_players[player].m_color,
                         -1,
                         -1,
@@ -1930,7 +1894,7 @@ void CheckEndGame(
                             localization::Tr("player.last_town_warning"),
                             cPlayerNames[player]
                         );
-                        NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[player].m_color);
+                        NormalDialog(gText, 1, -1, -1, NORMAL_DIALOG_CREST, gpGame->m_players[player].m_color);
                     }
                     currentPlayer->m_daysLeft = END_GAME_GRACE_DAYS;
                 } else if (currentPlayer->m_daysLeft == 0) {
@@ -1951,7 +1915,7 @@ void CheckEndGame(
                             cPlayerNames[player]
                         );
                     }
-                    NormalDialog(gText, 1, -1, -1, END_GAME_PLAYER_DIALOG_ICON, gpGame->m_players[player].m_color);
+                    NormalDialog(gText, 1, -1, -1, NORMAL_DIALOG_CREST, gpGame->m_players[player].m_color);
                 }
             } else {
                 currentPlayer->m_daysLeft = -1;
@@ -2027,7 +1991,7 @@ void CheckEndGame(
             if (!showedDialog && winFlag) {
                 showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2035,7 +1999,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN) {
         victoryTownData = gpGame->GetTown(gpGame->GetTownId(
             gpGame->m_mapHeader.victoryConditionValue,
-            gpGame->m_mapHeader.victoryTownY
+            gpGame->m_mapHeader.victoryConditionY
         ));
         if (victoryTownData->m_owner != TOWN_OWNER_NONE
             && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
@@ -2059,21 +2023,21 @@ void CheckEndGame(
                         victoryTownData->m_name
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN) {
         lossTown = gpGame->GetTown(
-            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
+            gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossConditionY)
         );
         if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[lossTown->m_owner]) {
             defeated = true;
             if (!showedDialog) {
                 showedDialog = true;
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.town_fallen"), lossTown->m_name);
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2110,25 +2074,25 @@ void CheckEndGame(
                             bestGold
                         );
                     }
-                    NormalDialog(gText, 1);
+                    NormalDialog(gText, NORMAL_DIALOG_INFO);
                 }
             }
         }
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
-        winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
-        if (winningHeroEntry->m_owner < 0 || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
-            || gbHumanPlayer[winningHeroEntry->m_owner]) {
+        victoryHero = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
+        if (victoryHero->m_owner < 0 || victoryHero->m_owner >= GAME_PLAYER_COUNT
+            || gbHumanPlayer[victoryHero->m_owner]) {
             winFlag = true;
             if (!showedDialog) {
                 showedDialog = true;
                 utf8::Format(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("victory.hero_captured"),
-                    winningHeroEntry->m_name
+                    victoryHero->m_name
                 );
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2141,7 +2105,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.hero"), lossHero->m_name);
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2152,7 +2116,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("loss.time_expired"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2214,7 +2178,7 @@ void CheckEndGame(
                         artifactName
                     );
                 }
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2236,7 +2200,7 @@ void CheckEndGame(
                     gText, GLOBAL_TEXT_BUFFER_SIZE,
                     localization::Tr("campaign.loss.dwarf_towns")
                 );
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2248,7 +2212,7 @@ void CheckEndGame(
         if (!showedDialog) {
             showedDialog = true;
             utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.victory.dragon_city"));
-            NormalDialog(gText, 1);
+            NormalDialog(gText, NORMAL_DIALOG_INFO);
         }
     }
 
@@ -2268,7 +2232,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("campaign.loss.roland_captured"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2289,7 +2253,7 @@ void CheckEndGame(
             if (!showedDialog && winFlag) {
                 showedDialog = true;
                 utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("victory.side_triumph"));
-                NormalDialog(gText, 1);
+                NormalDialog(gText, NORMAL_DIALOG_INFO);
             }
         }
     }
@@ -2347,8 +2311,8 @@ void CheckEndGame(
             1;
         gpGame->m_campaignScenarioDays[H2EnumIndex(gpGame->m_campaignType)][gpGame->m_campaignScenario] =
             currentDayIndex;
-        gpGame->m_campaignScore =
-            gpGame->m_campaignScenarioBonus[H2EnumIndex(gpGame->m_campaignType)][gpGame->m_campaignScenario]
+        gpGame->m_campaignTotalDays =
+            gpGame->m_campaignDaysBeforeScenario[H2EnumIndex(gpGame->m_campaignType)][gpGame->m_campaignScenario]
             + gpGame->m_campaignScenarioDays[H2EnumIndex(gpGame->m_campaignType)]
                                             [gpGame->m_campaignScenario];
 
@@ -2649,10 +2613,10 @@ void ClearMapExtra(void) {
             H2_FREE(ppMapExtra[i]);
     }
     if (ppMapExtra)
-        H2_FREE(ppMapExtra);
+        delete[] ppMapExtra;
     ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
-        H2_FREE(pwSizeOfMapExtra);
+        delete[] pwSizeOfMapExtra;
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
 }
@@ -2674,11 +2638,11 @@ i32 GetMonType(i32 score, HighScoreType highScoreType) {
 i32 AddScoreToHighScore(
     i32 score,
     i32 days,
-    i32 scenario,
+    i32 difficultyRating,
     HighScoreType highScoreType,
     const char* scenarioName
 ) {
-    i32 destinationIndex;
+    i32 shiftIndex;
     HighScoreEntry entries[HIGH_SCORE_ENTRY_COUNT];
     i32 file;
     i32 entry;
@@ -2737,8 +2701,8 @@ i32 AddScoreToHighScore(
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destinationIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; destinationIndex >= entry; destinationIndex--)
-            entries[destinationIndex + 1] = entries[destinationIndex];
+        for (shiftIndex = HIGH_SCORE_LAST_SHIFT_SOURCE; shiftIndex >= entry; shiftIndex--)
+            entries[shiftIndex + 1] = entries[shiftIndex];
 
         GetDataEntry(
             localization::Tr("high_score.name_prompt"),
@@ -2753,7 +2717,7 @@ i32 AddScoreToHighScore(
         utf8::Copy(entries[entry].scenarioName, scenarioName);
         entries[entry].score = score;
         entries[entry].days = days;
-        entries[entry].scenario = scenario;
+        entries[entry].difficultyRating = difficultyRating;
         entries[entry].cheated = gpGame->m_cheated;
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
             entries[entry].cheated = 1;
@@ -2800,7 +2764,7 @@ i32 WaitForOtherPlayer(void) {
     data = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
     if (data && data->type == REMOTE_MESSAGE_RELIABLE) {
         switch (data->command) {
-            case BOX_REMOTE_SETUP:
+            case REMOTE_COMMAND_NET_SETUP:
                 memcpy(
                     gbGamePosToNetPos,
                     data->payload.setup.gamePosToNetPos,
@@ -2815,7 +2779,7 @@ i32 WaitForOtherPlayer(void) {
                 );
                 giThisGamePos = NetPosToGamePos(giThisNetPos);
                 break;
-            case BOX_REMOTE_SAVE:
+            case REMOTE_COMMAND_SAVE_GAME:
                 result = gpGame->ReceiveSaveGame(
                     data->payload.save.dataSize,
                     data->payload.save.crc,
@@ -2929,7 +2893,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             if (remoteData->type == REMOTE_MESSAGE_UNRELIABLE) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                 switch (remoteData->command) {
-                    case BOX_REMOTE_MAP_CHANGE:
+                    case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
                         if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt;
@@ -2945,7 +2909,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
             } else {
                 switch (remoteData->command) {
-                    case BOX_REMOTE_CHAT:
+                    case REMOTE_COMMAND_POP_NET_BOX:
                         remoteData = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
                         utf8::Format(
                             gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -2979,17 +2943,17 @@ void PopNetBox(char* text, i32 netPlayer) {
             case MESSAGE_KEY_DOWN:
                 messageTime = 0;
                 switch (event.payload.keyboard.keyCode) {
-                    case BOX_KEY_ESCAPE:
+                    case INPUT_KEY_CODE_ESCAPE:
                     case BOX_KEY_F1:
                         done = true;
                         break;
-                    case BOX_KEY_BACKSPACE:
+                    case INPUT_KEY_CODE_DELETE:
                         if (inputLength > 0)
                             inputLength--;
                         updateInput = true;
                         cursorState = 1;
                         break;
-                    case BOX_KEY_ENTER:
+                    case INPUT_KEY_CODE_ENTER:
                         sendText = true;
                         break;
                     default:
@@ -3002,7 +2966,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                             textWidth = smallFont->LineWidth(inputText);
                             if (textWidth + BOX_CURSOR_WIDTH_PADDING < BOX_CURSOR_WIDTH_LIMIT) {
                                 inputText[inputLength] =
-                                    static_cast<char>(event.payload.keyboard.keyCode & 0xff);
+                                    static_cast<char>(event.payload.keyboard.keyCode & INPUT_KEY_CODE_CHARACTER_MASK);
                                 inputLength++;
                                 updateInput = true;
                                 cursorState = 0;
@@ -3021,9 +2985,9 @@ void PopNetBox(char* text, i32 netPlayer) {
             AddNetBoxLine(inputText, gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color);
             result = TransmitRemoteData(
                 inputText,
-                BOX_PACKET_BUFFER_SIZE,
+                REMOTE_BROADCAST_PLAYER,
                 strlen(inputText) + 1,
-                BOX_REMOTE_CHAT,
+                REMOTE_COMMAND_POP_NET_BOX,
                 1,
                 1,
                 REMOTE_MESSAGE_DEFAULT
@@ -3064,7 +3028,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             updateMessage.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
             netWindow->BroadcastMessage(updateMessage);
             netWindow->DrawWindow();
-            gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, LOGICAL_SCREEN_MAX_X, BOX_HEIGHT);
         }
 
         if (updateInput) {
@@ -3079,7 +3043,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             updateMessage.payload.widget.data.text = inputText;
             netWindow->BroadcastMessage(updateMessage);
             netWindow->DrawWindow();
-            gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, LOGICAL_SCREEN_MAX_X, BOX_INPUT_HEIGHT);
         }
 
         if (messageTime != 0 && messageTime + BOX_MESSAGE_TIMEOUT < platform::Ticks())
@@ -3245,7 +3209,7 @@ void SmackFade(u8* source, u8* destination) {
         );
         colorMap[sourceColor] = static_cast<u8>(bestColor);
     }
-    FadeTo(source, transitionPalette, HIGH_SCORE_FADE_STEPS);
+    FadeTo(source, transitionPalette, FADE_SPEED_STANDARD);
     pixel = gpWindowManager->m_screen->m_pixels;
     for (column = 0; column < LOGICAL_SCREEN_WIDTH; column++) {
         for (row = 0; row < LOGICAL_SCREEN_HEIGHT; row++) {
@@ -3268,7 +3232,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 
     gpMouseManager->HideColorPointer();
     memcpy(palette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
-    gpWindowManager->m_updateFlags = 0;
+    gpWindowManager->m_colorCycling = 0;
     congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
     realScore = baseScore * gpGame->m_difficultyRating / CONGRATS_DIFFICULTY_SCALE;
@@ -3290,7 +3254,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         utf8::Copy(
             ratingText,
             sizeof(ratingText),
-            gArmyNames[GetMonType(gpGame->m_campaignScore, highScoreType)]
+            gArmyNames[GetMonType(gpGame->m_campaignTotalDays, highScoreType)]
         );
     }
     utf8::UppercaseFirst(ratingText);
@@ -3321,12 +3285,12 @@ void ShowCongrats(HighScoreType highScoreType) {
             congratsText,
             CONGRATS_TEXT_SIZE,
             localization::Tr("high_score.congratulations.campaign"),
-            gpGame->m_campaignScore,
+            gpGame->m_campaignTotalDays,
             ratingText
         );
     }
 
-    PlaySmacker(CONGRATS_SMACKER);
+    PlaySmacker(CONGRATS);
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
     SmackFade(reinterpret_cast<u8*>(gpBufferPalette->m_data), palette);
     memcpy(gPalette->m_data, palette, PALETTE_DATA_SIZE);
@@ -3341,7 +3305,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     );
     H2_FREE(congratsText);
     congratsText = NULL;
-    gpWindowManager->m_updateFlags = 1;
+    gpWindowManager->m_colorCycling = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, PALETTE_DATA_SIZE);
 }
 
@@ -3447,7 +3411,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 loopIndex;
     HeroSecondarySkill secondarySkillIndex;
     HeroSkillLevel ssLevel;
-    i32 formationHexIndex;
+    i32 overlayHex;
 
     menuChanged = false;
     currentHeroRec = NULL;
@@ -3468,20 +3432,20 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     }
 
     switch (command) {
-        case APP_MENU_RESTART_0:
-        case APP_MENU_RESTART_1:
-        case APP_MENU_RESTART_2:
-        case APP_MENU_RESTART_3:
-        case APP_MENU_RESTART_4:
-        case APP_MENU_RESTART_5:
-        case APP_MENU_RESTART_6:
-        case APP_MENU_RESTART_7:
-        case APP_MENU_RESTART_8:
-        case APP_MENU_RESTART_9:
-        case APP_MENU_RESTART_10:
-        case APP_MENU_RESTART_11:
-        case APP_MENU_RESTART_12:
-        case APP_MENU_RESTART_13:
+        case APP_MENU_NEW_STANDARD_GAME:
+        case APP_MENU_NEW_CAMPAIGN_1:
+        case APP_MENU_NEW_CAMPAIGN_2:
+        case APP_MENU_NEW_CAMPAIGN_3:
+        case APP_MENU_NEW_CAMPAIGN_4:
+        case APP_MENU_NEW_HOT_SEAT_2:
+        case APP_MENU_NEW_HOT_SEAT_3:
+        case APP_MENU_NEW_HOT_SEAT_4:
+        case APP_MENU_NEW_NETWORK_HOST:
+        case APP_MENU_NEW_NETWORK_GUEST:
+        case APP_MENU_NEW_MODEM_HOST:
+        case APP_MENU_NEW_MODEM_GUEST:
+        case APP_MENU_NEW_DIRECT_HOST:
+        case APP_MENU_NEW_DIRECT_GUEST:
             utf8::Copy(
                 gText,
                 GLOBAL_TEXT_BUFFER_SIZE,
@@ -3489,17 +3453,17 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
             goto confirmMenuCommand;
 
-        case APP_MENU_LOAD_0:
-        case APP_MENU_LOAD_1:
-        case APP_MENU_LOAD_2:
-        case APP_MENU_LOAD_3:
-        case APP_MENU_LOAD_4:
-        case APP_MENU_LOAD_5:
-        case APP_MENU_LOAD_6:
-        case APP_MENU_LOAD_7:
-        case APP_MENU_LOAD_8:
-        case APP_MENU_LOAD_9:
-        case APP_MENU_LOAD_10:
+        case APP_MENU_LOAD_STANDARD_GAME:
+        case APP_MENU_LOAD_CAMPAIGN_GAME:
+        case APP_MENU_LOAD_HOT_SEAT_2:
+        case APP_MENU_LOAD_HOT_SEAT_3:
+        case APP_MENU_LOAD_HOT_SEAT_4:
+        case APP_MENU_LOAD_NETWORK_HOST:
+        case APP_MENU_LOAD_NETWORK_GUEST:
+        case APP_MENU_LOAD_MODEM_HOST:
+        case APP_MENU_LOAD_MODEM_GUEST:
+        case APP_MENU_LOAD_DIRECT_HOST:
+        case APP_MENU_LOAD_DIRECT_GUEST:
             utf8::Copy(
                 gText,
                 GLOBAL_TEXT_BUFFER_SIZE,
@@ -3507,8 +3471,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {
-                NormalDialog(gText, APP_MENU_CONFIRM_DIALOG);
-                if (gpWindowManager->m_dialogResult != APP_MENU_CONFIRM_OK)
+                NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
+                if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES)
                     break;
             }
             giMenuCommand = command;
@@ -3525,7 +3489,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gConfig.showRoute = 1 - gConfig.showRoute;
             menuChanged = true;
             break;
-        case APP_MENU_TOGGLE_BLACKOUT:
+        case APP_MENU_VIEW_ENEMY_MOVES:
             gConfig.blackoutComputer = 1 - gConfig.blackoutComputer;
             menuChanged = true;
             break;
@@ -3590,7 +3554,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             gpGame->m_cheated = 1;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
-            for (loopIndex = 0; loopIndex < APP_MENU_RESOURCE_COUNT; loopIndex++)
+            for (loopIndex = 0; loopIndex < H2EnumIndex(RES_COUNT); loopIndex++)
                 gpCurPlayer->m_resources[loopIndex] += loopIndex == H2EnumIndex(RES_GOLD)
                     ? APP_MENU_GOLD_BONUS
                     : APP_MENU_RESOURCE_BONUS;
@@ -3636,15 +3600,15 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (command >= APP_MENU_COMBAT_FIRST && command < APP_MENU_COMBAT_LAST) {
                 gpCombatManager->m_elevationOverlayIndex = command - APP_MENU_COMBAT_FIRST;
                 gpCombatManager->m_backgroundDrawn = false;
-                for (loopIndex = 0; loopIndex < APP_MENU_COMBAT_HEX_COUNT; loopIndex++) {
+                for (loopIndex = 0; loopIndex < COMBAT_HEX_COUNT; loopIndex++) {
                     gpCombatManager->m_hexCells[loopIndex].m_blocked = 0;
                     gpCombatManager->m_hexCells[loopIndex].m_obstacleIndex = -1;
                 }
-                for (loopIndex = 0; loopIndex < APP_MENU_FORMATION_HEX_COUNT; loopIndex++) {
-                    formationHexIndex =
+                for (loopIndex = 0; loopIndex < COMBAT_ELEVATION_OVERLAY_CELL_COUNT; loopIndex++) {
+                    overlayHex =
                         sElevationOverlay[gpCombatManager->m_elevationOverlayIndex].cellOffsets[loopIndex];
-                    if (formationHexIndex != -1)
-                        gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
+                    if (overlayHex != -1)
+                        gpCombatManager->m_hexCells[overlayHex].m_blocked = 1;
                 }
                 gpCombatManager->SetupGridForArmy(
                     &gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
@@ -3753,7 +3717,7 @@ void UpdateSystemOptionsMenu(void) {
     platform::SetMenuItemChecked(currentMenu, APP_MENU_TOGGLE_ROUTE, gConfig.showRoute != 0);
     platform::SetMenuItemChecked(
         currentMenu,
-        APP_MENU_TOGGLE_BLACKOUT,
+        APP_MENU_VIEW_ENEMY_MOVES,
         gConfig.blackoutComputer == 0
     );
 }
@@ -3775,13 +3739,9 @@ void EarlyResizeWindow(i32, i32, i32, i32) {
         return;
 }
 
-typedef enum MapAreaConstant {
-    MAP_AREA_ORIGIN = 16,
-    MAP_AREA_LIMIT = 448
-} MapAreaConstant;
-
 i32 InMapArea(i32 x, i32 y) {
-    return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN && y < MAP_AREA_LIMIT;
+    return x >= ADVENTURE_VIEW_BORDER && x < ADVENTURE_VIEW_SIZE && y >= ADVENTURE_VIEW_BORDER
+           && y < ADVENTURE_VIEW_SIZE;
 }
 
 typedef enum DynamicWindowConstant {
@@ -3791,8 +3751,8 @@ typedef enum DynamicWindowConstant {
     CONTENT_LEFT = 32,
     CONTENT_TOP = 16,
     CORNER_SIZE = 72,
-    CORNER_LEFT = 40,
-    CORNER_RIGHT = 23,
+    CORNER_TOP_LEFT_INSET = 40,
+    CORNER_BOTTOM_RIGHT_INSET = 23,
     EDGE_OFFSET = 24,
     CORNER_FRAME_TOP_LEFT = 0,
     CORNER_FRAME_TOP_RIGHT = 1,
@@ -3830,10 +3790,10 @@ void SetupDynamicWindow(
 
     i32 numRows;
     widget* newWidgetTemp;
-    i32 columnsSize;
+    i32 columnCount;
     i32 topOffsetNum;
 
-    i32 centeredHeightCount;
+    i32 centeredHeight;
 
     i32 bottomOffsetLocal;
     i32 rightOffset;
@@ -3845,19 +3805,19 @@ void SetupDynamicWindow(
     i32 columnIndex;
 
     newWidgetTemp = NULL;
-    columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
+    columnCount = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;
-    *windowWidth = columnsSize * TILE_SIZE + WINDOW_PADDING;
+    *windowWidth = columnCount * TILE_SIZE + WINDOW_PADDING;
     *windowHeight = numRows * TILE_SIZE + WINDOW_PADDING;
-    centeredWidthValue = columnsSize * TILE_SIZE + CONTENT_LEFT;
-    centeredHeightCount = numRows * TILE_SIZE + CONTENT_LEFT;
+    centeredWidthValue = columnCount * TILE_SIZE + CONTENT_LEFT;
+    centeredHeight = numRows * TILE_SIZE + CONTENT_LEFT;
     if (centered) {
         x += ((boundsWidth - centeredWidthValue) >> 1) - CONTENT_TOP;
-        y += (boundsHeight - centeredHeightCount) >> 1;
+        y += (boundsHeight - centeredHeight) >> 1;
     }
     *contentLeft = x + CONTENT_LEFT;
     *contentTop = y + CONTENT_TOP;
-    *contentRight = *contentLeft + columnsSize * TILE_SIZE - 1;
+    *contentRight = *contentLeft + columnCount * TILE_SIZE - 1;
     *contentBottom = *contentTop + numRows * TILE_SIZE - 1;
 
     if (windowType != DYNAMIC_WINDOW_STONE)
@@ -3875,7 +3835,7 @@ void SetupDynamicWindow(
     bottomOffsetLocal = *contentBottom - y;
 
     for (tileRowPosition = 0; tileRowPosition < numRows; tileRowPosition++) {
-        for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
+        for (columnIndex = 0; columnIndex < columnCount; columnIndex++) {
             newWidgetTemp = new iconWidget(
                 leftOffset + columnIndex * TILE_SIZE,
                 topOffsetNum + tileRowPosition * TILE_SIZE,
@@ -3895,8 +3855,8 @@ void SetupDynamicWindow(
     }
 
     newWidgetTemp = new iconWidget(
-        leftOffset - CORNER_LEFT,
-        topOffsetNum - CORNER_LEFT,
+        leftOffset - CORNER_TOP_LEFT_INSET,
+        topOffsetNum - CORNER_TOP_LEFT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -3911,8 +3871,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - CORNER_RIGHT,
-        topOffsetNum - CORNER_LEFT,
+        rightOffset - CORNER_BOTTOM_RIGHT_INSET,
+        topOffsetNum - CORNER_TOP_LEFT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -3927,8 +3887,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        rightOffset - CORNER_RIGHT,
-        bottomOffsetLocal - CORNER_RIGHT,
+        rightOffset - CORNER_BOTTOM_RIGHT_INSET,
+        bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -3943,8 +3903,8 @@ void SetupDynamicWindow(
     (*window)->AddWidget(newWidgetTemp, -1);
 
     newWidgetTemp = new iconWidget(
-        leftOffset - CORNER_LEFT,
-        bottomOffsetLocal - CORNER_RIGHT,
+        leftOffset - CORNER_TOP_LEFT_INSET,
+        bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
         CORNER_SIZE,
         CORNER_SIZE,
         "stonebk2.icn",
@@ -3958,10 +3918,10 @@ void SetupDynamicWindow(
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; edge < columnsSize; edge++) {
+    for (edge = 0; edge < columnCount; edge++) {
         newWidgetTemp = new iconWidget(
             leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
-            topOffsetNum - CORNER_LEFT,
+            topOffsetNum - CORNER_TOP_LEFT_INSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -3977,7 +3937,7 @@ void SetupDynamicWindow(
 
         newWidgetTemp = new iconWidget(
             leftOffset + edge * TILE_SIZE - EDGE_OFFSET,
-            bottomOffsetLocal - CORNER_RIGHT,
+            bottomOffsetLocal - CORNER_BOTTOM_RIGHT_INSET,
             CORNER_SIZE,
             CORNER_SIZE,
             "stonebk2.icn",
@@ -3994,7 +3954,7 @@ void SetupDynamicWindow(
 
     for (edge = 0; edge < numRows; edge++) {
         newWidgetTemp = new iconWidget(
-            leftOffset - CORNER_LEFT,
+            leftOffset - CORNER_TOP_LEFT_INSET,
             topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
@@ -4010,7 +3970,7 @@ void SetupDynamicWindow(
         (*window)->AddWidget(newWidgetTemp, -1);
 
         newWidgetTemp = new iconWidget(
-            rightOffset - CORNER_RIGHT,
+            rightOffset - CORNER_BOTTOM_RIGHT_INSET,
             topOffsetNum + edge * TILE_SIZE - EDGE_OFFSET,
             CORNER_SIZE,
             CORNER_SIZE,
@@ -4112,7 +4072,7 @@ void HandleRemoteSuddenExit(void) {
         reinterpret_cast<char*>(&exitInfo),
         destination,
         sizeof(exitInfo),
-        ADVMGR_REMOTE_COMMAND_PLAYER_EXIT,
+        REMOTE_COMMAND_PLAYER_EXIT,
         0,
         0,
         REMOTE_MESSAGE_RELIABLE
@@ -4293,7 +4253,7 @@ exitInfoProcessed:
                 reinterpret_cast<char*>(&exitInfo),
                 1 - giThisNetPos,
                 sizeof(exitInfo),
-                ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                REMOTE_COMMAND_HOST_PLAYER_EXIT,
                 1,
                 1,
                 REMOTE_MESSAGE_DEFAULT
@@ -4314,7 +4274,7 @@ exitInfoProcessed:
                     reinterpret_cast<char*>(&exitInfo),
                     recipient,
                     sizeof(exitInfo),
-                    ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT,
+                    REMOTE_COMMAND_HOST_PLAYER_EXIT,
                     1,
                     1,
                     REMOTE_MESSAGE_DEFAULT
@@ -4464,7 +4424,6 @@ typedef enum NormalDialogLayoutConstant {
     NORMAL_DIALOG_BUTTON_AREA_HEIGHT = 39,
     NORMAL_DIALOG_RESOURCE_VERTICAL_GAP = 14,
     NORMAL_DIALOG_ROW_CALCULATION_OFFSET = 25,
-    NORMAL_DIALOG_DEFAULT_X = 159,
     NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET = 17,
     NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X = 104,
     NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET = 87,
@@ -4675,21 +4634,21 @@ void NormalDialog(
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_CLEAR_FLAGS);
-    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
+    message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED) | H2EnumIndex(WIDGET_FLAG_DRAW);
+    if (dialogType != NORMAL_DIALOG_CHOOSE_ONE_OF_TWO && dialogType != NORMAL_DIALOG_SHOW_BUTTON_7) {
         message.payload.widget.id = DIALOG_BUTTON_7;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
+    if (dialogType != NORMAL_DIALOG_CHOOSE_ONE_OF_TWO) {
         message.payload.widget.id = DIALOG_BUTTON_8;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_CANCEL && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_1;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
-        && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_OK && dialogType != NORMAL_DIALOG_INFO
+        && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_2;
         pNormalDialogWindow->BroadcastMessage(message);
     }
@@ -4908,7 +4867,7 @@ void NormalDialog(
             resourceFrame,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+            resourceType[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_BOTTOM_CENTERED
                                                                   : WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -5175,11 +5134,11 @@ void NormalDialog(
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer(
         "advmice.mse",
-        0,
+        ADVENTURE_POINTER_DEFAULT,
         MOUSE_AUTO_CURSOR_TYPE
     );
 
-    if (dialogType == NORMAL_DIALOG_WAIT_LAST || dialogType == NORMAL_DIALOG_WAIT_FIRST) {
+    if (dialogType == NORMAL_DIALOG_WAIT_CANCEL || dialogType == NORMAL_DIALOG_WAIT_OK) {
         gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, 0);
     } else if (dialogType == NORMAL_DIALOG_QUICK_VIEW) {
         gpWindowManager->AddWindow(pNormalDialogWindow, -1, 1);
@@ -5205,7 +5164,7 @@ void NormalDialog(
 void UpdateNormalDialog(const char* text) {
 
     tag_message message;
-    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, 1);
+    SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, NORMAL_DIALOG_TEXT_WIDGET_ID);
     message.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(message);
     pNormalDialogWindow
@@ -5278,28 +5237,28 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_2(21),
     GROUND_REPEAT_2(19),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_REPEAT_4(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED,
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_REPEAT_4(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED,
     GROUND_REPEAT_4(5),
     GROUND_REPEAT_4(6),
     GROUND_REPEAT_4(7),
     GROUND_REPEAT_4(8),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_16(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_16(GROUND_SHAPE_VARIED),
     GROUND_SHAPE_STANDARD_FRAME_SET,
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
     GROUND_REPEAT_8(0),
-    GROUND_REPEAT_8(GROUND_SHAPE_FLIPPED),
-    GROUND_SHAPE_FLIPPED
+    GROUND_REPEAT_8(GROUND_SHAPE_VARIED),
+    GROUND_SHAPE_VARIED
 };
 
 #undef GROUND_SHAPE_STANDARD_FRAME_SET
@@ -6003,7 +5962,7 @@ i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
 i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137};
 i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] =
-    {H2EnumIndex(RES_WOOD), H2EnumIndex(RES_ORE), -1, -1};
+    {H2EnumIndex(RES_WOOD), H2EnumIndex(RES_ORE), H2EnumIndex(RES_NONE), H2EnumIndex(RES_NONE)};
 i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
 i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
@@ -6491,19 +6450,19 @@ i16 giScoreCampaignMon[H2EnumIndex(CREATURE_COUNT)][H2EnumIndex(MONSTER_SCORE_FI
     {320, 46},  {300, 37}
 };
 i8 townTheme[KB_FACTION_TABLE_CAPACITY] = {
-    H2EnumIndex(TOWN_MUSIC_KNIGHT),
-    H2EnumIndex(TOWN_MUSIC_BARBARIAN),
-    H2EnumIndex(TOWN_MUSIC_WARLOCK),
-    H2EnumIndex(TOWN_MUSIC_WIZARD),
-    H2EnumIndex(TOWN_MUSIC_SORCERESS),
-    H2EnumIndex(TOWN_MUSIC_NECROMANCER),
+    MUSIC_TRACK_KNIGHT_TOWN,
+    MUSIC_TRACK_BARBARIAN_TOWN,
+    MUSIC_TRACK_SORCERESS_TOWN,
+    MUSIC_TRACK_WARLOCK_TOWN,
+    MUSIC_TRACK_WIZARD_TOWN,
+    MUSIC_TRACK_NECROMANCER_TOWN,
     H2EnumIndex(TOWN_MUSIC_NONE),
     H2EnumIndex(TOWN_MUSIC_NONE),
     H2EnumIndex(TOWN_MUSIC_NONE),
     H2EnumIndex(TOWN_MUSIC_NONE),
     H2EnumIndex(TOWN_MUSIC_NONE),
     H2EnumIndex(TOWN_MUSIC_NONE),
-    H2EnumIndex(TOWN_MUSIC_CYBORG)
+    MUSIC_TRACK_CYBORG_TOWN
 };
 i8
     gHeroSkillBonus[KB_FACTION_TABLE_CAPACITY][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
@@ -6568,37 +6527,37 @@ struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_SPEED_FIRST + 2, 0, 0, 0},
     {APP_MENU_SPEED_FIRST + 3, 0, 0, 0},
     {APP_MENU_SPEED_LAST, 0, 0, 0},
-    {APP_MENU_UNKNOWN_9C6D, 0, 0, 0},
+    {APP_MENU_CD_STEREO, 0, 0, 0},
     {APP_MENU_TOGGLE_ROUTE, 0, 0, 0},
-    {APP_MENU_TOGGLE_BLACKOUT, 0, 0, 0},
+    {APP_MENU_VIEW_ENEMY_MOVES, 0, 0, 0},
     {H2EnumIndex(platform::SystemMenuCommand::Help), 1, 1, 0},
     {H2EnumIndex(platform::SystemMenuCommand::About), 1, 1, 0},
-    {APP_MENU_RESTART_0, 0, 1, 0},
-    {APP_MENU_RESTART_1, 0, 1, 0},
-    {APP_MENU_RESTART_2, 0, 1, 0},
-    {APP_MENU_RESTART_3, 0, 1, 0},
-    {APP_MENU_RESTART_4, 0, 1, 0},
-    {APP_MENU_UNKNOWN_9CAD, 0, 1, 0},
-    {APP_MENU_RESTART_5, 0, 1, 0},
-    {APP_MENU_RESTART_6, 0, 1, 0},
-    {APP_MENU_RESTART_7, 0, 1, 0},
-    {APP_MENU_RESTART_8, 0, 1, 0},
-    {APP_MENU_RESTART_9, 0, 1, 0},
-    {APP_MENU_RESTART_10, 0, 1, 0},
-    {APP_MENU_RESTART_11, 0, 1, 0},
-    {APP_MENU_RESTART_12, 0, 1, 0},
-    {APP_MENU_RESTART_13, 0, 1, 0},
-    {APP_MENU_LOAD_0, 0, 1, 0},
-    {APP_MENU_LOAD_1, 0, 1, 0},
-    {APP_MENU_LOAD_2, 0, 1, 0},
-    {APP_MENU_LOAD_3, 0, 1, 0},
-    {APP_MENU_LOAD_4, 0, 1, 0},
-    {APP_MENU_LOAD_5, 0, 1, 0},
-    {APP_MENU_LOAD_6, 0, 1, 0},
-    {APP_MENU_LOAD_7, 0, 1, 0},
-    {APP_MENU_LOAD_8, 0, 1, 0},
-    {APP_MENU_LOAD_9, 0, 1, 0},
-    {APP_MENU_LOAD_10, 0, 1, 0},
+    {APP_MENU_NEW_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_1, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_2, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_3, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_4, 0, 1, 0},
+    {APP_MENU_UNUSED_9CAD, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_CAMPAIGN_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_GUEST, 0, 1, 0},
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
@@ -7748,16 +7707,16 @@ struct SCmbtHero sCmbtHero[KB_COMBAT_HERO_SPRITE_COUNT] = {
       {-1, -1, -1, -1, -1, -1, -1, -1, -1}}}
 };
 H2EnumStorage<CombatCastleHex, u8> iWallToHexCell[KB_CASTLE_WALL_SEGMENT_COUNT] = {
-    COMBAT_CASTLE_HEX_TOP_TOWER,
-    COMBAT_CASTLE_HEX_SECOND_TOWER,
-    COMBAT_CASTLE_HEX_THIRD_TOWER,
-    COMBAT_CASTLE_HEX_BOTTOM_TOWER
-};
-H2EnumStorage<CombatCastleHex, u8> iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
     COMBAT_CASTLE_HEX_TOP_WALL,
     COMBAT_CASTLE_HEX_SECOND_WALL,
     COMBAT_CASTLE_HEX_THIRD_WALL,
     COMBAT_CASTLE_HEX_BOTTOM_WALL
+};
+H2EnumStorage<CombatCastleHex, u8> iTowerToHexCell[KB_CASTLE_TOWER_COUNT] = {
+    COMBAT_CASTLE_HEX_TOP_TOWER,
+    COMBAT_CASTLE_HEX_SECOND_TOWER,
+    COMBAT_CASTLE_HEX_THIRD_TOWER,
+    COMBAT_CASTLE_HEX_BOTTOM_TOWER
 };
 u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][H2EnumIndex(COORDINATE_AXIS_COUNT)] =
     {{468, 58}, {421, 128}, {417, 291}, {498, 402}};
@@ -7807,77 +7766,77 @@ u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
 SCampaignChoice
     campaignChoices[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
         {{{CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_THUNDER_MACE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_ARMORED_GAUNTLETS)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_MIRROR_IMAGE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_SUMMON_EARTH_ELEMENTAL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_RESURRECT)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_THUNDER_MACE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_ARMORED_GAUNTLETS)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_MIRROR_IMAGE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_SUMMON_EARTH_ELEMENTAL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_RESURRECT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_BLACK_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DRAGON_SWORD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DIVINE_BREASTPLATE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
          {{CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_CRYSTAL)}, CHOICE_RESOURCE_BONUS},
           {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GEMS)}, CHOICE_RESOURCE_BONUS},
           {CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_MERCURY)}, CHOICE_RESOURCE_BONUS}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_NONE, {CHOICE_VALUE_NONE}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CHOICE_NO_AMOUNT}}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_TAX_LIEN)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_HIDEOUS_MASK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, {CAMPAIGN_CHOICE_NO_VALUE}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WIZARD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_SORCERESS)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_KNIGHT)}, CAMPAIGN_CHOICE_NO_AMOUNT}}},
         {{{CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_MAGE_RING)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_MINOR_SCROLL)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_MAGE_RING)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_MINOR_SCROLL)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
          {{CAMPAIGN_CHOICE_RESOURCE, {H2EnumIndex(RES_GOLD)}, CHOICE_GOLD_BONUS},
-          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_MASS_CURSE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DEFENDER_HELM)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {H2EnumIndex(HERO_SKILL_LOGISTICS)}, CHOICE_BASIC_SKILL},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_POWER_AXE)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_WHITE_PEARL)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_BLACK_PEARL)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DRAGON_SWORD)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DIVINE_BREASTPLATE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_TAX_LIEN)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_HIDEOUS_MASK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CHOICE_NO_AMOUNT}},
-         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CHOICE_NO_AMOUNT},
-          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CHOICE_NO_AMOUNT}}}
+          {CAMPAIGN_CHOICE_SPELL, {H2EnumIndex(SPELL_MASS_CURSE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DEFENDER_HELM)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, {H2EnumIndex(HERO_SKILL_LOGISTICS)}, H2EnumIndex(HERO_SKILL_LEVEL_BASIC)},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_POWER_AXE)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_WHITE_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_BLACK_PEARL)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DRAGON_SWORD)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_DIVINE_BREASTPLATE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_TAX_LIEN)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_HIDEOUS_MASK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, {H2EnumIndex(ARTIFACT_FIZBIN_OF_MISFORTUNE)}, CAMPAIGN_CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_NECROMANCER)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_WARLOCK)}, CAMPAIGN_CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, {H2EnumIndex(FACTION_BARBARIAN)}, CAMPAIGN_CHOICE_NO_AMOUNT}}}
 };
 char* congratsText = NULL;
 const char* gArtifactNames[KB_ARTIFACT_TABLE_CAPACITY] = {
@@ -10276,7 +10235,7 @@ game* gpGame;
 b8 gbRetreatWin;
 DialogWaitType giWaitType;
 class icon* gCurLoadedSpellIcon;
-u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
+u8 bSaveMusicPosition[MIDI_TRACK_COUNT];
 H2EnumStorage<BottomViewMode, i32> giBottomViewOverride;
 char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 u8 giSetupGameType;
@@ -10328,7 +10287,7 @@ b32 gbThisNetGotAdventureControl;
 i32 giMapChangeCtr;
 SMapChange sMapChangeQueue[CURSOR_MAP_CHANGE_QUEUE_COUNT];
 b32 gbWaitForRemoteReceive;
-u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
+u8 bMusicIsLooping[MIDI_TRACK_COUNT];
 townManager* gpTownManager;
 advManager* gpAdvManager;
 i8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];

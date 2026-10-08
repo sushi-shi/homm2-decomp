@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_RUNTIME_H
 #define HOMM2_PLATFORM_RUNTIME_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <PLATFORM/Input.h>
 
 namespace platform {

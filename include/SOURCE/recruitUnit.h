@@ -1,9 +1,10 @@
 #ifndef HOMM2_SOURCE_RECRUITUNIT_H
 #define HOMM2_SOURCE_RECRUITUNIT_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 #include <PLATFORM/Runtime.h>
-#include <SOURCE/KB_TYPES.h>
 #include <BASE/baseManager.h>
 
 class armyGroup;
@@ -27,7 +28,7 @@ public:
     i32 m_resourceCost;
     i32 m_refreshTown;
     heroWindow* m_window;
-    char m_padding56[4];
+    char m_unused56[4];
     armyGroup* m_army;
     char m_padding5e[4];
     b32 m_recruited;

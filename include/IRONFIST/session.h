@@ -14,8 +14,10 @@ namespace ironfist {
 
 // Values crossing the persistence boundary. No live manager, Lua state,
 // window, resource handle, or owning engine allocation belongs in this data.
+// The game record is packed; its event lists keep u16 indices that must be
+// read at even addresses, so every copy is at least two-byte aligned here.
 struct GameRecords {
-#define IRONFIST_GAME_FIELD(member) decltype(game::member) member{};
+#define IRONFIST_GAME_FIELD(member) alignas(2) alignas(decltype(game::member)) decltype(game::member) member{};
 #include <IRONFIST/session_fields.inc>
 #undef IRONFIST_GAME_FIELD
 };

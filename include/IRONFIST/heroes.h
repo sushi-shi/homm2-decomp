@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <SOURCE/kbTypes.h>
 
 namespace ironfist {
 

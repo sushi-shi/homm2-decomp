@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_HOST_H
 #define HOMM2_PLATFORM_HOST_H
 
-#include "Types.h"
+#include <PLATFORM/Types.h>
 
 namespace platform {
 

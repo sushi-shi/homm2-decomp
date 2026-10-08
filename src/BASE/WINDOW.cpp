@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
@@ -28,7 +28,7 @@ enum class WindowWidgetRecordType : i32 {
     WIDGET_RECORD_DIMMER                = 0x40,
     WIDGET_RECORD_TEXT_ENTRY            = 0x100,
     WIDGET_RECORD_TEXT_ENTRY_RECT       = 0x201,
-    WIDGET_RECORD_TEXT_ENTRY_MULTILINE  = 0x202,
+    WIDGET_RECORD_TEXT_ENTRY_SCROLLING  = 0x202,
     WIDGET_RECORD_DROP_LIST             = 0x203,
     WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE = 0x204,
     WIDGET_RECORD_LIST_BOX              = 0x205,
@@ -45,9 +45,9 @@ typedef enum WindowConstant {
 } WindowConstant;
 
 heroWindow::heroWindow(void) {
-    strcpy(name, "Default Construct");
+    strcpy(m_name, "Default Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = m_posY = 0;
     m_winWidth = LOGICAL_SCREEN_WIDTH;
     m_winHeight = LOGICAL_SCREEN_HEIGHT;
@@ -60,9 +60,9 @@ heroWindow::heroWindow(void) {
 heroWindow::heroWindow(
     i32 x, i32 y, i32 width, i32 height, WindowFlag flags
 ) {
-    strcpy(name, "Dynamic Construct");
+    strcpy(m_name, "Dynamic Construct");
     m_nextWindow = m_prevWindow = NULL;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = width;
@@ -86,13 +86,13 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
     listBoxWidget* pListBox;
     i32 finishedReading;
     u32l resourceId;
-    strcpy(name, resourceName);
+    strcpy(m_name, resourceName);
     resourceId = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(resourceId);
     m_savedBackground = NULL;
     m_nextWindow = m_prevWindow = NULL;
     m_winState = WINDOW_STATE_CLOSED;
-    m_zOrder = -1;
+    m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
     m_winWidth = gpResourceManager->ReadWord();
@@ -144,9 +144,9 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
                 pTextEnt->Read(TEXT_ENTRY_READ_RECT);
                 pWidget = pTextEnt;
                 break;
-            case WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
+            case WIDGET_RECORD_TEXT_ENTRY_SCROLLING:
                 pTextEnt = new textEntryWidget();
-                pTextEnt->Read(TEXT_ENTRY_READ_MULTILINE);
+                pTextEnt->Read(TEXT_ENTRY_READ_SCROLLING);
                 pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
@@ -171,17 +171,17 @@ heroWindow::heroWindow(i32 x, i32 y, const char* resourceName) {
                 break;
         }
         if (finishedReading == 0 && pWidget != NULL)
-            AddWidget(pWidget, -1);
+            AddWidget(pWidget, WINDOW_Z_ORDER_TOP);
     }
 }
 
-i32 heroWindow::Open(i32 x, i32 flags) {
+i32 heroWindow::Open(i32 zOrder, i32 updateScreen) {
     if ((H2EnumIndex((m_winState) & (WINDOW_STATE_OPEN))) != 0)
         return OPEN_FAILURE;
     if ((H2EnumIndex((m_winFlags) & (WINDOW_FLAG_SAVE_BACKGROUND))) != 0 && SaveBackground() != 0)
         return OPEN_FAILURE;
-    m_zOrder = x;
-    DrawWindow(flags);
+    m_zOrder = zOrder;
+    DrawWindow(updateScreen);
     m_winState |= WINDOW_STATE_OPEN;
     return 0;
 }
@@ -219,7 +219,7 @@ void heroWindow::Close(void) {
 
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* currentWidget = m_widgetListHead;
-    if (zOrder == -1) {
+    if (zOrder == WINDOW_Z_ORDER_TOP) {
         if (currentWidget == NULL)
             zOrder = 0;
         else
@@ -343,10 +343,10 @@ void heroWindow::RestoreBackground(void) {
 }
 
 void heroWindow::MoveWindow(i32 dx, i32 dy) {
-    i32 x = m_posX;
-    i32 yPrev = m_posY;
-    i32 oldWidth = m_winWidth;
-    i32 oldHgt = m_winHeight;
+    i32 dirtyX = m_posX;
+    i32 dirtyY = m_posY;
+    i32 dirtyWidth = m_winWidth;
+    i32 dirtyHeight = m_winHeight;
     i32 destinationX = m_posX + dx;
     i32 destinationY = m_posY + dy;
     if (destinationX < 0)
@@ -362,11 +362,11 @@ void heroWindow::MoveWindow(i32 dx, i32 dy) {
     m_posY = destinationY;
     m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
     DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
-    oldWidth = oldWidth + abs(m_posX - x);
-    oldHgt = oldHgt + abs(m_posY - yPrev);
-    if (m_posX < x)
-        x = m_posX;
-    if (m_posY < yPrev)
-        yPrev = m_posY;
-    gpWindowManager->UpdateScreenRegion(x, yPrev, oldWidth, oldHgt);
+    dirtyWidth = dirtyWidth + abs(m_posX - dirtyX);
+    dirtyHeight = dirtyHeight + abs(m_posY - dirtyY);
+    if (m_posX < dirtyX)
+        dirtyX = m_posX;
+    if (m_posY < dirtyY)
+        dirtyY = m_posY;
+    gpWindowManager->UpdateScreenRegion(dirtyX, dirtyY, dirtyWidth, dirtyHeight);
 }

@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_DIMPALETTE_H
 #define HOMM2_SOURCE_DIMPALETTE_H
 
-#include <Ints.h>
+#include <Domains.h>
 #include <BASE/display.h>
 
 typedef enum DimPaletteConstant {

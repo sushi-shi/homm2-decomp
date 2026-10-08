@@ -1,13 +1,11 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/BITS.h>
 #include <BASE/executive.h>
 #include <IRONFIST/townconsts.h>
 #include <IRONFIST/state.h>
 #include <SOURCE/Castle.h>
 #include <BASE/heroWindowManager.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
@@ -38,7 +36,7 @@ town::town(void) {
     m_occupyingHeroId = TOWN_OCCUPYING_HERO_NONE;
     m_buildings = H2EnumIndex(TOWN_BUILDING_TENT);
     m_mageGuildLevel = 0;
-    m_unknown1d = 0;
+    m_unused1d = 0;
 }
 
 i32 town::HasGarrison(void) {
@@ -116,7 +114,7 @@ void town::View(i32 noFade) {
     townManager* manager = gpTownManager;
     manager->SetTown(this);
     if (!noFade)
-        gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
+        gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpExec->CallManager(gpTownManager);
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
@@ -183,11 +181,11 @@ void town::BuildBuilding(BuildingSlotType building) {
         m_buildings &= ~H2EnumIndex(TOWN_BUILDING_DWELLING_3);
     if (building == BUILDING_SLOT_UPGRADE_THIRD)
         m_buildings &= ~H2EnumIndex(TOWN_BUILDING_DWELLING_4);
-    if (building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE)
+    if (building == BUILDING_SLOT_UPGRADE_FOURTH)
         m_buildings &= ~H2EnumIndex(TOWN_BUILDING_DWELLING_5);
-    if (building == BUILDING_SLOT_SPECIAL_TWENTY_NINE)
+    if (building == BUILDING_SLOT_UPGRADE_FIFTH)
         m_buildings &= ~H2EnumIndex(TOWN_BUILDING_DWELLING_6);
-    if (building == BUILDING_SLOT_SPECIAL_THIRTY)
+    if (building == BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE)
         m_buildings &= ~(H2EnumIndex(TOWN_BUILDING_DWELLING_6) | H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_6));
 
     if (building >= BUILDING_SLOT_DWELLING_FIRST && building <= BUILDING_SLOT_DWELLING_SIXTH) {
@@ -196,11 +194,11 @@ void town::BuildBuilding(BuildingSlotType building) {
                 .growth;
     }
     if (building >= BUILDING_SLOT_UPGRADE_FIRST
-        && building <= BUILDING_SLOT_SPECIAL_TWENTY_NINE) {
+        && building <= BUILDING_SLOT_UPGRADE_FIFTH) {
         m_dwellingAvailable[H2EnumIndex(building) - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] =
             m_dwellingAvailable[H2EnumIndex(building) - H2EnumIndex(TOWN_OBJECT_DWELLING_6)];
     }
-    if (building == BUILDING_SLOT_SPECIAL_THIRTY) {
+    if (building == BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE) {
         m_dwellingAvailable[H2EnumIndex(building) - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] =
             m_dwellingAvailable[H2EnumIndex(building) - H2EnumIndex(TOWN_OBJECT_DWELLING_2)];
     }
@@ -233,10 +231,10 @@ void town::SetFaction(FactionType faction) {
 
         m_buildings &= ~buildingMask;
 
-        if (building == H2EnumIndex(BUILDING_SLOT_SPECIAL_THIRTY)) {
+        if (building == H2EnumIndex(BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE)) {
             i32 troopCount = m_dwellingAvailable[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)];
             m_dwellingAvailable[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
-            i32 downgraded = H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE);
+            i32 downgraded = H2EnumIndex(BUILDING_SLOT_UPGRADE_FIFTH);
             if (!((1L << downgraded) & eligibleMask)) {
                 m_dwellingAvailable[downgraded - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
                 downgraded = H2EnumIndex(BUILDING_SLOT_DWELLING_SIXTH);
@@ -244,7 +242,7 @@ void town::SetFaction(FactionType faction) {
             m_buildings |= 1L << downgraded;
             m_dwellingAvailable[downgraded - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = troopCount;
         } else if (building >= H2EnumIndex(BUILDING_SLOT_UPGRADE_FIRST)
-                   && building <= H2EnumIndex(BUILDING_SLOT_SPECIAL_TWENTY_NINE)) {
+                   && building <= H2EnumIndex(BUILDING_SLOT_UPGRADE_FIFTH)) {
             i32 troopCount = m_dwellingAvailable[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)];
             m_dwellingAvailable[building - H2EnumIndex(TOWN_OBJECT_DWELLING_1)] = 0;
             i32 downgraded = building - CASTLE_UPGRADE_OFFSET;
@@ -293,7 +291,7 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     *mageGuildLevel = m_mageGuildLevel;
     *numArchers = 0;
     BuildingSlotType building;
-    for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_SPECIAL_THIRTY;
+    for (building = BUILDING_SLOT_DWELLING_FIRST; building <= BUILDING_SLOT_UPGRADE_SIXTH_ALTERNATE;
          ++building) {
         if (m_buildings & (1 << H2EnumIndex(building)))
             ++*numArchers;

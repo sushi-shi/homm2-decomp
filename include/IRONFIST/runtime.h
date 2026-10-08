@@ -2,7 +2,7 @@
 #define HOMM2_IRONFIST_RUNTIME_H
 
 #include <string>
-#include <Ints.h>
+#include <H2/Ints.h>
 
 namespace ironfist { struct SessionData; }
 

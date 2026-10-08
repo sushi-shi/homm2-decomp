@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_RESOURCE_H
 #define HOMM2_BASE_RESOURCE_H
 
-#include <Ints.h>
+#include <Domains.h>
 
 enum class ResourceCategory : i16 {
     RESOURCE_CATEGORY_BITMAP  = 0,

@@ -352,7 +352,7 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_PEASANT_HUT", H2EnumIndex(MAP_OBJECT_PEASANT_HUT));
     SetConstant(L, "LOCATION_LOG_CABIN", H2EnumIndex(MAP_OBJECT_LOG_CABIN));
     // Ironfist's names for 18 and 19 predate the recovered ones.
-    SetConstant(L, "LOCATION_ROAD", H2EnumIndex(MAP_OBJECT_ALCHEMIST_TOWER));
+    SetConstant(L, "LOCATION_ROAD", H2EnumIndex(MAP_OBJECT_ROAD));
     SetConstant(L, "LOCATION_EVENT", H2EnumIndex(MAP_OBJECT_MAP_EVENT));
     SetConstant(L, "LOCATION_DRAGON_CITY", H2EnumIndex(MAP_OBJECT_DRAGON_CITY));
     SetConstant(L, "LOCATION_LIGHTHOUSE", H2EnumIndex(MAP_OBJECT_LIGHTHOUSE));
@@ -371,11 +371,11 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_TOWN", H2EnumIndex(MAP_OBJECT_CASTLE));
     SetConstant(L, "LOCATION_STONE_LITHS", H2EnumIndex(MAP_OBJECT_STONE_LITHS));
     SetConstant(L, "LOCATION_WAGON_CAMP", H2EnumIndex(MAP_OBJECT_WAGON_CAMP));
-    SetConstant(L, "LOCATION_WELL", H2EnumIndex(MAP_OBJECT_HUT_OF_MAGI));
+    SetConstant(L, "LOCATION_WELL", H2EnumIndex(MAP_OBJECT_WELL));
     SetConstant(L, "LOCATION_WHIRLPOOL", H2EnumIndex(MAP_OBJECT_WHIRLPOOL));
     SetConstant(L, "LOCATION_WINDMILL", H2EnumIndex(MAP_OBJECT_WINDMILL));
     SetConstant(L, "LOCATION_ARTIFACT", H2EnumIndex(MAP_OBJECT_ARTIFACT));
-    SetConstant(L, "LOCATION_HERO", H2EnumIndex(MAP_OBJECT_MERMAID));
+    SetConstant(L, "LOCATION_HERO", H2EnumIndex(MAP_OBJECT_HERO_INTERACTION));
     SetConstant(L, "LOCATION_BOAT", H2EnumIndex(MAP_OBJECT_BOAT));
     SetConstant(L, "LOCATION_RANDOM_ARTIFACT", H2EnumIndex(MAP_OBJECT_RANDOM_ARTIFACT));
     SetConstant(L, "LOCATION_RANDOM_RESOURCE", H2EnumIndex(MAP_OBJECT_RANDOM_RESOURCE));
@@ -402,7 +402,7 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_FORT", H2EnumIndex(MAP_OBJECT_FORT));
     SetConstant(L, "LOCATION_TRADING_POST", H2EnumIndex(MAP_OBJECT_TRADING_POST));
     SetConstant(L, "LOCATION_ABANDONED_MINE", H2EnumIndex(MAP_OBJECT_ABANDONED_MINE));
-    SetConstant(L, "LOCATION_DWARF_CABIN", H2EnumIndex(MAP_OBJECT_SIRENS));
+    SetConstant(L, "LOCATION_DWARF_CABIN", H2EnumIndex(MAP_OBJECT_DWARF_CABIN));
     SetConstant(L, "LOCATION_STANDING_STONES", H2EnumIndex(MAP_OBJECT_STANDING_STONES));
     SetConstant(L, "LOCATION_IDOL", H2EnumIndex(MAP_OBJECT_IDOL));
     SetConstant(L, "LOCATION_TREE_OF_KNOWLEDGE", H2EnumIndex(MAP_OBJECT_TREE_OF_KNOWLEDGE));
@@ -435,7 +435,7 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_MAGIC_GARDEN", H2EnumIndex(MAP_OBJECT_MAGIC_GARDEN));
     SetConstant(L, "LOCATION_OBSERVATION_TOWER", H2EnumIndex(MAP_OBJECT_OBSERVATION_TOWER));
     SetConstant(L, "LOCATION_FREEMANS_FOUNDRY", H2EnumIndex(MAP_OBJECT_FREEMANS_FOUNDRY));
-    SetConstant(L, "LOCATION_STREAM", H2EnumIndex(MAP_OBJECT_REEFS));
+    SetConstant(L, "LOCATION_STREAM", H2EnumIndex(MAP_OBJECT_STREAM));
     SetConstant(L, "LOCATION_TREES", H2EnumIndex(MAP_OBJECT_TREES));
     SetConstant(L, "LOCATION_MOUNTAINS", H2EnumIndex(MAP_OBJECT_MOUNTAINS));
     SetConstant(L, "LOCATION_VOLCANO", H2EnumIndex(MAP_OBJECT_VOLCANO));
@@ -451,8 +451,8 @@ static void set_location_consts(lua_State* L) {
     SetConstant(L, "LOCATION_DUNE", H2EnumIndex(MAP_OBJECT_DUNE));
     SetConstant(L, "LOCATION_LAVA_POOL", H2EnumIndex(MAP_OBJECT_LAVA_POOL));
     SetConstant(L, "LOCATION_SHRUB", H2EnumIndex(MAP_OBJECT_SHRUB));
-    SetConstant(L, "LOCATION_HOLE", H2EnumIndex(MAP_OBJECT_ARENA));
-    SetConstant(L, "LOCATION_OUTCROPPING", H2EnumIndex(MAP_OBJECT_BARROW_MOUNDS));
+    SetConstant(L, "LOCATION_HOLE", H2EnumIndex(MAP_OBJECT_HOLE));
+    SetConstant(L, "LOCATION_OUTCROPPING", H2EnumIndex(MAP_OBJECT_OUTCROPPING));
     SetConstant(
         L, "LOCATION_RANDOM_ARTIFACT_TREASURE", H2EnumIndex(MAP_OBJECT_RANDOM_TREASURE_ARTIFACT)
     );

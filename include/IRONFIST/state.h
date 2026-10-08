@@ -6,13 +6,13 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
+#include <Domains.h>
 #include <IRONFIST/creatures.h>
 #include <IRONFIST/combat_state.h>
 #include <SOURCE/armyGroup.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 class army;
 

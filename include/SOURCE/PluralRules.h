@@ -1,5 +1,5 @@
-#ifndef HOMM2_SOURCE_PLURAL_RULES_H
-#define HOMM2_SOURCE_PLURAL_RULES_H
+#ifndef HOMM2_SOURCE_PLURALRULES_H
+#define HOMM2_SOURCE_PLURALRULES_H
 
 #include <cstddef>
 #include <cstdint>

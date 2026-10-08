@@ -56,15 +56,15 @@ int main() {
     gpCombatManager = new combatManager;
     gpWindowManager->m_screen = new bitmap(BITMAP_TYPE_MEMORY, 640, 480);
     auto& combat = *gpCombatManager;
-    combat.m_nonVisualCombat = false;
+    combat.m_combatFinished = false;
     combat.m_combatWindowOpen = true;
     combat.m_combatMessagePending = false;
     combat.m_currentSide = COMBAT_ATTACKER_SIDE;
     for (i32 side = 0; side < COMBAT_SIDE_COUNT; ++side) {
         combat.m_armyCount[side] = 0;
         combat.m_heroes[side] = nullptr;
-        combat.m_heroIcons[side] = combat.m_heroOverlayIcons[side] = nullptr;
-        combat.m_drawHero[side] = combat.m_drawHeroOverlay[side] = false;
+        combat.m_heroIcons[side] = combat.m_heroFlagIcons[side] = nullptr;
+        combat.m_drawHero[side] = combat.m_drawHeroFlag[side] = false;
     }
     std::memset(combat.m_limitCreatureCount, 0, sizeof(combat.m_limitCreatureCount));
     combat.m_hexCells[20].m_x = 100;

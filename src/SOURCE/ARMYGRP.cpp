@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <string.h>
 #include <BASE/Misc.h>
 #include <IRONFIST/hooks.h>
@@ -6,7 +6,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/town.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 
 typedef enum MoraleConstant {

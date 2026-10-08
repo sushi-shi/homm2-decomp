@@ -1,5 +1,5 @@
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/REMOTE_TYPES.h>
+#include <SOURCE/remoteTypes.h>
 #include <array>
 #include <cstring>
 

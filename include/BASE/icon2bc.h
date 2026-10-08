@@ -1,6 +1,7 @@
-#ifndef HOMM2_ICON2BC_H
-#define HOMM2_ICON2BC_H
+#ifndef HOMM2_BASE_ICON2BC_H
+#define HOMM2_BASE_ICON2BC_H
 
+#include <Domains.h>
 #include <BASE/IconDraw.h>
 
 class bitmap;
@@ -19,7 +20,7 @@ void IconToBitmapColorTable(
     i32 clipH,
     i32 color,
     u8* colorTable,
-    i32 dimGate
+    i32 drawShadows
 );
 
 #endif

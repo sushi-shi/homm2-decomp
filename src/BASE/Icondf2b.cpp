@@ -7,7 +7,7 @@ void FlipDimIconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 color,
+    i32 dimLevel,
     IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
@@ -15,7 +15,7 @@ void FlipDimIconToBitmap(
     i32 clipH
 ) {
     images::IconOptions options;
-    options.color = color;
+    options.color = dimLevel;
     options.mirrored = true;
     options.paint = images::IconPaint::MaskDim;
     images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);

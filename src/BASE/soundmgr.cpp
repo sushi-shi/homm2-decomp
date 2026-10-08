@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Midi.h>
 #include <BASE/Misc.h>
 #include <BASE/MusicFlags.h>
@@ -26,7 +26,7 @@ typedef enum SoundConstant {
 } SoundConstant;
 
 bool gSoundDisabled = false;
-bool gSoundBackendsReady = false;
+bool gbSoundEnabled = false;
 
 namespace {
 
@@ -54,7 +54,7 @@ bool OpenAudioBackend(SoundBackendKind backend) {
     if (!platform::Audio().Open())
         return false;
     gpSoundManager->m_backend = backend;
-    gSoundBackendsReady = true;
+    gbSoundEnabled = true;
     return true;
 }
 
@@ -67,7 +67,7 @@ void soundManager::ShutdownSoundBackends(void) {
     MIDIShutdown();
     platform::Audio().Close();
     gActiveSamples.clear();
-    gSoundBackendsReady = false;
+    gbSoundEnabled = false;
     m_backend = SOUND_BACKEND_NONE;
 }
 
@@ -110,8 +110,8 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     }
     if (converted < 0)
         converted = 0;
-    if (converted > MIDI_VOLUME_MAX)
-        converted = MIDI_VOLUME_MAX;
+    if (converted > SOUND_VOLUME_FULL)
+        converted = SOUND_VOLUME_FULL;
     return converted;
 }
 
@@ -177,7 +177,7 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
 }
 
 void soundManager::StopAllSamples(i32 stopMusic) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     m_musicFadeSteps = 0;
     if (stopMusic != 0)
@@ -200,7 +200,7 @@ void soundManager::StopSample(class sample* sampleResource) {
 }
 
 void soundManager::ModifySample(class sample* sampleResource, i32 volume) {
-    if (!gSoundBackendsReady || sampleResource == NULL)
+    if (!gbSoundEnabled || sampleResource == NULL)
         return;
     platform::Audio().SetVoiceVolume(
         sampleResource->m_playbackData.activeSample,
@@ -209,12 +209,12 @@ void soundManager::ModifySample(class sample* sampleResource, i32 volume) {
 }
 
 bool soundManager::DigitalReport(class sample* sampleResource) {
-    return gSoundBackendsReady && sampleResource != NULL
+    return gbSoundEnabled && sampleResource != NULL
         && platform::Audio().IsVoicePlaying(sampleResource->m_playbackData.activeSample);
 }
 
 void soundManager::AdjustSoundVolumes(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     PurgeFinishedSamples();
     for (sample* sampleResource : gActiveSamples)
@@ -222,7 +222,7 @@ void soundManager::AdjustSoundVolumes(void) {
 }
 
 void soundManager::AdjustMusicVolumes(void) {
-    if (gSoundBackendsReady && m_musicTrack >= 0)
+    if (gbSoundEnabled && m_musicTrack >= 0)
         MIDISetVolume(m_musicFadeSteps);
 }
 
@@ -241,7 +241,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
 }
 
 void soundManager::PlayAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady || m_musicTrack == track)
+    if (!gbSoundEnabled || m_musicTrack == track)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_musicTrack = track;
@@ -286,7 +286,7 @@ void soundManager::PollSound(void) {
 }
 
 void soundManager::SwitchAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_musicTrack = track;
@@ -312,7 +312,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
 }
 
 void soundManager::MemorySample(class sample* sampleResource) {
-    if (sampleResource == NULL || !gSoundBackendsReady
+    if (sampleResource == NULL || !gbSoundEnabled
         || gConfig.soundVolume == CONFIG_VOLUME_MUTED
         || sampleResource->m_playbackData.volume == 0)
         return;
@@ -338,14 +338,14 @@ void soundManager::MemorySample(class sample* sampleResource) {
 }
 
 void soundManager::ServiceSound(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     platform::Audio().Service();
     PurgeFinishedSamples();
 }
 
 i32 soundManager::MusicPlaying(void) {
-    return gSoundBackendsReady && MIDIIsPlaying();
+    return gbSoundEnabled && MIDIIsPlaying();
 }
 
 SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {

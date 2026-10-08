@@ -1,7 +1,7 @@
-#ifndef HOMM2_SAVE_EVENT_HEADER_H
-#define HOMM2_SAVE_EVENT_HEADER_H
+#ifndef HOMM2_SOURCE_SAVEEVENTHEADER_H
+#define HOMM2_SOURCE_SAVEEVENTHEADER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <array>
 
 // Retail repeats the first index in this four-byte prefix, even for count=0.

@@ -4,10 +4,10 @@
 #include <stdexcept>
 #include <tinyxml2.h>
 #include <IRONFIST/xml_utils.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
-#include <SOURCE/SMACKMGR.h>
+#include <SOURCE/smackManager.h>
 #include <SOURCE/X_GLOBAL.h>
 
 namespace ironfist {
@@ -19,7 +19,7 @@ void Require(bool condition, const char* message) {
 }
 
 i32 Integer(tinyxml2::XMLElement* element, const char* attribute = nullptr) {
-    i32 value;
+    i32 value = 0;
     Require(element && (attribute ? element->QueryIntAttribute(attribute, &value)
                                   : element->QueryIntText(&value)) == tinyxml2::XML_SUCCESS,
             "Missing or invalid campaign integer");

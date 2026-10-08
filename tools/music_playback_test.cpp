@@ -50,8 +50,8 @@ Input input;
 
 configStruct gConfig{};
 soundManager* gpSoundManager = nullptr;
-u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT]{};
-u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT]{};
+u8 bSaveMusicPosition[MIDI_TRACK_COUNT]{};
+u8 bMusicIsLooping[MIDI_TRACK_COUNT]{};
 void WritePrefs() {}
 
 namespace platform {

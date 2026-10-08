@@ -1,9 +1,10 @@
 #ifndef HOMM2_BASE_TEXTWIDGET_H
 #define HOMM2_BASE_TEXTWIDGET_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/font.h>
-#include "widget.h"
+#include <BASE/widget.h>
 
 struct tag_message;
 

@@ -1,20 +1,56 @@
 #ifndef HOMM2_BASE_SOUNDMANAGER_H
 #define HOMM2_BASE_SOUNDMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <PLATFORM/Audio.h>
 #include <stdio.h>
-#include "baseManager.h"
+#include <BASE/baseManager.h>
 
 typedef enum MidiTrackConstant {
     MIDI_NO_TRACK    = -1,
     MIDI_TRACK_COUNT = 60
 } MidiTrackConstant;
 
+
+typedef enum MusicTrack {
+    MUSIC_TRACK_BATTLE_FIRST     = 2,
+    MUSIC_TRACK_BATTLE_LAST      = 4,
+    MUSIC_TRACK_SORCERESS_TOWN   = 5,
+    MUSIC_TRACK_WARLOCK_TOWN     = 6,
+    MUSIC_TRACK_NECROMANCER_TOWN = 7,
+    MUSIC_TRACK_KNIGHT_TOWN      = 8,
+    MUSIC_TRACK_BARBARIAN_TOWN   = 9,
+    MUSIC_TRACK_WIZARD_TOWN      = 10,
+    MUSIC_TRACK_LAVA             = 11,
+    MUSIC_TRACK_WASTELAND        = 12,
+    MUSIC_TRACK_DESERT           = 13,
+    MUSIC_TRACK_SNOW             = 14,
+    MUSIC_TRACK_SWAMP            = 15,
+    MUSIC_TRACK_WATER            = 16,
+    MUSIC_TRACK_DIRT             = 17,
+    MUSIC_TRACK_GRASS            = 18,
+    MUSIC_TRACK_LOST_GAME        = 19,
+    MUSIC_TRACK_NEW_WEEK         = 20,
+    MUSIC_TRACK_NEW_MONTH        = 21,
+    MUSIC_TRACK_CAMPAIGN_EVIL    = 22,
+    MUSIC_TRACK_CAMPAIGN_GOOD    = 24,
+    MUSIC_TRACK_AI_TURN          = 28,
+    MUSIC_TRACK_BATTLE_VICTORY   = 29,
+    MUSIC_TRACK_BATTLE_LOSS      = 30,
+    MUSIC_TRACK_MAIN_MENU        = 42,
+    MUSIC_TRACK_HIGH_SCORE       = 43,
+    // Ironfist's Cyborg town theme.
+    MUSIC_TRACK_CYBORG_TOWN      = 44
+} MusicTrack;
+
+
+typedef enum SoundVolumeScale {
+    SOUND_VOLUME_FULL = 127
+} SoundVolumeScale;
+
 typedef enum SoundStorageConstant {
-    SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
-    DIGITAL_DRIVER_NAME_COUNT     = 14,
-    SOUND_CHANNEL_TYPE_COUNT      = 4
+    SOUND_CHANNEL_TYPE_COUNT = 4
 } SoundStorageConstant;
 
 enum class SoundVolumeConversionMode : i32 {
@@ -22,20 +58,6 @@ enum class SoundVolumeConversionMode : i32 {
     SOUND_VOLUME_MUSIC  = 101
 };
 using enum SoundVolumeConversionMode;
-
-enum class SoundSampleOperation : i16 {
-    SOUND_SAMPLE_OPERATION_VOLUME        = 1,
-    SOUND_SAMPLE_OPERATION_START         = 5,
-    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME = 100,
-    SOUND_SAMPLE_OPERATION_MUSIC_VOLUME  = 101
-};
-using enum SoundSampleOperation;
-
-enum class SoundDigitalReportQuery : i16 {
-    SOUND_DIGITAL_REPORT_VOLUME  = 1,
-    SOUND_DIGITAL_REPORT_PLAYING = 4
-};
-using enum SoundDigitalReportQuery;
 
 class sample;
 struct tag_message;
@@ -88,7 +110,7 @@ public:
 extern bool gSoundDisabled;
 
 
-extern bool gSoundBackendsReady;
+extern bool gbSoundEnabled;
 
 inline bool IsCdBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_AUDIO_CD;

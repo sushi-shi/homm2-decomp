@@ -12,7 +12,7 @@
 #include <IRONFIST/state.h>
 #include <IRONFIST/paths.h>
 #include <PLATFORM/Platform.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>

@@ -36,9 +36,10 @@ int main() {
     for (i32 iteration = 0; iteration < 30; ++iteration) {
         for (const i32 count : {2, 3, 0, 1}) {
             LoadMap(count);
-            assert(iMemEntries == initialEntries + 2 + (count != 0));
-            assert(giTotalMemAllocated == initialBytes
-                + static_cast<i32>(36 * 36 * (sizeof(mapCell) + sizeof(u8)) + count * sizeof(mapCellExtra)));
+            // Cells and extras are new[] arrays; only the visibility layer is
+            // a tracked allocation.
+            assert(iMemEntries == initialEntries + 1);
+            assert(giTotalMemAllocated == initialBytes + static_cast<i32>(36 * 36 * sizeof(u8)));
             assert(map.extraCount == count);
             if (count) {
                 assert(map.extras[count - 1].objectIndex == 20 + count - 1);
@@ -50,7 +51,7 @@ int main() {
         // The normal map editor/adventure growth path uses the same owner.
         const i32 added = map.GetNewCellExtraIndex();
         assert(added == 1 && map.extraCount > added);
-        assert(iMemEntries == initialEntries + 3);
+        assert(iMemEntries == initialEntries + 1);
         assert(map.extras[0].objectIndex == 20);
         map.Close();
         H2_FREE(mapExtra);

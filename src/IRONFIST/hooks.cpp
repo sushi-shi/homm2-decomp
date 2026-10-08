@@ -18,7 +18,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/X_GLOBAL.h>
 

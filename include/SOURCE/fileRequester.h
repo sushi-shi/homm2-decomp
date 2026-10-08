@@ -2,7 +2,8 @@
 #define HOMM2_SOURCE_FILEREQUESTER_H
 
 #include <BASE/dialog.h>
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <PLATFORM/Runtime.h>
 #include <BASE/baseManager.h>
 
@@ -12,7 +13,7 @@ class iconWidget;
 struct SMapHeader;
 
 enum class FileRequesterMode : i32 {
-    FILE_REQUESTER_MAP_GAME  = 1,
+    FILE_REQUESTER_NEW_GAME_MAP  = 1,
     FILE_REQUESTER_LOAD_GAME = 2,
     FILE_REQUESTER_SAVE_GAME = 3,
     FILE_REQUESTER_MAP       = 4
@@ -64,13 +65,15 @@ typedef enum FileRequesterStorageConstant {
 } FileRequesterStorageConstant;
 
 typedef enum FileRequesterScrollGeometry {
+    FILE_REQUESTER_SCROLL_KNOB_FRAME       = 4,
+    FILE_REQUESTER_SCROLL_KNOB_WIDTH       = 8,
+    FILE_REQUESTER_SCROLL_KNOB_HEIGHT      = 17,
     FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT = 9,
     FILE_REQUESTER_GUTTER_SCALE            = 100,
 } FileRequesterScrollGeometry;
 
 typedef enum FileRequesterFileSelectionConstant {
     FILE_REQUESTER_EXTENSION_PLAYER_DIGIT      = 3,
-    FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
     FILE_REQUESTER_SELECTION_NONE              = -1,
 } FileRequesterFileSelectionConstant;
 
@@ -110,9 +113,16 @@ public:
     i32 m_topIndex;
     i32 m_selectedIndex;
     i32 m_result;
-    char m_listState[FILE_REQUESTER_LIST_STATE_SIZE];
+    char m_unusedListState[FILE_REQUESTER_LIST_STATE_SIZE];
     iconWidget* m_scrollKnob;
-    fileRequester(i32 x, i32 y, FileRequesterMode mode, const char* pattern, const char* directory, const char* defaultExtension);
+    fileRequester(
+        i32 x,
+        i32 y,
+        FileRequesterMode mode,
+        const char* pattern,
+        const char* directory,
+        const char* defaultExtension
+    );
     virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message& message) override;

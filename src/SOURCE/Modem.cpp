@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <string.h>
@@ -58,13 +58,13 @@ void ModemSetup(i32 mode) {
 
     LogStr("MS3");
     switch (mode) {
-        case MODEM_MODE_DIAL:
+        case H2EnumIndex(REMOTE_GAME_MODEM_HOST):
             if (gbDirectConnect == 0 && Dial() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;
             }
             break;
-        case MODEM_MODE_WAIT:
+        case H2EnumIndex(REMOTE_GAME_MODEM_GUEST):
             if (gbDirectConnect == 0 && Wait() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;
@@ -82,7 +82,7 @@ void ModemSetup(i32 mode) {
             directConnectMessage,
             localization::Tr("network.modem.direct_wait")
         );
-        NormalDialog(directConnectMessage, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(directConnectMessage, NORMAL_DIALOG_WAIT_CANCEL);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         LogStr("MS5");
@@ -128,7 +128,7 @@ void GUIModemCommand(const char* message, const char* command) {
     iModemCommandPos = 0;
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
     strcpy(cModemCommand, command);
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_CANCEL);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
 }
@@ -165,7 +165,7 @@ i8 GUIModemResponse(const char* message, const char* response) {
     GUIMRrespptr = 0;
     strcpy(GUIMRresp, response);
     giWaitType = DIALOG_WAIT_MODEM_RESPONSE;
-    NormalDialog(message, NORMAL_DIALOG_WAIT_LAST);
+    NormalDialog(message, NORMAL_DIALOG_WAIT_CANCEL);
     if (gbFunctionComplete == 0)
         ShutDown(NULL);
     return 0;

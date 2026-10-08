@@ -1,6 +1,6 @@
 #include <SOURCE/MapRecords.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <IRONFIST/creatures.h>
@@ -14,7 +14,7 @@ namespace {
 
 static_assert(sizeof(mapHeroExtra) == 62 && sizeof(mapTownExtra) == 41);
 static_assert(offsetof(mapEventExtra, riddle) == 136);
-static_assert(offsetof(timeEventExtra, message) == 49);
+static_assert(offsetof(EventExtra, message) == 49);
 static_assert(offsetof(EventExtra, message) == 49);
 
 // Ironfist maps extend the retail ranges: creatures 72-83 (Kobold through
@@ -110,7 +110,7 @@ const char* RecordError(Record bytes, Kind kind) {
     case Kind::Sign: textOffset = offsetof(signEventExtra, text); break;
     case Kind::Rumour: textOffset = offsetof(rumourEventExtra, text); break;
     case Kind::Sphinx: textOffset = offsetof(mapEventExtra, riddle); break;
-    case Kind::TimeEvent: textOffset = offsetof(timeEventExtra, message); break;
+    case Kind::TimeEvent: textOffset = offsetof(EventExtra, message); break;
     case Kind::MapEvent: textOffset = offsetof(EventExtra, message); break;
     }
     if (bytes.size() <= textOffset) return "short map text extra";

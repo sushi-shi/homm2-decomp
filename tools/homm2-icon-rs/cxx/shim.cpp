@@ -109,11 +109,11 @@ void h2cxx_icon_to_bitmap_color_table(
     unsigned char* body, std::size_t bodySize, unsigned char* pixels, int width, int height,
     int x, int y, int frame, int clip,
     int clipX, int clipY, int clipW, int clipH, int color,
-    unsigned char* colorTable, int dimGate
+    unsigned char* colorTable, int drawShadows
 ) {
     IconToBitmapColorTable(make_icon(body, bodySize), make_bitmap(pixels, width, height),
                            x, y, frame, clip_mode(clip), clipX, clipY, clipW, clipH,
-                           color, colorTable, dimGate);
+                           color, colorTable, drawShadows);
 }
 
 void h2cxx_flip_icon_to_bitmap_color_table(

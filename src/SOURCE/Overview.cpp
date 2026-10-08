@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <BASE/BITS.h>
 #include <BASE/Misc.h>
@@ -11,16 +11,15 @@
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <BASE/executive.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/game.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/Overview.h>
+#include <SOURCE/fileRequester.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
@@ -29,7 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 
 namespace {
@@ -45,7 +44,6 @@ typedef enum OverviewStorageConstant {
 
 typedef enum OverviewPresentationConstant {
     OVERVIEW_ICON_FILL_COLOR          = 1,
-    OVERVIEW_FADE_STEPS               = 8,
     OVERVIEW_WINDOW_TEXT_ID           = 9,
     OVERVIEW_POINTER_FRAME            = 0
 } OverviewPresentationConstant;
@@ -75,26 +73,26 @@ typedef enum OverviewControlId {
     TOWN_SELECT_WIDGET          = 4,
     TOWN_ARMY_FIRST             = 5,
     TOWN_ARMY_LAST              = 9,
-    TOWN_ARMY_ALT_FIRST         = 10,
-    TOWN_ARMY_ALT_LAST          = 14,
-    TOWN_RECRUIT_FIRST          = 15,
-    TOWN_RECRUIT_LAST           = 26,
-    TOWN_RECRUIT_ALT_FIRST      = 27,
-    TOWN_RECRUIT_ALT_LAST       = 38,
+    TOWN_ARMY_COUNT_FIRST         = 10,
+    TOWN_ARMY_COUNT_LAST          = 14,
+    TOWN_DWELLING_FIRST          = 15,
+    TOWN_DWELLING_LAST           = 26,
+    TOWN_DWELLING_AVAILABLE_FIRST      = 27,
+    TOWN_DWELLING_AVAILABLE_LAST       = 38,
     TOWN_HERO_FIRST             = 39,
     TOWN_HERO_PORTRAIT_CONTROL  = 40,
     TOWN_HERO_MANA_CONTROL      = 41,
     TOWN_HERO_MOBILITY_CONTROL  = 43,
     TOWN_HERO_LAST              = TOWN_HERO_MOBILITY_CONTROL,
-    TOWN_LOCATOR_CONTROL        = 44,
+    TOWN_BUILT_TODAY_CONTROL        = 44,
     HERO_SELECT_FIRST           = 100,
     HERO_PORTRAIT_CONTROL       = 101,
     HERO_MOBILITY_CONTROL       = 103,
     HERO_SELECT_LAST            = HERO_MOBILITY_CONTROL,
     HERO_ARMY_FIRST             = 104,
     HERO_ARMY_LAST              = 108,
-    HERO_ARMY_ALT_FIRST         = 109,
-    HERO_ARMY_ALT_LAST          = 113,
+    HERO_ARMY_COUNT_FIRST         = 109,
+    HERO_ARMY_COUNT_LAST          = 113,
     HERO_ARTIFACT_FIRST         = 114,
     HERO_ARTIFACT_LAST          = 127,
     HERO_ARTIFACT_FRAME_FIRST   = 128,
@@ -117,16 +115,12 @@ typedef enum OverviewScrollConstant {
     SCROLL_KNOB_STATIC_Y      = 169,
     SCROLL_MIN_Y              = 18,
     SCROLL_RANGE              = 304,
-    SCROLL_KNOB_OFFSET        = 9,
     SCROLL_LAST_PIXEL_ADJUST  = 1,
     SCROLL_SCALE              = 100,
     SCROLL_TRACK_PIXEL_COUNT  = 321,
     SCROLL_SCALED_TRACK_RANGE = SCROLL_TRACK_PIXEL_COUNT * SCROLL_SCALE,
     SCROLL_KNOB_X             = 629,
     SCROLL_KNOB_Y             = 18,
-    SCROLL_KNOB_WIDTH         = 8,
-    SCROLL_KNOB_HEIGHT        = 17,
-    SCROLL_KNOB_FRAME         = 4,
     SCROLL_UPDATE_X           = 627,
     SCROLL_UPDATE_Y           = 17,
     SCROLL_UPDATE_WIDTH       = 11,
@@ -266,8 +260,6 @@ typedef enum OverviewDwellingIndex {
 
 typedef enum OverviewDialogConstant {
     OVERVIEW_RETURN_ID_NONE = -1,
-    OVERVIEW_VIEW_ARMY_X    = 119,
-    OVERVIEW_VIEW_ARMY_Y    = 20
 } OverviewDialogConstant;
 
 }
@@ -409,7 +401,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     "locators.icn",
                     TOWN_LOCATOR_FRAME,
                     ICON_DRAW_NORMAL,
-                    rowWidgetId + TOWN_LOCATOR_CONTROL,
+                    rowWidgetId + TOWN_BUILT_TODAY_CONTROL,
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
                 );
@@ -526,7 +518,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(record->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + TOWN_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (iconWidgetDynamic[rowIndex][icons] == NULL) {
@@ -554,7 +546,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + i + TOWN_ARMY_ALT_FIRST,
+                            rowWidgetId + i + TOWN_ARMY_COUNT_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -623,8 +615,8 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             "mons32.icn",
                             static_cast<i16>(gDwellingType[H2EnumIndex(record->m_type)][building]),
                             ICON_DRAW_NORMAL,
-                            rowWidgetId + building + TOWN_RECRUIT_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            rowWidgetId + building + TOWN_DWELLING_FIRST,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (iconWidgetDynamic[rowIndex][icons] == NULL) {
@@ -652,7 +644,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + building + TOWN_RECRUIT_ALT_FIRST,
+                            rowWidgetId + building + TOWN_DWELLING_AVAILABLE_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -802,7 +794,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(curHero->m_army.m_creatureTypes[i]),
                             ICON_DRAW_NORMAL,
                             rowWidgetId + i + HERO_ARMY_FIRST,
-                            WIDGET_KIND_ICON_CENTERED,
+                            WIDGET_KIND_ICON_BOTTOM_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
                         );
                         if (iconWidgetDynamic[rowIndex][icons] == NULL) {
@@ -828,7 +820,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             valueText,
                             "smalfont.fnt",
                             FONT_DRAW_DEFAULT,
-                            rowWidgetId + i + HERO_ARMY_ALT_FIRST,
+                            rowWidgetId + i + HERO_ARMY_COUNT_FIRST,
                             WIDGET_KIND_TEXT,
                             FONT_ALIGN_CENTER
                         );
@@ -876,7 +868,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         "miniss.icn",
                         // The Cyborg Wisdom slot draws the Cybernetics small icon.
                         static_cast<i16>(
-                            curHero->m_cursorType == FACTION_CYBORG
+                            curHero->m_faction == FACTION_CYBORG
                                     && skillIndex == HERO_SKILL_WISDOM
                                 ? H2EnumIndex(ironfist::CYBERNETICS_MINI_SKILL_FRAME)
                                 : H2EnumIndex(skillIndex)
@@ -1079,7 +1071,7 @@ void game::Overview(void) {
     giOverviewReturnActionExtra = OVERVIEW_RETURN_ID_NONE;
     message.type = MESSAGE_WIDGET;
     gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     for (mine = 0; mine < OVERVIEW_TITLE_COUNT; mine++) {
         textWidgetTitle[mine] = NULL;
     }
@@ -1111,10 +1103,10 @@ void game::Overview(void) {
     OVScrollKnob = new iconWidget(
         SCROLL_KNOB_X,
         SCROLL_KNOB_Y,
-        SCROLL_KNOB_WIDTH,
-        SCROLL_KNOB_HEIGHT,
+        FILE_REQUESTER_SCROLL_KNOB_WIDTH,
+        FILE_REQUESTER_SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
-        SCROLL_KNOB_FRAME,
+        FILE_REQUESTER_SCROLL_KNOB_FRAME,
         ICON_DRAW_NORMAL,
         SCROLL_KNOB_WIDGET,
         WIDGET_KIND_ICON_DIRECT,
@@ -1126,7 +1118,7 @@ void game::Overview(void) {
     overWin->AddWidget(OVScrollKnob, -1);
 
     SetupResources();
-    memset(mineCounts, 0, H2EnumIndex(RES_COUNT));
+    memset(mineCounts, 0, sizeof(mineCounts));
     lighthouseCount = 0;
     for (mine = 0; mine < GAME_MINE_COUNT; mine++) {
         if (m_mineOwners[mine] == giCurPlayer) {
@@ -1161,7 +1153,7 @@ void game::Overview(void) {
     overWin->BroadcastMessage(message);
     SetupNewOverviewType(giOverviewType, 0);
     gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
-    gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
+    gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     delete overWin;
     overWin = NULL;
     H2_FREE(textWidgetDynamic);
@@ -1206,7 +1198,7 @@ void game::DoKnob(void) {
                 }
                 gpMouseManager->Main(widgetMessage);
                 OVScrollKnob->m_y =
-                    widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                    widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                 topNow = ((OVScrollKnob->m_y - topValue) / itemPixels);
                 if (topNow != topBefore) {
                     if (topNow > giOverviewItems[H2EnumIndex(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
@@ -1217,7 +1209,7 @@ void game::DoKnob(void) {
                     }
                     giOverviewTop[H2EnumIndex(giOverviewType)] = topNow;
                     OVScrollKnob->m_y =
-                        widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET;
+                        widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                     SetupDynamicStuff(1, 0, 0);
                     topBefore = topNow;
                 } else {
@@ -1296,7 +1288,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         scrollDivisor = SCROLL_SCALED_TRACK_RANGE / scrollSpan;
                         y = message.payload.mouse.screenY;
                         y -= SCROLL_MIN_Y;
-                        y -= SCROLL_KNOB_OFFSET;
+                        y -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                         topIndex = y * SCROLL_SCALE / scrollDivisor;
                         giOverviewTop[H2EnumIndex(giOverviewType)] = topIndex;
                         if (giOverviewTop[H2EnumIndex(giOverviewType)] + (OVERVIEW_VISIBLE_ROWS - 1)
@@ -1386,8 +1378,8 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
         }
     }
     if (done == 1) {
-        message.payload.widget.id = SCROLL_UP_WIDGET;
-        message.payload.widget.command = BaseWidgetCommand(SCROLL_UP_WIDGET);
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = BaseWidgetCommand(H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT));
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -1416,15 +1408,15 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     gpCurPlayer->m_heroIds[giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex];
                 return 1;
             }
-            if (widgetId >= HERO_ARMY_ALT_FIRST
-                && widgetId <= HERO_ARMY_ALT_LAST) {
+            if (widgetId >= HERO_ARMY_COUNT_FIRST
+                && widgetId <= HERO_ARMY_COUNT_LAST) {
                 widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= HERO_ARMY_FIRST && widgetId <= HERO_ARMY_LAST) {
                 item = widgetId - HERO_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     curHero->m_army.m_creatureTypes[item],
                     curHero->m_army.m_creatureCounts[item],
                     NULL,
@@ -1457,7 +1449,7 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     curHero->ViewArtifact(
                         selectedArtifact,
                         quickView,
-                        curHero->m_artifactExtra[widgetId - HERO_ARTIFACT_FIRST]
+                        curHero->m_artifactSpells[widgetId - HERO_ARTIFACT_FIRST]
                     );
                 }
             }
@@ -1484,15 +1476,15 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                 giOverviewReturnActionExtra = selectedTown->m_occupyingHeroId;
                 return 1;
             }
-            if (widgetId >= TOWN_ARMY_ALT_FIRST
-                && widgetId <= TOWN_ARMY_ALT_LAST) {
+            if (widgetId >= TOWN_ARMY_COUNT_FIRST
+                && widgetId <= TOWN_ARMY_COUNT_LAST) {
                 widgetId -= ARMY_GROUP_SLOT_COUNT;
             }
             if (widgetId >= TOWN_ARMY_FIRST && widgetId <= TOWN_ARMY_LAST) {
                 item = widgetId - TOWN_ARMY_FIRST;
                 gpGame->ViewArmy(
-                    OVERVIEW_VIEW_ARMY_X,
-                    OVERVIEW_VIEW_ARMY_Y,
+                    VIEW_ARMY_STANDARD_X,
+                    VIEW_ARMY_STANDARD_Y,
                     selectedTown->m_army.m_creatureTypes[item],
                     selectedTown->m_army.m_creatureCounts[item],
                     selectedTown,
@@ -1508,12 +1500,12 @@ i32 game::ProcessIconSelect(i32 widgetId, b32 quickView) {
                     SetupDynamicStuff(1, 1, 1);
                 }
             }
-            if (widgetId >= TOWN_RECRUIT_ALT_FIRST
-                && widgetId <= TOWN_RECRUIT_ALT_LAST) {
+            if (widgetId >= TOWN_DWELLING_AVAILABLE_FIRST
+                && widgetId <= TOWN_DWELLING_AVAILABLE_LAST) {
                 widgetId -= DWELLING_TYPE_COUNT;
             }
-            if (widgetId >= TOWN_RECRUIT_FIRST && widgetId <= TOWN_RECRUIT_LAST) {
-                item = widgetId - TOWN_RECRUIT_FIRST;
+            if (widgetId >= TOWN_DWELLING_FIRST && widgetId <= TOWN_DWELLING_LAST) {
+                item = widgetId - TOWN_DWELLING_FIRST;
                 if (quickView != 0) {
                     QuickViewRecruit(selectedTown, item);
                 } else {

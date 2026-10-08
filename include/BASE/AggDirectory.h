@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_AGG_DIRECTORY_H
-#define HOMM2_BASE_AGG_DIRECTORY_H
+#ifndef HOMM2_BASE_AGGDIRECTORY_H
+#define HOMM2_BASE_AGGDIRECTORY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <PLATFORM/FileSystem.h>
 
 #include <string>

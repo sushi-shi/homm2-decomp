@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include <Ints.h>
+#include <Domains.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 namespace ironfist {
 

@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/Utf8.h>
 #include <stdio.h>
 #include <BASE/border.h>
@@ -17,11 +17,8 @@
 
 typedef enum BankBoxConstant {
     BOX_TEXT_SIZE               = 12,
-    BOX_NON_GOLD_RESOURCE_COUNT = 6,
     BOX_FIRST_RESOURCE_WIDGET   = 0x7ee,
-    BOX_GOLD_WIDGET             = 0x7f4,
-    BOX_WINDOW_Z_ORDER          = -1,
-    BOX_WINDOW_ACTIVE           = 1
+    BOX_GOLD_WIDGET             = 0x7f4
 } BankBoxConstant;
 
 strip::strip(
@@ -38,7 +35,7 @@ strip::strip(
     m_selectedSlot = ARMY_GROUP_EMPTY_SLOT;
     m_x = x;
     m_y = y;
-    m_stripType = stripType;
+    m_unusedStripType = stripType;
     m_portraitIcon = gpResourceManager->GetIcon(portraitIconId);
     m_portraitFrame = portraitFrame;
     m_army = army;
@@ -220,7 +217,7 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_window = new heroWindow(m_x, m_y, "bankbox.bin");
     if (m_window == NULL)
         MemError();
-    gpWindowManager->AddWindow(m_window, BOX_WINDOW_Z_ORDER, BOX_WINDOW_ACTIVE);
+    gpWindowManager->AddWindow(m_window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
     Update(1);
 }
 
@@ -236,7 +233,7 @@ void bankBox::Update(i32 drawWindow) {
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    for (resource = 0; resource < BOX_NON_GOLD_RESOURCE_COUNT; resource++) {
+    for (resource = 0; resource < H2EnumIndex(RES_GOLD); resource++) {
         utf8::Format(currentText, "%d", m_player->m_resources[resource]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource;
         message.payload.widget.data.text = currentText;

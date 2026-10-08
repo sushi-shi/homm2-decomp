@@ -1,21 +1,31 @@
 #ifndef HOMM2_SOURCE_COMBATMANAGER_H
 #define HOMM2_SOURCE_COMBATMANAGER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <vector>
 #include <PLATFORM/Runtime.h>
 #include <BASE/baseManager.h>
-#include <BASE/WINMGR.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/icon.h>
 #include <SOURCE/COMMAND.h>
+#include <SOURCE/army.h>
+#include <SOURCE/hero.h>
+#include <SOURCE/hexcell.h>
+#include <SOURCE/SPELLS.h>
 #include <SOURCE/CombatCursor.h>
 #include <SOURCE/graphics.h>
-#include "army.h"
-#include "hero.h"
-#include "hexcell.h"
-#include "SPELLS.h"
 #include <SOURCE/combatTypes.h>
 #include <BASE/palette.h>
+#include <H2/Ints.h>
+#include <BASE/message.h>
+
+struct tag_message;
+
+struct CombatTowerOrigin {
+    u16 x;
+    u16 y;
+};
 
 // The six directions the plasma-cone cursor can point, matching the hex
 // adjacency order.
@@ -81,9 +91,9 @@ enum class CombatDrawbridgeState : i32 {
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND = 2,
-    COMBAT_CASTLE_GATE_HIDDEN            = 3,
+    COMBAT_CASTLE_GATE_DESTROYED         = 3,
     COMBAT_DRAWBRIDGE_RAISED             = 4,
-    COMBAT_CASTLE_GATE_OPEN              =
+    COMBAT_CASTLE_GATE_CLOSED            =
         COMBAT_DRAWBRIDGE_RAISED
 };
 using enum CombatDrawbridgeState;
@@ -108,6 +118,33 @@ typedef enum CombatCastleWallConstant {
     COMBAT_WALL_SECTION_COUNT = 4
 } CombatCastleWallConstant;
 
+
+typedef enum CombatCastleExteriorRange {
+    COMBAT_CASTLE_EXTERIOR_ROW_0_FIRST = 0,
+    COMBAT_CASTLE_EXTERIOR_ROW_0_LAST  = 8,
+    COMBAT_CASTLE_EXTERIOR_ROW_1_FIRST = 13,
+    COMBAT_CASTLE_EXTERIOR_ROW_1_LAST  = 21,
+    COMBAT_CASTLE_EXTERIOR_ROW_2_FIRST = 26,
+    COMBAT_CASTLE_EXTERIOR_ROW_2_LAST  = 33,
+    COMBAT_CASTLE_EXTERIOR_ROW_3_FIRST = 39,
+    COMBAT_CASTLE_EXTERIOR_ROW_3_LAST  = 46,
+    COMBAT_CASTLE_EXTERIOR_ROW_4_FIRST = 52,
+    COMBAT_CASTLE_EXTERIOR_ROW_4_LAST  = 58,
+    COMBAT_CASTLE_EXTERIOR_ROW_5_FIRST = 65,
+    COMBAT_CASTLE_EXTERIOR_ROW_5_LAST  = 72,
+    COMBAT_CASTLE_EXTERIOR_ROW_6_FIRST = 78,
+    COMBAT_CASTLE_EXTERIOR_ROW_6_LAST  = 85,
+    COMBAT_CASTLE_EXTERIOR_ROW_7_FIRST = 91,
+    COMBAT_CASTLE_EXTERIOR_ROW_7_LAST  = 99,
+    COMBAT_CASTLE_EXTERIOR_ROW_8_FIRST = 104,
+    COMBAT_CASTLE_EXTERIOR_ROW_8_LAST  = 112
+} CombatCastleExteriorRange;
+
+
+typedef enum CombatFrameTimingConstant {
+    COMBAT_FRAME_DELAY = 75
+} CombatFrameTimingConstant;
+
 enum class CombatCastleWallState : u8 {
     COMBAT_WALL_STATE_KEEP_STANDING        = 0,
     COMBAT_WALL_STATE_KEEP_DESTROYED       = 1,
@@ -130,7 +167,6 @@ typedef enum CombatCatapultConstant {
     COMBAT_CATAPULT_NO_SKILL_MISS_THRESHOLD   = 75,
     COMBAT_CATAPULT_ADVANCED_DOUBLE_THRESHOLD = 50,
     COMBAT_CATAPULT_MISS_HEX_COUNT            = 11,
-    COMBAT_CATAPULT_DIRECTION_COUNT           = 6,
     COMBAT_CATAPULT_DIRECTION_ROLL_MIN        = 0,
     COMBAT_CATAPULT_DIRECTION_ROLL_MAX        = 5,
     COMBAT_CATAPULT_MISS_Y_OFFSET             = 17,
@@ -145,9 +181,7 @@ typedef enum CombatCatapultConstant {
     COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME    = 2,
     COMBAT_CATAPULT_WALL_IMPACT_FRAME         = 6,
     COMBAT_CATAPULT_GATE_IMPACT_FRAME         = 7,
-    COMBAT_CATAPULT_ANIMATION_DELAY           = 75,
     COMBAT_CATAPULT_PROJECTILE_DELAY          = 63,
-    COMBAT_CATAPULT_TIMER_SLOT                = 1,
     COMBAT_CATAPULT_LAUNCH_SOUND              = 0,
     COMBAT_CATAPULT_IMPACT_SOUND              = 2,
     COMBAT_CATAPULT_INITIAL_MAX_X             = 160,
@@ -178,10 +212,7 @@ typedef enum CombatCatapultConstant {
     SPELL_AREA_DAMAGE_PER_POWER               = 10,
     COMBAT_KEEP_FACTION_COUNT                 = H2EnumIndex(FACTION_COUNT),
     COMBAT_KEEP_TOWER_COUNT                   = 3,
-    COMBAT_KEEP_MISSILE_ANGLE_COUNT           = 9,
     COMBAT_KEEP_TOWER_DAMAGE_BONUS            = 2,
-    COMBAT_KEEP_ATTACK_STAT_LIMIT             = 20,
-    COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET      = 20,
     COMBAT_KEEP_RANDOM_DAMAGE_MIN             = 2,
     COMBAT_KEEP_RANDOM_DAMAGE_MAX             = 3,
     COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR       = 2,
@@ -201,7 +232,7 @@ typedef enum CombatGridConstant {
     COMBAT_GRID_COPY_LEFT              = 67,
     COMBAT_GRID_COPY_TOP               = 63,
     COMBAT_GRID_COPY_RIGHT             = 573,
-    COMBAT_GRID_COPY_BOTTOM            = 442,
+    COMBAT_GRID_COPY_BOTTOM            = COMBAT_MAX_EXTENT_Y,
     COMBAT_GRID_LINE_FRAME             = 0,
     COMBAT_GRID_LINE_COLOR             = 0xe2,
     COMBAT_GRID_MOUSE_FRAME            = 2,
@@ -209,7 +240,7 @@ typedef enum CombatGridConstant {
     COMBAT_MOUSE_HEX_HEIGHT            = 52,
     COMBAT_MOUSE_HEX_MAX_X_OFFSET      = 43,
     COMBAT_MOUSE_HEX_MAX_Y_OFFSET      = 51,
-    COMBAT_MOUSE_REDRAW_DELAY          = 75,
+    COMBAT_MOUSE_REDRAW_DELAY          = COMBAT_FRAME_DELAY,
     COMBAT_BACKGROUND_COPY_WIDTH       = 507,
     COMBAT_BACKGROUND_COPY_HEIGHT      = 380,
     COMBAT_HEX_HORIZONTAL_STEP         = 44,
@@ -226,11 +257,10 @@ typedef enum CombatGridConstant {
     COMBAT_GRID_LEFT_SPECIAL_X_MAX     = 74,
     COMBAT_GRID_LEFT_SPECIAL_Y_MIN     = 80,
     COMBAT_GRID_LEFT_SPECIAL_Y_MAX     = 196,
-    COMBAT_GRID_LEFT_SPECIAL_HEX       = 26,
+    COMBAT_GRID_LEFT_HERO_HEX          = 26,
     COMBAT_GRID_RIGHT_SPECIAL_X_MIN    = 566,
     COMBAT_GRID_RIGHT_UPPER_Y_MIN      = 37,
     COMBAT_GRID_RIGHT_UPPER_Y_MAX      = 153,
-    COMBAT_GRID_RIGHT_UPPER_HEX        = 25,
     COMBAT_GRID_RIGHT_LOWER_Y_MIN      = 154,
     COMBAT_GRID_RIGHT_LOWER_Y_MAX      = 310,
     COMBAT_VALID_HEX_MAX               = 125,
@@ -243,6 +273,7 @@ typedef enum CombatGridConstant {
 
 typedef enum CombatManagerStorageConstant {
     COMBAT_ARMY_SLOT_COUNT           = 20,
+    COMBAT_ARMY_INDEX_NONE           = -1,
     COMBAT_ARMY_STORAGE_SLOT_COUNT   = 21,
     COMBAT_RUNTIME_ALIGNMENT_SIZE    = 4,
     COMBAT_MESSAGE_STATE_PAD_SIZE    = 0x64,
@@ -270,11 +301,10 @@ typedef enum CombatHeroPlacementConstant {
 typedef enum CombatSiegeDrawingConstant {
     COMBAT_CATAPULT_X                       = 22,
     COMBAT_CATAPULT_Y                       = 390,
-    COMBAT_CASTLE_TOP_LAYER_FRAME           = 0x19,
-    COMBAT_CASTLE_GATE_FRAME                = 0x1a,
-    COMBAT_CASTLE_GATE_CLOSED_FRAME         = 0x14,
+    COMBAT_DRAWBRIDGE_LOWERED_FRONT_FRAME           = 0x19,
+    COMBAT_CASTLE_KEEP_DESTROYED_FRAME                = 0x1a,
+    COMBAT_CASTLE_KEEP_FRAME         = 0x14,
     COMBAT_CASTLE_WALL_BASE_FRAME           = 0x11,
-    COMBAT_DOOR_ANIMATION_DELAY             = 75,
     COMBAT_DOOR_EXTENT_MIN_X                = 304,
     COMBAT_DOOR_EXTENT_MIN_Y                = 218,
     COMBAT_DOOR_EXTENT_MAX_X                = 384,
@@ -286,8 +316,6 @@ typedef enum CombatSiegeDrawingConstant {
 } CombatSiegeDrawingConstant;
 
 typedef enum CombatObstaclePlacementConstant {
-    COMBAT_OBSTACLE_TYPE_COUNT          = 32,
-    COMBAT_OBSTACLE_RANDOM_SENTINEL = COMBAT_OBSTACLE_TYPE_COUNT,
     COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH = 32,
     COMBAT_OBSTACLE_CELL_ROLL_MAX       = 116,
     COMBAT_OBSTACLE_TRY_LIMIT           = 500,
@@ -303,7 +331,6 @@ typedef enum CombatObstaclePlacementConstant {
 
 typedef enum CombatBattleSetupConstant {
     COMBAT_RANDOM_PERCENT_MAX     = 99,
-    COMBAT_CASTLE_STRUCTURE_COUNT = 4,
     COMBAT_FIXED_ICON_COUNT       = 15,
     COMBAT_SPEED_LEVEL_COUNT      = 15,
     COMBAT_MAX_SPEED              = 14,
@@ -318,12 +345,13 @@ typedef enum CombatMissileDirectionConstant {
 
 typedef enum CombatSmallViewConstant {
     COMBAT_SMALL_VIEW_FULL_INFO        = 2,
+    COMBAT_ARMY_INFO_LEVEL_COUNT       = 3,
     COMBAT_SMALL_VIEW_LEFT_X           = 5,
     COMBAT_SMALL_VIEW_RIGHT_X          = 555,
     COMBAT_SMALL_VIEW_FULL_Y           = 299,
-    COMBAT_SMALL_VIEW_FULL_RIGHT_Y     = 154,
+    COMBAT_SMALL_VIEW_FULL_STACKED_Y     = 154,
     COMBAT_SMALL_VIEW_COMPACT_Y        = 366,
-    COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y  = 288,
+    COMBAT_SMALL_VIEW_COMPACT_STACKED_Y  = 288,
     COMBAT_SMALL_VIEW_WIDTH            = 83,
     COMBAT_SMALL_VIEW_FULL_HEIGHT      = 141,
     COMBAT_SMALL_VIEW_COMPACT_HEIGHT   = 74,
@@ -406,8 +434,8 @@ enum class CombatIconIndex : i32 {
     COMBAT_ICON_SMALL_VIEW_BACKGROUND = 10,
     COMBAT_ICON_SMALL_VIEW_MODIFIER   = 11,
     COMBAT_ICON_SMALL_VIEW_SPELL      = 12,
-    COMBAT_ICON_MOAT                  = 13,
-    COMBAT_ICON_DRAWBRIDGE            = 14
+    COMBAT_ICON_MOAT_PART                  = 13,
+    COMBAT_ICON_MOAT_WHOLE            = 14
 };
 using enum CombatIconIndex;
 
@@ -415,10 +443,9 @@ typedef enum CombatRuntimeConstant {
     COMBAT_RANDOM_X_MULTIPLIER            = 100,
     COMBAT_CAPTAIN_SPRITE_OFFSET          = H2EnumIndex(FACTION_COUNT),
     COMBAT_NEUTRAL_HERO_COLOR             = H2EnumIndex(FACTION_COUNT),
-    COMBAT_HERO_OVERLAY_FRAME_COUNT       = 5,
+    COMBAT_HERO_FLAG_FRAME_COUNT       = 5,
     COMBAT_HERO_ANIMATION_TRACK_COUNT     = COMBAT_SIDE_COUNT + 1,
-    COMBAT_INITIAL_COMMAND                = 15,
-    COMBAT_INVALID_HISTORY_INDEX          = -99
+    COMBAT_INITIAL_SPEED                  = 15
 } CombatRuntimeConstant;
 
 typedef enum CombatAIConstant {
@@ -433,23 +460,23 @@ typedef enum CombatAIConstant {
     COMBAT_AI_ATTACK_FLY                       = 2,
     COMBAT_AI_ATTACK_WALK                      = 3,
     COMBAT_AI_MASK_FIRST_BIT                   = 1,
-    COMBAT_AI_NO_ARMY                          = -1,
+    COMBAT_AI_NO_ARMY                          = COMBAT_ARMY_INDEX_NONE,
     COMBAT_AI_LICH_DAMAGE_PER_CREATURE         = 9,
     COMBAT_AI_LICH_HIT_POINT_BONUS             = 100,
     COMBAT_AI_UNLIMITED_PATH_SPEED             = 0x7f,
     COMBAT_AI_DISTANCE_WEIGHT                  = 1000,
     COMBAT_AI_WORST_STRENGTH_LIMIT             = 999999999,
     COMBAT_AI_CLOSEST_ARMY_LIMIT               = 9999999,
-    COMBAT_AI_CASTLE_BOUNDARY_COUNT            = 9,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_0            = 8,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_1            = 0x15,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_2            = 0x21,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_3            = 0x2e,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_4            = 0x3a,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_5            = 0x48,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_6            = 0x55,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_7            = 99,
-    COMBAT_AI_CASTLE_BOUNDARY_ROW_8            = 0x70,
+    COMBAT_AI_CASTLE_BOUNDARY_COUNT            = COMBAT_GRID_ROW_COUNT,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_0            = COMBAT_CASTLE_EXTERIOR_ROW_0_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_1            = COMBAT_CASTLE_EXTERIOR_ROW_1_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_2            = COMBAT_CASTLE_EXTERIOR_ROW_2_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_3            = COMBAT_CASTLE_EXTERIOR_ROW_3_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_4            = COMBAT_CASTLE_EXTERIOR_ROW_4_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_5            = COMBAT_CASTLE_EXTERIOR_ROW_5_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_6            = COMBAT_CASTLE_EXTERIOR_ROW_6_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_7            = COMBAT_CASTLE_EXTERIOR_ROW_7_LAST,
+    COMBAT_AI_CASTLE_BOUNDARY_ROW_8            = COMBAT_CASTLE_EXTERIOR_ROW_8_LAST,
     COMBAT_AI_TOWER_STRENGTH                   = 300,
     COMBAT_AI_MIN_ARTIFACT_VALUE               = 1000,
     COMBAT_AI_MIN_HERO_EXPERIENCE              = 2000,
@@ -476,8 +503,8 @@ typedef enum CombatSpellAIConstant {
 
 enum class CombatGridShade : u8 {
     GRID_SHADE_NONE          = 0,
-    GRID_SHADE_REACHABLE     = 1,
-    GRID_SHADE_EMPTY_BLOCKED = 3
+    GRID_SHADE_OCCUPIED     = 1,
+    GRID_SHADE_MOVE = 3
 };
 using enum CombatGridShade;
 
@@ -501,7 +528,7 @@ public:
     i32 m_obstacleCount;
     H2EnumStorage<SpellType, i16> m_eagleEyeSpell[COMBAT_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
-    b32 m_drawbridgeBackgroundVisible;
+    b32 m_hasMoat;
     H2SteppedEnumStorage<CombatCastleWallState, u8>
     m_wallStates[H2EnumIndex(COMBAT_WALL_SLOT_COUNT)];
     class bitmap* m_combatBuffer;
@@ -524,10 +551,10 @@ public:
     i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
     i32l m_heroCycleTimer[COMBAT_SIDE_COUNT];
     class icon* m_heroIcons[COMBAT_SIDE_COUNT];
-    class icon* m_heroOverlayIcons[COMBAT_SIDE_COUNT];
-    i32 m_heroOverlayFrame[COMBAT_SIDE_COUNT];
+    class icon* m_heroFlagIcons[COMBAT_SIDE_COUNT];
+    i32 m_heroFlagFrame[COMBAT_SIDE_COUNT];
     struct SLimitData m_heroLimits[COMBAT_SIDE_COUNT];
-    struct SLimitData m_heroOverlayLimits[COMBAT_SIDE_COUNT];
+    struct SLimitData m_heroFlagLimits[COMBAT_SIDE_COUNT];
     struct SLimitData m_moatLimits[H2EnumIndex(COMBAT_WALL_SLOT_COUNT)];
     i32l m_previousCombatMessageExpiration;
     i32l m_combatMessageExpiration;
@@ -545,44 +572,44 @@ public:
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
     H2EnumStorage<CombatSide, i32> m_currentSide;
-    b32 m_gridSelectionDisabled;
-    b32 m_limitCreature;
-    i32 m_limitCreatureHex;
+    b32 m_autoCombat;
+    b32 m_selectorVisible;
+    i32 m_selectorHex;
     i32 m_showArmyQuantities;
     i32 m_selectedHex;
     i32 m_directionTargetHex;
     CombatMessageCommand m_previousCommand;
     CombatMessageCommand m_currentCommand;
     struct SLimitData m_catapultLimits;
-    struct SLimitData m_gateLimits;
-    struct SLimitData m_upperWallLimits;
-    struct SLimitData m_middleWallLimits;
+    struct SLimitData m_keepLimits;
+    struct SLimitData m_drawbridgeLimits;
+    struct SLimitData m_drawbridgeFrontLimits;
     i32 m_catapultFrame[COMBAT_SIDE_COUNT];
     i32 m_catapultAttackCount[COMBAT_SIDE_COUNT];
     i32 m_catapultAttacksRemaining[COMBAT_SIDE_COUNT];
     i32 m_keepAttacksRemaining[COMBAT_SIDE_COUNT];
     b32 m_inCastleCombat;
-    i32 m_unknownF337[COMBAT_SIDE_COUNT];
+    i32 m_unusedF337[COMBAT_SIDE_COUNT];
     b32 m_visitingHeroPresent[COMBAT_SIDE_COUNT];
     char _pad_0xf347[COMBAT_RUNTIME_ALIGNMENT_SIZE];
-    i32 m_unknownF34B;
-    i32 m_unknownF34F;
-    i32 m_unknownF353;
-    b32 m_nonVisualCombat;
-    i32 m_unknownF35B;
+    i32 m_unusedF34B;
+    i32 m_unusedF34F;
+    i32 m_unusedF353;
+    b32 m_combatFinished;
+    i32 m_unusedF35B;
     i32 m_killBenefit[COMBAT_SIDE_COUNT];
     class heroWindow* m_combatWindow;
     char _pad_0xf36b[COMBAT_RUNTIME_DOUBLE_PAD_SIZE];
-    i32 m_unknownF373;
+    i32 m_unusedF373;
     b32 m_sideRetreated[COMBAT_SIDE_COUNT];
     i32 m_limitCreatureCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     b32 m_drawHero[COMBAT_SIDE_COUNT];
-    i32 m_drawHeroOverlay[COMBAT_SIDE_COUNT];
+    i32 m_drawHeroFlag[COMBAT_SIDE_COUNT];
     b32 m_combatWindowOpen;
     class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     class widget* m_winLoseBottomTextWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
-    i32 m_combatX;
-    i32 m_combatY;
+    i32 m_battleSiteX;
+    i32 m_battleSiteY;
     i8 m_directionMap[COMBAT_DIRECTION_MAP_COUNT];
     i32 m_mouseDirection;
     i32 m_validDirectionCount;
@@ -829,7 +856,6 @@ public:
 };
 extern b32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
-extern H2EnumStorage<CombatSide, i32> iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
 extern b32 bInTeleportGetDest;
@@ -883,5 +909,9 @@ extern bool gbAutoWinBattles;
 extern i32 bMouseWasVis;
 extern class heroWindow* CSPanel;
 extern b32 bCPrefsChanged;
+
+i32 ValidHex(i32 hex);
+void UpdateCombatSystemOptions(i32 initialDraw);
+MessageDispatchResult CombatSystemOptionsHandler(struct tag_message& message);
 
 #endif

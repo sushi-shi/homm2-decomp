@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/KB.h>
 

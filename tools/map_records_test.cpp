@@ -1,6 +1,6 @@
 #include <SOURCE/MapRecords.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 #include <array>
 #include <cstdio>
@@ -26,7 +26,7 @@ std::vector<u8> Valid(Kind kind) {
     case Kind::Town: return std::vector<u8>(sizeof(mapTownExtra), 0);
     case Kind::Sign: return std::vector<u8>(sizeof(signEventExtra), 0);
     case Kind::Rumour: return std::vector<u8>(sizeof(rumourEventExtra), 0);
-    case Kind::TimeEvent: return std::vector<u8>(sizeof(timeEventExtra), 0);
+    case Kind::TimeEvent: return std::vector<u8>(sizeof(EventExtra), 0);
     case Kind::MapEvent: return std::vector<u8>(sizeof(EventExtra), 0);
     case Kind::Sphinx: return std::vector<u8>(sizeof(mapEventExtra), 0);
     }

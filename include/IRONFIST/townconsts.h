@@ -1,9 +1,9 @@
 #ifndef HOMM2_IRONFIST_TOWNCONSTS_H
 #define HOMM2_IRONFIST_TOWNCONSTS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <IRONFIST/creatures.h>
-#include <SOURCE/KB_TYPES.h>
+#include <SOURCE/kbTypes.h>
 
 namespace ironfist {
 

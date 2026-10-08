@@ -1,8 +1,9 @@
 #ifndef HOMM2_EDITOR_FULLMAP_H
 #define HOMM2_EDITOR_FULLMAP_H
 
-#include <Ints.h>
-#include "mapcell.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <EDITOR/mapcell.h>
 
 class mapCell;
 struct mapCellExtra;
@@ -35,7 +36,7 @@ public:
         TilesetId tileset,
         i32 index,
         i32 overlay,
-        i32
+        i32 link
     );
 
     mapCell* Cells(void) {
@@ -52,6 +53,10 @@ public:
     }
     mapCell* GetCell(i32 x, i32 y) {
         return &Column(x)[y * width];
+    }
+
+    mapCell* CellAt(i32 x, i32 y) {
+        return cells + x + y * width;
     }
     mapCellExtra* Extra(i32 i) {
         return &extras[i];

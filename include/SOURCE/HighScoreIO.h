@@ -1,7 +1,7 @@
-#ifndef HOMM2_SOURCE_HIGH_SCORE_IO_H
-#define HOMM2_SOURCE_HIGH_SCORE_IO_H
+#ifndef HOMM2_SOURCE_HIGHSCOREIO_H
+#define HOMM2_SOURCE_HIGHSCOREIO_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 struct HighScoreEntry;
 

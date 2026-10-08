@@ -1,8 +1,9 @@
 #ifndef HOMM2_BASE_RESOURCEMANAGER_H
 #define HOMM2_BASE_RESOURCEMANAGER_H
 
-#include <Ints.h>
-#include "baseManager.h"
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/baseManager.h>
 #include <BASE/AggDirectory.h>
 
 class bitmap;
@@ -21,6 +22,9 @@ typedef enum ResourceManagerLayoutConstant {
     // Two locale overlays plus Ironfist, expansion, and base archives.
     RESOURCE_MANAGER_AGGREGATE_LIMIT   = 5,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
+
+
+    RESOURCE_MANAGER_NAME_BUFFER_SIZE  = 16,
     RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 } ResourceManagerLayoutConstant;
 

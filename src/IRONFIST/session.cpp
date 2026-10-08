@@ -18,7 +18,7 @@
 #include <PLATFORM/Strings.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/netwin.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/searchArray.h>
 
 namespace ironfist::runtime {
@@ -69,12 +69,21 @@ TrackedStorage<T> AllocateRecords(size_t count) {
     return TrackedStorage<T>(records);
 }
 
+// The map's cells and extras and the map-extra tables are typed arrays that the
+// engine frees with delete[].
+template <typename T>
+std::unique_ptr<T[]> AllocateArray(size_t count) {
+    if (!count)
+        return {};
+    return std::unique_ptr<T[]>(new T[count]());
+}
+
 // Prepare every owned buffer before replacing the active world's storage.
 struct PreparedWorld {
     fullMap map;
     TrackedStorage<u8> visibility;
-    TrackedStorage<void*> objects;
-    TrackedStorage<i16> objectSizes;
+    std::unique_ptr<void*[]> objects;
+    std::unique_ptr<i16[]> objectSizes;
     std::vector<TrackedStorage<i8>> objectBytes;
 
     explicit PreparedWorld(const WorldRecords& data) {
@@ -85,17 +94,17 @@ struct PreparedWorld {
             || data.height > MAP_DIMENSION_XLARGE || data.cells.size() != cellCount
             || data.visibility.size() != cellCount)
             throw std::invalid_argument("Inconsistent world records");
-        auto cells = AllocateRecords<mapCell>(cellCount);
+        auto cells = AllocateArray<mapCell>(cellCount);
         std::copy(data.cells.begin(), data.cells.end(), cells.get());
         map.cells = cells.release();
-        auto extras = AllocateRecords<mapCellExtra>(data.extras.size());
+        auto extras = AllocateArray<mapCellExtra>(data.extras.size());
         std::copy(data.extras.begin(), data.extras.end(), extras.get());
         map.extras = extras.release();
         map.extraCount = static_cast<i32>(data.extras.size());
         visibility = AllocateRecords<u8>(cellCount);
         std::copy(data.visibility.begin(), data.visibility.end(), visibility.get());
-        objects = AllocateRecords<void*>(data.objects.size());
-        objectSizes = AllocateRecords<i16>(data.objects.size());
+        objects = AllocateArray<void*>(data.objects.size());
+        objectSizes = AllocateArray<i16>(data.objects.size());
         objectBytes.reserve(data.objects.size());
         for (size_t i = 0; i < data.objects.size(); ++i) {
             const auto& source = data.objects[i];
@@ -103,8 +112,8 @@ struct PreparedWorld {
                 throw std::invalid_argument("Map object exceeds engine record capacity");
             auto bytes = AllocateRecords<i8>(source.size());
             std::copy(source.begin(), source.end(), bytes.get());
-            objects.get()[i] = bytes.get();
-            objectSizes.get()[i] = static_cast<i16>(source.size());
+            objects[i] = bytes.get();
+            objectSizes[i] = static_cast<i16>(source.size());
             objectBytes.push_back(std::move(bytes));
         }
     }
@@ -374,7 +383,7 @@ LoadResult LoadGame(const char* filename, i32 loadFromFile) {
     }
     if (platform::CompareIgnoringCase(filename, "RMT", 3))
         utf8::Copy(gpGame->m_saveName, sizeof(gpGame->m_saveName), filename);
-    gpAdvManager->m_heroContextLocked = false;
+    gpAdvManager->m_heroMobilized = false;
     gpGame->SetupAdjacentMons();
     gpAdvManager->CheckSetEvilInterface(0, -1);
     return LoadResult::Loaded;

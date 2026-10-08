@@ -1,6 +1,6 @@
 #include <BASE/message.h>
 #include <SOURCE/COMMAND.h>
-#include <SOURCE/CONFIG_TYPES.h>
+#include <SOURCE/configTypes.h>
 #include <SOURCE/REMOTE_SAVE.h>
 #include <SOURCE/town.h>
 

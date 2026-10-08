@@ -7,7 +7,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/netwin.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 
 #include <cassert>
@@ -19,7 +19,7 @@
 int main() {
     gpGame = new game{};
     gpAdvManager = new advManager;
-    gpAdvManager->m_heroContextLocked = false;
+    gpAdvManager->m_heroMobilized = false;
     gpAdvManager->m_mapData = &gpGame->m_worldMap;
     gpCurPlayer = &gpGame->m_players[0];
     gpCurPlayer->m_currentHero = -1;
@@ -37,9 +37,9 @@ int main() {
     gpGame->m_worldMap.Init(36, 36);
     std::memset(gpGame->m_worldMap.cells, 0, 36 * 36 * sizeof(mapCell));
     iMaxMapExtra = 1;
-    ppMapExtra = static_cast<void**>(H2_ALLOC(sizeof(void*)));
+    ppMapExtra = new void*[1];
     ppMapExtra[0] = nullptr;
-    pwSizeOfMapExtra = static_cast<i16*>(H2_ALLOC(sizeof(i16)));
+    pwSizeOfMapExtra = new i16[1];
     pwSizeOfMapExtra[0] = 0;
 
     for (const char* directory : {"DATA/", "GAMES/"}) {

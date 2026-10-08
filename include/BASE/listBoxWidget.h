@@ -1,11 +1,41 @@
 #ifndef HOMM2_BASE_LISTBOXWIDGET_H
 #define HOMM2_BASE_LISTBOXWIDGET_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 #include <BASE/font.h>
-#include "widget.h"
+#include <BASE/widget.h>
 
 struct tag_message;
+
+typedef enum ListBoxSelectionClickCount {
+
+
+    SELECTION_SINGLE_CLICK = 1,
+    SELECTION_DOUBLE_CLICK = 2
+} ListBoxSelectionClickCount;
+
+typedef enum ListBoxSelectedIndex {
+
+
+    LIST_BOX_NO_SELECTION = -1
+} ListBoxSelectedIndex;
+
+typedef enum ListBoxLayout {
+
+
+    LIST_BOX_EDGE_ROW_COUNT              = 2,
+    LIST_BOX_TEXT_LEFT_INSET             = 5,
+    LIST_BOX_TEXT_HORIZONTAL_INSET_COUNT = 2,
+    LIST_BOX_FIRST_ROW_TEXT_TOP_INSET    = 4,
+    LIST_BOX_ROW_TEXT_TOP_INSET          = 2,
+    LIST_BOX_SCROLL_TRACK_EDGE_ROW_COUNT = 2,
+    LIST_BOX_SCROLL_THUMB_X_INSET        = 5,
+    LIST_BOX_SCROLL_THUMB_Y_INSET        = 3,
+    LIST_BOX_SCROLL_THUMB_TRAVEL_PADDING = 7,
+    LIST_BOX_SCROLL_THUMB_CENTER_DIVISOR = 2,
+    LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT    = 4
+} ListBoxLayout;
 
 class font;
 class icon;
@@ -65,7 +95,7 @@ public:
     u8 m_scrollDownPressed;
     u8 m_scrollThumbDragging;
     u8 m_itemSelectionTracking;
-    bitmap* m_scrollbar;
+    bitmap* m_unusedBitmap;
     listBoxWidget(void);
     virtual ~listBoxWidget() override;
     virtual void Draw(void) override;

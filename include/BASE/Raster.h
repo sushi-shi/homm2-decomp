@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_RASTER_H
 #define HOMM2_BASE_RASTER_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <algorithm>
 #include <limits>
 

@@ -1,10 +1,10 @@
-#ifndef HOMM2_PLATFORM_MONOCHROME_CURSOR_H
-#define HOMM2_PLATFORM_MONOCHROME_CURSOR_H
+#ifndef HOMM2_PLATFORM_MONOCHROMECURSOR_H
+#define HOMM2_PLATFORM_MONOCHROMECURSOR_H
 
 #include <array>
 #include <cstdint>
 
-#include "Types.h"
+#include <PLATFORM/Types.h>
 
 namespace platform {
 

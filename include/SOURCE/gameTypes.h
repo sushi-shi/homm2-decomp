@@ -1,11 +1,10 @@
-#ifndef HOMM2_GAME_H
-#define HOMM2_GAME_H
+#ifndef HOMM2_SOURCE_GAMETYPES_H
+#define HOMM2_SOURCE_GAMETYPES_H
 
-#include <Ints.h>
-#include <BASE/message.h>
-#include <SOURCE/KB_TYPES.h>
-
-struct tag_message;
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <BASE/soundManager.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum PlayerColor {
     PLAYER_COLOR_BLUE   = 0,
@@ -35,16 +34,18 @@ typedef enum GameSerializationConstant {
     GAME_UNUSED_FILE_MARKER      = 9999,
     GAME_PLAYER_COUNT            = PLAYER_COLOR_COUNT,
     GAME_HERO_COUNT              = 54,
+    GAME_HEROES_PER_FACTION      = GAME_HERO_COUNT / H2EnumIndex(FACTION_COUNT),
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,
     GAME_BOAT_COUNT              = 48,
-    GAME_EVENT_RUNTIME_GAP_SIZE  = 4,
     GAME_EVENT_MESSAGE_HEAD_SIZE = 1
 } GameSerializationConstant;
 
 typedef enum GameCalendarConstant {
-    CALENDAR_DAYS_PER_WEEK  = 7,
-    CALENDAR_DAYS_PER_MONTH = 28
+    CALENDAR_FIRST           = 1,
+    CALENDAR_DAYS_PER_WEEK   = 7,
+    CALENDAR_WEEKS_PER_MONTH = 4,
+    CALENDAR_DAYS_PER_MONTH  = 28
 } GameCalendarConstant;
 
 typedef enum GameSetupSharedConstant {
@@ -52,17 +53,20 @@ typedef enum GameSetupSharedConstant {
 } GameSetupSharedConstant;
 
 #pragma pack(push, 1)
+
+
 struct EventExtra {
-    u8 unknown00;
+    u8 isMapEvent;
     i32 resources[H2EnumIndex(RES_COUNT)];
     i16 artifact;
-    u8 applyToComputer;
+    u8 appliesToComputer;
     u8 cancelAfterVisit;
-    char unknown21[GAME_EVENT_RUNTIME_GAP_SIZE];
+    u16 firstDay;
+    u16 repeatInterval;
     b8 active;
     u16 x;
     u16 y;
-    u8 unknown2a;
+    u8 appliesToHuman;
     u8 players[GAME_PLAYER_COUNT];
     char message[GAME_EVENT_MESSAGE_HEAD_SIZE];
 };
@@ -81,15 +85,14 @@ using enum GameMonsterMetadata;
 
 typedef enum GameWeeklyConstant {
     WEEKLY_WATER_WHEEL_EMPTY        = 0xff,
-    WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
+    WEEKLY_TREE_CITY_LIMIT = 0x1fe1,
     WEEKLY_DWELLING_NO_GROWTH_FLAG  = 0x80,
     WEEKLY_GROWTH_LIMIT             = 0x1feb,
-    WEEKLY_DRAGON_CITY_LIMIT        = 220,
+    WEEKLY_GUARDED_DWELLING_LIMIT        = 220,
     WEEKLY_MONSTER_LIMIT            = 4000,
     WEEKLY_RECRUIT_MIN_GROWTH       = 2,
     WEEKLY_RECRUIT_MAX_GROWTH       = 5,
-    WEEKLY_RECRUIT_LIMIT            = 1000,
-    WEEKLY_AVAILABLE_HERO           = 64
+    WEEKLY_RECRUIT_LIMIT            = 1000
 } GameWeeklyConstant;
 
 typedef enum GameRandomTownConstant {
@@ -113,7 +116,6 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_EXPERIENCE_BASE           = 40,
     RANDOM_HERO_SEED_MIN                  = 1,
     RANDOM_HERO_SEED_MAX                  = 255,
-    RANDOM_HERO_ENABLED                   = 1,
     RANDOM_HERO_STARTING_SPELL_KNOWN      = 1,
     RANDOM_HERO_STACK_SELECTED            = 1,
     RANDOM_HERO_FIRST_STACK_CHANCE        = 50,
@@ -129,24 +131,54 @@ typedef enum GameRandomHeroConstant {
     RANDOM_HERO_EMPTY_COUNT               = -1
 } GameRandomHeroConstant;
 
+
+typedef enum GameViewSpellsConstant {
+    VIEW_SPELLS_WINDOW_X               = 86,
+    VIEW_SPELLS_WINDOW_Y               = 87,
+    VIEW_SPELL_PREVIOUS_ID             = 2,
+    VIEW_SPELL_NEXT_ID                 = 3,
+    VIEW_SPELL_ADVENTURE_TAB_ID        = 4,
+    VIEW_SPELL_COMBAT_TAB_ID           = 5,
+    VIEW_SPELL_MANA_LABEL_ID           = 6,
+    VIEW_SPELL_MANA_HUNDREDS_ID        = 7,
+    VIEW_SPELL_MANA_TENS_ID            = 8,
+    VIEW_SPELL_MANA_ONES_ID            = 9,
+    VIEW_SPELL_PAGE_SIZE               = 12,
+    VIEW_SPELL_TEXT_ID_BASE            = 30,
+    VIEW_SPELL_ICON_ID_0               = 100,
+    VIEW_SPELL_ICON_ID_1               = 101,
+    VIEW_SPELL_ICON_ID_2               = 102,
+    VIEW_SPELL_ICON_ID_3               = 103,
+    VIEW_SPELL_ICON_ID_4               = 104,
+    VIEW_SPELL_ICON_ID_5               = 105,
+    VIEW_SPELL_ICON_ID_6               = 106,
+    VIEW_SPELL_ICON_ID_7               = 107,
+    VIEW_SPELL_ICON_ID_8               = 108,
+    VIEW_SPELL_ICON_ID_9               = 109,
+    VIEW_SPELL_ICON_ID_10              = 110,
+    VIEW_SPELL_ICON_ID_11              = 111,
+    VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
+    VIEW_SPELL_NAME_WIDTH              = 78,
+    VIEW_SPELL_MANA_MAX                = 999,
+    VIEW_SPELL_MANA_HUNDREDS_THRESHOLD = 99,
+    VIEW_SPELL_MANA_TENS_THRESHOLD     = 9,
+    VIEW_SPELL_MANA_HUNDREDS_DIVISOR   = 100,
+    VIEW_SPELL_MANA_TENS_DIVISOR       = 10,
+    VIEW_SPELL_MANA_DIGIT_BASE         = 10,
+    VIEW_SPELL_HELP_PREVIOUS           = 0,
+    VIEW_SPELL_HELP_NEXT               = 1,
+    VIEW_SPELL_HELP_ADVENTURE          = 2,
+    VIEW_SPELL_HELP_COMBAT             = 3,
+    VIEW_SPELL_HELP_CLOSE              = 4,
+    VIEW_SPELL_HELP_OTHER              = 5,
+    VIEW_SPELL_HELP_SELECT_SPELL       = 6,
+    VIEW_SPELL_HELP_COMBAT_DEFAULT     = 7,
+    VIEW_SPELL_HELP_MANA               = 8
+} GameViewSpellsConstant;
+
 typedef enum GameWaitConstant {
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
-    WAIT_AMBIENT_MUSIC       = 21,
-    WAIT_DIALOG_TYPE         = 9
+    WAIT_AMBIENT_MUSIC       = MUSIC_TRACK_NEW_MONTH
 } GameWaitConstant;
-
-i32 GetNumObelisks(i32 color);
-void ComputeUALoc(i32 playerIndex);
-MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
-MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
-MessageDispatchResult ViewArmyHandler(struct tag_message& message);
-i32 CalcBaseScore(i32 days);
-void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
-void CreateJoinFile(char* oldName, char* diffName, char* joinName);
-EventExtra* GetMapEvent(i32 x, i32 y);
-void CheckValidAvailableHeroes(void);
-i32 CalcFileCRC(char* file);
-
-extern bchar bMapInitialized;
 
 #endif

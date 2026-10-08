@@ -1,7 +1,7 @@
-#ifndef HOMM2_SOURCE_MAP_RECORDS_H
-#define HOMM2_SOURCE_MAP_RECORDS_H
+#ifndef HOMM2_SOURCE_MAPRECORDS_H
+#define HOMM2_SOURCE_MAPRECORDS_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <EDITOR/mapcell.h>
 #include <span>
 #include <string_view>

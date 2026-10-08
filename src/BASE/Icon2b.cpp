@@ -12,9 +12,9 @@ void IconToBitmap(
     i32 clipY,
     i32 clipW,
     i32 clipH,
-    i32 color
+    i32 outlineColor
 ) {
     images::IconOptions options;
-    options.color = color;
+    options.color = outlineColor;
     images::DrawIcon(sourceIcon, destination, x, y, frame, clip, clipX, clipY, clipW, clipH, options);
 }

@@ -145,7 +145,7 @@ heroWindowManager* gpWindowManager = &windows;
 
 int main() {
     windows.m_screen = &screen;
-    windows.m_updateFlags = 0;
+    windows.m_colorCycling = 0;
     mouseManager mouse;
     mouse.Open(0);
     mouse.SetPointer("advmco.icn", 0, MOUSE_AUTO_CURSOR_TYPE);

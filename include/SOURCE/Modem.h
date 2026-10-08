@@ -1,7 +1,8 @@
-#ifndef HOMM2_MODEM_H
-#define HOMM2_MODEM_H
+#ifndef HOMM2_SOURCE_MODEM_H
+#define HOMM2_SOURCE_MODEM_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
+#include <Domains.h>
 
 void ModemSetup(i32 mode);
 i32l Dial(void);
@@ -18,11 +19,6 @@ void Connect(void);
 i32 WaitForDirectConnect(void);
 char ReadPacket(void);
 void WriteModemPacket(char* buffer, i32 length);
-
-typedef enum ModemSetupMode {
-    MODEM_MODE_DIAL = 3,
-    MODEM_MODE_WAIT = 4,
-} ModemSetupMode;
 
 typedef enum ModemConnectionStage {
     MODEM_CONNECTION_INIT_STAGE      = 0,

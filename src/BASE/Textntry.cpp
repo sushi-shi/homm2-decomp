@@ -1,4 +1,4 @@
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/textEntryWidget.h>
@@ -21,12 +21,7 @@
 #include <algorithm>
 #include <vector>
 
-typedef enum TextEntrySourceFileConstant {
-    ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-} TextEntrySourceFileConstant;
-
 typedef enum TextEntryConstant {
-    RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,
     HORIZONTAL_INSET_SIDE_COUNT = 2,
     SERIALIZED_HORIZONTAL_INSET = 7,
@@ -101,7 +96,7 @@ inline textEntryWidget::~textEntryWidget() {
 }
 
 void textEntryWidget::Read(TextEntryReadMode type) {
-    char resourceName[RESOURCE_NAME_CAPACITY];
+    char resourceName[RESOURCE_MANAGER_READ13_BYTES];
     READ_WIDGET_GEOMETRY(*this, gpResourceManager);
     m_maxLength = gpResourceManager->ReadWord();
     std::vector<char> legacyText(static_cast<std::size_t>(m_maxLength) + 1, 0);
@@ -137,7 +132,7 @@ void textEntryWidget::Read(TextEntryReadMode type) {
         m_rectW = m_width;
         m_rectH = m_height;
         m_maxLines = 1;
-        if (type == TEXT_ENTRY_READ_MULTILINE)
+        if (type == TEXT_ENTRY_READ_SCROLLING)
             m_preserveTextOnFocus = 1;
         else
             m_preserveTextOnFocus = 0;
@@ -261,7 +256,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                     const u16 oldCursor = m_cursorPosition;
                     m_cursorPosition += static_cast<u16>(encodedLength);
                     SetupDisplayString(edit, m_cursorPosition);
-                    if (m_entryType != TEXT_ENTRY_READ_MULTILINE
+                    if (m_entryType != TEXT_ENTRY_READ_SCROLLING
                         && m_font->LineLength(m_text, m_innerW) > m_maxLines) {
                         strcpy(edit, copy);
                         m_cursorPosition = oldCursor;
@@ -354,7 +349,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
 }
 
 void textEntryWidget::Draw(void) {
-    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
+    if (m_entryType == TEXT_ENTRY_READ_SCROLLING) {
         char display[TEXT_BUFFER_CAPACITY];
         u32 length;
 
@@ -416,7 +411,7 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
         strcpy(m_text + cursor + 1, source + cursor);
     else
         m_text[cursor + 1] = 0;
-    if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
+    if (m_entryType == TEXT_ENTRY_READ_SCROLLING) {
         changed = true;
         while (changed) {
             changed = false;

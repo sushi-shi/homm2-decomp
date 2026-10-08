@@ -40,7 +40,7 @@ void LoadArmy(army& unit, CreatureType type, int index, int hex, ArmyFacing faci
     unit.m_index = index;
     unit.m_hex = hex;
     unit.m_showQuantity = true;
-    unit.m_palette = nullptr;
+    unit.m_yModify = nullptr;
     unit.m_xOffset = unit.m_yOffset = 0;
     gpResourceManager->PointToFile(
         gpResourceManager->MakeId(cArmyFrameFileNames[H2EnumIndex(type)], 1));
@@ -50,7 +50,7 @@ void LoadArmy(army& unit, CreatureType type, int index, int hex, ArmyFacing faci
     auto& cell = gpCombatManager->m_hexCells[hex];
     cell.m_occupantSide = COMBAT_DEFENDER_SIDE;
     cell.m_occupantIndex = index;
-    cell.m_occupantFrame = ARMY_FACING_NONE;
+    cell.m_occupantFootprintHalf = ARMY_FACING_NONE;
 }
 }
 
@@ -73,12 +73,12 @@ int main() {
     gpMouseManager->m_hideCount = 1;
 
     auto& combat = *gpCombatManager;
-    combat.m_nonVisualCombat = false;
+    combat.m_combatFinished = false;
     combat.m_combatWindowOpen = true;
     combat.m_showArmyQuantities = true;
     combat.m_inCastleCombat = false;
-    combat.m_limitCreature = false;
-    combat.m_limitCreatureHex = -1;
+    combat.m_selectorVisible = false;
+    combat.m_selectorHex = -1;
     combat.m_backgroundBuffer = new bitmap(BITMAP_TYPE_MEMORY, Width, COMBAT_AREA_HEIGHT);
     combat.m_combatBuffer = new bitmap(BITMAP_TYPE_MEMORY,
         COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
@@ -99,7 +99,7 @@ int main() {
     for (int side = 0; side < 2; ++side) {
         combat.m_heroes[side] = nullptr;
         combat.m_drawHero[side] = false;
-        combat.m_drawHeroOverlay[side] = false;
+        combat.m_drawHeroFlag[side] = false;
     }
     auto* pixels = gpWindowManager->m_screen->m_pixels;
     std::fill(pixels, pixels + Width * Height, 40);

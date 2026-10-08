@@ -9,7 +9,7 @@
 
 #include <tinyxml2.h>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 namespace ironfist::xml {
 

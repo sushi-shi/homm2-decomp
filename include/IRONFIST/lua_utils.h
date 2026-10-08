@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <IRONFIST/lua.h>
 
 namespace ironfist::script {

@@ -1,7 +1,7 @@
-#ifndef HOMM2_BASE_MONOCHROME_CURSOR_H
-#define HOMM2_BASE_MONOCHROME_CURSOR_H
+#ifndef HOMM2_BASE_MONOCHROMECURSOR_H
+#define HOMM2_BASE_MONOCHROMECURSOR_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 #include <PLATFORM/MonochromeCursor.h>
 
 #include <span>

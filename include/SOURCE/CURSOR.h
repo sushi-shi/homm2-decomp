@@ -1,8 +1,9 @@
-#ifndef HOMM2_CURSOR_H
-#define HOMM2_CURSOR_H
+#ifndef HOMM2_SOURCE_CURSOR_H
+#define HOMM2_SOURCE_CURSOR_H
 
-#include <Ints.h>
-#include <SOURCE/KB_TYPES.h>
+#include <H2/Ints.h>
+#include <Domains.h>
+#include <SOURCE/kbTypes.h>
 
 typedef enum CursorConstant {
     CURSOR_BOAT_WAKE_TYPE               = 7,
@@ -11,9 +12,9 @@ typedef enum CursorConstant {
     CURSOR_LAST_FRAME_COUNT             = 8,
     CURSOR_FLIP_FLAG                    = 0x80,
     CURSOR_FRAME_MASK                   = 0x7f,
-    CURSOR_BOAT_BASE_FRAME_5            = 0x9b,
-    CURSOR_BOAT_BASE_FRAME_6            = 0x92,
-    CURSOR_BOAT_BASE_FRAME_7            = 0x89,
+    CURSOR_SOUTH_WEST_BASE_FRAME        = CURSOR_FLIP_FLAG | 3 * CURSOR_FRAMES_PER_DIRECTION,
+    CURSOR_WEST_BASE_FRAME              = CURSOR_FLIP_FLAG | 2 * CURSOR_FRAMES_PER_DIRECTION,
+    CURSOR_NORTH_WEST_BASE_FRAME        = CURSOR_FLIP_FLAG | CURSOR_FRAMES_PER_DIRECTION,
     CURSOR_MAP_DRAW_OFFSET              = 7,
     CURSOR_DRAW_X                       = 0xe0,
     CURSOR_FLIPPED_DRAW_X               = 0x100,
@@ -26,32 +27,22 @@ typedef enum CursorConstant {
     CURSOR_SHADOW_ANIM_FIRST            = 9,
     CURSOR_SHADOW_ANIM_END              = 0x24,
     CURSOR_SLOW_TURN_MULTIPLIER         = 3,
-    CURSOR_MAP_VISIBLE_FLAG             = 0x40,
-    CURSOR_CELL_UNCOVERED_FLAG          = 0x04,
-    CURSOR_OBJECT_PASSABLE_FLAG         = 0x80,
     CURSOR_MOVE_HALF_TILE_PIXELS        = 16,
     CURSOR_RESOURCE_LAST                = H2EnumIndex(RES_COUNT) - 1,
     CURSOR_RESOURCE_DIALOG_PENALTY      = 100000,
-    CURSOR_FIZZLE_X                     = 0xc0,
-    CURSOR_FIZZLE_Y                     = 0xc0,
-    CURSOR_FIZZLE_WIDTH                 = 0x60,
-    CURSOR_FIZZLE_HEIGHT                = 0x60,
     CURSOR_FIZZLE_COMPUTER_TYPE         = 50,
     CURSOR_INVALID_POSITION             = -1,
-    CURSOR_NORTH_DIRECTION_MASK         = 0x83,
-    CURSOR_SOUTH_DIRECTION_MASK         = 0x38,
     CURSOR_MAP_CHANGE_RECENT_COUNT      = 4,
     CURSOR_MAP_CHANGE_QUEUE_COUNT       = 196,
     CURSOR_MAP_CHANGE_PENDING_SENTINEL  = 999,
     CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL = 999999999,
     CURSOR_DEAD_PLAYER_DIALOG_TIME      = 5000,
     CURSOR_REMOTE_PLAYER_ALL            = 0x7f,
-    CURSOR_REMOTE_PACKET_TYPE           = 0x29,
     CURSOR_REMOTE_RELIABLE              = 1
 } CursorConstant;
 
 typedef enum BoatHeroConstant {
-    BOAT_OCCUPIED_FLAG = 0x80
+    BOAT_VACATED_FLAG = 0x80
 } BoatHeroConstant;
 
 typedef enum MapChangeConstant {

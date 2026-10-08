@@ -1,7 +1,7 @@
 #ifndef HOMM2_PLATFORM_ENTRY_H
 #define HOMM2_PLATFORM_ENTRY_H
 
-#include <Ints.h>
+#include <H2/Ints.h>
 
 namespace platform {
 

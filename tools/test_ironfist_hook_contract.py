@@ -164,7 +164,7 @@ class IronfistHookContractTest(unittest.TestCase):
             "/ NEUTRAL_CASTLE_GROWTH_DIVISOR;",
             "m_dwellingAvailable[innerIndex - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)] += creatureGrowth;",
         )
-        town_constants = (REPOSITORY / "include/SOURCE/TOWNMGR.h").read_text()
+        town_constants = (REPOSITORY / "include/SOURCE/townManager.h").read_text()
         self.assertRegex(town_constants, r"TOWN_WELL_BASE_GROWTH_BONUS\s*=\s*2\s*,")
 
     def test_source_uses_explicit_integration_namespace(self):
