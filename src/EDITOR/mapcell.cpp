@@ -35,10 +35,10 @@ fullMap::~fullMap(void) {
 
 void fullMap::Close(void) {
     if (cells)
-        delete cells;
+        delete[] cells;
     cells = NULL;
     if (extras)
-        delete extras;
+        delete[] extras;
     extras = NULL;
     extraCount = 0;
 }
@@ -50,8 +50,8 @@ void fullMap::Init(i32 mapWidth, i32 mapHeight) {
     width = mapWidth;
     height = mapHeight;
     Close();
-    cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
-    extras = static_cast<mapCellExtra*>(H2_ALLOC(EXTRA_POOL_SIZE * sizeof(mapCellExtra)));
+    cells = new mapCell[width * height];
+    extras = new mapCellExtra[EXTRA_POOL_SIZE];
     extraCount = EXTRA_POOL_SIZE;
     for (index = 0; index < EXTRA_POOL_SIZE; index++)
         extras[index].nextIndex = MAPCELL_EXTRA_FREE;
@@ -62,7 +62,7 @@ void fullMap::Init(i32 mapWidth, i32 mapHeight) {
     width = mapWidth;
     height = mapHeight;
     Close();
-    cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
+    cells = new mapCell[width * height];
 }
 #endif
 
@@ -86,9 +86,9 @@ void fullMap::ClearCellExtra(i32 index) {
 
 #ifdef HOMM2_EDITOR
 void fullMap::Copy(fullMap& source) {
-    delete extras;
+    delete[] extras;
     extraCount = source.extraCount;
-    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
+    extras = new mapCellExtra[extraCount];
     memcpy(cells, source.cells, width * sizeof(mapCell) * height);
     memcpy(extras, source.extras, extraCount * sizeof(mapCellExtra));
 }
@@ -105,11 +105,9 @@ i32 fullMap::GetNewCellExtraIndex(void) {
             return extraIndex;
         }
     }
-    newExtras = static_cast<mapCellExtra*>(
-        H2_ALLOC((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
-    );
+    newExtras = new mapCellExtra[extraCount + EXTRA_ALLOCATION_STEP];
     memcpy(newExtras, extras, extraCount * sizeof(mapCellExtra));
-    delete extras;
+    delete[] extras;
     extras = newExtras;
     for (j = extraCount; j < extraCount + EXTRA_ALLOCATION_STEP; j++)
         extras[j].nextIndex = MAPCELL_EXTRA_FREE;
@@ -367,10 +365,9 @@ void fullMap::Compact(void) {
         extras[i].nextIndex = indexMap[extras[i].nextIndex];
     delete indexMap;
     spare = EXTRA_COMPACT_SLACK;
-    newCellExtras
-        = static_cast<mapCellExtra*>(H2_ALLOC((extraCount + spare) * sizeof(mapCellExtra)));
+    newCellExtras = new mapCellExtra[extraCount + spare];
     memcpy(newCellExtras, extras, extraCount * sizeof(mapCellExtra));
-    delete extras;
+    delete[] extras;
     extras = newCellExtras;
     for (i = extraCount; i < extraCount + spare; i++)
         extras[i].nextIndex = MAPCELL_EXTRA_FREE;
@@ -411,25 +408,25 @@ void fullMap::Read(i32 handle, i32 convert) {
     READ_FILE_VALUE(handle, height);
     Init(width, height);
     if (convert) {
-        oldCells = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        oldCells = new oldMapCell[width * height];
         read(handle, oldCells, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(cells + x + y * width, oldCells + x + y * width, sizeof(mapCell));
-        delete oldCells;
+        delete[] oldCells;
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
     }
     READ_FILE_VALUE(handle, extraCount);
     if (extras)
-        delete extras;
-    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
+        delete[] extras;
+    extras = new mapCellExtra[extraCount];
     if (convert) {
-        oldExtras = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
+        oldExtras = new oldMapCellExtra[extraCount];
         read(handle, oldExtras, extraCount * sizeof(oldMapCellExtra));
         for (extraIndex = 0; extraIndex < extraCount; extraIndex++)
             memcpy(extras + extraIndex, oldExtras + extraIndex, sizeof(mapCellExtra));
-        delete oldExtras;
+        delete[] oldExtras;
     } else {
         read(handle, extras, extraCount * sizeof(mapCellExtra));
     }

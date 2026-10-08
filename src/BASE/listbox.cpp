@@ -49,7 +49,7 @@ listBoxWidget::~listBoxWidget() {
         delete m_scrollbar;
     for (i = 0; i < m_itemCount; i++)
         H2_FREE(m_items[i]);
-    H2_FREE(m_items);
+    delete[] m_items;
     gbSendMouseMoveMessages = false;
 }
 
@@ -135,10 +135,10 @@ void listBoxWidget::DeleteItem(i32 index) {
             m_topIndex = m_scrollRange;
         if (m_itemCount == 1) {
             H2_FREE(m_items[0]);
-            H2_FREE(m_items);
+            delete[] m_items;
             m_items = NULL;
         } else {
-            char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
+            char** newItems = new char*[m_itemCount - 1];
             memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
                 memcpy(
@@ -147,7 +147,7 @@ void listBoxWidget::DeleteItem(i32 index) {
                     (m_itemCount - index - 1) * sizeof(*m_items)
                 );
             if (m_items != NULL)
-                H2_FREE(m_items);
+                delete[] m_items;
             m_items = newItems;
         }
         m_itemCount--;
@@ -197,13 +197,13 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
                     if (message.payload.widget.id != m_id)
                         break;
                     text = message.payload.widget.data.text;
-                    newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
+                    newItems = new char*[m_itemCount + 1];
                     if (m_itemCount != 0)
                         memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
                     ALLOC_COPY_STRING(newItems[m_itemCount], text);
                     m_itemCount++;
                     if (m_items != NULL)
-                        H2_FREE(m_items);
+                        delete[] m_items;
                     m_items = newItems;
                     if (m_itemCount > m_maxVisibleItems) {
                         m_scrollRange = m_itemCount - m_maxVisibleItems;

@@ -2534,7 +2534,7 @@ void combatManager::RippleCreature(
 
     height = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(H2_ALLOC(LOGICAL_SCREEN_HEIGHT));
-    wave = static_cast<float*>(H2_ALLOC(sizeof(float) * LOGICAL_SCREEN_HEIGHT));
+    wave = new float[LOGICAL_SCREEN_HEIGHT];
     memset(gyModify, 0, LOGICAL_SCREEN_HEIGHT);
     for (rowIndex = 0; rowIndex < LOGICAL_SCREEN_HEIGHT; ++rowIndex) {
         wave[rowIndex] = static_cast<float>(
@@ -2608,7 +2608,7 @@ void combatManager::RippleCreature(
     target->m_palette = NULL;
     target->m_showQuantity = true;
     H2_FREE(gyModify);
-    H2_FREE(wave);
+    delete[] wave;
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
