@@ -431,7 +431,7 @@ public:
         class mapCell*,
         i32 mapX,
         i32 mapY,
-        i32 defender,
+        i32 monstersAttack,
         i32 combatX,
         i32 combatY,
         H2_ENUM_PARAM(CreatureType, i32) secondaryType,

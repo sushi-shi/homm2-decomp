@@ -96,13 +96,13 @@ public:
     H2_ENUM_STORAGE(CampaignSide, u8) m_campaignStartingSide;
     i8 m_campaignScenario;
     u8 m_campaignScenarioCompleted[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScenarioBonus[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
+    i16 m_campaignDaysBeforeScenario[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     i16 m_campaignScenarioDays[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    char m_unknown7d;
+    char m_unused7d;
     u8 m_campaignAwards[CAMPAIGN_AWARD_COUNT];
     u8 m_campaignChoice[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
     u8 m_campaignMapEnabled[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT];
-    i16 m_campaignScore;
+    i16 m_campaignTotalDays;
     H2_ENUM_STORAGE(CreatureType, i16) m_campaignCarryoverCreatureTypes[ARMY_GROUP_SLOT_COUNT];
     i16 m_campaignCarryoverCreatureCounts[ARMY_GROUP_SLOT_COUNT];
     u8 m_campaignScenarioWon;
@@ -137,7 +137,7 @@ public:
     i8 m_heroOwners[IDX(GAME_HERO_COUNT)];
     mineRecord m_mines[IDX(GAME_MINE_COUNT)];
     i8 m_mineOwners[IDX(GAME_MINE_COUNT)];
-    char m_randomArtifacts[IDX(ARTIFACT_COUNT)];
+    char m_artifactPlaced[IDX(ARTIFACT_COUNT)];
     boatRecord m_boats[IDX(GAME_BOAT_COUNT)];
     i8 m_boatSlots[IDX(GAME_BOAT_COUNT)];
     i8 m_obeliskVisitors[GAME_OBELISK_VISITOR_COUNT];
@@ -163,7 +163,7 @@ public:
     H2_ENUM_STORAGE(SpellType, i32) m_viewSpell;
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
-    u8 m_gameLoaded;
+    u8 m_gameLoaded; // set by LoadGame; never read
     void SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate);
     void SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom);
     void SetupResources(void);
@@ -192,7 +192,7 @@ public:
     class fullMap* GetWorldMapData(void);
     i32 CreateBoat(i32 x, i32 y, i32 skipNotify);
     i32 Scan(i8* array, i32 start, i32 length);
-    i32 RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target);
+    i32 RandomScan(i8* array, i32 start, i32 range, i32 retryLimit, i8 target);
     i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
     i32 GetTownId(i32 column, i32 row);
     hero* GetHero(i32 id) {

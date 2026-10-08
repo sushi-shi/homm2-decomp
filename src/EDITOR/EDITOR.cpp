@@ -874,37 +874,37 @@ DATA(0x00480088) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_
     {APP_MENU_SPEED_FIRST + 2, 0, 0, 0},
     {APP_MENU_SPEED_FIRST + 3, 0, 0, 0},
     {APP_MENU_SPEED_LAST, 0, 0, 0},
-    {APP_MENU_UNKNOWN_9C6D, 0, 0, 0},
+    {APP_MENU_CD_STEREO, 0, 0, 0},
     {APP_MENU_TOGGLE_ROUTE, 0, 0, 0},
-    {APP_MENU_TOGGLE_BLACKOUT, 0, 0, 0},
+    {APP_MENU_VIEW_ENEMY_MOVES, 0, 0, 0},
     {IDX(KBWIN_MENU_HELP), 1, 1, 0},
     {IDX(KBWIN_MENU_ABOUT), 1, 1, 0},
-    {APP_MENU_RESTART_0, 0, 1, 0},
-    {APP_MENU_RESTART_1, 0, 1, 0},
-    {APP_MENU_RESTART_2, 0, 1, 0},
-    {APP_MENU_RESTART_3, 0, 1, 0},
-    {APP_MENU_RESTART_4, 0, 1, 0},
-    {APP_MENU_UNKNOWN_9CAD, 0, 1, 0},
-    {APP_MENU_RESTART_5, 0, 1, 0},
-    {APP_MENU_RESTART_6, 0, 1, 0},
-    {APP_MENU_RESTART_7, 0, 1, 0},
-    {APP_MENU_RESTART_8, 0, 1, 0},
-    {APP_MENU_RESTART_9, 0, 1, 0},
-    {APP_MENU_RESTART_10, 0, 1, 0},
-    {APP_MENU_RESTART_11, 0, 1, 0},
-    {APP_MENU_RESTART_12, 0, 1, 0},
-    {APP_MENU_RESTART_13, 0, 1, 0},
-    {APP_MENU_LOAD_0, 0, 1, 0},
-    {APP_MENU_LOAD_1, 0, 1, 0},
-    {APP_MENU_LOAD_2, 0, 1, 0},
-    {APP_MENU_LOAD_3, 0, 1, 0},
-    {APP_MENU_LOAD_4, 0, 1, 0},
-    {APP_MENU_LOAD_5, 0, 1, 0},
-    {APP_MENU_LOAD_6, 0, 1, 0},
-    {APP_MENU_LOAD_7, 0, 1, 0},
-    {APP_MENU_LOAD_8, 0, 1, 0},
-    {APP_MENU_LOAD_9, 0, 1, 0},
-    {APP_MENU_LOAD_10, 0, 1, 0},
+    {APP_MENU_NEW_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_1, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_2, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_3, 0, 1, 0},
+    {APP_MENU_NEW_CAMPAIGN_4, 0, 1, 0},
+    {APP_MENU_UNUSED_9CAD, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_NEW_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_NEW_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_NEW_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_NEW_DIRECT_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_STANDARD_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_CAMPAIGN_GAME, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_2, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_3, 0, 1, 0},
+    {APP_MENU_LOAD_HOT_SEAT_4, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_NETWORK_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_MODEM_GUEST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_HOST, 0, 1, 0},
+    {APP_MENU_LOAD_DIRECT_GUEST, 0, 1, 0},
     {APP_MENU_SAVE, 0, 0, 0},
     {APP_MENU_EXIT, 0, 0, 0}
 };
@@ -3959,12 +3959,12 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_8;
     pNormalDialogWindow->BroadcastMessage(message);
-    if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_CANCEL && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_1;
         pNormalDialogWindow->BroadcastMessage(message);
     }
-    if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
-        && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
+    if (dialogType != NORMAL_DIALOG_WAIT_OK && dialogType != NORMAL_DIALOG_INFO
+        && dialogType != NORMAL_DIALOG_OK_CANCEL) {
         message.payload.widget.id = DIALOG_BUTTON_2;
         pNormalDialogWindow->BroadcastMessage(message);
     }

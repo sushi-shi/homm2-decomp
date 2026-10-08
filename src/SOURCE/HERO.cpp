@@ -901,7 +901,7 @@ void hero::CheckLevel(void) {
                 strcat(gText, text);
                 NormalDialog(
                     gText,
-                    NORMAL_DIALOG_SHOW_BUTTONS_7_8,
+                    NORMAL_DIALOG_CHOOSE_ONE_OF_TWO,
                     -1,
                     -1,
                     NORMAL_DIALOG_SECONDARY_SKILL,

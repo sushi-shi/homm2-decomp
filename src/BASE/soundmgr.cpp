@@ -39,7 +39,7 @@ DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat = H2_ZERO_INIT;
 #define NORMALIZED_VOLUME_MAX 127.0f
 
 DATA(0x005348f0) bool gSoundDisabled = false;
-DATA(0x005348f1) bool gSoundBackendsReady = false;
+DATA(0x005348f1) bool gbSoundEnabled = false;
 
 VA(0x004b5710, 0x101)
 void soundManager::ShutdownSoundBackends(void) {
@@ -109,7 +109,7 @@ bool soundManager::StartupMilesBackend(void) {
     }
 
     StartupMilesSamples(m_digitalDriver);
-    gSoundBackendsReady = true;
+    gbSoundEnabled = true;
     return MIDIStartup();
 }
 
@@ -174,7 +174,7 @@ soundManager::soundManager(void) : baseManager() {
     m_backend = SOUND_BACKEND_NONE;
     m_savedBackend = SOUND_BACKEND_NONE;
     m_active = false;
-    gSoundBackendsReady = false;
+    gbSoundEnabled = false;
     m_digitalDriver = NULL;
     m_audiereDevice = NULL;
     m_musicFadeTargetTrack = MIDI_NO_TRACK;
@@ -286,7 +286,7 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
 
 VA(0x004b6040, 0xcb)
 void soundManager::StopAllSamples(i32 stopMusic) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
 
     if (IsAudiereBackend(this)) {
@@ -318,7 +318,7 @@ void soundManager::ModifySample(
     class sample* sampleResource,
     i32 volume
 ) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (IsAudiereBackend(this)) {
         SetAudiereSampleVolume(sampleResource, volume);
@@ -339,7 +339,7 @@ bool soundManager::DigitalReport(class sample* sampleResource) {
 
 VA(0x004b62e0, 0x4d)
 void soundManager::AdjustSoundVolumes(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (IsMilesBackend(this))
         AdjustMilesSampleVolumes();
@@ -347,7 +347,7 @@ void soundManager::AdjustSoundVolumes(void) {
 
 VA(0x004b6330, 0xad)
 void soundManager::AdjustMusicVolumes(void) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (m_musicTrack < 0)
         return;
@@ -383,7 +383,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
 
 VA(0x004b64d0, 0x106)
 void soundManager::PlayAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (m_musicTrack == track)
         return;
@@ -465,7 +465,7 @@ void soundManager::PollSound(void) {
 
 VA(0x004b6810, 0xbb)
 void soundManager::SwitchAmbientMusic(i32 track) {
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_musicTrack = track;
@@ -496,7 +496,7 @@ VA(0x004b68d0, 0x115)
 void soundManager::MemorySample(class sample* sampleResource) {
     if (sampleResource == NULL)
         return;
-    if (!gSoundBackendsReady)
+    if (!gbSoundEnabled)
         return;
     if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
         return;

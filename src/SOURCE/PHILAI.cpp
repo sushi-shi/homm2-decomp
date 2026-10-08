@@ -1717,7 +1717,7 @@ firstWeekDone:
             gpCurPlayer->m_resources[IDX(RES_GOLD)]
             + gpCurPlayer->m_aiData.m_income[IDX(RES_GOLD)]
         ) / (totalFightValue + 1000)
-        + gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase;
+        + gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention;
 
     artifactTotal = 0;
     for (generalIndex = IDX(ARTIFACT_ULTIMATE_SHIELD);
@@ -2473,12 +2473,12 @@ void philAI::ProbableOutcomeOfBattle(
         static_cast<i32>(defenderLossValue * (1.0f - winChance) + defRaw * winChance);
 
     lossWeight = static_cast<float>(
-        AI_BATTLE_LOSS_FACTOR_BASE - gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase
+        AI_BATTLE_LOSS_FACTOR_BASE - gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention
     );
     outcomeValue = static_cast<i32>(-expectedAttackerLossValue * lossWeight * lossWeight);
     if (enemyPlayer >= 0) {
         lossWeight = static_cast<float>(
-            gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase + AI_BATTLE_PLAYER_FACTOR_BASE
+            gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention + AI_BATTLE_PLAYER_FACTOR_BASE
         );
         if (gbHumanPlayer[enemyPlayer] != 0)
             outcomeValue = static_cast<i32>(
@@ -2545,7 +2545,7 @@ void philAI::ProbableOutcomeOfBattle(
             static_cast<i32>(attStr),
             static_cast<i32>(defStrong),
             static_cast<i32>(
-                gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase * AI_BATTLE_PERCENT_SCALE
+                gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention * AI_BATTLE_PERCENT_SCALE
             ),
             0,
             aArt,
@@ -2722,11 +2722,11 @@ void philAI::ValueOfBuyingBuilding(
             break;
         case BUILDING_SLOT_SPECIAL_FOUR:
             adjustedValue = static_cast<float>(
-                adjustedValue * (gpCurPlayer->m_aiData.m_attentionWeights.buildingValue + 0.66)
+                adjustedValue * (gpCurPlayer->m_aiData.m_attentionWeights.turnBuildingAttention + 0.66)
             );
             adjustedValue = static_cast<float>(
                 adjustedValue
-                * (gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase * 2.0f + 0.33)
+                * (gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention * 2.0f + 0.33)
             );
             adjustedValue = static_cast<float>(adjustedValue * (dwellingTotal * 0.33 + 0.66));
             if ((townPointer->m_type != FACTION_KNIGHT
@@ -2771,11 +2771,11 @@ void philAI::ValueOfBuyingBuilding(
                     break;
             }
             adjustedValue = static_cast<float>(
-                adjustedValue * (gpCurPlayer->m_aiData.m_attentionWeights.buildingValue + 0.66)
+                adjustedValue * (gpCurPlayer->m_aiData.m_attentionWeights.turnBuildingAttention + 0.66)
             );
             adjustedValue = static_cast<float>(
                 adjustedValue
-                * (gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase * 2.0f + 0.33)
+                * (gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention * 2.0f + 0.33)
             );
             adjustedValue = static_cast<float>(
                 adjustedValue
@@ -2980,7 +2980,7 @@ void philAI::ValueOfBuyingCreature(
         }
         creatureRV = static_cast<i32>(
             creatureRV
-            * (gpGame->m_players[IDX(townPointer->m_owner)].m_aiData.m_attentionWeights.upgradeBase
+            * (gpGame->m_players[IDX(townPointer->m_owner)].m_aiData.m_attentionWeights.turnCreatureAttention
                + AI_CREATURE_BALANCE_BASE)
         );
     }
@@ -3239,8 +3239,8 @@ void philAI::ValueOfBuyingHero(
     heroRV += heroPointer->m_experience / 2;
     heroRV = static_cast<i32>(
         heroRV
-        * (gpCurPlayer->m_aiData.m_attentionWeights.heroValue + 1.0
-           - gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase)
+        * (gpCurPlayer->m_aiData.m_attentionWeights.turnHeroAttention + 1.0
+           - gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention)
     );
     if (heroPointer->m_faction == FACTION_SORCERESS
         || heroPointer->m_faction == FACTION_WARLOCK
@@ -3358,29 +3358,29 @@ VA(0x004842f1, 0x14d)
 void philAI::GetGameAttentionValue(i32 player) {
     playerAttentionWeights* attention =
         &gpGame->m_players[player].m_aiData.m_attentionWeights;
-    attention->gameWeightA = static_cast<float>(Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR)
+    attention->gameBuildingAttention = static_cast<float>(Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR)
                              + AI_ATTENTION_RANDOM_BASE;
-    attention->gameWeightB = static_cast<float>(Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR)
+    attention->gameHeroAttention = static_cast<float>(Random(0, 100) / AI_ATTENTION_RANDOM_DIVISOR)
                              + AI_ATTENTION_RANDOM_BASE;
-    attention->gameWeightB *=
+    attention->gameHeroAttention *=
         (AI_ATTENTION_IDENTITY_FLOAT + AI_ATTENTION_PLAYER_CENTER) / AI_ATTENTION_NORMALIZER;
-    attention->gameWeightB *=
+    attention->gameHeroAttention *=
         (AI_ATTENTION_UPPER_BOUND - AI_ATTENTION_IDENTITY) / AI_ATTENTION_NORMALIZER;
-    attention->gameWeightA *=
+    attention->gameBuildingAttention *=
         (AI_ATTENTION_IDENTITY + AI_ATTENTION_PLAYER_CENTER) / AI_ATTENTION_NORMALIZER;
-    attention->gameWeightB = static_cast<float>(
-        attention->gameWeightB
+    attention->gameHeroAttention = static_cast<float>(
+        attention->gameHeroAttention
         * ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount)
                * AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR
            + 1.0)
     );
-    attention->gameWeightA = static_cast<float>(
-        attention->gameWeightA
+    attention->gameBuildingAttention = static_cast<float>(
+        attention->gameBuildingAttention
         * ((AI_ATTENTION_PLAYER_CENTER - gpGame->m_playerCount)
                * AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR
            + 1.0)
     );
-    attention->gameRemainder = ((1.0f - attention->gameWeightB) - attention->gameWeightA);
+    attention->gameCreatureAttention = ((1.0f - attention->gameHeroAttention) - attention->gameBuildingAttention);
 }
 
 #if H2_RETAIL_COMPILER
@@ -3389,12 +3389,12 @@ void philAI::GetGameAttentionValue(i32 player) {
 VA(0x0048443e, 0xc6)
 void philAI::GetTurnAttentionValue(i32 player) {
     playerAttentionWeights* attentionWeights = &gpGame->m_players[player].m_aiData.m_attentionWeights;
-    attentionWeights->gameWeightA = 0.4f;
-    attentionWeights->gameWeightB = 0.3f;
-    attentionWeights->gameRemainder = 0.3f;
-    attentionWeights->buildingValue = attentionWeights->gameWeightA;
-    attentionWeights->heroValue = attentionWeights->gameWeightB;
-    attentionWeights->upgradeBase = attentionWeights->gameRemainder;
+    attentionWeights->gameBuildingAttention = 0.4f;
+    attentionWeights->gameHeroAttention = 0.3f;
+    attentionWeights->gameCreatureAttention = 0.3f;
+    attentionWeights->turnBuildingAttention = attentionWeights->gameBuildingAttention;
+    attentionWeights->turnHeroAttention = attentionWeights->gameHeroAttention;
+    attentionWeights->turnCreatureAttention = attentionWeights->gameCreatureAttention;
     float scale;
     if (giCurTurn < 5)
         scale = 1.6f;
@@ -3406,7 +3406,7 @@ void philAI::GetTurnAttentionValue(i32 player) {
         scale = 1.0f;
     else
         scale = 0.8f;
-    attentionWeights->heroValue = attentionWeights->heroValue * scale;
+    attentionWeights->turnHeroAttention = attentionWeights->turnHeroAttention * scale;
 }
 #if H2_RETAIL_COMPILER
 #undef attentionWeights
@@ -3985,7 +3985,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
                  / AI_OBELISK_VISITOR_COUNT_FLOAT)
     );
     playerAI->m_obeliskValue =
-        static_cast<i32>(playerAI->m_obeliskValue * (playerAI->m_attentionWeights.heroValue + 0.66));
+        static_cast<i32>(playerAI->m_obeliskValue * (playerAI->m_attentionWeights.turnHeroAttention + 0.66));
     return playerAI->m_obeliskValue;
 }
 #if H2_RETAIL_COMPILER
@@ -7073,7 +7073,7 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
                 else
                     result = 0;
                 break;
-            case ARTIFACT_EVENT_MODE_UNKNOWN_2:
+            case ARTIFACT_EVENT_MODE_UNUSED_2:
                 break;
             case ARTIFACT_EVENT_MODE_GOLD:
                 result = NetValueOfArtifact(IDX(artifact), ARTIFACT_EVENT_GOLD_COST, 0, 0);

@@ -112,7 +112,7 @@ H2_ENUM_BEGIN(CampaignConstant)
     CAMPAIGN_STATE_RESET_SIZE         = 0x147,
     CAMPAIGN_SETUP_RESET_SIZE         = 0x41,
     CAMPAIGN_ARMY_NAME_BUFFER_SIZE    = 52,
-    CAMPAIGN_CARRYOVER_PLAYER         = 3,
+    CAMPAIGN_STRENGTHENED_ROLAND_PLAYER         = 3,
     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER   = 3,
     CAMPAIGN_EASY_SCENARIO_LIMIT      = 2,
     CAMPAIGN_NORMAL_SCENARIO_LIMIT    = 5,
@@ -196,11 +196,11 @@ H2_ENUM_END(NormalDialogAnswer)
 H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_INFO                     = 1,
     NORMAL_DIALOG_CONFIRM                  = 2,
-    NORMAL_DIALOG_BUTTON_PAIR              = 3,
+    NORMAL_DIALOG_OK_CANCEL              = 3,
     NORMAL_DIALOG_QUICK_VIEW               = 4,
-    NORMAL_DIALOG_WAIT_FIRST               = 5,
-    NORMAL_DIALOG_WAIT_LAST                = 6,
-    NORMAL_DIALOG_SHOW_BUTTONS_7_8         = 7,
+    NORMAL_DIALOG_WAIT_OK               = 5,
+    NORMAL_DIALOG_WAIT_CANCEL                = 6,
+    NORMAL_DIALOG_CHOOSE_ONE_OF_TWO         = 7,
     NORMAL_DIALOG_SHOW_BUTTON_7            = 8,
     NORMAL_DIALOG_RESOURCE_COUNT           = 2,
     NORMAL_DIALOG_PRIMARY_BONUS_OFFSET     = 100,
@@ -253,7 +253,7 @@ struct HighScoreEntry {
     char scenarioName[HIGH_SCORE_SCENARIO_NAME_SIZE];
     i32 score;
     i32 days;
-    i32 scenario;
+    i32 difficultyRating;
     char cheated;
     char reserved[HIGH_SCORE_RESERVED_SIZE];
 };
@@ -272,35 +272,35 @@ H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_SOUND_LAST      = 0x9c66,
     APP_MENU_SPEED_FIRST     = 0x9c68,
     APP_MENU_SPEED_LAST      = 0x9c6c,
-    APP_MENU_UNKNOWN_9C6D    = 0x9c6d,
+    APP_MENU_CD_STEREO    = 0x9c6d,
     APP_MENU_TOGGLE_ROUTE    = 0x9c6e,
-    APP_MENU_TOGGLE_BLACKOUT = 0x9c6f,
-    APP_MENU_RESTART_0       = 0x9ca6,
-    APP_MENU_RESTART_1       = 0x9ca8,
-    APP_MENU_RESTART_2       = 0x9ca9,
-    APP_MENU_RESTART_3       = 0x9caa,
-    APP_MENU_RESTART_4       = 0x9cab,
-    APP_MENU_UNKNOWN_9CAD    = 0x9cad,
-    APP_MENU_RESTART_5       = 0x9cae,
-    APP_MENU_RESTART_6       = 0x9caf,
-    APP_MENU_RESTART_7       = 0x9cb0,
-    APP_MENU_RESTART_8       = 0x9cb2,
-    APP_MENU_RESTART_9       = 0x9cb3,
-    APP_MENU_RESTART_10      = 0x9cb5,
-    APP_MENU_RESTART_11      = 0x9cb6,
-    APP_MENU_RESTART_12      = 0x9cb8,
-    APP_MENU_RESTART_13      = 0x9cb9,
-    APP_MENU_LOAD_0          = 0x9cbb,
-    APP_MENU_LOAD_1          = 0x9cbc,
-    APP_MENU_LOAD_2          = 0x9cbf,
-    APP_MENU_LOAD_3          = 0x9cc0,
-    APP_MENU_LOAD_4          = 0x9cc1,
-    APP_MENU_LOAD_5          = 0x9cc3,
-    APP_MENU_LOAD_6          = 0x9cc4,
-    APP_MENU_LOAD_7          = 0x9cc6,
-    APP_MENU_LOAD_8          = 0x9cc7,
-    APP_MENU_LOAD_9          = 0x9cc9,
-    APP_MENU_LOAD_10         = 0x9cca,
+    APP_MENU_VIEW_ENEMY_MOVES = 0x9c6f,
+    APP_MENU_NEW_STANDARD_GAME       = 0x9ca6,
+    APP_MENU_NEW_CAMPAIGN_1       = 0x9ca8,
+    APP_MENU_NEW_CAMPAIGN_2       = 0x9ca9,
+    APP_MENU_NEW_CAMPAIGN_3       = 0x9caa,
+    APP_MENU_NEW_CAMPAIGN_4       = 0x9cab,
+    APP_MENU_UNUSED_9CAD    = 0x9cad,
+    APP_MENU_NEW_HOT_SEAT_2       = 0x9cae,
+    APP_MENU_NEW_HOT_SEAT_3       = 0x9caf,
+    APP_MENU_NEW_HOT_SEAT_4       = 0x9cb0,
+    APP_MENU_NEW_NETWORK_HOST       = 0x9cb2,
+    APP_MENU_NEW_NETWORK_GUEST       = 0x9cb3,
+    APP_MENU_NEW_MODEM_HOST      = 0x9cb5,
+    APP_MENU_NEW_MODEM_GUEST      = 0x9cb6,
+    APP_MENU_NEW_DIRECT_HOST      = 0x9cb8,
+    APP_MENU_NEW_DIRECT_GUEST      = 0x9cb9,
+    APP_MENU_LOAD_STANDARD_GAME          = 0x9cbb,
+    APP_MENU_LOAD_CAMPAIGN_GAME          = 0x9cbc,
+    APP_MENU_LOAD_HOT_SEAT_2          = 0x9cbf,
+    APP_MENU_LOAD_HOT_SEAT_3          = 0x9cc0,
+    APP_MENU_LOAD_HOT_SEAT_4          = 0x9cc1,
+    APP_MENU_LOAD_NETWORK_HOST          = 0x9cc3,
+    APP_MENU_LOAD_NETWORK_GUEST          = 0x9cc4,
+    APP_MENU_LOAD_MODEM_HOST          = 0x9cc6,
+    APP_MENU_LOAD_MODEM_GUEST          = 0x9cc7,
+    APP_MENU_LOAD_DIRECT_HOST          = 0x9cc9,
+    APP_MENU_LOAD_DIRECT_GUEST         = 0x9cca,
     APP_MENU_SAVE            = 0x9ccb,
     APP_MENU_EXIT            = 0x9ccc,
     APP_MENU_CHEAT_REVEAL    = 0x9ccd,
@@ -441,7 +441,7 @@ i32 InterpretCommandLine(void);
 MessageDispatchResult InitMenuHandler(struct tag_message& message);
 MessageDispatchResult NullHandler(struct tag_message& message);
 MessageDispatchResult RecruitHeroHandler(tag_message& message);
-H2_CONST char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
+H2_CONST char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading);
 H2_CONST char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
 H2_CONST char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster);
@@ -459,7 +459,7 @@ void QuickViewWait(void);
 void InitVars(void);
 void ClearMapExtra(void);
 i32 GetMonType(i32 score, HighScoreType highScoreType);
-i32 AddScoreToHighScore(i32 score, i32 days, i32 scenario, HighScoreType highScoreType, H2_CONST char* scenarioName);
+i32 AddScoreToHighScore(i32 score, i32 days, i32 difficultyRating, HighScoreType highScoreType, H2_CONST char* scenarioName);
 void BVResMsg(H2_CONST char* text, H2_ENUM_PARAM(ResourceType, i32) resourceType, i32 quantity);
 void GOut(H2_CONST char* text);
 i32 NetPosToGamePos(i32 netPosition);

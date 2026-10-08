@@ -173,7 +173,7 @@ i32 DoArenaDialog(void) {
 #define widgetIndex widgetIndex_5
 #endif
 VA(0x004b2f5b, 0x1e1)
-MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
+MessageDispatchResult ArenaWindowHandler(struct tag_message& message) {
     tag_message H2_UNUSED(dialogMessage);
     i32 H2_UNUSED(widgetIndex);
     i32 H2_UNUSED(unusedDialogResourceType);
@@ -184,33 +184,33 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
-        message_1.type = MESSAGE_WIDGET;
-        gpWindowManager->m_dialogResult = message_1.payload.widget.id;
-        message_1.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message_1.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.type = MESSAGE_WIDGET;
+        gpWindowManager->m_dialogResult = message.payload.widget.id;
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
 
-    if (message_1.type == MESSAGE_KEY_DOWN) {
-        if (message_1.payload.keyboard.keyCode == INPUT_SCAN_TAB) {
+    if (message.type == MESSAGE_KEY_DOWN) {
+        if (message.payload.keyboard.keyCode == INPUT_SCAN_TAB) {
             choice++;
             if (choice >= CHOICE_COUNT)
                 choice = 0;
             UpdateArenaIcons();
         }
-    } else if (message_1.type == MESSAGE_WIDGET) {
-        switch (message_1.payload.widget.command) {
+    } else if (message.type == MESSAGE_WIDGET) {
+        switch (message.payload.widget.command) {
             case WIDGET_NOTIFY_SELECT:
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 extra = NORMAL_DIALOG_NO_VALUE;
                 unusedDialogResourceType = NORMAL_DIALOG_NO_RESOURCE;
-                if (message_1.payload.widget.parameter & IDX(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                    switch (message_1.payload.widget.id) {
+                if (message.payload.widget.parameter & IDX(MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                    switch (message.payload.widget.id) {
                         case WIDGET_FIRST_ID:
                         case WIDGET_FIRST_ID + 1:
                         case WIDGET_LAST_ID:
-                            choice = message_1.payload.widget.id - WIDGET_FIRST_ID;
+                            choice = message.payload.widget.id - WIDGET_FIRST_ID;
                             NormalDialog(gStatDesc[choice], NORMAL_DIALOG_QUICK_VIEW);
                             break;
                     }
@@ -218,17 +218,17 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
                 break;
 
             case WIDGET_NOTIFY_DESELECT:
-                switch (message_1.payload.widget.id) {
+                switch (message.payload.widget.id) {
                     case WIDGET_FIRST_ID:
                     case WIDGET_FIRST_ID + 1:
                     case WIDGET_LAST_ID:
-                        choice = message_1.payload.widget.id - WIDGET_FIRST_ID;
+                        choice = message.payload.widget.id - WIDGET_FIRST_ID;
                         UpdateArenaIcons();
                         break;
                     case DIALOG_BUTTON_2:
-                        gpWindowManager->m_dialogResult = message_1.payload.widget.id;
-                        message_1.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-                        message_1.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                     default:

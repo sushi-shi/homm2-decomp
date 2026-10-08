@@ -43,7 +43,7 @@ src/SOURCE/SPELLS.cpp	combatManager::MirrorImage	2	code	&& distance <= 2)	a two-
 src/SOURCE/GAME.cpp	GenerateStandardFileName	999	code	i = 999;	forces the scan loop past the end of the source name once the basename is full (retail's loop exit)
 src/SOURCE/GAME.cpp	game::RandomizeEvents	[2-9]	code	case *:	one bucket of the 0..9 decile roll (EVENT_BUCKET_COUNT) that picks the site's reward
 src/SOURCE/GAME.cpp	game::RandomizeEvents	*	code	cell->m_objectMetadata = Random(*	a site's initial stock, guard or reward roll: retail per-object values with no shared domain
-src/SOURCE/GAME.cpp	game::RandomizeEvents	2	code	cell->m_objectMetadata = BANK_GUARDIAN_FLAG | 2;	the dragon city's fixed guardian roll (other banks roll 4..6)
+src/SOURCE/GAME.cpp	game::RandomizeEvents	2	code	cell->m_objectMetadata = DWELLING_GUARDED_FLAG | 2;	the dragon city's fixed guardian roll (other banks roll 4..6)
 src/SOURCE/GAME.cpp	game::RandomizeEvents	[2-9]	code	artifactGuardianChoices[[]*[]] = CREATURE_*;	the major artifact's guardian choices, a retail local table filled element by element
 src/SOURCE/GAME.cpp	game::GetRandomNumTroops	*	code	return *;	the creature's random wandering-stack size range, a retail per-creature table spelled as a switch
 src/SOURCE/GAME.cpp	game::PerWeek	*	code	WORLDMAP->GetCell(mapX, mapY)->m_objectMetadata *	a site's weekly refill or growth: retail per-object values with no shared domain

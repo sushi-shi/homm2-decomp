@@ -75,7 +75,7 @@ struct HeroExtra {
     u8 hasCustomSkills;
     i8 skillTypes[HERO_SECONDARY_SKILL_CAPACITY];
     i8 skillLevels[HERO_SECONDARY_SKILL_CAPACITY];
-    char unknown2c;
+    char unused2c;
     u8 hasCustomName;
     char name[EVENT_RECORD_HERO_NAME_SIZE];
     u8 hasPatrol;

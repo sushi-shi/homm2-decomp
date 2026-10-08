@@ -7560,7 +7560,7 @@ i32 editManager::CountMines(void) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_MINE)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
-                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE))
                 mineTotal++;
@@ -7665,7 +7665,7 @@ void editManager::WriteMines(i32 file) {
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_SAWMILL)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ALCHEMIST_LAB)
                 || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_ABANDONED_MINE)
-                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                || cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)) {
                 if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_LIGHTHOUSE)) {
                     type = EDIT_MINE_TYPE_LIGHTHOUSE;
                 } else if (cell->m_triggerType
@@ -7673,7 +7673,7 @@ void editManager::WriteMines(i32 file) {
                     type = EDIT_MINE_TYPE_ABANDONED_MINE;
                 } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_DRAGON_CITY)) {
                     type = EDIT_MINE_TYPE_DRAGON_CITY;
-                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_EYE_OF_MAGI)) {
+                } else if (cell->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MINE)) {
                     type = EDIT_MINE_TYPE_EYE_OF_MAGI;
                 } else {
                     markerCell = gMap.CellAt(x, y);

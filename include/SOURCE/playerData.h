@@ -9,7 +9,7 @@
 H2_ENUM_BEGIN(PlayerDataStorageConstant)
     PLAYER_HERO_CAPACITY         = 8,
     PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
-    PLAYER_BARRIER_STATE_SIZE    = 6,
+    PLAYER_UNUSED_TAIL_SIZE    = 6,
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
 H2_ENUM_END(PlayerDataStorageConstant)
 
@@ -25,19 +25,19 @@ H2_ENUM_CLASS_END(PlayerPersonality)
 
 #pragma pack(push, 1)
 struct playerAttentionWeights {
-    float gameWeightA;
-    float gameRemainder;
-    float gameWeightB;
-    float buildingValue;
-    float upgradeBase;
-    float heroValue;
+    float gameBuildingAttention;
+    float gameCreatureAttention;
+    float gameHeroAttention;
+    float turnBuildingAttention;
+    float turnCreatureAttention;
+    float turnHeroAttention;
 };
 SIZE(playerAttentionWeights, 0x18);
 
 class playerAIData {
 public:
     playerAttentionWeights m_attentionWeights;
-    char m_unknown18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
+    char m_unused18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
     i32 m_income[IDX(RES_COUNT)];
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;
@@ -71,7 +71,7 @@ public:
     i32 m_resources[IDX(RES_COUNT)];
     b8 m_evilInterface;
     i8 m_barrierTents;
-    char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
+    char m_unusedAd[PLAYER_UNUSED_TAIL_SIZE];
     playerAIData m_aiData;
     void Write(i32 file);
     void Read(i32 file);

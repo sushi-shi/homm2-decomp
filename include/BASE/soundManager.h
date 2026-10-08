@@ -123,7 +123,7 @@ extern bool gSoundDisabled;
 // Set once a backend has come up and cleared on shutdown; the adventure and
 // game layers save/restore it around forced ambient-music switches, so it is
 // module state rather than a soundManager member.
-extern bool gSoundBackendsReady;
+extern bool gbSoundEnabled;
 
 inline bool IsAudiereBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_AUDIERE && manager->m_audiereDevice != NULL;

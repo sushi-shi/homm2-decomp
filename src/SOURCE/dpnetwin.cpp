@@ -100,7 +100,7 @@ i16 dpnet_init(void) {
                 localization::Tr("network.waiting_guest.buka")
 
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
@@ -111,7 +111,7 @@ i16 dpnet_init(void) {
                 ,
                 giNumHumanPlayers - 1
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_OK);
             gbRemoteGameOpen = false;
             startup.playerCount = giNumHumanPlayers;
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
@@ -131,7 +131,7 @@ i16 dpnet_init(void) {
                 localization::Tr("network.waiting_player_start")
 
             );
-            NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
         }

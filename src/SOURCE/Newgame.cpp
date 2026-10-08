@@ -41,7 +41,7 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SETUP_PACKET_SIZE                = 0x7d,
     GAME_CHAT_TEXT_LIMIT                  = 100,
     GAME_NETWORK_PLAYER_NONE              = -1,
-    GAME_MAP_OPTIONS_CONTROL              = 0x36,
+    GAME_SELECT_SCENARIO_BUTTON              = 0x36,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
     GAME_COMPUTER_COLOR_UNLOCKED_FRAME    = 3,
@@ -88,7 +88,7 @@ H2_ENUM_BEGIN(NewGameConstant)
 H2_ENUM_END(NewGameConstant)
 
 H2_ENUM_BEGIN(NewGamePlayerSetupType)
-    GAME_PLAYER_DEFAULT  = 0,
+    GAME_PLAYER_FIXED  = 0,
     GAME_PLAYER_FLEXIBLE = 1
 H2_ENUM_END(NewGamePlayerSetupType)
 
@@ -309,13 +309,13 @@ void game::InitNewGame(struct SMapHeader* header) {
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                 && !m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
-                m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
+                m_setupPlayerType[player] = GAME_PLAYER_FIXED;
                 m_setupPlayerNetworkId[player] = humanCount;
                 ++humanCount;
             } else if (!m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                        && m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
-                m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
+                m_setupPlayerType[player] = GAME_PLAYER_FIXED;
                 ++computerCount;
             }
         }
@@ -324,7 +324,7 @@ void game::InitNewGame(struct SMapHeader* header) {
             && computerCount < m_mapHeader.playerCount - giNumHumanPlayers)
             playerType = GAME_PLAYER_FLEXIBLE;
         else
-            playerType = GAME_PLAYER_DEFAULT;
+            playerType = GAME_PLAYER_FIXED;
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerType[player] == GAME_NETWORK_PLAYER_NONE)
@@ -362,6 +362,7 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
+#define mapMatchesType wrongExpansionType // frame-slot spelling
 VA(0x00475b4b, 0xa71)
 i32 game::NewGame(void) {
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
@@ -372,7 +373,7 @@ i32 game::NewGame(void) {
     NewGameRemotePacket* remoteBuffer;
     heroWindow* choiceWindow;
     b32 result;
-    b8 wrongExpansionType;
+    b8 mapMatchesType;
     char* mapExt;
     i32 mapHeaderRead;
     i32 textBufferIndex;
@@ -447,7 +448,7 @@ i32 game::NewGame(void) {
                     UpdateNewGameWindow();
 
                     windowMessage.type = MESSAGE_WIDGET;
-                    windowMessage.payload.widget.id = GAME_MAP_OPTIONS_CONTROL;
+                    windowMessage.payload.widget.id = GAME_SELECT_SCENARIO_BUTTON;
                     windowMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                     windowMessage.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
                     m_newGameWindow->BroadcastMessage(windowMessage);
@@ -483,15 +484,15 @@ i32 game::NewGame(void) {
         }
     } else {
         for (;;) {
-            wrongExpansionType = false;
+            mapMatchesType = false;
             mapExt = FindLastToken(m_mapFilename, '.');
             if (mapExt != NULL) {
                 if (StrEqNoCase(mapExt, ".MX2") && xIsExpansionMap)
-                    wrongExpansionType = true;
+                    mapMatchesType = true;
                 if (StrEqNoCase(mapExt, ".MP2") && !xIsExpansionMap)
-                    wrongExpansionType = true;
+                    mapMatchesType = true;
             }
-            if (!wrongExpansionType) {
+            if (!mapMatchesType) {
                 if (xIsExpansionMap)
                     strcpy(gpGame->m_mapFilename, "arrax.mx2");
                 else
@@ -578,20 +579,21 @@ cleanup:
     gpResourceManager->Dispose(NGKPBkg);
     return result;
 }
+#undef mapMatchesType
 
 VA(0x004765bc, 0xeb)
     void game::CleanUpNewGameWindow(void) {
         i32 player;
 
         for (player = 0; player < GAME_PLAYER_COUNT; ++player) {
-            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_OPPONENT_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_SELECT_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_COLOR_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_NAME_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_ICON_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_CYCLE_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_NAME_FIRST);
-            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_HUMAN_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_LABEL_FIRST);
             m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_FIRST);
         }
     }
@@ -632,7 +634,7 @@ VA(0x004766a7, 0x794)
                     "ngextra.icn",
                     PLAYER_HUMAN_FRAME,
                     ICON_DRAW_NORMAL,
-                    playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
+                    playerCounter + NEW_GAME_HANDICAP_LABEL_FIRST,
                     WIDGET_KIND_ICON_DIRECT,
                     PLAYER_WIDGET_FILL_COLOR
                 );
@@ -668,7 +670,7 @@ VA(0x004766a7, 0x794)
                 giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
                                           : GAME_RACE_WIDGET_SINGLE_FRAME,
                 ICON_DRAW_NORMAL,
-                playerCounter + NEW_GAME_RACE_FIRST,
+                playerCounter + NEW_GAME_OPPONENT_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -814,11 +816,11 @@ VA(0x00476e3b, 0x50f)
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         for (playerIndex = 0; playerIndex < IDX(DIFFICULTY_COUNT); ++playerIndex) {
-            message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
+            message.payload.widget.id = NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + playerIndex;
             m_newGameWindow->BroadcastMessage(message);
         }
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
+        message.payload.widget.id = NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(m_difficulty);
         m_newGameWindow->BroadcastMessage(message);
 
         if (giNumHumanPlayers > 1) {
@@ -854,7 +856,7 @@ VA(0x00476e3b, 0x50f)
             message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_newGameWindow->BroadcastMessage(message);
 
-            if (m_setupPlayerType[playerIndex] != GAME_PLAYER_DEFAULT
+            if (m_setupPlayerType[playerIndex] != GAME_PLAYER_FIXED
                 || (giNumHumanPlayers > 1
                     && m_setupPlayerNetworkId[playerIndex] != GAME_COMPUTER_PLAYER))
                 playerLockedValue = false;
@@ -932,12 +934,14 @@ VA(0x00476e3b, 0x50f)
 #undef unusedPlayer
 #endif
 
+#define setupSlot currentPlayerLocal              // frame-slot spelling
+#define cancelButtonMessage mapWindowMessageTemp // frame-slot spelling
 VA(0x0047734a, 0xdd1)
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
         i32 sendResult;
         i32 oldNetworkId;
         i32 swapPlayerTemp;
-        i32 currentPlayerLocal;
+        i32 setupSlot;
         tag_message windowMessage;
         b32 redraw = false;
         b32 needSync = false;
@@ -945,7 +949,7 @@ VA(0x0047734a, 0xdd1)
         NewGameRemotePacket* remotePacketResult;
         i32 sender;
         char mapPacketLocal[GAME_MAP_PACKET_SIZE];
-        tag_message mapWindowMessageTemp;
+        tag_message cancelButtonMessage;
         i32 helpDialogIndexLocal;
         i32 H2_UNUSED(unusedSender);
         char mapNamePacket[IDX(MAP_HEADER_NAME_SIZE) + GAME_SETUP_BUFFER_SIZE];
@@ -1014,11 +1018,11 @@ VA(0x0047734a, 0xdd1)
                             unusedSender = 0;
                         }
                         gText[GAME_CHAT_TEXT_LIMIT] = 0;
-                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
-                             ++currentPlayerLocal) {
+                        for (setupSlot = 0; setupSlot < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
+                             ++setupSlot) {
                             strcpy(
-                                cTextReceivedBuffer[currentPlayerLocal],
-                                cTextReceivedBuffer[currentPlayerLocal + 1]
+                                cTextReceivedBuffer[setupSlot],
+                                cTextReceivedBuffer[setupSlot + 1]
                             );
                         }
                         strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], gText);
@@ -1034,11 +1038,11 @@ VA(0x0047734a, 0xdd1)
         if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
             && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
             redraw = true;
-            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
-                 ++currentPlayerLocal) {
+            for (setupSlot = 0; setupSlot < GAME_RECEIVED_TEXT_BUFFER_COUNT - 1;
+                 ++setupSlot) {
                 strcpy(
-                    cTextReceivedBuffer[currentPlayerLocal],
-                    cTextReceivedBuffer[currentPlayerLocal + 1]
+                    cTextReceivedBuffer[setupSlot],
+                    cTextReceivedBuffer[setupSlot + 1]
                 );
             }
             strcpy(cTextReceivedBuffer[GAME_RECEIVED_TEXT_BUFFER_COUNT - 1], cNGKPCore);
@@ -1069,24 +1073,24 @@ VA(0x0047734a, 0xdd1)
                     if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_BUTTON_FIRST
                          && message.payload.widget.id
                                 <= NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
+                        || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
+                                   <= NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_COUNT) - 1))
                         helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
                     if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
                          && message.payload.widget.id
                                 <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
-                            && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST
+                        || (message.payload.widget.id >= NEW_GAME_HANDICAP_LABEL_FIRST
+                            && message.payload.widget.id <= NEW_GAME_HANDICAP_LABEL_FIRST
                                                                 + IDX(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_HANDICAP;
                     if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
                          && message.payload.widget.id
                                 <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
-                        || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
+                        || (message.payload.widget.id >= NEW_GAME_OPPONENT_FIRST
                             && message.payload.widget.id
-                                   <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
+                                   <= NEW_GAME_OPPONENT_FIRST + IDX(GAME_PLAYER_COUNT) - 1)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
                             && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
                         || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
@@ -1100,7 +1104,7 @@ VA(0x0047734a, 0xdd1)
                                                                 + IDX(GAME_PLAYER_COUNT)
                                                                 - 1))
                         helpDialogIndexLocal = GAME_HELP_RACE;
-                    if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
+                    if (message.payload.widget.id == GAME_SELECT_SCENARIO_BUTTON
                         || message.payload.widget.id == NEW_GAME_MAP_SELECT
                         || message.payload.widget.id == NEW_GAME_SCENARIO_NAME)
                         helpDialogIndexLocal = GAME_HELP_MAP;
@@ -1150,7 +1154,7 @@ VA(0x0047734a, 0xdd1)
                                 gbNewGameDialogOver = true;
                                 return MESSAGE_DISPATCH_FORWARD;
 
-                            case GAME_MAP_OPTIONS_CONTROL:
+                            case GAME_SELECT_SCENARIO_BUTTON:
                                 goto chooseMap;
 
                             default:
@@ -1165,20 +1169,20 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_HARD):
                             case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_EXPERT):
                             case NEW_GAME_DIFFICULTY_BUTTON_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_DIFFICULTY_BUTTON_FIRST;
                                 goto setDifficulty;
 
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_NORMAL):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_HARD):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EXPERT):
-                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HIGHLIGHT_FIRST;
                             setDifficulty:
                                 gpGame->m_difficulty =
-                                    static_cast<GameDifficulty>(currentPlayerLocal);
+                                    static_cast<GameDifficulty>(setupSlot);
                                 needSync = true;
                                 redraw = true;
                                 break;
@@ -1189,38 +1193,38 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
                                 goto cycleHandicap;
 
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_HANDICAP_LABEL_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_HANDICAP_LABEL_FIRST;
                             cycleHandicap:
                                 needSync = true;
                                 redraw = true;
-                                if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                if (gpGame->m_setupPlayerNetworkId[setupSlot]
                                     != GAME_COMPUTER_PLAYER) {
-                                    gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
-                                        (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
+                                    gpGame->m_playerHandicap[setupSlot] = PlayerHandicap(
+                                        (IDX(gpGame->m_playerHandicap[setupSlot]) + 1)
                                         % IDX(PLAYER_HANDICAP_COUNT)
                                     );
                                 }
                                 break;
 
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIRST):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SECOND):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_THIRD):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
-                                    message.payload.widget.id - NEW_GAME_RACE_FIRST;
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_OPPONENT_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                setupSlot =
+                                    message.payload.widget.id - NEW_GAME_OPPONENT_FIRST;
                                 goto selectPlayer;
 
                             case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIRST):
@@ -1229,7 +1233,7 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_COLOR_FIRST;
                                 goto selectPlayer;
 
@@ -1239,7 +1243,7 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
                                 goto selectPlayer;
 
@@ -1249,18 +1253,18 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
                             selectPlayer:
                                 needSync = true;
                                 redraw = true;
-                                if (gpGame->m_setupPlayerType[currentPlayerLocal]
-                                        != GAME_PLAYER_DEFAULT
+                                if (gpGame->m_setupPlayerType[setupSlot]
+                                        != GAME_PLAYER_FIXED
                                     || (giNumHumanPlayers > 1
-                                        && gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                        && gpGame->m_setupPlayerNetworkId[setupSlot]
                                                != GAME_COMPUTER_PLAYER)) {
                                     if (giNumHumanPlayers == 1) {
-                                        if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                        if (gpGame->m_setupPlayerNetworkId[setupSlot]
                                             == GAME_COMPUTER_PLAYER) {
                                             for (swapPlayerTemp = 0;
                                                  swapPlayerTemp < gpGame->m_mapHeader.playerCount;
@@ -1271,9 +1275,9 @@ VA(0x0047734a, 0xdd1)
                                                                        [swapPlayerTemp];
                                                     gpGame->m_setupPlayerNetworkId[swapPlayerTemp] =
                                                         gpGame->m_setupPlayerNetworkId
-                                                            [currentPlayerLocal];
+                                                            [setupSlot];
                                                     gpGame->m_setupPlayerNetworkId
-                                                        [currentPlayerLocal] = oldNetworkId;
+                                                        [setupSlot] = oldNetworkId;
                                                     swapPlayerTemp = GAME_SWAP_SEARCH_DONE;
                                                 }
                                             }
@@ -1281,29 +1285,29 @@ VA(0x0047734a, 0xdd1)
                                     } else if (gpGame->m_selectedSetupPlayer
                                                == GAME_NETWORK_PLAYER_NONE) {
                                         gpGame->m_selectedSetupPlayer =
-                                            currentPlayerLocal;
-                                    } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal
+                                            setupSlot;
+                                    } else if (gpGame->m_selectedSetupPlayer == setupSlot
                                                || (gpGame->m_setupPlayerNetworkId
-                                                           [currentPlayerLocal]
+                                                           [setupSlot]
                                                        == GAME_COMPUTER_PLAYER
                                                    && gpGame->m_setupPlayerNetworkId
                                                               [gpGame->m_selectedSetupPlayer]
                                                           == GAME_COMPUTER_PLAYER)) {
                                         gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
                                     } else {
-                                        if ((gpGame->m_setupPlayerType[currentPlayerLocal]
-                                                 != GAME_PLAYER_DEFAULT
+                                        if ((gpGame->m_setupPlayerType[setupSlot]
+                                                 != GAME_PLAYER_FIXED
                                              && gpGame->m_setupPlayerType
                                                         [gpGame->m_selectedSetupPlayer]
-                                                    != GAME_PLAYER_DEFAULT)
-                                            || (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                                    != GAME_PLAYER_FIXED)
+                                            || (gpGame->m_setupPlayerNetworkId[setupSlot]
                                                     != GAME_COMPUTER_PLAYER
                                                 && gpGame->m_setupPlayerNetworkId
                                                            [gpGame->m_selectedSetupPlayer]
                                                        != GAME_COMPUTER_PLAYER)) {
                                             swapPlayerTemp =
-                                                gpGame->m_setupPlayerNetworkId[currentPlayerLocal];
-                                            gpGame->m_setupPlayerNetworkId[currentPlayerLocal] =
+                                                gpGame->m_setupPlayerNetworkId[setupSlot];
+                                            gpGame->m_setupPlayerNetworkId[setupSlot] =
                                                 gpGame->m_setupPlayerNetworkId
                                                     [gpGame->m_selectedSetupPlayer];
                                             gpGame->m_setupPlayerNetworkId
@@ -1326,7 +1330,7 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
                                 goto cycleRace;
 
@@ -1336,28 +1340,28 @@ VA(0x0047734a, 0xdd1)
                             case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FOURTH):
                             case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIFTH):
                             case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                                currentPlayerLocal =
+                                setupSlot =
                                     message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
                             cycleRace:
                                 if (gpGame->m_mapHeader
-                                        .playerRace[gpGame->m_setupPlayerColor[currentPlayerLocal]]
+                                        .playerRace[gpGame->m_setupPlayerColor[setupSlot]]
                                     == FACTION_RANDOM) {
-                                    if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                    if (gpGame->m_setupPlayerRace[setupSlot]
                                         == FACTION_RANDOM)
-                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                        gpGame->m_setupPlayerRace[setupSlot] =
                                             FACTION_KNIGHT;
-                                    else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                    else if (gpGame->m_setupPlayerRace[setupSlot]
                                              == FACTION_NECROMANCER)
-                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                        gpGame->m_setupPlayerRace[setupSlot] =
                                             FACTION_RANDOM;
                                     else
-                                        ++gpGame->m_setupPlayerRace[currentPlayerLocal];
+                                        ++gpGame->m_setupPlayerRace[setupSlot];
                                     needSync = true;
                                     redraw = true;
                                 }
                                 break;
 
-                            case GAME_MAP_OPTIONS_CONTROL:
+                            case GAME_SELECT_SCENARIO_BUTTON:
                                 break;
 
                             case NEW_GAME_SCENARIO_NAME:
@@ -1366,21 +1370,21 @@ VA(0x0047734a, 0xdd1)
                                 if (gbRemoteOn && giThisNetPos != 0)
                                     break;
                                 {
-                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                                    mapWindowMessageTemp.payload.widget.command =
+                                    cancelButtonMessage.type = MESSAGE_WIDGET;
+                                    cancelButtonMessage.payload.widget.command =
                                         WIDGET_COMMAND_CLEAR_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                                    mapWindowMessageTemp.payload.widget.data.value =
+                                    cancelButtonMessage.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    cancelButtonMessage.payload.widget.data.value =
                                         IDX(WIDGET_FLAG_ENABLED);
-                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    gpGame->m_newGameWindow->BroadcastMessage(cancelButtonMessage);
                                     gpGame->GetMap();
-                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                                    mapWindowMessageTemp.payload.widget.command =
+                                    cancelButtonMessage.type = MESSAGE_WIDGET;
+                                    cancelButtonMessage.payload.widget.command =
                                         WIDGET_COMMAND_SET_FLAGS;
-                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                                    mapWindowMessageTemp.payload.widget.data.value =
+                                    cancelButtonMessage.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    cancelButtonMessage.payload.widget.data.value =
                                         IDX(WIDGET_FLAG_ENABLED);
-                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    gpGame->m_newGameWindow->BroadcastMessage(cancelButtonMessage);
                                     if (gbRemoteOn) {
                                         memcpy(
                                             mapPacketLocal,
@@ -1428,6 +1432,8 @@ VA(0x0047734a, 0xdd1)
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+#undef setupSlot
+#undef cancelButtonMessage
 
 #if H2_RETAIL_COMPILER
 #define buffer buf
@@ -1696,7 +1702,7 @@ void game::ShowScenInfo(void) {
                 "ngextra.icn",
                 PLAYER_HUMAN_FRAME,
                 ICON_DRAW_NORMAL,
-                playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST,
+                playerCounter + NEW_GAME_HANDICAP_LABEL_FIRST,
                 WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
@@ -1731,7 +1737,7 @@ void game::ShowScenInfo(void) {
             giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
                                       : GAME_RACE_WIDGET_SINGLE_FRAME,
             ICON_DRAW_NORMAL,
-            playerCounter + NEW_GAME_RACE_FIRST,
+            playerCounter + NEW_GAME_OPPONENT_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
@@ -1863,7 +1869,7 @@ void game::ShowScenInfo(void) {
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message);
 
-        if (m_setupPlayerType[playerCounter] != GAME_PLAYER_DEFAULT
+        if (m_setupPlayerType[playerCounter] != GAME_PLAYER_FIXED
             || (giNumHumanPlayers > 1
                 && m_setupPlayerNetworkId[playerCounter] != GAME_COMPUTER_PLAYER))
             locked = false;

@@ -7699,7 +7699,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     i32 H2_UNUSED(maxCells) = ADVMGR_ACTIVE_SOUND_COUNT;
     i32 layer;
 
-    if (gSoundBackendsReady == 0) {
+    if (gbSoundEnabled == 0) {
         return;
     }
 
@@ -8939,9 +8939,9 @@ void advManager::LoadRemote(void) {
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
     if ((gpGame->m_day != 1 || (gpGame->m_week == 1 && gpGame->m_month == 1)) && gbRemoteOn
         && gbThisNetHumanPlayer[giCurPlayer]) {
-        gSoundBackendsReady = 1;
+        gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
-        gSoundBackendsReady = 0;
+        gbSoundEnabled = 0;
         giForceSwitchMusic = KBTickCount();
     }
 
@@ -8952,7 +8952,7 @@ void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->CancelComputerScreen();
         gbThisNetGotAdventureControl = true;
-        gSoundBackendsReady = 0;
+        gbSoundEnabled = 0;
     }
 
     gpGame->DoNewTurn();
@@ -8962,7 +8962,7 @@ void advManager::LoadRemote(void) {
     UpdBottomView(true, true, true);
     gpAdvManager->ForceNewHover();
     SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
-    gSoundBackendsReady = 1;
+    gbSoundEnabled = 1;
 
     if (gpGame->m_cheated) {
         DATA(0x00523ffc) static b32 cheatWarned = false;
@@ -10288,7 +10288,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     spot = GetCell(bestX, bestY);
     type = static_cast<CreatureType>(spot->m_objectIndex);
-    isForced = spot->m_objectMetadata & MONSTER_JOIN_FORCED;
+    isForced = spot->m_objectMetadata & IDX(MAP_MONSTER_FORCE_JOIN);
     count = spot->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
     sprintf(
         gText,

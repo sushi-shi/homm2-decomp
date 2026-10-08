@@ -102,7 +102,7 @@ i16 wsnet_init(void) {
                 0,
                 giTCPNumPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         } else {
             sprintf(
                 cWSTextBuffer,
@@ -114,7 +114,7 @@ i16 wsnet_init(void) {
                 localization::Tr("network.tcp.host.waiting_guests"),
                 inet_ntoa(gIn_addrIP)
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
@@ -133,7 +133,7 @@ i16 wsnet_init(void) {
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
             }
         } else {
             sprintf(
@@ -145,7 +145,7 @@ i16 wsnet_init(void) {
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = giNumHumanPlayers;
@@ -184,7 +184,7 @@ i16 wsnet_init(void) {
             NormalDialog(
 
                 localization::Tr("network.tcp.host_address.invalid"),
-                NORMAL_DIALOG_WAIT_FIRST
+                NORMAL_DIALOG_WAIT_OK
             );
             goto retryAddress;
         }
@@ -193,7 +193,7 @@ i16 wsnet_init(void) {
             cWSTextBuffer,
              localization::Tr("network.tcp.host.searching")
         );
-        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
@@ -258,7 +258,7 @@ void wsSendMessage(
                     goto sendPacket;
                 }
                 sprintf(cWSTextBuffer, "TCP/IP Error During command 'sendto()' # %d", error);
-                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
                 return;
             }
         }
@@ -274,7 +274,7 @@ void wsSendMessage(
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
-            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_OK);
             return;
         }
     }

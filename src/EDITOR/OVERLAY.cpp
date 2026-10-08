@@ -716,7 +716,7 @@ b32 PlaceOverlay(overlayType* type, i32 x, i32 y, b32 newLink) {
     if ((type->trigger == IDX(MAP_OBJECT_ABANDONED_MINE) || type->trigger == IDX(MAP_OBJECT_MINE)
          || type->trigger == IDX(MAP_OBJECT_SAWMILL)
          || type->trigger == IDX(MAP_OBJECT_ALCHEMIST_LAB)
-         || type->trigger == IDX(MAP_OBJECT_EYE_OF_MAGI)
+         || type->trigger == IDX(MAP_OBJECT_RANDOM_MINE)
          || type->trigger == IDX(MAP_OBJECT_DRAGON_CITY)
          || type->trigger == IDX(MAP_OBJECT_LIGHTHOUSE))
         && gEditManager->CountMines() >= GAME_MINE_COUNT) {

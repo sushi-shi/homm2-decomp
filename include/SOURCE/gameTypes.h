@@ -84,16 +84,15 @@ H2_ENUM_CLASS_BEGIN(GameMonsterMetadata)
 H2_ENUM_CLASS_END(GameMonsterMetadata)
 
 H2_ENUM_BEGIN(GameWeeklyConstant)
-    WEEKLY_WATER_WHEEL_EMPTY        = 0xff,
-    WEEKLY_MONSTER_POPULATION_LIMIT = 0x1fe1,
-    WEEKLY_DWELLING_NO_GROWTH_FLAG  = 0x80,
+    WEEKLY_WATER_WHEEL_EMPTY        = 0xff, // no code stores it: a visited wheel holds 0
+    WEEKLY_TREE_CITY_LIMIT = 0x1fe1,
+    WEEKLY_DWELLING_NO_GROWTH_FLAG  = 0x80, // no code sets it; the guard flag is DWELLING_GUARDED_FLAG
     WEEKLY_GROWTH_LIMIT             = 0x1feb,
-    WEEKLY_DRAGON_CITY_LIMIT        = 220,
+    WEEKLY_GUARDED_DWELLING_LIMIT        = 220,
     WEEKLY_MONSTER_LIMIT            = 4000,
     WEEKLY_RECRUIT_MIN_GROWTH       = 2,
     WEEKLY_RECRUIT_MAX_GROWTH       = 5,
-    WEEKLY_RECRUIT_LIMIT            = 1000,
-    WEEKLY_AVAILABLE_HERO           = 64
+    WEEKLY_RECRUIT_LIMIT            = 1000
 H2_ENUM_END(GameWeeklyConstant)
 
 H2_ENUM_BEGIN(GameRandomTownConstant)

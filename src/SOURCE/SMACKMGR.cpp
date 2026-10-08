@@ -373,7 +373,7 @@ void SmackManagerMain(void) {
                     }
                     if (bSmackNum == SMACK_CREDITS || bSmackNum == BUKA_CREDITS)
                         gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
-                    if (bSmackNum == SPECIAL_MUSIC)
+                    if (bSmackNum == CYBERLORE_CREDITS)
                         gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
                 }
                 primaryStarted = true;
@@ -522,7 +522,7 @@ void SmackManagerMain(void) {
         if (!SmackOptions[bSmackNum].waitForInput
             && (gbLastFramePlayed
                 || (smk2
-                    && ((bSmackNum < FIRST_NETWORK ? smk2->FrameNum >= smk2->Frames - 1
+                    && ((bSmackNum < FIRST_EXPANSION_CAMPAIGN_VIDEO ? smk2->FrameNum >= smk2->Frames - 1
                                                    : smk2->FrameNum >= smk2->Frames - 1)
                         || (smk2->FrameNum <= 0 && companionStarted)))
                 || (!smk2
@@ -659,7 +659,7 @@ i32 PlaySmacker(i32 smackNumber) {
     oldUpdateFlags = gpWindowManager->m_colorCycling;
     gpWindowManager->m_colorCycling = 0;
     if (smackNumber != EXPANSION_CAMPAIGN) {
-        gSoundBackendsReady = 1;
+        gbSoundEnabled = 1;
         gpSoundManager->PlayAmbientMusic(-1);
     }
     if (gConfig.slowVideo == VIDEO_SPEED_TEST) {

@@ -89,12 +89,12 @@ public:
     ExpansionCampaignId m_campaignId;
     ExpansionCampaignMap m_currentMap;
     i32 m_mapCount;
-    u8 m_mapChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    u8 m_mapsAvailable[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_mapsPlayed[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
-    i16 m_mapDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
+    i16 m_mapStartDays[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
     u8 m_awards[EXPANSION_CAMPAIGN_AWARD_COUNT];
     u8 m_bonusChoices[EXPANSION_CAMPAIGN_MAX_MAP_COUNT];
-    char m_pad_0x3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
+    char m_unused3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
     ExpansionCampaignMap m_viewMap;
     class heroWindow* m_window;
     i32 m_viewOnly;

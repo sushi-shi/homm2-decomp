@@ -92,7 +92,7 @@ namespace {
         EVENT_GUARD_COUNT_MAX = 255,
         EVENT_MINE_SPELL_LOOP_END = 999,
         EVENT_MINE_SPELL_COUNT_SCALE = 5,
-        EVENT_RANDOM_EVENT_SUCCESS = 40,
+        SPHINX_AI_SUCCESS_CHANCE = 40,
         EVENT_RANDOM_PERCENT_MAX = 100,
         EVENT_BOAT_RESTORE_MODE = 3,
         EVENT_SIRENS_MIN_ARMY_QUANTITY = 1,
@@ -120,16 +120,15 @@ namespace {
     H2_ENUM_END(RiddleComparisonConstant)
 
     H2_ENUM_BEGIN(BarrierEventConstant)
-        PASSWORD_SHIFT = 3,
+        EVENT_BARRIER_PASSWORD_SHIFT = 3,
         INPUT_LENGTH = 14
     H2_ENUM_END(BarrierEventConstant)
 
     H2_ENUM_BEGIN(GenericSiteConstant)
         SITE_VISIBILITY_RADIUS = 10,
-        SITE_HUT_COLOR = 3,
+        SITE_EYE_OF_MAGI_TYPE = 3,
         SITE_STABLE_REWARD_VALUE = 8,
-        SITE_MERMAID_WINDOW_ICON = 10,
-        SITE_STRING_LIMIT = 10
+        STR_EQ_NO_CASE_LIMIT = 10
     H2_ENUM_END(GenericSiteConstant)
 
     H2_ENUM_CLASS_BEGIN_SPLIT(StableVisitResult, u8)
@@ -298,7 +297,7 @@ namespace {
 #define eventType eventType_g
 #define eventValue eventValue1
 #define firstUpgrade firstUpgrade_e
-#define fizzleType fizzleType_k
+#define pickupFizzle fizzleType_k
 #define guardedCount guardedCount_i
 #define guardedMonster guardedMonster_c
 #define heroCombatResult heroCombatResult_h
@@ -369,7 +368,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade;
     SAMPLE2 playedSample;
     CreatureType firstUpgrade;
-    b32 fizzleType;
+    b32 pickupFizzle;
     i32 eventValue;
     signEventExtra* signExtra;
     CreatureType thirdUpgrade;
@@ -379,7 +378,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     eventHero = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
     eventType = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eraseObject = 0;
-    fizzleType = false;
+    pickupFizzle = false;
     playedSample = NULL;
     eventSample = NULL;
     gpMouseManager->ShowColorPointer();
@@ -730,7 +729,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO
                 );
             }
-            fizzleType = true;
+            pickupFizzle = true;
             eraseObject = 1;
             break;
 
@@ -790,7 +789,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     GiveResource(eventHero, RES_GOLD, FLOTSAM_LARGE_GOLD_AMOUNT);
                     break;
             }
-            fizzleType = true;
+            pickupFizzle = true;
             eraseObject = 1;
             break;
         }
@@ -821,7 +820,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO
                 );
             }
-            fizzleType = true;
+            pickupFizzle = true;
             eraseObject = 1;
             break;
 
@@ -1026,7 +1025,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 resourceAmount = 1;
             EventWindow(
                 IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
-                    + MINE_RESOURCE_ICON_OFFSET,
+                    + EVENT_TEXT_MINE_CAPTURED_BASE,
                 NORMAL_DIALOG_INFO,
                 "",
                 IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
@@ -1144,7 +1143,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
             }
             eraseObject = 1;
-            fizzleType = true;
+            pickupFizzle = true;
             eventHero->CheckLevel();
             break;
 
@@ -1524,7 +1523,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
             eraseObject = 1;
-            fizzleType = true;
+            pickupFizzle = true;
             SetEnvironmentOrigin(
                 m_mapOriginX + ENVIRONMENT_BORDER,
                 m_mapOriginY + ENVIRONMENT_BORDER,
@@ -1739,7 +1738,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                          : cell->m_objectMetadata
             );
             eraseObject = 1;
-            fizzleType = true;
+            pickupFizzle = true;
             break;
 
         case MAP_OBJECT_WINDMILL:
@@ -1791,7 +1790,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 RecruitEvent(eventHero, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
                     eraseObject = 1;
-                    fizzleType = true;
+                    pickupFizzle = true;
                 }
             }
             break;
@@ -2476,7 +2475,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveArtifact(eventHero, eventArtifact, true, cell->m_objectMetadata);
                 eraseObject = 1;
-                fizzleType = true;
+                pickupFizzle = true;
                 break;
             }
 
@@ -2495,7 +2494,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 GiveArtifact(eventHero, eventArtifact, true, cell->m_objectMetadata);
                 eraseObject = 1;
-                fizzleType = true;
+                pickupFizzle = true;
                 break;
             }
 
@@ -2607,7 +2606,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     giveArtifact:
                         GiveArtifact(eventHero, eventArtifact, true);
                         eraseObject = 1;
-                        fizzleType = true;
+                        pickupFizzle = true;
                         break;
 
                     case ARTIFACT_EVENT_MODE_GOLD:
@@ -2792,7 +2791,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1
                     );
             }
-            fizzleType = true;
+            pickupFizzle = true;
             eraseObject = 1;
             break;
 
@@ -3368,7 +3367,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     UpdBottomView(true, true, true);
     if (eraseObject) {
         EraseObj(cell, x, y);
-        FizzleCenter(fizzleType);
+        FizzleCenter(pickupFizzle);
     } else {
         CompleteDraw(0);
     }
@@ -3393,7 +3392,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 #undef eventType
 #undef eventValue
 #undef firstUpgrade
-#undef fizzleType
+#undef pickupFizzle
 #undef guardedCount
 #undef guardedMonster
 #undef heroCombatResult
@@ -3667,7 +3666,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     i32 colorIndex = cell->m_objectMetadata;
     colorIndex &= EVENT_BARRIER_COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
-    passwordIndex >>= PASSWORD_SHIFT;
+    passwordIndex >>= EVENT_BARRIER_PASSWORD_SHIFT;
     char word[INPUT_LENGTH];
 
     sprintf(
@@ -3707,7 +3706,7 @@ i8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString) {
 
     while (1) {
         chCount++;
-        if (chCount == SITE_STRING_LIMIT)
+        if (chCount == STR_EQ_NO_CASE_LIMIT)
             return 1;
         fstUpper = toupper(static_cast<i32>(*firstPointer));
         sndUpper = toupper(static_cast<i32>(*secondPointer));
@@ -3732,7 +3731,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
-    passwordIndex >>= PASSWORD_SHIFT;
+    passwordIndex >>= EVENT_BARRIER_PASSWORD_SHIFT;
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &playSample);
     /* "Вы зашли в шатер и увидели пожилую женщину с магическим камнем в руках.
@@ -3874,7 +3873,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     -1,
                     NORMAL_DIALOG_INFO,
                     localization::Tr("event.inline.fae6f0b9369f8351"),
-                    SITE_MERMAID_WINDOW_ICON,
+                    NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
                     0,
@@ -3896,7 +3895,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     currentSiteType &= EVENT_BARRIER_COLOR_MASK;
                     if ((currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                             == MAP_OBJECT_EXPANSION_OBJECT
-                        && currentSiteType == SITE_HUT_COLOR) {
+                        && currentSiteType == SITE_EYE_OF_MAGI_TYPE) {
                         gpGame->SetVisibility(mapX, mapY, giCurPlayer, SITE_VISIBILITY_RADIUS);
                         CompleteDraw(0);
                         UpdateScreen(0, 0);
@@ -5122,7 +5121,7 @@ CombatResult advManager::CombatMonsterEvent(
     mapCell*,
     i32 mapX,
     i32 mapY,
-    i32 defender,
+    i32 monstersAttack,
     i32 combatX,
     i32 combatY,
     CreatureType secondaryType,
@@ -5260,7 +5259,7 @@ CombatResult advManager::CombatMonsterEvent(
             savedCounts[placement[stackIndex]];
     }
 
-    if (defender != 0)
+    if (monstersAttack != 0)
         battleOutcome = DoCombat(
             combatX,
             combatY,
@@ -5645,7 +5644,7 @@ void advManager::HeroLoses(hero* lostHero) {
         CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
         UpdateScreen(0, 0);
         lostHero->Deallocate(1);
-        FizzleCenter(EVENT_FIZZLE_HERO_LOSS);
+        FizzleCenter(EVENT_FIZZLE_KILL);
         UpdateRadar(1, 0);
         UpdateHeroLocators(1, 1);
     }
@@ -5696,13 +5695,13 @@ void advManager::FizzleCenter(i32 fizzleType) {
         return;
     {
         switch (fizzleType) {
-            case EVENT_FIZZLE_HERO_LOSS:
+            case EVENT_FIZZLE_KILL:
                 sprintf(
                     gText,
                     "killfade.82M"
                 );
                 break;
-            case EVENT_FIZZLE_ARTIFACT:
+            case EVENT_FIZZLE_PICKUP:
                 sprintf(
                     gText,
                     "pickup%02d.82M",
@@ -5748,7 +5747,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
 #define boat boat_k
 #define combatResult combatResult_d
 #define creatureCosts creatureCosts_a
-#define creatureFlag creatureFlag_l
+#define freeRecruit creatureFlag_l
 #define creatureType creatureType_i
 #define defenderLoss defenderLoss_k
 #define eraseObject eraseObject_l
@@ -5768,9 +5767,9 @@ void advManager::FizzleCenter(i32 fizzleType) {
 #define otherHero otherHero_e
 #define primaryAmount primaryAmount_j
 #define primaryReward primaryReward_e
-#define purchaseCost purchaseCost_i
+#define purchaseValue purchaseCost_i
 #define purchaseCount purchaseCount_o
-#define purchaseValue purchaseValue_a
+#define replacementSlot purchaseValue_a
 #define pyramidBattleValue pyramidBattleValue_l
 #define savedShowIt savedShowIt_e
 #define secondaryAmount secondaryAmount_j
@@ -5815,16 +5814,16 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 H2_UNUSED(eventWork)[IDX(RES_COUNT)];
     i32 eraseObject;
     i32 battleResult;
-    b32 creatureFlag;
+    b32 freeRecruit;
     i32 oldPlayer;
-    i32 purchaseCost;
+    i32 purchaseValue;
     i32 battleWon;
     i32 pyramidBattleValue;
     i32 H2_UNUSED(unusedResult);
     i32 index;
     i32 purchaseCount;
     CreatureType creatureType;
-    i32 purchaseValue;
+    i32 replacementSlot;
     i32 abandonedMineValue;
     town* occupiedTown;
     playerData* oldPlayerData;
@@ -6217,78 +6216,78 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_TREE_CITY:
             creatureType = CREATURE_SPRITE;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_RUINS:
             creatureType = CREATURE_MEDUSA;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_TROLL_BRIDGE:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType = CREATURE_TROLL;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_CITY_OF_DEAD:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType = CREATURE_POWER_LICH;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_DRAGON_CITY:
             if (cell->m_objectMetadata & DWELLING_GUARDED_FLAG)
                 break;
             creatureType = CREATURE_RED_DRAGON;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_HALFLING_HOLE:
             creatureType = CREATURE_HALFLING;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_ANCIENT_LAMP:
             creatureType = CREATURE_GENIE;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_WAGON_CAMP:
             creatureType = CREATURE_ROGUE;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_DESERT_TENT:
             creatureType = CREATURE_NOMAD;
-            creatureFlag = false;
+            freeRecruit = false;
             goto creaturePurchase;
         case MAP_OBJECT_WATCH_TOWER:
             creatureType = CREATURE_ORC;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_TREE_HOUSE:
             creatureType = CREATURE_SPRITE;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_ARCHER_HOUSE:
             creatureType = CREATURE_ARCHER;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_GOBLIN_HUT:
             creatureType = CREATURE_GOBLIN;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_PEASANT_HUT:
             creatureType = CREATURE_PEASANT;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_DWARF_COTTAGE:
         case MAP_OBJECT_SIRENS:
             creatureType = CREATURE_DWARF;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_CAVE:
             creatureType = CREATURE_CENTAUR;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
         case MAP_OBJECT_EXCAVATION:
             creatureType = CREATURE_SKELETON;
-            creatureFlag = true;
+            freeRecruit = true;
             goto creaturePurchase;
 
         creaturePurchase:
@@ -6296,20 +6295,20 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
                     creatureType,
                     cell->m_objectMetadata,
-                    creatureFlag,
+                    freeRecruit,
                     purchaseCount,
-                    purchaseCost,
-                    purchaseValue
+                    purchaseValue,
+                    replacementSlot
                 );
                 if (purchaseCount > 0) {
                     gpGame->GiveArmy(
                         &eventHero->m_army,
                         creatureType,
                         purchaseCount,
-                        purchaseValue
+                        replacementSlot
                     );
                     cell->m_objectMetadata -= purchaseCount;
-                    if (creatureFlag == 0) {
+                    if (freeRecruit == 0) {
                         GetMonsterCost(creatureType, creatureCosts);
                         for (index = 0; index < IDX(RES_COUNT); ++index)
                             gpCurPlayer->m_resources[index] -=
@@ -6830,7 +6829,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             eventExtra = static_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (eventExtra->active == 0)
                 break;
-            if (Random(0, EVENT_RANDOM_PERCENT_MAX) < EVENT_RANDOM_EVENT_SUCCESS) {
+            if (Random(0, EVENT_RANDOM_PERCENT_MAX) < SPHINX_AI_SUCCESS_CHANCE) {
                 primaryReward = MAP_EVENT_REWARD_NONE;
                 primaryAmount = 0;
                 secondaryReward = MAP_EVENT_REWARD_NONE;
@@ -6894,7 +6893,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 #undef boat
 #undef combatResult
 #undef creatureCosts
-#undef creatureFlag
+#undef freeRecruit
 #undef creatureType
 #undef defenderLoss
 #undef eraseObject
@@ -6914,9 +6913,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 #undef otherHero
 #undef primaryAmount
 #undef primaryReward
-#undef purchaseCost
-#undef purchaseCount
 #undef purchaseValue
+#undef purchaseCount
+#undef replacementSlot
 #undef pyramidBattleValue
 #undef savedShowIt
 #undef secondaryAmount
@@ -6954,7 +6953,7 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
 #endif
 
 #if H2_RETAIL_COMPILER
-#define armyValue armyValue7
+#define experience armyValue7
 #define artifactIndex artifactIndex14
 #define creatureType creatureType3
 #define cursedArtifactCount cursedArtifactCount3
@@ -6976,7 +6975,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 quantity;
     i32 H2_UNUSED(unusedTriple)[3];
     CreatureType creatureType;
-    i32 armyValue;
+    i32 experience;
 
     cursedArtifactCount = 0;
     siteType = static_cast<GenericSiteType>(cell->m_objectMetadata);
@@ -7034,7 +7033,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             break;
         case GENERIC_SITE_SIRENS:
             if (!(eventHero->m_eventFlags & HERO_EVENT_SIRENS)) {
-                armyValue = 0;
+                experience = 0;
                 for (artifactIndex = 0; artifactIndex < ARMY_GROUP_SLOT_COUNT; artifactIndex++) {
                     creatureType = eventHero->m_army.m_creatureTypes[artifactIndex];
                     if (creatureType != CREATURE_NONE) {
@@ -7042,14 +7041,14 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                         if (quantity > EVENT_SIRENS_MIN_ARMY_QUANTITY) {
                             eventHero->m_army.m_creatureCounts[artifactIndex] =
                                 quantity * AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER;
-                            armyValue +=
+                            experience +=
                                 gMonsterDatabase[IDX(creatureType)].hitPoints
                                 * (quantity - eventHero->m_army.m_creatureCounts[artifactIndex]);
                         }
                     }
                 }
-                if (armyValue != 0)
-                    GiveExperience(eventHero, armyValue, 1);
+                if (experience != 0)
+                    GiveExperience(eventHero, experience, 1);
                 eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_SIRENS;
             }
             break;
@@ -7065,7 +7064,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 #if H2_RETAIL_COMPILER
-#undef armyValue
+#undef experience
 #undef artifactIndex
 #undef creatureType
 #undef cursedArtifactCount
@@ -7214,7 +7213,7 @@ void advManager::PlayerMonsterInteract(
     defender = 0;
     gpMouseManager->ShowColorPointer();
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
-    forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
+    forceJoin = cell->m_objectMetadata & IDX(MAP_MONSTER_FORCE_JOIN);
     creatureCount = cell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
     armyRatio = static_cast<double>(
                     gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0)
@@ -7462,7 +7461,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* re
 
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK);
-    forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
+    forceJoin = cell->m_objectMetadata & IDX(MAP_MONSTER_FORCE_JOIN);
     armyRatio = static_cast<double>(
                     gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0)
                 )
