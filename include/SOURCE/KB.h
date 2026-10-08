@@ -38,9 +38,9 @@ class townManager;
 #include <SOURCE/kbTypes.h>
 #include <BASE/message.h>
 #include <BASE/soundManager.h>
-#include <BASE/WINMGR.h>
+#include <BASE/heroWindowManager.h>
 #include <BASE/dialog.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/town.h>
 
 H2_ENUM_BEGIN(GlobalTimerConstant)

@@ -9,7 +9,7 @@
 #include <match.h>
 #include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/ARMY.h>
+#include <SOURCE/army.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/hero.h>
 

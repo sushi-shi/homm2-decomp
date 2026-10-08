@@ -1,5 +1,4 @@
 #include <match.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/kbTypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +18,6 @@
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>

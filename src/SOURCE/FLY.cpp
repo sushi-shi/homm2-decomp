@@ -7,7 +7,6 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/army.h>
 #include <BASE/Misc.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/kbwin.h>

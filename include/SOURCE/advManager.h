@@ -6,9 +6,158 @@
 #include <H2/Macros.h>
 #include <BASE/baseManager.h>
 #include <BASE/widget.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/Viewwrld.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
+#include <BASE/message.h>
+#include <SOURCE/kbTypes.h>
+#include <SOURCE/remoteTypes.h>
+#include <SOURCE/REQUEST.h>
+
+class mapCell;
+struct tag_message;
+
+// Adventure screen geometry: the 480-pixel map frame, the 448-pixel map view
+// inside its 16-pixel border, the radar square to the right of the frame, and
+// the square around the hero that embarking and disembarking fizzle.
+H2_ENUM_BEGIN(AdventureViewportConstant)
+    ADVENTURE_VIEWPORT_EXTENT         = 480,
+    ADVENTURE_VIEW_BORDER             = 16,
+    ADVENTURE_VIEW_SIZE               = 448,
+    ADVENTURE_VIEW_END                = ADVENTURE_VIEW_BORDER + ADVENTURE_VIEW_SIZE,
+    ADVENTURE_RADAR_LEFT              = ADVENTURE_VIEWPORT_EXTENT,
+    ADVENTURE_RADAR_TOP               = ADVENTURE_VIEW_BORDER,
+    ADVENTURE_RADAR_SIZE              = MAP_DIMENSION_XLARGE,
+    ADVENTURE_RADAR_RIGHT             = ADVENTURE_RADAR_LEFT + ADVENTURE_RADAR_SIZE,
+    ADVENTURE_RADAR_BOTTOM            = ADVENTURE_RADAR_TOP + ADVENTURE_RADAR_SIZE,
+    ADVENTURE_RADAR_SMALL_CELL_PIXELS  = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_SMALL,
+    ADVENTURE_RADAR_MEDIUM_CELL_PIXELS = ADVENTURE_RADAR_SIZE / MAP_DIMENSION_MEDIUM,
+    // A large map draws four radar pixels per three cells: one wide cell of
+    // each three, so positions scale by 1 + 1/3, rounded up.
+    ADVENTURE_RADAR_LARGE_SCALE_DIVISOR  = 3,
+    ADVENTURE_RADAR_LARGE_SCALE_ROUNDING = ADVENTURE_RADAR_LARGE_SCALE_DIVISOR - 1,
+    ADVENTURE_HERO_FIZZLE_LEFT        = 192,
+    ADVENTURE_HERO_FIZZLE_TOP         = 192,
+    ADVENTURE_HERO_FIZZLE_SIZE        = 96
+H2_ENUM_END(AdventureViewportConstant)
+
+// advmice.mse pointer frames of the adventure screen; frames from SCROLL_FIRST
+// up to SCROLL_END are the eight edge-scroll arrows.
+H2_ENUM_BEGIN(AdventurePointerFrame)
+    ADVENTURE_POINTER_DEFAULT      = 0,
+    ADVENTURE_POINTER_HERO         = 2,
+    ADVENTURE_POINTER_TOWN         = 3,
+    ADVENTURE_POINTER_MOVE         = 4,
+    ADVENTURE_POINTER_ATTACK       = 5,
+    ADVENTURE_POINTER_SAIL         = 6,
+    ADVENTURE_POINTER_DISEMBARK    = 7,
+    ADVENTURE_POINTER_SELECT_HERO  = 8,
+    ADVENTURE_POINTER_ACTION       = 9,
+    ADVENTURE_POINTER_WATER_ACTION = 28,
+    ADVENTURE_POINTER_SCROLL_FIRST = 32,
+    ADVENTURE_POINTER_SCROLL_END   = 40
+H2_ENUM_END(AdventurePointerFrame)
+
+// Current screen and fixed adventure viewport; clipping policy remains explicit.
+#define DRAW_ADVENTURE_ICON(pic, x, y, frame, clip)                                                \
+    IconToBitmap(                                                                                  \
+        (pic),                                                                                     \
+        gpWindowManager->m_screen,                                                                 \
+        (x),                                                                                       \
+        (y),                                                                                       \
+        (frame),                                                                                   \
+        (clip),                                                                                    \
+        0,                                                                                         \
+        0,                                                                                         \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        ADVENTURE_VIEWPORT_EXTENT,                                                                 \
+        0                                                                                          \
+    )
+#define DRAW_FLIPPED_ADVENTURE_ICON(pic, x, y, frame, clip) \
+    FlipIconToBitmap((pic), gpWindowManager->m_screen, (x), (y), (frame), (clip), \
+                     0, 0, ADVENTURE_VIEWPORT_EXTENT, ADVENTURE_VIEWPORT_EXTENT, 0)
+
+H2_ENUM_BEGIN(AdventureRemoteConstant)
+    ADVMGR_REMOTE_DATA_REQUEST             = 1,
+H2_ENUM_END(AdventureRemoteConstant)
+
+H2_ENUM_BEGIN(AdventureBottomViewSharedConstant)
+    BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION = 5000
+H2_ENUM_END(AdventureBottomViewSharedConstant)
+
+H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
+    ADVMGR_ENVIRONMENT_SOUND_NONE     = -1,
+    ADVMGR_SOUND_BUOY                 = 0,
+    ADVMGR_SOUND_SHIPWRECK            = 1,
+    ADVMGR_SOUND_COAST                = 2,
+    ADVMGR_SOUND_ORACLE               = 3,
+    ADVMGR_SOUND_STONE_LITHS          = 4,
+    ADVMGR_SOUND_SMALL_VOLCANO        = 5,
+    ADVMGR_SOUND_LAVA_POOL            = 6,
+    ADVMGR_SOUND_ALCHEMIST_LAB        = 7,
+    ADVMGR_SOUND_ALCHEMIST_LAB_ACTION = 8,
+    ADVMGR_SOUND_WATER_WHEEL          = 9,
+    ADVMGR_SOUND_CAMPFIRE             = 10,
+    ADVMGR_SOUND_WINDMILL             = 11,
+    ADVMGR_SOUND_FOUNTAIN             = 12,
+    ADVMGR_SOUND_WATERING_HOLE        = 13,
+    ADVMGR_SOUND_STREAM               = 14,
+    ADVMGR_SOUND_MINE                 = 15,
+    ADVMGR_SOUND_SAWMILL              = 16,
+    ADVMGR_SOUND_DAEMON_CAVE          = 17,
+    ADVMGR_SOUND_SHRINE               = 18,
+    ADVMGR_SOUND_SEAGULLS             = 19,
+    ADVMGR_SOUND_COASTLINE            = 20,
+    ADVMGR_SOUND_TAR_PIT              = 21,
+    ADVMGR_SOUND_TRADING_POST         = 22,
+    ADVMGR_SOUND_DERELICT_SHIP        = 23,
+    ADVMGR_SOUND_RUINS                = 24,
+    ADVMGR_SOUND_DWELLING             = 25,
+    ADVMGR_SOUND_ABANDONED_MINE       = 26,
+    ADVMGR_SOUND_LARGE_VOLCANO        = 27,
+    ADVMGR_ENVIRONMENT_SOUND_COUNT    = 28
+H2_ENUM_CLASS_END(AdventureEnvironmentSoundId)
+
+H2_ENUM_CLASS_BEGIN(AdventureCommand)
+    ADVMGR_COMMAND_NONE               = -1,
+    ADVMGR_COMMAND_MOVE_TO            = 1,
+    ADVMGR_COMMAND_HERO_VIEW          = 2,
+    ADVMGR_COMMAND_TOWN_VIEW          = 3,
+    ADVMGR_COMMAND_SELECT_HERO        = 4,
+    ADVMGR_COMMAND_SELECT_TOWN        = 5,
+    ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW = 6,
+    ADVMGR_COMMAND_CONTINUE_ROUTE     = 7
+H2_ENUM_CLASS_END(AdventureCommand)
+
+H2_ENUM_CLASS_BEGIN(AdventureDrawMask)
+    ADVMGR_DRAW_GROUND      = 0x01,
+    ADVMGR_DRAW_OBJECT      = 0x02,
+    ADVMGR_DRAW_OVERLAY     = 0x04,
+    ADVMGR_DRAW_HERO        = 0x08,
+    ADVMGR_DRAW_CLOUD       = 0x20,
+    ADVMGR_DRAW_OVERLAY_TOP = 0x40,
+    ADVMGR_DRAW_HERO_SHADOW = 0x80
+H2_ENUM_CLASS_END(AdventureDrawMask)
+H2_ENUM_FLAGS(AdventureDrawMask)
+
+H2_ENUM_BEGIN(AdventureSystemOptionsConstant)
+    ADVMGR_SYSTEM_OPTIONS_WINDOW_X                = 160,
+    ADVMGR_SYSTEM_OPTIONS_WINDOW_Y                = 33,
+    ADVMGR_SYSTEM_OPTIONS_TITLE                   = 2,
+    ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE        = 2,
+    ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE        = 4,
+    ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE = 10,
+    ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE        = 13,
+    ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME   = 9,
+    ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE    = 15,
+    ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE        = 18,
+    ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE       = 20,
+    ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET          = 10,
+H2_ENUM_END(AdventureSystemOptionsConstant)
+
+H2_ENUM_BEGIN(AdventureAIStorageConstant)
+    ADVMGR_PLACE_VISIT_COUNT      = 30,
+    ADVMGR_PLACE_COORDINATE_COUNT = 2
+H2_ENUM_END(AdventureAIStorageConstant)
 
 class armyGroup;
 class hero;
@@ -440,5 +589,49 @@ extern struct tag_message CDMsg;
 extern i8 bComboDraw[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE]
                     [ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
 extern i32 iLastAnimFrame;
+
+i32 SaveGame(void);
+MessageDispatchResult DimensionDoorHandler(struct tag_message& message);
+MessageDispatchResult TownPortalHandler(struct tag_message& message);
+void ComputeAdvNetControl(void);
+i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask);
+MessageDispatchResult APanelHandler(struct tag_message& message);
+MessageDispatchResult CPanelHandler(struct tag_message& message);
+void UpdateSystemOptions(i32 initialDraw);
+MessageDispatchResult SystemOptionsHandler(struct tag_message& message);
+i32 GetMobilityFrame(i32 mobility);
+i32 GetManaFrame(i32 mana);
+u8 StopOnTrigger(class mapCell* cell);
+
+extern float fFirstWeekTownFV;
+extern i32 iVepCacheHits;
+extern i32 iTotalVepHits;
+extern b32 giShowComputerRoute;
+extern i32l glLastStartTick;
+extern i32l glCurTicks;
+extern i32l glTotalTicks;
+extern float gfAttackHumanBonus;
+extern float gfAttackComputerBonus;
+extern b32 bSVSearchArrayInUse;
+extern b32 bEvaluatingTravelGates;
+extern b32 gbReduceByBerserk;
+extern float fBerserkFactor;
+extern i32 giMaxHeroesForThisPlayer;
+extern float fReduceFactor;
+extern i32 giBestShipyardDist;
+extern i16 gaiHeroLiveChance[GAME_HERO_COUNT];
+extern i32 giHumanTownConquered;
+extern i32 costTemp[IDX(RES_COUNT)];
+extern b32 gbPossibleShipyardFound;
+extern i32 iCurPlaceToVisit;
+extern i32 giBestShipyardId;
+extern b32 gbActualBoatFound;
+extern float gfHeroInteractionBonus[GAME_HERO_COUNT];
+extern b32 gbBerserk;
+extern i32 giCurAIHeroMorale;
+extern i32 iPlacesVisited[ADVMGR_PLACE_VISIT_COUNT][ADVMGR_PLACE_COORDINATE_COUNT];
+extern b32 gbTroopReload;
+extern i32 giCurAIHeroLuck;
+extern b32 gbActualShipyardFound;
 
 #endif

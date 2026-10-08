@@ -20,7 +20,7 @@
 #include <SOURCE/townManager.h>
 #include <BASE/dialog.h>
 #include <SOURCE/kbTypes.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
     WINDOW_X                    = 0x8f,

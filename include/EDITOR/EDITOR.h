@@ -9,7 +9,7 @@
 #include <Domains.h>
 #include <BASE/message.h>
 #include <EDITOR/fullMap.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 H2_ENUM_BEGIN(EditorStatusBar)
     // The status line under the map view.

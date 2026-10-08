@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/remoteTypes.h>
 
 H2_ENUM_BEGIN(RemoteStorageConstant)

@@ -60,7 +60,7 @@ directory. Nothing in the binary hands you a symbol.
    `homm2 sema rva <rva>` (claim/src/match dossier) —
    see `homm2 sema -h`. Raw fallback: `llvm-objdump -dr --start-address=<rva>
    --stop-address=<rva+size> build/delink/<TIER>/<TU>.c.obj`. Read the class layout from
-   `include/<TIER>/<TU>.h` (already recovered).
+   class header (`include/SOURCE/hero.h`; already recovered).
 2. **Reconstruct types + bodies.** Write C++ that lowers to the same instruction
    selection. On base-profile TUs `/Od` is **literal**: each statement compiles
    straight down, full `ebp` frames, every local spilled to the stack — so the body
@@ -237,7 +237,7 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   mangling) and recover the devs' shape. Reserve casts for reinterpretations the
   binary proves (ptr↔DWORD storage, fn-ptr→void* params).
 - **Headers, not local decls (gate-enforced).** Types come from the recovered
-  `include/<TIER>/*.h`; call a cross-TU function via its owner header `<TIER>/<TU>.h`; CRT from
+  `include/<TIER>/*.h`; call a cross-TU function via its owner header (the class header, or `<TIER>/<TU>.h`); CRT from
   real `<io.h>`/`<string.h>`; Win32 from the real MSVC SDK `<windows.h>`.
   Include the SPECIFIC headers you use (no `_all.h`). Put NO local
   `class/struct/enum`/`extern`/forward-decl in a .cpp — `homm2 build`'s header-discipline gates

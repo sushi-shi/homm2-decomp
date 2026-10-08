@@ -60,7 +60,8 @@ rejected.
 
 ### 5. `defs-declared` — every definition has a header declaration
 Every free function **defined** in a `.cpp` is **declared** in that TU's owner header
-`include/<TIER>/<TU>.h`, and the `.cpp` `#include`s its own header. Member functions are
+(`include/<TIER>/<TU>.h`, or the class header `OWNER_HEADERS` names, such as
+`SOURCE/hero.h` for `HERO.cpp`), and the `.cpp` `#include`s it. Member functions are
 exempt (declared in their class header). Closes the loop with gate 1: a definition's prototype
 lives in a header, so callers share the one canonical declaration. Owner headers are
 bootstrapped by `gen_module_header.py`.
@@ -144,7 +145,7 @@ and `ninja link-audit` attributes the residual.
 
 ## The owner model these enforce
 
-- A symbol defined in `<TU>.cpp` is **declared only** in `include/<TIER>/<TU>.h`; callers
+- A symbol defined in `<TU>.cpp` is **declared only** in its owner header; callers
   `#include` that specific header (there is no `_all.h` / `_globals.h` umbrella).
 - Types come from the recovered class headers; globals from their owner-TU headers (a plain
   `extern`) + the `DATA(VA) T g;` definition in the owner `.cpp`; Win32 from

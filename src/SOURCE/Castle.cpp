@@ -8,10 +8,8 @@
 #include <EDITOR/fullMap.h>
 #include <EDITOR/mapcell.h>
 #include <SOURCE/Castle.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
-#include <SOURCE/TOWNMGR.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/bankBox.h>
 #include <SOURCE/game.h>

@@ -1,6 +1,5 @@
 #include <match.h>
 #include <SOURCE/army.h>
-#include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>

@@ -80,7 +80,7 @@ SAFE_CALLING_CONVENTIONS = ("__cdecl", "__fastcall", "__stdcall")
 CURATED_INCLUDES = (
     "<stddef.h>", "<limits.h>", "<string.h>", "<stdlib.h>",
     "<match.h>", "<Domains.h>", "<windows.h>", "<BASE/bitmap.h>",
-    "<BASE/IconEntry.h>", "<BASE/WINMGR.h>",
+    "<BASE/IconEntry.h>", "<BASE/heroWindowManager.h>",
 )
 DEFAULT_COMPILE_TIMEOUT_SECONDS = 120.0
 DEFAULT_MAX_DECLARATIONS = 64

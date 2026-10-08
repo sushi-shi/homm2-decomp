@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <winsock.h>
 #include <SOURCE/remoteTypes.h>
 

@@ -12,7 +12,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/Overview.h>
 #include <EDITOR/mapcell.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <BASE/display.h>
 #include <BASE/soundManager.h>
 

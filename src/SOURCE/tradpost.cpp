@@ -9,7 +9,7 @@
 #include <BASE/widget.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/playerData.h>

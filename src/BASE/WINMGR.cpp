@@ -1,4 +1,6 @@
-#include <BASE/WINMGR.h>
+#include <match.h>
+
+#include <BASE/heroWindowManager.h>
 
 H2_ENUM_BEGIN(WindowColorCycleConstant)
     CYCLE_FRAME_COUNT                    = 8,
@@ -45,12 +47,6 @@ H2_ENUM_BEGIN(WindowFizzleConstant)
     SCREENSHOT_FILENAME_CAPACITY  = 16
 H2_ENUM_END(WindowFizzleConstant)
 
-#ifdef __clang__
-#define DATA(addr) __attribute__((annotate("data:" #addr)))
-#else
-#define DATA(addr)
-#endif
-
 DATA(0x005348f4) i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 DATA(0x00534954) i16 memSelector;
 
@@ -59,10 +55,6 @@ static inline u32& FadeSavedUpdate(void) {
     return savedUpdate;
 }
 
-#undef DATA
-#include <match.h>
-
-
 DATA(0x0053495c) i32 iCombatCycleFrame = 0;
 DATA(0x0051dfe4) u8 gbEveryOtherCycle = true;
 DATA(0x00534960) i32 iCycle1Count = 0;
@@ -70,7 +62,6 @@ DATA(0x00534964) i32 iCycle2Count = 0;
 DATA(0x00534968) i32 iCycle3Count = 0;
 DATA(0x0053496c) i32 iDialogNestCount = 0;
 
-#include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>

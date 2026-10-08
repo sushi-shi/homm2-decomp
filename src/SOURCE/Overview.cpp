@@ -11,11 +11,9 @@
 #include <BASE/resourceManager.h>
 #include <BASE/textWidget.h>
 #include <BASE/executive.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/game.h>

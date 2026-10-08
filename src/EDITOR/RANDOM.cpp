@@ -8,7 +8,6 @@
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/OVERLAY.h>
-#include <EDITOR/EDITMGR.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/specedit.h>
 #include <BASE/Misc.h>

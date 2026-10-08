@@ -8,7 +8,6 @@
 // and the x_loc frame ranges.
 
 #include <match.h>
-#include <EDITOR/EDITMGR.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>
 #include <EDITOR/setup.h>
@@ -25,7 +24,7 @@
 #include <EDITOR/RANDOM.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/configTypes.h>
 #include <BASE/bitmap.h>
@@ -120,7 +119,7 @@ H2_ENUM_BEGIN(EditCellLayer)
 H2_ENUM_END(EditCellLayer)
 
 H2_ENUM_BEGIN(EditRadarGeometry)
-    // The adventure radar square (ADVMGR.h) of the 640-pixel screen: a small
+    // The adventure radar square (advManager.h) of the 640-pixel screen: a small
     // map fills it with 4x4 dots, a medium one with 2x2, a large one with a
     // 2-1-1 pattern of rows and columns (ADVENTURE_RADAR_LARGE_SCALE_DIVISOR),
     // an extra large one with 1x1.

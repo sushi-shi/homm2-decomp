@@ -19,13 +19,12 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/SETUP.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Newgame.h>
-#include <SOURCE/GAME.h>
 #include <BASE/dialog.h>
 #include <BASE/widget.h>
 

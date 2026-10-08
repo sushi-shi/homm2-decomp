@@ -28,8 +28,10 @@ byte-identical to retail.
 - Ordinary C++ with real types. No decompiler output, byte blobs, naked
   assembly, dummy bodies, address masking, C-style casts, or compiler-state
   steering in retained source; game code uses the `H2/Ints.h` aliases.
-- One TU is `src/<TIER>/<TU>.cpp` with its declarations in
-  `include/<TIER>/<TU>.h`, functions in retail-RVA order, marked `VA(...)`,
+- One TU is `src/<TIER>/<TU>.cpp`. A class and its unit's free functions are
+  declared in one camelCase header (`include/SOURCE/hero.h`), a unit without
+  a class in `include/<TIER>/<TU>.h`, shared types in camelCase `*Types.h`.
+  Functions are in retail-RVA order, marked `VA(...)`,
   globals `DATA(...)`, vtables `VTBL`/`VTBL2`. Data identities, types and
   initializers come from retail bytes and their code users.
 - Compiler profiles live in `config/units.toml`; changing one needs

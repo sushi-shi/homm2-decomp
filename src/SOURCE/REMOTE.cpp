@@ -16,11 +16,10 @@
 #include <SOURCE/Netbios.h>
 #include <SOURCE/netwin.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/PHILAI.h>
+#include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/GAME.h>
 #include <BASE/dialog.h>
 
 H2_ENUM_BEGIN(RemoteImplementationConstant)

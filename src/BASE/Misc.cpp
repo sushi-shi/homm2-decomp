@@ -141,7 +141,7 @@ H2_ENUM_END(FileIdHashConstant)
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>

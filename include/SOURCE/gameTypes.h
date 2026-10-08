@@ -1,13 +1,10 @@
-#ifndef HOMM2_GAME_H
-#define HOMM2_GAME_H
+#ifndef HOMM2_SOURCE_GAMETYPES_H
+#define HOMM2_SOURCE_GAMETYPES_H
 
 #include <match.h>
 #include <Domains.h>
-#include <BASE/message.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/kbTypes.h>
-
-struct tag_message;
 
 H2_ENUM_BEGIN(PlayerColor)
     PLAYER_COLOR_BLUE   = 0,
@@ -183,26 +180,5 @@ H2_ENUM_BEGIN(GameWaitConstant)
     WAIT_BOTTOM_VIEW_TIMEOUT = 9999999,
     WAIT_AMBIENT_MUSIC       = MUSIC_TRACK_NEW_MONTH
 H2_ENUM_END(GameWaitConstant)
-
-i32 GetNumObelisks(i32 player);
-void ComputeUALoc(i32 playerIndex);
-void GenerateStandardFileName(char* source, char* destination);
-MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
-MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
-MessageDispatchResult ViewArmyHandler(struct tag_message& message);
-i32 IsCursedItem(ArtifactType item);
-i32 CalcBaseScore(i32 days);
-void WriteDiffHeaderInfo(u8 command, i32 length, u8* buffer, i32* position);
-i32 GetSkipCopyLen(u8* buffer, i32* position);
-void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
-void CreateJoinFile(char* oldName, char* diffName, char* joinName);
-EventExtra* GetMapEvent(i32 x, i32 y);
-void CheckValidAvailableHeroes(void);
-i32 CalcFileCRC(char* file);
-void CompressTest2(void);
-void CompressTest(void);
-void CompressTest3(void);
-
-extern bchar bMapInitialized;
 
 #endif

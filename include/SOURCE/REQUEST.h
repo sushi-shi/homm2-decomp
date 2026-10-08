@@ -3,7 +3,7 @@
 
 #include <match.h>
 #include <Domains.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 H2_ENUM_BEGIN(MapHeaderConstant)
     MAP_HEADER_SIZE                 = 0x1a4,

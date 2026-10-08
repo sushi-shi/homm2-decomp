@@ -4,7 +4,6 @@
 // assertion names it; Open stores the class name "eventsManager".
 
 #include <match.h>
-#include <EDITOR/EVENTMGR.h>
 #include <EDITOR/eventsManager.h>
 #include <EDITOR/editManager.h>
 #include <EDITOR/EDITOR.h>

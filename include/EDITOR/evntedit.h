@@ -7,7 +7,7 @@
 
 #include <Domains.h>
 #include <BASE/message.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 
 H2_ENUM_BEGIN(EventEditConstant)
     // evntedit.bin's controls; the message is EVENT_TEXT_FIELD.

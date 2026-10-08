@@ -125,7 +125,9 @@ Every entry point keeps `homm2.core.usage.logged` (`homm2 audit usage`).
 
 ## Repository model
 
-- One TU lives at `src/<TIER>/<TU>.cpp`; its declarations live in
+- One TU lives at `src/<TIER>/<TU>.cpp`. A class and the free functions of its
+  unit are declared in one camelCase header named for the class
+  (`include/SOURCE/hero.h` for `HERO.cpp`); a unit without a class keeps
   `include/<TIER>/<TU>.h`. Define functions in retail-RVA order.
 - Mark functions with `VA(0x........, 0x..)`, global definitions with `DATA(<VA>)`,
   primary vtables with `VTBL(Class, <VA>)`, and secondary base-specific vtables with

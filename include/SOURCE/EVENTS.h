@@ -3,7 +3,7 @@
 
 #include <Domains.h>
 #include <SOURCE/kbTypes.h>
-#include <SOURCE/GAME.h>
+#include <SOURCE/gameTypes.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 

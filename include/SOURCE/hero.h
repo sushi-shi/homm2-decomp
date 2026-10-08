@@ -5,6 +5,7 @@
 #include <Domains.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/kbTypes.h>
+#include <BASE/message.h>
 
 class town;
 
@@ -223,5 +224,15 @@ extern class heroWindow* gheroWin;
 extern i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT];
 extern i32 iOrigHeroViewID;
 extern b32 gbNoDismiss;
+
+struct tag_message;
+
+void HeroMessageUpdate(H2_CONST char* text);
+void UpdateHeroScreenStatusBar(struct tag_message& message);
+MessageDispatchResult HeroHandler(struct tag_message& message);
+void RedrawHeroScreen(void);
+i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut);
+void SetupHeroView(void);
+void DoHeroSplit(i32 destinationSlot, i32 sourceSlot);
 
 #endif

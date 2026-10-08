@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <match.h>
-#include <BASE/INPUTMGR.h>
+#include <BASE/inputManager.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/soundManager.h>

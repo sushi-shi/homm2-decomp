@@ -12,7 +12,18 @@ from homm2.core.usage import logged
 #: A unit whose free functions live in a camelCase header named for its class
 #: or role (HoMM1's layout) rather than in include/<TIER>/<TU>.h.
 OWNER_HEADERS = {
+    "BASE/INPUTMGR": "BASE/inputManager.h",
+    "BASE/WINMGR": "BASE/heroWindowManager.h",
+    "EDITOR/EDITMGR": "EDITOR/editManager.h",
+    "EDITOR/EVENTMGR": "EDITOR/eventsManager.h",
+    "SOURCE/ADVMGR": "SOURCE/advManager.h",
+    "SOURCE/ARMY": "SOURCE/army.h",
+    "SOURCE/CMBTMGR": "SOURCE/combatManager.h",
+    "SOURCE/GAME": "SOURCE/game.h",
+    "SOURCE/HERO": "SOURCE/hero.h",
+    "SOURCE/PHILAI": "SOURCE/philAI.h",
     "SOURCE/SMACKMGR": "SOURCE/smackManager.h",
+    "SOURCE/TOWNMGR": "SOURCE/townManager.h",
 }
 
 

@@ -9,12 +9,8 @@
 #include <BASE/icon.h>
 #include <BASE/mouseManager.h>
 #include <BASE/resourceManager.h>
-#include <SOURCE/ADVMGR.h>
 #include <SOURCE/EVENTS.h>
-#include <SOURCE/GAME.h>
-#include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/TOWNMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>

@@ -2,7 +2,7 @@
 #define HOMM2_ADVMGR_TYPES_H
 
 #include <match.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/remoteTypes.h>
 

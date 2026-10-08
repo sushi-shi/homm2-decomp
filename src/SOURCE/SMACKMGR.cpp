@@ -14,7 +14,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/smackManager.h>
-#include <SOURCE/ADVMGR.h>
+#include <SOURCE/advManager.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
