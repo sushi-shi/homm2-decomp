@@ -41,7 +41,7 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
             );
     }
 
-    if (gbEnlargeScreenBlit != 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
+    if (gbEnlargeScreenBlit != false && CURRENT_GRAPHICS_CONFIG.fullScreen == false) {
         const platform::Size screen = platform::Video().Resolution();
         if (screen.width == LOGICAL_SCREEN_WIDTH && screen.height == LOGICAL_SCREEN_HEIGHT) {
             if (width < LOGICAL_SCREEN_WIDTH)
@@ -60,7 +60,7 @@ extern "C" void __cdecl BlitBitmapToScreenVesa(
         }
     }
 
-    if (gbLeaveNetBoxAlone != 0) {
+    if (gbLeaveNetBoxAlone != false) {
         if (destinationY >= NET_BOX_TOP)
             return;
         if (destinationY + height >= NET_BOX_TOP)

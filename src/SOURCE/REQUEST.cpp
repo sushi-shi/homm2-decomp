@@ -110,8 +110,8 @@ i32 CheckSumIsDemoOK(const char*) {
     return 1;
 }
 
-i32 ShowThisMapGame(const char* filename) {
-    return 1;
+b32 ShowThisMapGame(const char* filename) {
+    return true;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
     i32 index;
@@ -123,16 +123,16 @@ i32 ShowThisMapGame(const char* filename) {
         }
     }
     if (platform::CompareIgnoringCase(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 i32 ShowThisMap(const char*) {
     return 1;
 }
 
-i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, i32 countOnly) {
+i32 fileRequester::InitializeFiles(const char* directory, const char* pattern, b32 countOnly) {
     SMapHeader header;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
@@ -268,14 +268,14 @@ fileRequester::fileRequester(
     if (!MapExistsForFilter(giMapSizeFilter)) {
         giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
     }
-    InitializeFiles(m_directory, m_filePattern, 0);
+    InitializeFiles(m_directory, m_filePattern, false);
     m_result = RESULT_PENDING;
 }
 
-i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
+b32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
     FileRequesterMapSizeFilter oldFilter = giMapSizeFilter;
     giMapSizeFilter = filter;
-    i32 result = InitializeFiles(m_directory, m_filePattern, 1);
+    i32 result = InitializeFiles(m_directory, m_filePattern, true);
     giMapSizeFilter = oldFilter;
     return result > 0;
 }
@@ -286,7 +286,7 @@ void fileRequester::SetupFiles(void) {
     m_topIndex = 0;
     m_result = RESULT_PENDING;
     m_selectedIndex = FILE_REQUESTER_SELECTION_NONE;
-    InitializeFiles(m_directory, m_filePattern, 0);
+    InitializeFiles(m_directory, m_filePattern, false);
 }
 
 void fileRequester::CleanUpData(void) {
@@ -404,7 +404,7 @@ i32 fileRequester::Open(i32 id) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_MAX_LENGTH, FILE_REQUESTER_FILENAME_ENTRY);
     message.payload.widget.data.value = FILENAME_ENTRY_LIMIT;
     m_window->BroadcastMessage(message);
-    Update(0);
+    Update(false);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         enabled = 1;
     }
@@ -436,7 +436,7 @@ void fileRequester::SetOK(i32 enabled) {
         enabled ? WIDGET_COMMAND_CLEAR_FLAGS : WIDGET_COMMAND_SET_FLAGS,
         FILE_REQUESTER_OK
     );
-    message.payload.widget.data.value = m_active == 1 ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
+    message.payload.widget.data.value = m_active == true ? H2EnumIndex(WIDGET_FLAG_DIMMED) : H2EnumIndex(WIDGET_FLAGS_ARGUMENT_DIMMED);
     m_window->BroadcastMessage(message);
     message.payload.widget.command = enabled ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED);
@@ -482,7 +482,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             }
                         }
                     }
-                    Update(1);
+                    Update(true);
                     break;
                 }
                 case INPUT_SCAN_NUMPAD_8:
@@ -491,7 +491,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (m_topIndex > m_selectedIndex) {
                             --m_topIndex;
                         }
-                        Update(1);
+                        Update(true);
                     }
                     break;
                 case INPUT_SCAN_NUMPAD_2:
@@ -500,7 +500,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (m_topIndex + iMaxListSize <= m_selectedIndex) {
                             ++m_topIndex;
                         }
-                        Update(1);
+                        Update(true);
                     }
                     break;
             }
@@ -512,7 +512,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         case FILE_REQUESTER_SCROLL_UP:
                             if (m_topIndex > 0) {
                                 --m_topIndex;
-                                Update(1);
+                                Update(true);
                             }
                             break;
                         case FILE_REQUESTER_SCROLL_DOWN:
@@ -521,7 +521,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
                                     m_topIndex = m_fileCount - iMaxListSize;
                                 }
-                                Update(1);
+                                Update(true);
                             }
                             break;
                         case FILE_REQUESTER_OK:
@@ -671,7 +671,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                         }
                                     }
                                 }
-                                Update(1);
+                                Update(true);
                                 break;
                             }
                             case FILE_REQUESTER_FILENAME_ENTRY: {
@@ -721,7 +721,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
                                 broadcastMessage.payload.widget.data.text = m_filename;
                                 m_window->BroadcastMessage(broadcastMessage);
-                                Update(1);
+                                Update(true);
                                 break;
                             }
                             case FILE_REQUESTER_SCROLL_GUTTER: {
@@ -744,7 +744,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     m_topIndex = m_fileCount - iMaxListSize;
                                 if (m_topIndex < 0)
                                     m_topIndex = 0;
-                                Update(1);
+                                Update(true);
                                 break;
                             }
                             case FILE_REQUESTER_SCROLL_KNOB:
@@ -805,7 +805,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     break;
                                 m_selectedIndex = iResult + m_topIndex;
                                 SetOK(1);
-                                Update(1);
+                                Update(true);
                                 break;
                             }
                         }
@@ -815,7 +815,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             break;
     }
 
-    if (closeRequested == 1) {
+    if (closeRequested == true) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
             && platform::CompareIgnoringCase(m_extensions[m_selectedIndex].text, ".GMC") != 0
@@ -850,7 +850,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 }
             }
         }
-        if (closeRequested != 0) {
+        if (closeRequested != false) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
@@ -897,7 +897,7 @@ void fileRequester::DoKnob(void) {
                         topIndex = 0;
                     }
                     m_topIndex = topIndex;
-                    Update(0);
+                    Update(false);
                     m_scrollKnob->m_y = knobMessage.payload.mouse.y - knobOffset;
                     m_window->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                     oldTopIndex = topIndex;
@@ -912,10 +912,10 @@ void fileRequester::DoKnob(void) {
         knobMessage = gpInputManager->GetEvent();
     }
     m_scrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
-    Update(1);
+    Update(true);
 }
 
-void fileRequester::Update(i32 drawWindow) {
+void fileRequester::Update(b32 drawWindow) {
 
     tag_message message;
 

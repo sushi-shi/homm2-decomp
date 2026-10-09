@@ -119,12 +119,12 @@ struct SSmackOptions {
 #pragma pack(pop)
 
 
-void DoAdvance(platform::MovieId movie, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette);
+void DoAdvance(platform::MovieId movie, b32 drawFrame, b32 advanceFrame, b32 updatePalette, b32 skipPalette);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
-i32 PlaySmacker(i32 smackNumber);
+b32 PlaySmacker(i32 smackNumber);
 ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y);
-i8 PointInRect(i32 x, i32 y, struct tag_rect* rect);
+b8 PointInRect(i32 x, i32 y, struct tag_rect* rect);
 
 extern b32 bSmackSound;
 extern class icon* brotherIcon;

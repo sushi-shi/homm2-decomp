@@ -165,36 +165,36 @@ public:
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
-    void SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate);
-    void SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom);
+    void SetupDynamicStuff(b32 redraw, b32 updateKnob, b32 forceUpdate);
+    void SetupNewOverviewType(OverviewType overviewType, b32 redrawFrom);
     void SetupResources(void);
     void Overview(void);
     void DoKnob(void);
-    i32 ProcessIconSelect(i32 widgetId, i32 quickView);
+    b32 ProcessIconSelect(i32 widgetId, i32 quickView);
     i32 SetupCampaignGame(void);
-    i32 SetupBaud(void);
-    i32 SetupComPort(void);
-    i32 SetupHotSeatGame(void);
-    i32 SetupNetworkGame(void);
-    i32 SetupNetworkGame2(void);
-    i32 SetupModemGame(void);
-    i32 SetupMultiPlayerGame(void);
-    i32 SetupGame(void);
-    i32 PickLoadGame(void);
-    i32 HandleCampaignWin(void);
+    b32 SetupBaud(void);
+    b32 SetupComPort(void);
+    b32 SetupHotSeatGame(void);
+    b32 SetupNetworkGame(void);
+    b32 SetupNetworkGame2(void);
+    b32 SetupModemGame(void);
+    b32 SetupMultiPlayerGame(void);
+    b32 SetupGame(void);
+    b32 PickLoadGame(void);
+    b32 HandleCampaignWin(void);
     void PlayPreScenarioSmacker(CampaignSide side, i32 map);
-    void ShowCampaignInfo(i32 viewOnly, i32);
-    void CampaignInfoUpdate(i32 redraw);
+    void ShowCampaignInfo(b32 viewOnly, i32);
+    void CampaignInfoUpdate(b32 redraw);
     void InitEntireCampaign(CampaignSide side);
     void InitCampaignMap(void);
     i32 MineTypesOwned(i32 owner, MineType mineType);
-    i32 SetupPuzzlePieces(i32 player, i32 justCount);
-    i32 IsMobile(i32 heroId);
+    i32 SetupPuzzlePieces(i32 player, b32 justCount);
+    b32 IsMobile(i32 heroId);
     class fullMap* GetWorldMapData(void);
-    i32 CreateBoat(i32 x, i32 y, i32 skipNotify);
+    i32 CreateBoat(i32 x, i32 y, b32 skipNotify);
     i32 Scan(i8* array, i32 start, i32 length);
     i32 RandomScan(i8* array, i32 start, i32 range, i32, i8 target);
-    i32 GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced);
+    i32 GetNewHeroId(i32, FactionType heroClass, b32 requireExperienced);
     i32 GetTownId(i32 column, i32 row);
     hero* GetHero(i32 id) {
         return &m_heroRecs[id];
@@ -212,9 +212,9 @@ public:
         return m_players[player].m_color;
     }
     i32 GetMineId(i32 column, i32 row);
-    i32 SaveGame(const char* filename, i32 generateName, i8);
+    i32 SaveGame(const char* filename, b32 generateName, b8);
     void SetupOrigData(void);
-    void LoadGame(const char* filename, i32 originalDataOnly, i32);
+    void LoadGame(const char* filename, b32 originalDataOnly, b32);
     void GiveTroopsToNeutralTown(i32 townId);
     void GiveTroopsToNeutralTowns(void);
     void NewMap(const char* filename);
@@ -223,7 +223,7 @@ public:
     void RandomizeBarrier(class mapCell* cell);
     void RandomizePassword(class mapCell* cell);
     i32 LoadMap(const char* filename);
-    void ClaimTown(i32 townId, i32 player, i32 suppressVisibility);
+    void ClaimTown(i32 townId, i32 player, b32 suppressVisibility);
     void ClaimMine(i32 mineId, i32 player);
     SpellType ViewSpells(class hero* spellHero, HeroSpellType spellType, MessageDispatchHandler callback, i32 readOnly);
     void UpdateSpellWidgets(void);
@@ -233,9 +233,9 @@ public:
         CreatureType monsterType,
         i32 numTroops,
         class town* castle,
-        i32 disableDismiss,
+        b32 disableDismiss,
         ArmyFacing facing,
-        i32 quickView,
+        b32 quickView,
         class hero* theHero,
         class army* theArmy,
         class armyGroup* theGroup,
@@ -264,7 +264,7 @@ public:
         MapObjectType oldTrigger,
         MapObjectType newTrigger
     );
-    void RandomizeTown(i32 x, i32 y, i32);
+    void RandomizeTown(i32 x, i32 y, b32);
     void RandomizeMine(i32 x, i32 y);
     void InitRandomArtifacts(void);
     i32 GetRandomArtifactId(ArtifactLevelMask levelMask, b32 allowCursed);
@@ -281,16 +281,16 @@ public:
     void ShowComputerScreen(void);
     void ShowHeroesLogo(void);
     void WaitForPlayer(const char* text, i32 player);
-    i32 HasLateOverlay(i32 column, i32 row);
+    b32 HasLateOverlay(i32 column, i32 row);
     void ConvertFlagToLateOverlay(i32 column, i32 row);
-    i32 HasObjectTilesetIndex(i32 column, i32 row, TilesetId tileset, i32 index);
+    b32 HasObjectTilesetIndex(i32 column, i32 row, TilesetId tileset, i32 index);
     void ConvertAllToLateOverlay(i32 column, i32 row);
     void ProcessMapExtra(void);
     void SetupTowns(void);
     void ProcessOnMapHeroes(void);
     void CheckHeroConsistency(void);
-    i32 TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave);
-    i32 ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc, i32 remotePlayer);
+    b32 TransmitSaveGame(i32 remotePlayer, b32 playerExited, b32 useCurrentSave);
+    b32 ReceiveSaveGame(i32 dataSize, i32 expectedCrc, i32 expectedTransmitCrc, i32 remotePlayer);
     void DoNewTurn(void);
     i32 GetBoatsBuilt(void);
     i32 GetNumThievesGuilds(i32 player);
@@ -315,17 +315,17 @@ public:
     void ProcessNewMap(struct SMapHeader* header);
     void InitNewGame(struct SMapHeader* header);
     void SetupNetPlayerNames(void);
-    i32 NewGame(void);
+    b32 NewGame(void);
     void CleanUpNewGameWindow(void);
     void InitNewGameWindow(void);
     void UpdateNewGameWindow(void);
-    i32 ProcessNGKeyPress(struct tag_message& message);
+    b32 ProcessNGKeyPress(struct tag_message& message);
     void NGKPSetupDisplayString(char* text, u16 cursor);
-    void DrawNGKPDisplayString(i32 updateScreen);
+    void DrawNGKPDisplayString(b32 updateScreen);
     void ShowScenInfo(void);
     void GetLossConditionText(char* text);
     void GetVictoryConditionText(char* text);
-    i32 GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer);
+    b32 GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer);
 };
 #pragma pack(pop)
 
@@ -351,7 +351,7 @@ extern i32 giOverviewItems[H2EnumIndex(OVERVIEW_TYPE_COUNT)];
 extern class textWidget* textWidgetTitle[];
 extern H2EnumStorage<CampaignSide, i32> iCurViewSide;
 extern CampaignTrackType iCampaignTrackType;
-extern i32 bCampaignViewOnly;
+extern b32 bCampaignViewOnly;
 extern i32 iCurViewMap;
 extern char* cNGKPDisplay;
 extern b32 gbNewGameShadowHidden;
@@ -365,9 +365,9 @@ void ComputeUALoc(i32 playerIndex);
 MessageDispatchResult ViewSpellsHandler(struct tag_message& message);
 MessageDispatchResult ViewSpecialHandler(struct tag_message& message);
 MessageDispatchResult ViewArmyHandler(struct tag_message& message);
-i32 IsCursedItem(ArtifactType item);
+b32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32 days);
-void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, i32 forceWhole);
+void CreateDiffFile(char* oldName, char* joinName, char* diffName, i32 remotePlayer, b32 forceWhole);
 void CreateJoinFile(char* oldName, char* diffName, char* joinName);
 EventExtra* GetMapEvent(i32 x, i32 y);
 void CheckValidAvailableHeroes(void);

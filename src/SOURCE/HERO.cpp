@@ -220,7 +220,7 @@ typedef enum HeroRecordConstant {
     HERO_BASE_TAIL_SIZE      = BASE_RECORD_SIZE - HERO_RETAIL_PREFIX_SIZE
 } HeroRecordConstant;
 
-void hero::Read(i32 file, i8 expansion) {
+void hero::Read(i32 file, b8 expansion) {
     const bool complete = platform::FileReadExact(file, this, HERO_RETAIL_PREFIX_SIZE)
         && platform::FileReadExact(
             file,
@@ -234,7 +234,7 @@ void hero::Read(i32 file, i8 expansion) {
     utf8::Copy(m_name, sizeof(m_name), name.c_str());
 }
 
-void hero::Write(i32 file, i8 expansion) {
+void hero::Write(i32 file, b8 expansion) {
     hero serialized = *this;
     if (!localization::EncodeText(
             m_name,
@@ -259,14 +259,14 @@ void hero::Write(i32 file, i8 expansion) {
 
 void hero::GetArmyStrengths(u32l* const) {}
 
-i32 hero::HasArtifact(ArtifactType artifact) {
+b32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == artifact)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 i32 hero::CalcMobility(void) {
@@ -351,22 +351,22 @@ i32 hero::CalcMobility(void) {
     return Ironfist_CalcMobility(this, movePoints);
 }
 
-i32 hero::HasSpell(SpellType spell) {
+b32 hero::HasSpell(SpellType spell) {
     i32 artifactIndex;
 
     if (!HasArtifact(ARTIFACT_MAGIC_BOOK))
-        return 0;
+        return false;
     if (m_spells[H2EnumIndex(spell)])
-        return 1;
+        return true;
     for (artifactIndex = 0; artifactIndex < HERO_ARTIFACT_SLOT_COUNT; artifactIndex++) {
         if (m_artifacts[artifactIndex] == ARTIFACT_SPELL_SCROLL
             && m_artifactSpells[artifactIndex] == H2EnumIndex(spell)) {
-            return 1;
+            return true;
         }
     }
     if (HasArtifact(ARTIFACT_BATTLE_GARB) && spell == SPELL_TOWN_PORTAL)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
@@ -423,8 +423,8 @@ void hero::UseSpell(SpellType spell) {
     m_spellPoints -= GetManaCost(spell, this);
     if (m_spellPoints < 0)
         m_spellPoints = 0;
-    if (gpAdvManager->m_active == 1 && gbThisNetHumanPlayer[giCurPlayer])
-        gpAdvManager->UpdateHeroLocator(-1, 1, 1);
+    if (gpAdvManager->m_active == true && gbThisNetHumanPlayer[giCurPlayer])
+        gpAdvManager->UpdateHeroLocator(-1, true, true);
 }
 
 void hero::AddSpell(SpellType spell, i32) {
@@ -524,29 +524,32 @@ void hero::UpdateArmies(void) {
     }
 }
 
-void hero::ViewStat(i32 stat, i32 quickView) {
-    NormalDialog(gStatDesc[stat], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW);
+void hero::ViewStat(i32 stat, b32 quickView) {
+    NormalDialog(
+        gStatDesc[stat],
+        quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
+    );
 }
 
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, gArtifactDesc[H2EnumIndex(artifact)], gSpellNames[scrollSpell]);
-        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
+        NormalDialog(gText, quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
     } else {
-        NormalDialog(gArtifactDesc[H2EnumIndex(artifact)], quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
+        NormalDialog(gArtifactDesc[H2EnumIndex(artifact)], quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, -1, UI_ARTIFACT_DIALOG_Y);
     }
 }
 
-i32 hero::Dismiss(void) {
+b32 hero::Dismiss(void) {
     NormalDialog(localization::Tr("hero.confirm.dismiss"), NORMAL_DIALOG_CONFIRM);
     if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5) {
-        Deallocate(1);
-        return 1;
+        Deallocate(true);
+        return true;
     }
-    return 0;
+    return false;
 }
 
-void hero::Deallocate(i32 updateMap) {
+void hero::Deallocate(b32 updateMap) {
     i32 oldOwner;
     i32 i;
     playerData* playerPointer;
@@ -570,9 +573,9 @@ void hero::Deallocate(i32 updateMap) {
     playerPointer = &gpGame->m_players[m_owner];
 
     if (updateMap)
-        gpAdvManager->MobilizeCurrHero(0);
+        gpAdvManager->MobilizeCurrHero(false);
     if (updateMap)
-        gpAdvManager->HideRoute(0, 0, 0);
+        gpAdvManager->HideRoute(false, false, false);
 
     if ((H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         for (i = 0; i < GAME_BOAT_COUNT; i++) {
@@ -590,7 +593,7 @@ void hero::Deallocate(i32 updateMap) {
     }
 
     if (giCurPlayer != m_owner || gpGame->m_players[m_owner].m_currentHero != m_id
-        || gpAdvManager->m_heroMobilized == 0) {
+        || gpAdvManager->m_heroMobilized == false) {
         gpGame->RestoreCell(m_x, m_y, m_locationType, m_locationMetadata, NULL, 1);
     }
 
@@ -1033,7 +1036,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     cHeroScreen[H2EnumIndex(TEXT_SELECT_ARMY)],
                     gArmyNamesPlural[H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot])]
                 );
-            } else if (gpTownManager->m_castleDialogActive != 0) {
+            } else if (gpTownManager->m_castleDialogActive != false) {
                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
                     utf8::Format(
                         gText, GLOBAL_TEXT_BUFFER_SIZE,
@@ -1199,7 +1202,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_NOTIFY_DESELECT:
-                if (quickView == 0) {
+                if (quickView == false) {
                     switch (message.payload.widget.id) {
                         case UI_DISMISS:
                             if (gpHVHero->Dismiss())
@@ -1250,7 +1253,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_MORALE_LAST:
                         gpGame->ShowMoraleInfo(
                             gpHVHero,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
+                            quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
 
@@ -1259,7 +1262,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_LUCK_LAST:
                         gpGame->ShowLuckInfo(
                             gpHVHero,
-                            quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
+                            quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                         );
                         break;
 
@@ -1298,7 +1301,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             gpHVHero->m_spellPoints,
                             HERO_NORMAL_SPELL_POINTS(*gpHVHero)
                         );
-                        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
+                        NormalDialog(gText, quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         break;
 
                     case UI_EXPERIENCE_FIRST:
@@ -1313,7 +1316,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             gpHVHero->m_experience,
                             nextExperience
                         );
-                        NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
+                        NormalDialog(gText, quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE);
                         break;
                     }
 
@@ -1323,14 +1326,14 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_ARMY_SELECTOR_SLOT_3:
                     case UI_ARMY_SELECTOR_SLOT_4:
                         armySlot = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
-                        if (quickView == 0 && giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
+                        if (quickView == false && giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
                             if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE) {
                                 giHeroScreenSrcIndex = armySlot;
                                 gpHVHero->HeroScreenUpdate();
                             }
-                        } else if ((quickView != 0
+                        } else if ((quickView != false
                                     && gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE)
-                                   || (quickView == 0
+                                   || (quickView == false
                                        && giHeroScreenSrcIndex
                                               == message.payload.widget.id
                                                      - UI_ARMY_SELECTOR_FIRST)) {
@@ -1340,7 +1343,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 gpHVHero->m_army.m_creatureTypes[armySlot],
                                 gpHVHero->m_army.m_creatureCounts[armySlot],
                                 NULL,
-                                quickView == 0
+                                quickView == false
                                         && gpTownManager->m_castleDialogActive
                                                != UI_CASTLE_DIALOG_ACTIVE
                                         && gpHVHero->m_army.GetNumArmies() != 1
@@ -1353,17 +1356,18 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 &gpHVHero->m_army,
                                 armySlot
                             );
-                            if (quickView == 0)
+                            if (quickView == false)
                                 giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
                             SetupHeroView();
                             RedrawHeroScreen();
                         } else {
-                            if (quickView == 0 && gpTownManager->m_castleDialogActive != 0) {
+                            if (quickView == false
+                                && gpTownManager->m_castleDialogActive != false) {
                                 if (gpHVHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE) {
                                     giHeroScreenSrcIndex = armySlot;
                                     gpHVHero->HeroScreenUpdate();
                                 }
-                            } else if (quickView == 0) {
+                            } else if (quickView == false) {
                                 temporary = H2EnumIndex(gpHVHero->m_army.m_creatureTypes[armySlot]);
                                 if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_SHIFT_KEYS)))
                                     && (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE
@@ -1394,7 +1398,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 gpHVHero->HeroScreenUpdate();
                             }
                         }
-                        if (quickView == 0) {
+                        if (quickView == false) {
                             gpWindowManager->m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
                             UpdateHeroScreenStatusBar(message);
                         }
@@ -1416,7 +1420,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_ARTIFACT_SLOT_13:
                         if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                             != ARTIFACT_NONE) {
-                            if (quickView == 0
+                            if (quickView == false
                                 && gpHVHero->m_artifacts
                                            [message.payload.widget.id - UI_ARTIFACT_FIRST]
                                        == ARTIFACT_MAGIC_BOOK) {
@@ -1490,7 +1494,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     gpAdvManager->TrimLoopingSounds(ADVMGR_ACTIVE_SOUND_COUNT);
     gpHVHero = gpGame->GetHero(heroId);
     gbHeroWindShowing = true;
-    if (fadeAlreadyOut == 0)
+    if (fadeAlreadyOut == false)
         gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
 
     heroWin = new heroWindow(0, 0, "herowind.bin");
@@ -1510,7 +1514,7 @@ i32 HeroView(i32 heroId, b32 noDismiss, b32 fadeAlreadyOut) {
     SetupHeroView();
     RedrawHeroScreen();
     gpWindowManager->FadeScreen(FADE_IN, UI_FADE_STEPS, NULL);
-    gpWindowManager->DoDialog(heroWin, HeroHandler, 0);
+    gpWindowManager->DoDialog(heroWin, HeroHandler, false);
     gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
     delete heroWin;
     gheroWin = NULL;
@@ -1572,7 +1576,7 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    if (bNoDismiss != 0 || gpTownManager->m_castleDialogActive != 0
+    if (bNoDismiss != false || gpTownManager->m_castleDialogActive != false
         || (gpCurPlayer->m_townCount == 0 && gpCurPlayer->m_heroCount == UI_SINGLE_HERO_COUNT))
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     else
@@ -1795,7 +1799,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_childWindow->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, false);
     delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
@@ -1953,7 +1957,7 @@ i8 hero::GetSSLevel(HeroSecondarySkill skill) {
     return H2EnumIndex(ssLevel);
 }
 
-void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
+void hero::DoSSLevelDialog(HeroSecondarySkill skill, b32 quickView) {
     i32 skillBonusValue;
     const char* skillText;
 
@@ -1987,7 +1991,7 @@ void hero::DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView) {
     } else {
         utf8::Copy(gText, GLOBAL_TEXT_BUFFER_SIZE, cSecSkillDesc[H2EnumIndex(skill)][H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)]) - 1]);
     }
-    NormalDialog(gText, quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_SECONDARY_SKILL, H2EnumIndex(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
+    NormalDialog(gText, quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW, NORMAL_DIALOG_NO_RESOURCE, NORMAL_DIALOG_NO_VALUE, NORMAL_DIALOG_SECONDARY_SKILL, H2EnumIndex(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + H2EnumIndex(m_secondarySkills[H2EnumIndex(skill)])
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE);
 }
 

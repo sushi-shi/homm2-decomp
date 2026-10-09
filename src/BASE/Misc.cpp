@@ -319,7 +319,7 @@ void FadeIn(i32 increment) {
     palette* currentPalette = new palette;
     if (currentPalette == NULL)
         MemError();
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == false)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
     i = 0;
@@ -351,7 +351,7 @@ void FadeOut(i32 increment) {
     palette* currentPalette = new palette;
     if (currentPalette == NULL)
         MemError();
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == false)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     i = 0;
@@ -597,14 +597,14 @@ void BitmapToScreen(class bitmap* image) {
     BlitBitmapToScreen(image, 0, 0, image->m_width, image->m_height, 0, 0);
 }
 
-void SetPalette(i8* paletteData, i32 updateDisplay) {
+void SetPalette(i8* paletteData, b32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
     memcpy(
         gCyclePal,
         paletteData + H2EnumIndex(CYCLE_RANGE_ONE_FIRST) * H2EnumIndex(PALETTE_CHANNEL_COUNT),
         sizeof(gCyclePal)
     );
-    if (updateDisplay != 0)
+    if (updateDisplay != false)
         UpdatePalette(gpBufferPalette->m_data);
 }
 
@@ -630,7 +630,7 @@ void BlitBitmapToScreen(
     i32 destinationX,
     i32 destinationY
 ) {
-    if (gbColorMice == 0) {
+    if (gbColorMice == false) {
         BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
         platform::Video().Present();
         return;
@@ -643,7 +643,7 @@ void BlitBitmapToScreen(
     }
     gBlitRight = destinationX + width - 1;
     gBlitBottom = destinationY + height - 1;
-    if (gpMouseManager->IsVis() == 0 || gBlitRight < gpMouseManager->m_savedLeft
+    if (gpMouseManager->IsVis() == false || gBlitRight < gpMouseManager->m_savedLeft
         || destinationX > gpMouseManager->m_cursorRight
         || gBlitBottom < gpMouseManager->m_savedTop
         || destinationY > gpMouseManager->m_cursorBottom) {
@@ -867,7 +867,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     gpWindowManager->m_colorCycling = savedColorCycling;
 }
 
-i32 IsCycleColor(i32 color) {
+b32 IsCycleColor(i32 color) {
     return (color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
 }
@@ -1011,8 +1011,8 @@ void GetDataEntry(
     char* destination,
     i32 maximumLength,
     char* initialText,
-    i32 showCancel,
-    i32 editImmediately
+    b32 showCancel,
+    b32 editImmediately
 ) {
     MouseCursorType savedCursorType;
 
@@ -1040,13 +1040,13 @@ void GetDataEntry(
 
     textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
     nHeight = textLines * PROMPT_LINE_HEIGHT;
-    if (showCancel != 0)
+    if (showCancel != false)
         nHeight += CANCEL_PROMPT_HEIGHT;
     nHeight += ROW_TOP_MARGIN;
     nRows = (nHeight - ROW_ROUNDING_BIAS) / ROW_HEIGHT;
     if (nRows > MAX_ROW_COUNT)
         nRows = MAX_ROW_COUNT;
-    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
+    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != false ? CANCEL_Y_OFFSET : 0);
 
     const std::string windowName = "evntwin" + std::to_string(nRows) + ".bin";
     DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName.c_str());
@@ -1082,7 +1082,7 @@ void GetDataEntry(
     DataEntryWin->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(message);
-    if (showCancel == 0) {
+    if (showCancel == false) {
         message.payload.widget.id = ENTRY_CANCEL_BUTTON;
         DataEntryWin->BroadcastMessage(message);
     }
@@ -1110,12 +1110,12 @@ void GetDataEntry(
     inBoxY = entryY + INPUT_BOX_Y_OFFSET;
     DataEntryWin->AddWidget(pText, WINDOW_Z_ORDER_TOP);
 
-    if (editImmediately != 0) {
+    if (editImmediately != false) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = false;
     } else
         bDataEntryTime = ENTRY_PHASE_READY;
-    gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
+    gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, false);
     delete DataEntryWin;
     gpMouseManager->SetPointer(
         "",
@@ -1166,7 +1166,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
                         DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, ENTRY_TEXT_WIDGET, ENTRY_TEXT_WIDGET);
-                        if (gbTextEntryEscaped != 0)
+                        if (gbTextEntryEscaped != false)
                             break;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;

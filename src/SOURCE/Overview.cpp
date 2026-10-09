@@ -273,7 +273,7 @@ typedef enum OverviewDialogConstant {
 #define OVERVIEW_ICON_WIDGET(row, item)                                                            \
     (*(iconWidgetDynamic + (row) * OVERVIEW_DYNAMIC_WIDGETS_PER_ROW + (item)))
 
-void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
+void game::SetupDynamicStuff(b32 redraw, b32 updateKnob, b32 forceUpdate) {
     i32 rowIndex;
     i32 i;
     i32 texts;
@@ -952,7 +952,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     }
 }
 
-void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
+void game::SetupNewOverviewType(OverviewType overviewType, b32 redrawFrom) {
     i32 column;
     tag_message message;
     char* titleText;
@@ -1010,8 +1010,8 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         );
         overWin->AddWidget(textWidgetTitle[column], -1);
     }
-    SetupDynamicStuff(0, 1, 0);
-    if (redrawFrom != 0) {
+    SetupDynamicStuff(false, true, false);
+    if (redrawFrom != false) {
         overWin->DrawWindow(redrawFrom, HERO_TAB_WIDGET, ICON_ROW_LIMIT - 1);
     }
 }
@@ -1121,8 +1121,8 @@ void game::Overview(void) {
     message.payload.widget.data.text = gText;
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%d", ComputeDailyGold(giCurPlayer));
     overWin->BroadcastMessage(message);
-    SetupNewOverviewType(giOverviewType, 0);
-    gpWindowManager->DoDialog(overWin, OverviewHandler, 1);
+    SetupNewOverviewType(giOverviewType, false);
+    gpWindowManager->DoDialog(overWin, OverviewHandler, true);
     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     delete overWin;
     overWin = NULL;
@@ -1180,7 +1180,7 @@ void game::DoKnob(void) {
                     giOverviewTop[H2EnumIndex(giOverviewType)] = topNow;
                     OVScrollKnob->m_y =
                         widgetMessage.payload.mouse.y - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
-                    SetupDynamicStuff(1, 0, 0);
+                    SetupDynamicStuff(true, false, false);
                     topBefore = topNow;
                 } else {
                     overWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
@@ -1201,7 +1201,7 @@ void game::DoKnob(void) {
             }
         }
         OVScrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;
-        SetupDynamicStuff(0, 1, 0);
+        SetupDynamicStuff(false, true, false);
         overWin->DrawWindow(
             false,
             OVERVIEW_DYNAMIC_DRAW_FIRST,
@@ -1220,15 +1220,15 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     i32 topIndex;
     i32 scrollSpan;
     i32 scrollDivisor;
-    i32 done;
+    b32 done;
     b32 quickView;
     i32 y;
 
-    done = 0;
+    done = false;
     quickView = false;
     const auto selectOverview = [](OverviewType type) {
         if (giOverviewType != type)
-            gpGame->SetupNewOverviewType(type, 1);
+            gpGame->SetupNewOverviewType(type, true);
     };
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -1241,13 +1241,13 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                 }
                 switch (message.payload.widget.id) {
                     case SCROLL_KNOB_WIDGET:
-                        if (quickView != 0) {
+                        if (quickView != false) {
                             break;
                         }
                         gpGame->DoKnob();
                         break;
                     case SCROLL_TRACK_WIDGET:
-                        if (quickView != 0) {
+                        if (quickView != false) {
                             break;
                         }
                         if (giOverviewItems[H2EnumIndex(giOverviewType)] <= OVERVIEW_VISIBLE_ROWS) {
@@ -1269,16 +1269,16 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                         if (giOverviewTop[H2EnumIndex(giOverviewType)] < 0) {
                             giOverviewTop[H2EnumIndex(giOverviewType)] = 0;
                         }
-                        gpGame->SetupDynamicStuff(1, 1, 0);
+                        gpGame->SetupDynamicStuff(true, true, false);
                         break;
                     case HERO_TAB_WIDGET:
-                        if (quickView != 0) {
+                        if (quickView != false) {
                             break;
                         }
                         selectOverview(OVERVIEW_HEROES);
                         break;
                     case TOWN_TAB_WIDGET:
-                        if (quickView != 0) {
+                        if (quickView != false) {
                             break;
                         }
                         selectOverview(OVERVIEW_TOWNS);
@@ -1299,19 +1299,19 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                     case SCROLL_UP_WIDGET:
                         if (giOverviewTop[H2EnumIndex(giOverviewType)] > 0) {
                             giOverviewTop[H2EnumIndex(giOverviewType)]--;
-                            gpGame->SetupDynamicStuff(1, 1, 0);
+                            gpGame->SetupDynamicStuff(true, true, false);
                         }
                         break;
                     case SCROLL_DOWN_WIDGET:
                         if (giOverviewTop[H2EnumIndex(giOverviewType)]
                             < giOverviewItems[H2EnumIndex(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
                             giOverviewTop[H2EnumIndex(giOverviewType)]++;
-                            gpGame->SetupDynamicStuff(1, 1, 0);
+                            gpGame->SetupDynamicStuff(true, true, false);
                         }
                         break;
                     case CLOSE_WIDGET:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
-                        done = 1;
+                        done = true;
                         break;
                 }
                 break;
@@ -1325,7 +1325,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                 if (giOverviewTop[H2EnumIndex(giOverviewType)] < 0) {
                     giOverviewTop[H2EnumIndex(giOverviewType)] = 0;
                 }
-                gpGame->SetupDynamicStuff(1, 1, 0);
+                gpGame->SetupDynamicStuff(true, true, false);
                 break;
             case INPUT_SCAN_NUMPAD_3:
                 giOverviewTop[H2EnumIndex(giOverviewType)] += OVERVIEW_VISIBLE_ROWS;
@@ -1334,20 +1334,20 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
                     giOverviewTop[H2EnumIndex(giOverviewType)] =
                         giOverviewItems[H2EnumIndex(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
                 }
-                gpGame->SetupDynamicStuff(1, 1, 0);
+                gpGame->SetupDynamicStuff(true, true, false);
                 break;
             case INPUT_SCAN_NUMPAD_7:
                 giOverviewTop[H2EnumIndex(giOverviewType)] = 0;
-                gpGame->SetupDynamicStuff(1, 1, 0);
+                gpGame->SetupDynamicStuff(true, true, false);
                 break;
             case INPUT_SCAN_NUMPAD_1:
                 giOverviewTop[H2EnumIndex(giOverviewType)] =
                     giOverviewItems[H2EnumIndex(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
-                gpGame->SetupDynamicStuff(1, 1, 0);
+                gpGame->SetupDynamicStuff(true, true, false);
                 break;
         }
     }
-    if (done == 1) {
+    if (done == true) {
         message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = BaseWidgetCommand(H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT));
         return MESSAGE_DISPATCH_FORWARD;
@@ -1355,7 +1355,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
+b32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     i32 item;
     town* selectedTown;
     hero* curHero;
@@ -1364,7 +1364,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     if (widgetId >= ICON_ROW_BASE && widgetId <= ICON_ROW_LIMIT - 1) {
         rowIndex = (widgetId - ICON_ROW_BASE) / OVERVIEW_ROW_ID_STRIDE;
         if (giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex > giOverviewItems[H2EnumIndex(giOverviewType)]) {
-            return 0;
+            return false;
         }
         widgetId -= ICON_ROW_BASE;
         widgetId %= OVERVIEW_ROW_ID_STRIDE;
@@ -1376,7 +1376,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 giOverviewReturnAction = OVERVIEW_RETURN_HERO;
                 giOverviewReturnActionExtra =
                     gpCurPlayer->m_heroIds[giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex];
-                return 1;
+                return true;
             }
             if (widgetId >= HERO_ARMY_COUNT_FIRST
                 && widgetId <= HERO_ARMY_COUNT_LAST) {
@@ -1398,8 +1398,8 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     &curHero->m_army,
                     item
                 );
-                if (quickView == 0) {
-                    SetupDynamicStuff(1, 1, 1);
+                if (quickView == false) {
+                    SetupDynamicStuff(true, true, true);
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
@@ -1427,7 +1427,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 item = widgetId - HERO_STAT_FIRST;
                 NormalDialog(
                     gStatDesc[item],
-                    quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
+                    quickView == false ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW
                 );
             }
         }
@@ -1438,13 +1438,13 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 giOverviewReturnAction = OVERVIEW_RETURN_TOWN;
                 giOverviewReturnActionExtra =
                     gpCurPlayer->m_townIds[giOverviewTop[H2EnumIndex(giOverviewType)] + rowIndex];
-                return 1;
+                return true;
             }
             if (widgetId >= TOWN_HERO_FIRST && widgetId <= TOWN_HERO_LAST
                 && selectedTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
                 giOverviewReturnAction = OVERVIEW_RETURN_HERO;
                 giOverviewReturnActionExtra = selectedTown->m_occupyingHeroId;
-                return 1;
+                return true;
             }
             if (widgetId >= TOWN_ARMY_COUNT_FIRST
                 && widgetId <= TOWN_ARMY_COUNT_LAST) {
@@ -1458,7 +1458,7 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     selectedTown->m_army.m_creatureTypes[item],
                     selectedTown->m_army.m_creatureCounts[item],
                     selectedTown,
-                    0,
+                    false,
                     ARMY_FACING_RIGHT,
                     quickView,
                     NULL,
@@ -1466,8 +1466,8 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                     &selectedTown->m_army,
                     item
                 );
-                if (quickView == 0) {
-                    SetupDynamicStuff(1, 1, 1);
+                if (quickView == false) {
+                    SetupDynamicStuff(true, true, true);
                 }
             }
             if (widgetId >= TOWN_DWELLING_AVAILABLE_FIRST
@@ -1476,10 +1476,10 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
             }
             if (widgetId >= TOWN_DWELLING_FIRST && widgetId <= TOWN_DWELLING_LAST) {
                 item = widgetId - TOWN_DWELLING_FIRST;
-                if (quickView != 0) {
+                if (quickView != false) {
                     QuickViewRecruit(selectedTown, item);
                 } else {
-                    recruitUnit* recruitDialog = new recruitUnit(selectedTown, item, 0);
+                    recruitUnit* recruitDialog = new recruitUnit(selectedTown, item, false);
                     if (recruitDialog == NULL) {
                         MemError();
                     }
@@ -1491,13 +1491,13 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                         1
                     );
                     SetupResources();
-                    SetupDynamicStuff(0, 1, 1);
+                    SetupDynamicStuff(false, true, true);
                     overWin->DrawWindow();
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 
 class heroWindow* overWin = NULL;

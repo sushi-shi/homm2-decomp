@@ -54,7 +54,7 @@ class IronfistHookContractTest(unittest.TestCase):
             "if (Ironfist_LocationVisit(cell, x, y))",
             "goto event_done;",
             "event_done:",
-            "UpdateRadar(1, 0);",
+            "UpdateRadar(1, false);",
             "CheckEndGame(END_GAME_FORCE_NONE, false);",
         )
 
