@@ -126,7 +126,7 @@ i32 DoArenaDialog(void) {
     message.payload.widget.id = DIALOG_BUTTON_6;
     arenaWinPtr->BroadcastMessage(message);
 
-    gpWindowManager->DoDialog(arenaWinPtr, ArenaWindowHandler, 0);
+    gpWindowManager->DoDialog(arenaWinPtr, ArenaWindowHandler, false);
     delete arenaWinPtr;
     return choice;
 }
@@ -137,7 +137,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message) {
     i32 unusedDialogResourceType [[maybe_unused]];
     i32 extra [[maybe_unused]];
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == true)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[(gpAdvManager->m_currentTerrain)]
         );

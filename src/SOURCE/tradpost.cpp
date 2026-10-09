@@ -60,11 +60,11 @@ static char rightName[OFFER_NAME_SIZE] = {};
 i32 iTradeRatio = 0;
 i32 rightResource = 0;
 i32 maxUnitsToTrade = 0;
-i32 bIsMarketPlace = 0;
+b32 bIsMarketPlace = 0;
 class heroWindow* tpWindow = NULL;
 class iconWidget* tradeKnob = NULL;
 
-void DoTradingPost(i32 isMarketplace, float efficiency) {
+void DoTradingPost(b32 isMarketplace, float efficiency) {
     tag_message messageTemp [[maybe_unused]];
 
     bIsMarketPlace = isMarketplace;
@@ -93,12 +93,12 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     if (tradeKnob == NULL)
         MemError();
     tpWindow->AddWidget(tradeKnob, -1);
-    UpdateTradingPost(0);
-    gpWindowManager->DoDialog(tpWindow, TradingPostHandler, 0);
+    UpdateTradingPost(false);
+    gpWindowManager->DoDialog(tpWindow, TradingPostHandler, false);
     delete tpWindow;
 }
 
-void UpdateTradingPost(i32 draw) {
+void UpdateTradingPost(b32 draw) {
     tag_message messageTemp;
     i32 index;
     OfferSide sideCurrent;
@@ -130,7 +130,7 @@ void UpdateTradingPost(i32 draw) {
         sprintf(
             gText,
             "{%s}\n\nНа моем рынке %s и %s меняются из соотношения %d %s к %d %s",
-            bIsMarketPlace != 0 ? "Рынок"
+            bIsMarketPlace != false ? "Рынок"
                                 : "Рынок",
             rightName,
             leftName,
@@ -139,18 +139,18 @@ void UpdateTradingPost(i32 draw) {
             requestedValue,
             requestedValue > 1 ? "ед." : "ед."
         );
-    } else if (bTradeMade != 0) {
+    } else if (bTradeMade != false) {
         sprintf(
             gText,
             "{%s}\n\nВам предложена достойная сделка. Я не пытаюсь нажиться на ней. Вас интересует что-нибудь из моих товаров?",
-            bIsMarketPlace != 0 ? "Рынок"
+            bIsMarketPlace != false ? "Рынок"
                                 : "Рынок"
         );
     } else {
         sprintf(
             gText,
             "{%s}\n\nПосмотрите на наши товары. Если что-то вас заинтересует, щелкните по нужным вещам и выберите, на что хотите поменять.",
-            bIsMarketPlace != 0 ? "Рынок"
+            bIsMarketPlace != false ? "Рынок"
                                 : "Рынок"
         );
     }
@@ -244,7 +244,7 @@ void UpdateTradingPost(i32 draw) {
         );
     else
         tradeKnob->m_x = TRADING_POST_KNOB_X;
-    if (draw != 0) {
+    if (draw != false) {
         tpWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             tpX + REDRAW_X_OFFSET,
@@ -290,7 +290,7 @@ void DoTradeKnob(struct tag_message message) {
             if (qtyToTrade > iMaxUnitsToTrade)
                 qtyToTrade = iMaxUnitsToTrade;
             gpMouseManager->Main(message);
-            UpdateTradingPost(1);
+            UpdateTradingPost(true);
         }
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
@@ -302,7 +302,7 @@ void DoTradeKnob(struct tag_message message) {
             }
         }
     }
-    UpdateTradingPost(1);
+    UpdateTradingPost(true);
 }
 
 void SetupNewTrade(void) {
@@ -410,7 +410,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
         }
     }
     if (redraw)
-        UpdateTradingPost(1);
+        UpdateTradingPost(true);
     if (exitFlag) {
         message.payload.widget.id = (WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;

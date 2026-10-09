@@ -103,8 +103,8 @@ struct mapCellExtra {
 #ifdef HOMM2_EDITOR
 
 
-    i32 objectLink;
-    i32 overlayLink;
+    b32 objectLink;
+    b32 overlayLink;
 #endif
 };
 #pragma pack(pop)
@@ -148,8 +148,8 @@ public:
     u16 m_extraIndex;
 #ifdef HOMM2_EDITOR
 
-    i32 m_objectLink;
-    i32 m_overlayLink;
+    b32 m_objectLink;
+    b32 m_overlayLink;
 #endif
 
     inline b32 HasFlag(MapCellFlag flag) const {

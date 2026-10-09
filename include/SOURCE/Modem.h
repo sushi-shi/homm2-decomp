@@ -8,16 +8,16 @@ void ModemSetup(i32 mode);
 i32l Dial(void);
 i32l Wait(void);
 void GUIModemCommand(const char* message, const char* command);
-i8 GUIModemCommandExec(void);
+b8 GUIModemCommandExec(void);
 void ModemCommand(const char* command);
 i8 GUIModemResponse(const char* message, const char* response);
-i8 GUIModemResponseExec(void);
-i32 write_buffer(const char* buffer, i32 length);
+b8 GUIModemResponseExec(void);
+b32 write_buffer(const char* buffer, i32 length);
 i32 read_byte(void);
 void write_byte(i32 value);
 void Connect(void);
-i32 WaitForDirectConnect(void);
-char ReadPacket(void);
+b32 WaitForDirectConnect(void);
+bchar ReadPacket(void);
 void WriteModemPacket(const char* buffer, i32 length);
 
 typedef enum ModemConnectionStage {

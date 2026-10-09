@@ -294,7 +294,7 @@ void combatManager::SetupCombat(
 
         m_inCastleCombat = (((defenderTown->m_buildings) & ((TOWN_BUILDING_CASTLE)))) != 0;
 
-        if (m_inCastleCombat != 0)
+        if (m_inCastleCombat != false)
             m_hasMoat =
                 (((defenderTown->m_buildings) & ((TOWN_BUILDING_MOAT)))) != 0;
 
@@ -460,14 +460,14 @@ i32 combatManager::Open(i32 openFlags) {
     InitNonVisualVars();
     SetupAndLoadObstacles();
     memset(m_previousGridState, (GRID_SHADE_NONE), sizeof(m_previousGridState));
-    GetNextArmy(0);
+    GetNextArmy(false);
     m_backgroundDrawn = false;
 
     SAMPLE2 preBattleSample = LoadPlaySample("PREBATTL.82M");
     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     giCycleType = m_colorCycleType;
-    CycleColors(1);
-    CycleColors(1);
+    CycleColors(true);
+    CycleColors(true);
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
     gpMouseManager->m_pointerLocked = false;
@@ -479,11 +479,11 @@ i32 combatManager::Open(i32 openFlags) {
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = true;
-    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, false, false, COMBAT_FRAME_DELAY, true, true);
     glTimers[0] = KBTickCount();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
-    CombatMessage("", 1, 1, 0);
+    CombatMessage("", 1, true, false);
     gConfig.showCombatMouseHex = savedMouseHex;
     if (gpBufferPalette->m_data != m_combatPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
@@ -512,7 +512,7 @@ void combatManager::Close(void) {
     }
     gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
-    CycleColors(0);
+    CycleColors(false);
     delete m_combatBuffer;
     delete m_backgroundBuffer;
     if (m_mouseGridBuffer != NULL)
@@ -594,7 +594,7 @@ void combatManager::GenerateMap(void) {
     i32 y;
     i32 coordinateY [[maybe_unused]];
 
-    m_catapultFrame[(COMBAT_ATTACKER_SIDE)] = m_inCastleCombat == 1 ? 0 : -1;
+    m_catapultFrame[(COMBAT_ATTACKER_SIDE)] = m_inCastleCombat == true ? 0 : -1;
 
     for (y = 0; y < COMBAT_GRID_ROW_COUNT; y++) {
         for (x = 0; x < COMBAT_GRID_ROW_LENGTH; x++) {
@@ -693,7 +693,7 @@ const char* combatManager::GetBackgroundName(void) {
     return cCombatBkgNames[(backgroundIndex)];
 }
 
-i32 combatManager::MoreTreesNear(void) {
+b32 combatManager::MoreTreesNear(void) {
     i32 treeCount;
     i32 x;
     i32 y;
@@ -751,8 +751,8 @@ i32 combatManager::MoreTreesNear(void) {
         }
     }
     if (treeCount > mountainCounter)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 void combatManager::LoadIcons(void) {
@@ -907,7 +907,7 @@ void combatManager::LoadArmies(void) {
 
 void combatManager::FreeArmies(void) {
     i32 index;
-    gpSoundManager->StopAllSamples(1);
+    gpSoundManager->StopAllSamples(true);
 
     for (index = 0; index < m_armyCount[(COMBAT_ATTACKER_SIDE)]; index++)
         m_armies[(COMBAT_ATTACKER_SIDE)][index].FreeResources();
@@ -1010,10 +1010,10 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
                 "Высокая мораль %s позволила \nим еще раз атаковать врага.",
                 gArmyNamesPlural[(activeArmy->m_monsterType)]
             );
-        CombatMessage(gText, 1, 1, 0);
+        CombatMessage(gText, 1, true, false);
     }
 
-    activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
+    activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, false);
     if ((((activeArmy->m_monster.attributes) & (MONSTER_FLAGS_TURN_SPENT))))
         ((activeArmy->m_monster.attributes) &= ~(MONSTER_FLAGS_TURN_SPENT));
     activeArmy->m_monster.attributes |= MONSTER_FLAGS_HIGH_MORALE;
@@ -1022,22 +1022,22 @@ void combatManager::CheckApplyGoodMorale(CombatSide side, i32 index) {
         WaitEndSample(&moraleSample);
 }
 
-i32 combatManager::CheckApplyBadMorale(
+b32 combatManager::CheckApplyBadMorale(
     CombatSide side, i32 index
 ) {
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
-        return 0;
+        return false;
 
     army* activeArmy = &m_armies[(side)][index];
     if ((((activeArmy->m_monster.attributes) & (MONSTER_FLAGS_NO_MORALE))))
-        return 0;
+        return false;
     if (activeArmy->m_morale >= 0
         || SRandom(MORALE_ROLL_MIN, BAD_MORALE_ROLL_MAX) > -activeArmy->m_morale)
-        return 0;
+        return false;
     if (!m_humanPlayerSide[(side)]
         && SRandom(MORALE_ROLL_MIN, BAD_MORALE_AI_ROLL_MAX)
                == BAD_MORALE_AI_SKIP_ROLL)
-        return 0;
+        return false;
 
     SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
@@ -1054,17 +1054,17 @@ i32 combatManager::CheckApplyBadMorale(
                 "Низкая мораль %s привела к тому, что \nони застыли в панике.",
                 gArmyNamesPlural[(activeArmy->m_monsterType)]
             );
-        CombatMessage(gText, 1, 1, 0);
+        CombatMessage(gText, 1, true, false);
     }
 
-    activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
+    activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, true);
     activeArmy->m_monster.attributes |= MONSTER_FLAGS_TURN_SPENT;
     if (!gbNoShowCombat)
         WaitEndSample(&moraleSample);
-    return 1;
+    return true;
 }
 
-i32 combatManager::GetNextArmy(i32 checkMorale) {
+b32 combatManager::GetNextArmy(b32 checkMorale) {
     b32 skipEnt;
     i32 speedIter;
     b32 hasPending;
@@ -1121,7 +1121,7 @@ restart:
                 else
                     m_currentSide = stackSide;
                 GetControl();
-                return 1;
+                return true;
             }
         }
 
@@ -1133,7 +1133,7 @@ restart:
     }
 
     if (hasPending) {
-        checkMorale = 0;
+        checkMorale = false;
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             for (stackCounter = 0; stackCounter < m_armyCount[sideLoop]; stackCounter++) {
                 (m_armies[sideLoop] + stackCounter)->m_monster.attributes &=
@@ -1147,17 +1147,17 @@ restart:
     m_currentSide = OppositeCombatSide(m_currentSide);
     CheckCastleAttack();
     m_currentSide = OppositeCombatSide(m_currentSide);
-    return 0;
+    return false;
 }
 
-i32 combatManager::IsWinner(CombatSide side) {
+b32 combatManager::IsWinner(CombatSide side) {
     b32 result;
     i32 index;
 
     if (m_sideSurrendered[(COMBAT_DEFENDER_SIDE) - (side)])
-        return 1;
+        return true;
     if (m_sideRetreated[(COMBAT_DEFENDER_SIDE) - (side)])
-        return 1;
+        return true;
 
     side ^= 1;
     result = true;
@@ -1177,8 +1177,8 @@ void combatManager::CatAttack(CombatSide side) {
     if (m_smallViewSide[(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
         || m_smallViewSide[(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
         m_smallViewSide[(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
-        DrawSmallView((COMBAT_ATTACKER_SIDE), 1);
-        DrawSmallView((COMBAT_DEFENDER_SIDE), 1);
+        DrawSmallView((COMBAT_ATTACKER_SIDE), true);
+        DrawSmallView((COMBAT_DEFENDER_SIDE), true);
     }
 
     i32 random = SRandom(COMBAT_CATAPULT_TARGET_ROLL_MIN, COMBAT_CATAPULT_TARGET_ROLL_MAX);
@@ -1341,7 +1341,7 @@ void combatManager::CatAttack(CombatSide side) {
     giMaxExtentY = COMBAT_CATAPULT_INITIAL_MAX_Y;
     m_catapultFrame[(side)] = 0;
     while (m_catapultFrame[(side)] < COMBAT_CATAPULT_LOAD_FRAME_COUNT) {
-        DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+        DrawFrame(true, false, true, false, COMBAT_FRAME_DELAY, true, true);
         m_catapultFrame[(side)]++;
     }
 
@@ -1397,7 +1397,7 @@ void combatManager::CatAttack(CombatSide side) {
             if (giMaxExtentY < COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y)
                 giMaxExtentY = COMBAT_CATAPULT_MIN_VISIBLE_EXTENT_Y;
         }
-        DrawFrame(0, 0, 1, 0, COMBAT_CATAPULT_PROJECTILE_DELAY, 1, 1);
+        DrawFrame(false, false, true, false, COMBAT_CATAPULT_PROJECTILE_DELAY, true, true);
         boulder->CombatClipDrawToBuffer(
             static_cast<i32l>(projectileX),
             static_cast<i32l>(projectileY),
@@ -1441,13 +1441,13 @@ void combatManager::CatAttack(CombatSide side) {
 
     for (frame = 0; frame < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame++) {
         if (frame >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT
-            && (gateIndex != -1 || missShot != 0))
+            && (gateIndex != -1 || missShot != false))
             continue;
         glTimers[COMBAT_EFFECT_TIMER_SLOT] = static_cast<i32l>(
             KBTickCount()
             + (COMBAT_FRAME_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
         );
-        DrawFrame(0, 0, 1, 0, 0, 1, 0);
+        DrawFrame(false, false, true, false, 0, true, false);
         if (gateIndex != -1 && frame >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot) {
             IconToBitmap(
                 cloud,
@@ -1519,7 +1519,7 @@ void combatManager::CatAttack(CombatSide side) {
 
     gpResourceManager->Dispose(cloud);
     m_catapultFrame[(side)] = 0;
-    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, false, false, COMBAT_FRAME_DELAY, true, true);
     gpResourceManager->Dispose(boulder);
     WaitEndSample(&impactSound);
     WaitEndSample(&catapultSound);
@@ -1653,9 +1653,9 @@ void combatManager::KeepAttack(CombatTowerSelector tower) {
             "ед. урона"
         );
     }
-    gpCombatManager->CombatMessage(gText, 1, 1, 0);
+    gpCombatManager->CombatMessage(gText, 1, true, false);
     target->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
-    target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+    target->PowEffect(COMBAT_EFFECT_INVALID, true, -1, -1);
     WaitEndSample(&keepSample);
 }
 
@@ -1686,7 +1686,7 @@ void combatManager::ResetHitByCreature(void) {
     }
 }
 
-i32 ValidHex(i32 hex) {
+b32 ValidHex(i32 hex) {
     return hex >= 0 && hex < COMBAT_HEX_COUNT;
 }
 
@@ -1789,7 +1789,7 @@ void combatManager::SetupAndLoadObstacles(void) {
                 if (m_hexCells[obstacleHex].m_blocked != 0)
                     blocked = true;
             }
-            if (blocked != 0)
+            if (blocked != false)
                 continue;
             misses = 0;
             placedCells += sCmbtObstacles[obstacleType].cellCount;
@@ -1817,7 +1817,7 @@ void combatManager::MakeCreaturesVanish(void) {
                 m_limitCreatureCount[iSide][armyIndex] = 1;
         }
     }
-    DrawFrame(0, 1, 0, 1, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(false, true, false, true, COMBAT_FRAME_DELAY, true, true);
     i32 x = giMinExtentX;
     i32 y = giMinExtentY;
     i32 width = giMaxExtentX - giMinExtentX + 1;
@@ -1837,7 +1837,7 @@ void combatManager::MakeCreaturesVanish(void) {
         }
     }
     gpWindowManager->SaveFizzleSource(x, y, width, height);
-    gpCombatManager->DrawFrame(0, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(false, false, true, false, COMBAT_FRAME_DELAY, true, true);
     gpWindowManager->FizzleForward(
         x,
         y,
@@ -1860,7 +1860,7 @@ void combatManager::LowerDoor(void) {
          bridgeFrame >= COMBAT_DRAWBRIDGE_LOWERED;
          bridgeFrame--) {
         m_drawbridgeState = bridgeFrame;
-        DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+        DrawFrame(true, false, true, false, COMBAT_FRAME_DELAY, true, true);
     }
     WaitEndSample(&drawbridgeSample);
 }
@@ -1872,11 +1872,11 @@ void combatManager::RaiseDoor(void) {
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST;
-    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, true, false, COMBAT_FRAME_DELAY, true, true);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
-    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, true, false, COMBAT_FRAME_DELAY, true, true);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
-    DrawFrame(1, 0, 1, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, true, false, COMBAT_FRAME_DELAY, true, true);
     WaitEndSample(&drawbridgeSample);
 }
 
@@ -1890,7 +1890,7 @@ void combatManager::TestRaiseDoor(void) {
     }
 }
 
-i32 combatManager::InCastle(i32 hex) {
+b32 combatManager::InCastle(i32 hex) {
     return ((hex < COMBAT_CASTLE_EXTERIOR_ROW_0_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_0_LAST)
             && (hex < COMBAT_CASTLE_EXTERIOR_ROW_1_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_1_LAST)
             && (hex < COMBAT_CASTLE_EXTERIOR_ROW_2_FIRST || hex > COMBAT_CASTLE_EXTERIOR_ROW_2_LAST)
@@ -1905,7 +1905,7 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
-i32 combatManager::ShotIsThroughWall(
+b32 combatManager::ShotIsThroughWall(
     CombatSide side, i32 sourceHex, i32 targetHex
 ) {
     float columnStride;
@@ -1924,15 +1924,15 @@ i32 combatManager::ShotIsThroughWall(
     i32 sourceLine;
 
     if (!m_inCastleCombat)
-        return 0;
+        return false;
     if (m_heroes[(side)]
         && (m_heroes[(side)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
             || m_heroes[(side)]->m_secondarySkills[(HERO_SKILL_ARCHERY)]
                    != HERO_SKILL_LEVEL_NONE)) {
-        return 0;
+        return false;
     }
     if (InCastle(sourceHex) || !InCastle(targetHex))
-        return 0;
+        return false;
 
     sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
     sourceLine = sourceHex / COMBAT_GRID_ROW_LENGTH;
@@ -1966,19 +1966,19 @@ i32 combatManager::ShotIsThroughWall(
                        != COMBAT_WALL_STATE_DESTROYED
                 && m_wallStates[structIndex + (COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
-                return 1;
+                return true;
             }
             if (traceSquare == (iTowerToHexCell[structIndex])
                 && m_wallStates[structIndex] != COMBAT_WALL_STATE_DESTROYED) {
-                return 1;
+                return true;
             }
             if (traceSquare == (COMBAT_CASTLE_HEX_GATE)
                 && m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
-                return 1;
+                return true;
             }
         }
     }
-    return 0;
+    return false;
 }
 
 void combatManager::ShootMissile(
@@ -2148,16 +2148,16 @@ void combatManager::CombatSystemOptions(void) {
     if (!CSPanel)
         MemError();
     SetWinText(CSPanel, 1);
-    UpdateCombatSystemOptions(1);
-    gpWindowManager->DoDialog(CSPanel, CombatSystemOptionsHandler, 0);
+    UpdateCombatSystemOptions(true);
+    gpWindowManager->DoDialog(CSPanel, CombatSystemOptionsHandler, false);
     delete CSPanel;
     if (bCPrefsChanged)
         WritePrefs();
     m_backgroundDrawn = false;
-    DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+    DrawFrame(true, false, false, false, COMBAT_FRAME_DELAY, true, true);
 }
 
-void UpdateCombatSystemOptions(i32 initialDraw) {
+void UpdateCombatSystemOptions(b32 initialDraw) {
     tag_message message;
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_FRAME, SYSTEM_OPTION_SPEED_BUTTON);
     message.payload.widget.data.value =
@@ -2291,7 +2291,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
         }
     }
     if (bRedraw)
-        UpdateCombatSystemOptions(0);
+        UpdateCombatSystemOptions(false);
     if (bDone) {
         FINISH_DIALOG_MESSAGE(message);
         return MESSAGE_DISPATCH_FORWARD;
@@ -2303,6 +2303,6 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
 b32 bInHighMoraleBonus = false;
 i32 giSeed = 1;
 u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
-i32 bMouseWasVis;
+b32 bMouseWasVis;
 class heroWindow* CSPanel;
 b32 bCPrefsChanged;

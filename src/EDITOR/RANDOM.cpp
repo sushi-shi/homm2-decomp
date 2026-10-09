@@ -312,7 +312,7 @@ void editManager::PaintRandomTerrain(i32 terrain, i32 percent, i32 baseTerrain) 
         balance = targetCells;
         escapes = 0;
         minWeight = gScatterTerrain ? 2 : 3;
-        maxWeight = (gScatterTerrain != 0) + 6;
+        maxWeight = (gScatterTerrain != false) + 6;
         for (cluster = 0; cluster < patches; cluster++) {
             perSeed = balance / (patches - cluster);
             looking = true;

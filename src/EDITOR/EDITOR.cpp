@@ -3508,7 +3508,7 @@ i32 gUnusedData4a45d8Instance[2];
 inputManager* gpInputManager;
 char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 
-i32 gNextObjectLink;
+b32 gNextObjectLink;
 char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 configStruct gConfig;
 
@@ -3529,14 +3529,14 @@ extern "C" void PollSound(void) {
     gbInPollSound = true;
     if (glTimers[GLOBAL_MOUSE_TIMER_SLOT] < KBTickCount() && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + EDITOR_MOUSE_UPDATE_INTERVAL;
-        gpMouseManager->NewUpdate(0);
+        gpMouseManager->NewUpdate(false);
     }
     if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + EDITOR_COLOR_CYCLE_INTERVAL;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += EDITOR_NON_PALETTED_CYCLE_DELAY;
-        CycleColors(0);
+        CycleColors(false);
     }
     gbInPollSound = false;
 }
@@ -3583,7 +3583,7 @@ i32 oldmain(void) {
         window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpemain.bin");
         if (!window)
             MemError();
-        gpWindowManager->DoDialog(window, SetupMainHandler, 0);
+        gpWindowManager->DoDialog(window, SetupMainHandler, false);
         delete window;
         result = gpWindowManager->m_dialogResult;
         gbInSetupDialog = false;
@@ -3746,12 +3746,12 @@ void EarlyShutdown(const char* caption, const char* text) {
     exit(0);
 }
 
-i32 EarlySetup(void) {
+b32 EarlySetup(void) {
     CDRomSetupResult result;
     i32 i;
 
     if (bEarlySetupDone)
-        return 0;
+        return false;
     sprintf(cAggPathName, "%s%s", ".\\DATA\\", "heroes2.agg");
     DEFAULT_AGGREGATE_NAME = cAggPathName;
     sprintf(cExpAggPathName, "%s%s", ".\\DATA\\", "heroes2x.agg");
@@ -3760,7 +3760,7 @@ i32 EarlySetup(void) {
     GetGraphicsInfo();
     ReadPrefs();
     if (!InterpretCommandLine())
-        return 1;
+        return true;
     LogTruncate();
     result = SetupCDDrive();
     if (result == CD_ROM_DRIVE_UNAVAILABLE) {
@@ -3794,7 +3794,7 @@ i32 EarlySetup(void) {
     for (i = 0; i < GLOBAL_TIMER_COUNT; i++)
         glTimers[i] = 0;
     hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
-    return 1;
+    return true;
 }
 
 void MemError(void) {
@@ -3930,7 +3930,7 @@ void NormalDialog(
         QuickViewWait();
         gpWindowManager->RemoveWindow(pNormalDialogWindow);
     } else {
-        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, 0);
+        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, false);
     }
     delete pNormalDialogWindow;
 }
@@ -3957,10 +3957,10 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
 
 void QuickViewWait(void) {
     tag_message event;
-    i32 done;
+    b32 done;
 
     gpMouseManager->ReallyHidePointer();
-    done = 0;
+    done = false;
     while (!done) {
         PollSound();
         Process1WindowsMessage();
@@ -4034,11 +4034,11 @@ void EarlyShutDownSystem(void) {
         gEditManager->SelectTool(EDIT_TOOL_NONE);
 }
 
-i32 GameUnsaved(void) {
-    return 1;
+b32 GameUnsaved(void) {
+    return true;
 }
 
-i32 HandleAppSpecificMenuCommands(i32 command) {
+b32 HandleAppSpecificMenuCommands(i32 command) {
     switch (command) {
         case EDITOR_MENU_PALETTE_CYCLING:
             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
@@ -4057,9 +4057,9 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             PostMessageA(hwndApp, WM_CLOSE, 0, 0);
             break;
         default:
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 void EarlyResizeWindow(i32 x [[maybe_unused]], i32 y [[maybe_unused]], i32 width [[maybe_unused]],

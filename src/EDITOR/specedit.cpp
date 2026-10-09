@@ -170,7 +170,7 @@ b32 EditMapSpecifications(b32 randomMap [[maybe_unused]]) {
     message.payload.widget.data.value = (gEditMapHeader.lossCondition);
     gSpecWindow->BroadcastMessage(message);
     UpdateSpecificationsWindow();
-    gpWindowManager->DoDialog(gSpecWindow, SpecificationsHandler, 0);
+    gpWindowManager->DoDialog(gSpecWindow, SpecificationsHandler, false);
     delete gSpecWindow;
     gSpecWindow = NULL;
     gEditManager->DrawMap();

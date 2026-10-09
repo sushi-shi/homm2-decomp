@@ -224,7 +224,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                     if (event.type == MESSAGE_KEY_DOWN) {
                         switch (event.payload.keyboard.keyCode) {
                             case INPUT_SCAN_ESCAPE:
-                                if (gbAllowTextEntryEscape == 0)
+                                if (gbAllowTextEntryEscape == false)
                                     break;
                                 strcpy(edit, original);
                                 done++;

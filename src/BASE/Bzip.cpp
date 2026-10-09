@@ -35,7 +35,7 @@
 #define smallF 18
 
 u32 globalCrc;
-i32 bsInUse;
+b32 bsInUse;
 BitStream aBitStreamBuffer;
 i32 bytesOut;
 UInt32 bigL;
@@ -162,7 +162,7 @@ BitStream* bsOpenReadStream(FILE* f) {
     if (bsInUse)
         panic(const_cast<char*>(
             "bsOpenReadStream"));
-    bsInUse = 1;
+    bsInUse = true;
     bs = &aBitStreamBuffer;
     bs->handle = f;
     bs->buffer = 0;
@@ -176,7 +176,7 @@ BitStream* bsOpenWriteStream(FILE* f) {
     if (bsInUse)
         panic(const_cast<char*>(
             "bsOpenWriteStream"));
-    bsInUse = 1;
+    bsInUse = true;
     bs = &aBitStreamBuffer;
     bs->handle = f;
     bs->buffer = 0;
@@ -1852,7 +1852,7 @@ i32l EncodeData(char* destination, char* source, u32l sourceLength) {
     i32l flen;
 
     outputHandleJustInCase = NULL;
-    bsInUse = 0;
+    bsInUse = false;
     errno = 0;
     blockSize100k = 3;
     LogStr("Encode 1");
@@ -1893,7 +1893,7 @@ i32l DecodeData(char* destination, char* source, u32l sourceLength) {
     i32l flen;
 
     outputHandleJustInCase = NULL;
-    bsInUse = 0;
+    bsInUse = false;
     errno = 0;
     blockSize100k = 0;
     allocateCompressStructures();

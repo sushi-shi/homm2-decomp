@@ -46,19 +46,19 @@ typedef HRESULT(__stdcall* DirectDrawCreateProc)(
 );
 
 void DDRestoreDisplayMode(void);
-i32 DDQueryNewPalette(void);
+b32 DDQueryNewPalette(void);
 void CreatePrimary(void);
 void SetupClipper(void);
 void DDInitGraphics(void);
 i32 DDAppPaint(HWND window, HDC paintDC);
 void DDInitializePalette(void);
-i32 DDSetPalette(void);
-struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary);
+b32 DDSetPalette(void);
+struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, b32 primary);
 void DDSD(i32 error, const char* file, i32 line);
 void __cdecl DDUpdatePalette(i8* paletteData);
 void DDCleanUpWinGraphics(void);
 void DDSetFullScreenStatus(b32 fullScreen);
-i32 WGQueryNewPalette(void);
+b32 WGQueryNewPalette(void);
 void WGInitGraphics(void);
 void __cdecl WGUpdatePalette(i8* paletteData);
 void WGInitializePalette(void);
@@ -67,7 +67,7 @@ void WGCleanUpWinGraphics(void);
 void ConnectToDLLs(void);
 void DisconnectDLLs(void);
 void RestoreDisplayMode(void);
-i32 SetPalette(void);
+b32 SetPalette(void);
 void GetGraphicsInfo(void);
 void InitGraphics(void);
 i32 AppPaint(HWND window, HDC paintDC);
@@ -75,8 +75,8 @@ void InitializePalette(void);
 void __cdecl UpdatePalette(i8* paletteData);
 void CleanUpWinGraphics(void);
 void SetFullScreenStatus(b32 fullScreen);
-i32 QueryNewPalette(void);
-i32 SetGraphicsType(WingraphGraphicsType graphicsType);
+b32 QueryNewPalette(void);
+b32 SetGraphicsType(WingraphGraphicsType graphicsType);
 
 extern WingraphGraphicsType giGraphicsType;
 

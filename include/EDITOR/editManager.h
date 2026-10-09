@@ -368,7 +368,7 @@ public:
     b32 FindTown(i32 index, i32* x, i32* y);
     b32 FindHero(i32 index, i32* x, i32* y);
 
-    void RemoveLinkedObject(i32 link);
+    void RemoveLinkedObject(b32 link);
 };
 #pragma pack(pop)
 
@@ -409,7 +409,7 @@ void ShowStatusWarning(const char* text);
 i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
 
 
-i32 InMapArea(i32 x, i32 y);
+b32 InMapArea(i32 x, i32 y);
 
 
 void FillInOverlayTiles(void);

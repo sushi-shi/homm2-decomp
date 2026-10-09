@@ -94,7 +94,7 @@ public:
     void RestoreBackend(void);
     i32 ConvertVolume(i32 volume, SoundVolumeConversionMode soundType);
     float ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode soundType);
-    void StopAllSamples(i32 stopMusic);
+    void StopAllSamples(b32 stopMusic);
     void StopSample(class sample* sampleResource);
     void ModifySample(class sample* sampleResource, i32 volume);
     bool DigitalReport(class sample* sampleResource);
@@ -106,7 +106,7 @@ public:
     void SwitchAmbientMusic(i32 track);
     void MemorySample(class sample* sampleResource);
     void ServiceSound(void);
-    i32 MusicPlaying(void);
+    b32 MusicPlaying(void);
 };
 #pragma pack(pop)
 

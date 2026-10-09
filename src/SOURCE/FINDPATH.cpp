@@ -82,19 +82,19 @@ i32 CalcTerrainCost(
     i32 diagonal,
     i32 mobility,
     i32 pathfindingLevel,
-    i32 sourceHasRoad,
-    i32 destinationHasRoad
+    b32 sourceHasRoad,
+    b32 destinationHasRoad
 ) {
     if (mobility < giTerrainCost[(terrain)][pathfindingLevel][1]) {
         if (mobility >= giTerrainCost[(terrain)][pathfindingLevel][0]
-            || (sourceHasRoad != 0
+            || (sourceHasRoad != false
                 && mobility >= giTerrainCost[(TERRAIN_ROAD)][pathfindingLevel][0])) {
-            if (sourceHasRoad != 0)
+            if (sourceHasRoad != false)
                 return giTerrainCost[(TERRAIN_ROAD)][pathfindingLevel][0];
             return giTerrainCost[(terrain)][pathfindingLevel][0];
         }
     }
-    if (sourceHasRoad != 0 && destinationHasRoad != 0)
+    if (sourceHasRoad != false && destinationHasRoad != false)
         terrain = TERRAIN_ROAD;
     return giTerrainCost[(terrain)][pathfindingLevel][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
@@ -106,10 +106,10 @@ void searchArray::PushPoint(
     i32 cost,
     i32 maximumCost,
     i32 occupied,
-    i32 hasAdjacentMonster,
+    b32 hasAdjacentMonster,
     i32 adjacentMonsterX,
     i32 adjacentMonsterY,
-    i32 beyondTurnMobility,
+    b32 beyondTurnMobility,
     i32 turnEndX,
     i32 turnEndY
 ) {
@@ -150,7 +150,7 @@ void searchArray::PushPoint(
     }
     m_queueCount++;
 
-    if (cost > giCurTempMobility && beyondTurnMobility == 0) {
+    if (cost > giCurTempMobility && beyondTurnMobility == false) {
         gSearchQueueNode->beyondTurnMobility = 1;
         gSearchQueueNode->signedTurnEndX = static_cast<i8>(x - normalDirTable[(direction)].x);
         gSearchQueueNode->signedTurnEndY = static_cast<i8>(y - normalDirTable[(direction)].y);
@@ -197,7 +197,7 @@ void searchArray::TestPossibleDirections(
             gSearchTerrain = TERRAIN_INVALID;
             goto storeDirection;
         }
-        if (gbHumanPlayer[giCurPlayer] != 0
+        if (gbHumanPlayer[giCurPlayer] != false
             && (MAP_EXTRA_AT_WFIRST(gSearchNextX, gSearchNextY) & giCurPlayerBit) == 0) {
             gSearchTerrain = TERRAIN_INVALID;
             goto storeDirection;
@@ -331,7 +331,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
             && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
                    == COMBAT_ALL_DIRECTIONS_BLOCKED) {
             gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
-        } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
+        } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == true) {
             gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
         }
 
@@ -345,7 +345,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
                 && unit->GetAttackMask(unit->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID)
                        == COMBAT_ALL_DIRECTIONS_BLOCKED) {
                 gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
-            } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == 1) {
+            } else if (unit->ValidPath(enemyHex, ARMY_PATH_EXACT_TARGET_HEX) == true) {
                 gpCombatManager->m_hexCells[enemyHex].m_movementOrAttackReachable = 1;
             }
         }
@@ -359,7 +359,7 @@ i32 searchArray::FindCombatPath(
     i32 targetHex,
     class army* unit,
     ArmyPathTarget attackPath,
-    i32 slowTargetMoat
+    b32 slowTargetMoat
 ) {
     i32 moveMask;
     i32 distance;
@@ -378,7 +378,7 @@ i32 searchArray::FindCombatPath(
 
     memset(bIsMoatSlowed, 0, sizeof(bIsMoatSlowed));
 
-    if (gpCombatManager->m_hasMoat != 0) {
+    if (gpCombatManager->m_hasMoat != false) {
         i32 sourceWideHex = -1;
         i32 targetWideHex = -1;
 
@@ -395,7 +395,7 @@ i32 searchArray::FindCombatPath(
                 && gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED)
                 continue;
             if ((moatCell[moatIndex] == targetHex || moatCell[moatIndex] == targetWideHex)
-                && slowTargetMoat == 0)
+                && slowTargetMoat == false)
                 continue;
             if (moatCell[moatIndex] == unit->m_hex || moatCell[moatIndex] == sourceWideHex)
                 continue;
@@ -508,7 +508,7 @@ i32 searchArray::FindCombatPath(
 restoreMoatFailure:
     result = 0;
 restoreMoat:
-    if (gpCombatManager->m_hasMoat != 0) {
+    if (gpCombatManager->m_hasMoat != false) {
         for (moatIndex = 0; moatIndex < KB_MOAT_CELL_COUNT; moatIndex++)
             gpCombatManager->m_hexCells[moatCell[moatIndex]].m_blocked =
                 savedMoatState[moatIndex];

@@ -28,7 +28,7 @@ typedef enum AudiereChannelCount {
 
 
 struct MilesSampleState {
-    i32 ready;
+    b32 ready;
     struct _SAMPLE* handles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
     i32 handleCount;
 };
@@ -90,7 +90,7 @@ bool AudiereMusicAvailable(void);
 bool AudiereMusicPlaying(void);
 bool StartupAudiereMusic(audiere::AudioDevicePtr device);
 void ResetAudiereMusic(void);
-void SetAudiereMusicVolume(i32 volume, i32 fading);
+void SetAudiereMusicVolume(i32 volume, b32 fading);
 void PlayAudiereMusic(
     audiere::AudioDevicePtr device,
     i32& currentTrack,

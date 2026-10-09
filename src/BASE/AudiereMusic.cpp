@@ -78,11 +78,11 @@ void ResetAudiereMusic(void) {
         gAudiereMusicPositions[track] = 0;
 }
 
-void SetAudiereMusicVolume(i32 volume, i32 fading) {
+void SetAudiereMusicVolume(i32 volume, b32 fading) {
     i32 volumeLevel;
     if (volume == -1) {
         volumeLevel = (gConfig.musicVolume);
-    } else if (fading != 0) {
+    } else if (fading != false) {
         if (volume > AUDIERE_FADE_VOLUME_LIMIT - 1)
             volumeLevel = 1;
         else

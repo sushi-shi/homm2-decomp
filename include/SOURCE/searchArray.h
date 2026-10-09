@@ -96,13 +96,13 @@ public:
         MapDirection seedDirection,
         i32 maximumCost,
         i32 waterMode,
-        i32 findAdjacentMonster,
+        b32 findAdjacentMonster,
         i32 mobility,
         i32 pathfindingSkill,
         i32 targetX,
         i32 targetY,
-        i32 continueSeed,
-        i32 seedMonsterCells
+        b32 continueSeed,
+        b32 seedMonsterCells
     );
     void Init(void);
     void Close(void);
@@ -115,10 +115,10 @@ public:
         i32 cost,
         i32 maximumCost,
         i32 occupied,
-        i32 hasAdjacentMonster,
+        b32 hasAdjacentMonster,
         i32 adjacentMonsterX,
         i32 adjacentMonsterY,
-        i32 beyondTurnMobility,
+        b32 beyondTurnMobility,
         i32 turnEndX,
         i32 turnEndY
     );
@@ -131,7 +131,7 @@ public:
         i32 waterMode
     );
     void SeedCombatPosition(class army* unit);
-    i32 FindCombatPath(i32 sourceHex, i32 targetHex, class army* unit, ArmyPathTarget attackPath, i32 slowTargetMoat);
+    i32 FindCombatPath(i32 sourceHex, i32 targetHex, class army* unit, ArmyPathTarget attackPath, b32 slowTargetMoat);
     void PushCombatPoint(i32 hex, CombatHexDirection direction, i32 distance, i32 speed);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + x)[MAP_WIDTH * y];

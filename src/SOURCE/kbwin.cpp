@@ -59,9 +59,9 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
 
     memset(gcCommandLine, 0, KBWIN_COMMAND_LINE_CLEAR_SIZE);
     strncpy(gcCommandLine, commandLine, KBWIN_COMMAND_LINE_LIMIT);
-    if (EarlySetup() == 0)
+    if (EarlySetup() == false)
         return 0;
-    if (AppInit(instance, previousInstance, showCommand, commandLine) == 0)
+    if (AppInit(instance, previousInstance, showCommand, commandLine) == false)
         return 0;
 
     for (;;) {
@@ -79,7 +79,7 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     return message.wParam;
 }
 
-i32 AppInit(
+b32 AppInit(
     HINSTANCE instance,
     HINSTANCE previousInstance,
     i32 showCommand,
@@ -134,7 +134,7 @@ i32 AppInit(
         appClass.cbWndExtra = 0;
         appClass.cbClsExtra = 0;
         if (RegisterClassA(&appClass) == 0)
-            return 0;
+            return false;
     }
 
     if (CURRENT_GRAPHICS_CONFIG.showMenu != 0)
@@ -176,18 +176,18 @@ i32 AppInit(
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         if (CURRENT_GRAPHICS_CONFIG.showMenu == 0)
-            SetMenuStatus(0);
+            SetMenuStatus(false);
         InitGraphics();
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
         oldmain();
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 
 i32 AppIdle(void) {
-    if (gbForegroundApp != 0)
+    if (gbForegroundApp != false)
         return 1;
     else
         return 1;
@@ -206,7 +206,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             return 0;
         case WM_KEYDOWN:
         case WM_KEYUP:
-            if (KeyboardMessageHandler(window, message, messageParam, messageData) == 0)
+            if (KeyboardMessageHandler(window, message, messageParam, messageData) == false)
                 return 0;
             break;
         case WM_MOUSEMOVE:
@@ -216,7 +216,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
         case WM_RBUTTONDOWN:
         case WM_RBUTTONUP:
         case WM_RBUTTONDBLCLK:
-            if (MouseMessageHandler(window, message, messageParam, messageData) == 0)
+            if (MouseMessageHandler(window, message, messageParam, messageData) == false)
                 return 0;
             break;
         case WM_TIMER:
@@ -239,8 +239,8 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (hwndApp == NULL)
                 return 0;
             lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
-            if ((lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0 && gbClosingApp == 0
-                && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
+            if ((lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0 && gbClosingApp == false
+                && CURRENT_GRAPHICS_CONFIG.fullScreen == false) {
                 GetWindowRect(window, &rcTemp);
                 CURRENT_GRAPHICS_CONFIG.x = rcTemp.left;
                 CURRENT_GRAPHICS_CONFIG.y = rcTemp.top;
@@ -271,7 +271,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (iMainWinScreenHeight < 1)
                 iMainWinScreenHeight = 1;
             if (hwndApp != NULL && (lTemp & WS_MAXIMIZE) == 0 && (lTemp & WS_MINIMIZE) == 0
-                && gbClosingApp == 0 && CURRENT_GRAPHICS_CONFIG.fullScreen == 0) {
+                && gbClosingApp == false && CURRENT_GRAPHICS_CONFIG.fullScreen == false) {
                 CURRENT_GRAPHICS_CONFIG.width = iMainWinScreenWidth;
                 CURRENT_GRAPHICS_CONFIG.height = iMainWinScreenHeight;
                 WritePrefs();
@@ -290,7 +290,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             return 0;
         case WM_CLOSE:
             if (window == hwndApp) {
-                if (GameUnsaved() != 0) {
+                if (GameUnsaved() != false) {
                     NormalDialog(
                         "Вы действительно хотите выйти?",
                         NORMAL_DIALOG_CONFIRM
@@ -364,7 +364,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     RECT windowRectangle;
     i32 targetY;
 
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != false)
         return;
     GetWindowRect(hwndApp, &windowRectangle);
     windowX = (x == -1 ? windowRectangle.left : x);
@@ -457,7 +457,7 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, (KBWIN_MENU_SIZE_1024_768), MF_GRAYED);
     if (giMainVideoModeWidth <= KBWIN_WIDTH_1280)
         EnableMenuItem(menu, (KBWIN_MENU_SIZE_1280_1024), MF_GRAYED);
-    if (gbDDrawAttached == 0)
+    if (gbDDrawAttached == false)
         EnableMenuItem(menu, (KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
@@ -480,7 +480,7 @@ void KBChangeMenu(HMENU menu) {
     }
 }
 
-void SetMenuStatus(i32 showMenu) {
+void SetMenuStatus(b32 showMenu) {
     i32 winWidth;
     i32 height;
     i32l windowStyle [[maybe_unused]];
@@ -550,7 +550,7 @@ void SetMenus(HMENU menu, b32 enabled) {
             }
         }
         if (updateItem != 0) {
-            EnableMenuItem(menu, id, enabled == 0 ? MF_GRAYED : MF_ENABLED);
+            EnableMenuItem(menu, id, enabled == false ? MF_GRAYED : MF_ENABLED);
         }
     }
     UpdateDfltMenu(menu);

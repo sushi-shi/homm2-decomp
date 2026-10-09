@@ -52,7 +52,7 @@ void eventsManager::EditSign(i32 x, i32 y) {
     message.payload.widget.id = SIGN_TITLE;
     gEditDialog->BroadcastMessage(message);
     FillInSignEdit(&gSign);
-    gpWindowManager->DoDialog(gEditDialog, EditSignHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditSignHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         len = strlen(gSignText) + sizeof(gSign);

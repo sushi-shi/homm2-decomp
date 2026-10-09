@@ -48,13 +48,13 @@ void searchArray::SeedPosition(
     MapDirection seedDirection,
     i32 maximumCost,
     i32 waterMode,
-    i32 findAdjacentMonster,
+    b32 findAdjacentMonster,
     i32 mobility,
     i32 pathfindingSkill,
     i32 targetX,
     i32 targetY,
-    i32 continueSeed,
-    i32 seedMonsterCells
+    b32 continueSeed,
+    b32 seedMonsterCells
 ) {
     static b32 s_hasTarget;
     static b32 s_hasAdjacentMonster;
@@ -64,9 +64,9 @@ void searchArray::SeedPosition(
 
 
     static i32 s_unusedInt [[maybe_unused]];
-    static i32 s_targetHasRoad;
+    static b32 s_targetHasRoad;
     static i32 s_adjacentCost;
-    static i32 s_currentHasRoad;
+    static b32 s_currentHasRoad;
     static i32 s_adjacentX;
     static searchNode s_currentNode;
     static i32 s_mapY;
@@ -140,7 +140,7 @@ void searchArray::SeedPosition(
     }
 
     if (!continueSeed)
-        PushPoint(seedX, seedY, seedDirection, 0, maximumCost, 0, 0, 0, 0, 0, 0, 0);
+        PushPoint(seedX, seedY, seedDirection, 0, maximumCost, 0, false, 0, 0, false, 0, 0);
 
     s_currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
 
@@ -364,10 +364,10 @@ void searchArray::SeedPosition(
                                                 ),
                                             maximumCost,
                                             1,
-                                            0,
+                                            false,
                                             SEARCH_INVALID_COORDINATE,
                                             SEARCH_INVALID_COORDINATE,
-                                            0,
+                                            false,
                                             SEARCH_INVALID_COORDINATE,
                                             SEARCH_INVALID_COORDINATE
                                         );

@@ -70,7 +70,7 @@ i32 eventsManager::EditEvent(i32 extra) {
         gEditDialog->BroadcastMessage(message);
     }
     FillInEventEdit(&gEventEdit);
-    gpWindowManager->DoDialog(gEditDialog, EditEventHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditEventHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         byteCount = strlen(gEventMessage) + sizeof(EventExtra);

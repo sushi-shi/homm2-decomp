@@ -15,7 +15,7 @@ struct RemoteSaveInitialization {
     i32 dataSize;
     i32 crc;
     i32 wireCrc;
-    i32 playerExited;
+    b32 playerExited;
 };
 #pragma pack(pop)
 

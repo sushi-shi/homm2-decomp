@@ -66,7 +66,7 @@ public:
     MessageDispatchResult BroadcastMessage(MessageType type, BaseWidgetCommand command, i32 widgetId, i32 value);
     void AddWindow(class heroWindow* window, i32 zOrder, i32 updateScreen);
     void RemoveWindow(class heroWindow* window);
-    i32 DoDialog(class heroWindow* window, MessageDispatchHandler handler, i32 fade);
+    i32 DoDialog(class heroWindow* window, MessageDispatchHandler handler, b32 fade);
     void UpdateScreen(void);
     void UpdateScreenRegion(i32 x, i32 y, i32 width, i32 height);
     void RedrawScreen(void);
@@ -94,7 +94,7 @@ extern i32 iDialogNestCount;
 extern i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 extern i16 memSelector;
 
-void CycleColors(i32 forceUpdate);
+void CycleColors(b32 forceUpdate);
 void CreateFizzleTables(void);
 void CreateColorTables(void);
 void CreateColorLookupTables(void);

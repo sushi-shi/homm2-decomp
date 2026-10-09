@@ -113,7 +113,7 @@ i32 mouseManager::Open(i32 priority) {
     m_mouseY = MOUSE_SCREEN_CENTER_Y;
     m_cursorIndex = 0;
     m_drawnCursorIndex = 0;
-    if (gbColorMice != 0)
+    if (gbColorMice != false)
         ShowCursor(0);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
     m_priority = priority;
@@ -123,7 +123,7 @@ i32 mouseManager::Open(i32 priority) {
 
 void mouseManager::Close(void) {
     i32 cursorIndex;
-    if (m_active != 1)
+    if (m_active != true)
         return;
     m_active = false;
     if (m_savedUnderlying != NULL)
@@ -155,7 +155,7 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
 
 void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType cursorType) {
     MouseCursorType type;
-    if (m_pointerLocked != 0)
+    if (m_pointerLocked != false)
         return;
     {
         gbPutzingWithMouseCtr++;
@@ -170,7 +170,7 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
         } else {
             type = cursorType;
         }
-        if (type != m_cursorType && (m_cursorType = type, gbColorMice != 0)) {
+        if (type != m_cursorType && (m_cursorType = type, gbColorMice != false)) {
             b32 wasCursorReady = m_cursorReady;
             m_cursorReady = false;
             if (m_cursorIcon != NULL)
@@ -203,7 +203,7 @@ void mouseManager::SetPointer(const char* name, i32 frame, MouseCursorType curso
 }
 
 void mouseManager::SetPointer(i32 frame) {
-    if (m_pointerLocked != 0)
+    if (m_pointerLocked != false)
         return;
     if (frame < 0)
         return;
@@ -211,7 +211,7 @@ void mouseManager::SetPointer(i32 frame) {
         return;
     if (frame == m_cursorFrame)
         return;
-    if (gbInSetPointer != 0)
+    if (gbInSetPointer != false)
         return;
 
     gbInSetPointer = true;
@@ -226,8 +226,8 @@ void mouseManager::SetPointer(i32 frame) {
     m_cursorIndex = frame + iMouseOffset[(m_cursorType)];
     H2_ASSERT(m_cursorIndex >= 0 && m_cursorIndex < MOUSE_CURSOR_COUNT);
 
-    if (gbColorMice != 0) {
-        NewUpdate(1);
+    if (gbColorMice != false) {
+        NewUpdate(true);
         goto done;
     }
     if (hMouseCursor[m_cursorIndex] == NULL) {
@@ -324,21 +324,21 @@ done:
     gbInSetPointer = false;
 }
 
-void mouseManager::NewUpdate(i32 force) {
-    if (m_hideCount != 0 && force == 0)
+void mouseManager::NewUpdate(b32 force) {
+    if (m_hideCount != 0 && force == false)
         return;
-    if (m_cursorReady == 0)
+    if (m_cursorReady == false)
         return;
-    if (bInNewMouseUpdate != 0)
+    if (bInNewMouseUpdate != false)
         return;
 
     gbPutzingWithMouseCtr = gbPutzingWithMouseCtr + 1;
     bInNewMouseUpdate = true;
-    if (force == 0) {
+    if (force == false) {
         CheckUpdateMousePos();
     }
-    if (gbColorMice != 0) {
-        if (force != 0
+    if (gbColorMice != false) {
+        if (force != false
             || m_cursorLeft != m_mouseX - iHotSpot[m_cursorIndex][MOUSE_CURSOR_HORIZONTAL]
             || m_cursorTop != m_mouseY - iHotSpot[m_cursorIndex][MOUSE_CURSOR_VERTICAL]) {
             gOldMouseLeft = m_savedLeft;
@@ -530,7 +530,7 @@ void mouseManager::RestoreUnderlying(void) {
 }
 
 void mouseManager::ReallyHidePointer(void) {
-    if (gbColorMice != 0) {
+    if (gbColorMice != false) {
         HideColorPointer();
     } else {
         ShowCursor(0);
@@ -538,7 +538,7 @@ void mouseManager::ReallyHidePointer(void) {
 }
 
 void mouseManager::ReallyShowPointer(void) {
-    if (gbColorMice != 0) {
+    if (gbColorMice != false) {
         ShowColorPointer();
     } else {
         ShowCursor(1);
@@ -548,7 +548,7 @@ void mouseManager::ReallyShowPointer(void) {
 void mouseManager::HideColorPointer(void) {
     m_hideCount++;
     if (m_hideCount == 1)
-        NewUpdate(1);
+        NewUpdate(true);
 }
 
 void mouseManager::ShowColorPointer(void) {
@@ -557,23 +557,23 @@ void mouseManager::ShowColorPointer(void) {
         if (m_hideCount == 0) {
             gbPutzingWithMouseCtr = gbPutzingWithMouseCtr + 1;
             CheckUpdateMousePos();
-            NewUpdate(1);
+            NewUpdate(true);
             gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
         }
     }
 }
 
-i32 mouseManager::IsVis(void) {
+b32 mouseManager::IsVis(void) {
     return m_hideCount == 0;
 }
 
 void mouseManager::CheckUpdateMousePos(void) {
-    if (gbColorMice != 0) {
+    if (gbColorMice != false) {
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
         m_mouseX = CLIENT_TO_GAME_X(gMouseCheckPt.x);
         m_mouseY = CLIENT_TO_GAME_Y(gMouseCheckPt.y);
-        CheckChangeCursor(m_mouseX, m_mouseY, 0);
+        CheckChangeCursor(m_mouseX, m_mouseY, false);
     }
 }
 

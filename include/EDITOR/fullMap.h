@@ -36,14 +36,14 @@ public:
     void Compact(void);
 #endif
     void Write(i32 handle);
-    void Read(i32 handle, i32 convert);
+    void Read(i32 handle, b32 convert);
     void ChangeTilesetIndex(
         class mapCell* cell,
         i32 x,
         i32 y,
         TilesetId tileset,
         i32 index,
-        i32 overlay,
+        b32 overlay,
         i32 link
     );
 

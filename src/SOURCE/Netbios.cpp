@@ -22,7 +22,7 @@ typedef enum NetbiosSetupConstant {
     DETACH_SOURCE_SESSION    = 1
 } NetbiosSetupConstant;
 
-i8 InitNetHost(void) {
+b8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 reserved [[maybe_unused]];
     i32 needName;
@@ -43,7 +43,7 @@ i8 InitNetHost(void) {
             if (needName)
                 iInitNetHostStatus++;
             else
-                return 1;
+                return true;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
             sprintf(
@@ -62,15 +62,15 @@ i8 InitNetHost(void) {
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
             if ((((static_cast<NetbiosSessionStatus>(needName)) & (NETBIOS_SESSION_NAME_REGISTERED))))
-                return 1;
+                return true;
             else if ((((static_cast<NetbiosSessionStatus>(needName)) & (NETBIOS_SESSION_ERROR)))) {
             }
             break;
     }
-    return 0;
+    return false;
 }
 
-i8 InitNetGuest(void) {
+b8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
     b32 unregistered;
 
@@ -128,25 +128,25 @@ i8 InitNetGuest(void) {
                 sprintf(gText, "Ошибка инициализации сети.");
                 ShutDown(gText);
             }
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
-i8 WaitForHost(void) {
+b8 WaitForHost(void) {
     i32 status;
 
     switch (iWaitForHostStatus) {
         case WAIT_START:
             status = (((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION)))) & (NETBIOS_SESSION_ACTIVE)));
             if (status != 0)
-                return 1;
+                return true;
             break;
     }
-    return 0;
+    return false;
 }
 
-i8 WaitForGuest(void) {
+b8 WaitForGuest(void) {
     i32 status;
 
     switch (iWaitForGuestStatus) {
@@ -156,7 +156,7 @@ i8 WaitForGuest(void) {
             );
             if (static_cast<NetbiosResult>(status) == NETBIOS_RESULT_SUCCESS)
                 iWaitForGuestStatus++;
-            return 0;
+            return false;
         case WAIT_POLL:
             status = !(((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION)))) & (NETBIOS_SESSION_ACTIVE)));
             if (status) {
@@ -171,10 +171,10 @@ i8 WaitForGuest(void) {
                     CONNECTED_SESSION,
                     DETACH_SOURCE_SESSION
                 );
-                return 1;
+                return true;
             }
     }
-    return 0;
+    return false;
 }
 
 i32 nbnet_init(void) {
@@ -186,14 +186,14 @@ i32 nbnet_init(void) {
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
             sprintf(gText, "Инициализация сети.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
             sprintf(gText, "Ожидание гостя.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
             LogStr("GUON2");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
             LogStr("GUON3");
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             LogStr("GUON4");
             break;
@@ -201,12 +201,12 @@ i32 nbnet_init(void) {
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
             sprintf(gText, "Инициализация сети.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
             sprintf(gText, "Ожидание хоста.\n\n  Нажмите 'ОТМЕНА', чтобы прервать соединение.");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             break;
     }
