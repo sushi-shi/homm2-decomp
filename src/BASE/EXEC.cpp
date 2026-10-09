@@ -62,9 +62,9 @@ void executive::ShutDownSystem(void) {
             RemoveManager(manager);
         manager = next;
     }
-    if (gpWindowManager->m_active == 1)
+    if (gpWindowManager->m_active == true)
         RemoveManager(gpWindowManager);
-    if (gpMouseManager->m_active == 1)
+    if (gpMouseManager->m_active == true)
         RemoveManager(gpMouseManager);
     gpInputManager->Close();
     gpResourceManager->Close();

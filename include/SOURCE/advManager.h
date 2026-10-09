@@ -304,19 +304,19 @@ public:
         i32* eventX,
         i32* eventY,
         i32* outOfMobility,
-        i32 processEvent,
+        b32 processEvent,
         i32* adjacentMonster,
-        i32 forceMove
+        b32 forceMove
     );
     void CheckAdjacentMon(i32* adjacentMonster);
-    i32 ValidMoveWithEvent(class hero* movingHero, MapDirection direction);
-    i32 ValidMove(MapDirection direction, i32 eventMode);
+    b32 ValidMoveWithEvent(class hero* movingHero, MapDirection direction);
+    b32 ValidMove(MapDirection direction, b32 eventMode);
     void MoveOrigin(i32 directionX, i32 directionY);
     void ProcessMapChange(struct SMapChange change);
     void ProcessIncomingSingleMapChange(struct SMapChange* incoming);
     void ProcessIncomingGroupMapChange(char* incomingData);
     void PurgeMapChangeQueue(void);
-    void UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges);
+    void UnwindMapChangeQueue(i32 maximumToUnwind, b32 processChanges);
     void ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains);
     void VWCleanup(void);
     void VWInit(i32 centerX, i32 centerY);
@@ -329,84 +329,84 @@ public:
     i32 GetCommandTargetY(void) {
         return m_commandTargetY;
     }
-    void CheckSetEvilInterface(i32 redraw, i32 player);
+    void CheckSetEvilInterface(b32 redraw, i32 player);
     void Reseed(i32, i32);
     MessageDispatchResult ProcessSelect(struct tag_message* message, class mapCell** eventCell);
     MessageDispatchResult ProcessDeSelect(struct tag_message* message, i32* result, class mapCell** eventCell);
     i32 ProcessSearch(i32 x, i32 y);
     MessageDispatchResult ProcessHover(i32 mouseX, i32 mouseY);
-    void UpdateScreen(i32, i32 forceUpdate);
-    void CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView);
-    void CompleteDraw(i32 forceDraw);
+    void UpdateScreen(b32, b32 forceUpdate);
+    void CompleteDraw(i32 originX, i32 originY, b32 forceDraw, b32 updateBottomView);
+    void CompleteDraw(b32 forceDraw);
     i32 GetCloudLookup(i32 x, i32 y);
-    void DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY, AdventureDrawMask drawMask, i32 forceDraw);
+    void DrawCell(i32 mapX, i32 mapY, i32 screenX, i32 screenY, AdventureDrawMask drawMask, b32 forceDraw);
     class mapCell* GetCell(i32 x, i32 y);
-    void UpdateRadar(i32 updateScreen, i32 partial);
+    void UpdateRadar(i32 updateScreen, b32 partial);
     void QuickInfo(i32 cellX, i32 cellY);
-    void UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen);
-    void UpdateHeroLocators(i32 drawWindow, i32 updateScreen);
-    void UpdateTownLocators(i32 drawWindow, i32 updateScreen);
+    void UpdateHeroLocator(i32 locatorSlot, b32 drawWindow, b32 updateScreen);
+    void UpdateHeroLocators(b32 drawWindow, b32 updateScreen);
+    void UpdateTownLocators(b32 drawWindow, b32 updateScreen);
     void UpdBottomView(b32 forceUpdate, b32 drawWindow, b32 updateScreen);
     void ClearBottomView(void);
-    i32 UpdBottomViewEnemyTurn(void);
-    i32 UpdBottomViewNewTurn(void);
-    i32 UpdBottomViewResMsg(void);
-    i32 UpdBottomViewKingdom(void);
-    i32 UpdBottomViewHero(void);
+    b32 UpdBottomViewEnemyTurn(void);
+    b32 UpdBottomViewNewTurn(void);
+    b32 UpdBottomViewResMsg(void);
+    b32 UpdBottomViewKingdom(void);
+    b32 UpdBottomViewHero(void);
     void HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY);
     const char* GetArmySizeName(i32 armySize, ArmySizeNameVariant grammar);
     void TownQuickView(i32 townId, i32, i32 windowX, i32 windowY);
-    void RedrawAdvScreen(i32 update, i32 freeBorder);
+    void RedrawAdvScreen(i32 update, b32 freeBorder);
     void DeactivateCurrTown(void);
     void DeactivateCurrHero(void);
-    void MobilizeCurrHero(i32 update);
+    void MobilizeCurrHero(b32 update);
     void DemobilizeCurrHero(void);
     void SetTownContext(i32 townId);
-    void SetHeroContext(i32 heroId, i32 update);
+    void SetHeroContext(i32 heroId, b32 update);
     void DoHeroKnob(void);
     void DoTownKnob(void);
     void CastSpell(SpellType spell);
     void CheckCastSpell(void);
-    i32 ComboDraw(i32 originX, i32 originY, i32 animate);
-    i32 ComboDraw(i32 animate);
-    void SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds);
+    b32 ComboDraw(i32 originX, i32 originY, b32 animate);
+    b32 ComboDraw(b32 animate);
+    void SetEnvironmentOrigin(i32 originX, i32 originY, b32 stopSounds);
     void CheckLoadSample(i32 index);
     AdventureEnvironmentSoundId GetSoundId(i32 x, i32 y);
     void InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer);
-    void TeleportTo(class hero* mapHero, i32 destinationX, i32 destinationY, i32, i32 skipMapChange);
+    void TeleportTo(class hero* mapHero, i32 destinationX, i32 destinationY, b32, b32 skipMapChange);
     void DimensionDoor(void);
     void TownGate(SpellType spellId);
     void SummonBoat(void);
-    void ShowRoute(i32 redraw, i32, i32 updateButton);
-    void HideRoute(i32 redraw, i32 clearDestination, i32 updateButton);
+    void ShowRoute(b32 redraw, b32, b32 updateButton);
+    void HideRoute(b32 redraw, b32 clearDestination, b32 updateButton);
     void CheckDimHero(void);
     void CheckDimNextHeroBut(void);
     void SeedTo(i32 targetX, i32 targetY);
     void ForceNewHover(void);
-    void ScreenScroll(MapDirection direction, i32 updatePointer);
+    void ScreenScroll(MapDirection direction, b32 updatePointer);
     void CheckScreenScroll(void);
-    i32 MouseInScrollZone(void);
+    b32 MouseInScrollZone(void);
     void SetInitialMapOrigin(void);
     void LoadRemote(void);
     char* CheckHandleNet(void);
-    MessageDispatchResult CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain);
+    MessageDispatchResult CheckHandleNetPlayerWait(struct tag_message& message, b32 doMain);
     void TrimLoopingSounds(i32 maxSamples);
     void DisableButtons(void);
     void EnableButtons(void);
     void SaveAdventureBorder(void);
     void DrawAdventureBorder(void);
-    i32 FindAdjacentMonster(i32 originX, i32 originY, i32* monsterX, i32* monsterY, i32 excludedX, i32 excludedY);
+    b32 FindAdjacentMonster(i32 originX, i32 originY, i32* monsterX, i32* monsterY, i32 excludedX, i32 excludedY);
     void ViewPuzzle(void);
     void PuzzleDraw(i32 originX, i32 originY, i32 ultimateArtifactX, i32 ultimateArtifactY);
     void AdvPanel(void);
-    i32 ControlPanel(void);
+    b32 ControlPanel(void);
     void SystemOptions(void);
-    i32 DoVisions(class hero* visionHero);
-    i32 IsCrystalBallInEffect(i32 x, i32 y, i32 radius);
+    b32 DoVisions(class hero* visionHero);
+    b32 IsCrystalBallInEffect(i32 x, i32 y, i32 radius);
     void DoEvent(class mapCell* cell, i32 x, i32 y);
     void EraseObj(class mapCell* cell, i32 x, i32 y);
     void HeroSwap(class hero* firstHero, class hero* secondHero);
-    i32 BarrierEvent(class mapCell* cell, class hero*);
+    b32 BarrierEvent(class mapCell* cell, class hero*);
     void PasswordEvent(class mapCell* cell, class hero*);
     void GenericSiteEvent(class mapCell* cell, class hero* eventHero);
     void RecruitSiteEvent(class mapCell* cell, class hero* eventHero);
@@ -416,12 +416,12 @@ public:
     void EventSound(MapObjectType eventType, i32 eventData, SAMPLE2* outSample);
     void EventWindow(i32 eventId, i32 buttons, const char* text, i32 type1, i32 value1, i32 type2, i32 value2, i32 type3);
     ArtifactType GiveRandomArtifact(class hero* eventHero);
-    i32 GiveExperience(class hero* eventHero, i32 experience, i32 checkLevel);
+    i32 GiveExperience(class hero* eventHero, i32 experience, b32 checkLevel);
     void GiveResource(class hero* eventHero, ResourceType resourceType, i32 amount);
     void RecruitEvent(class hero* eventHero, CreatureType creatureType, class mapCell* cell);
-    i32 SkeletonEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
-    i32 ZombieEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
-    i32 GhostEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
+    b32 SkeletonEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
+    b32 ZombieEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
+    b32 GhostEvent(class hero* eventHero, class mapCell* cell, const char* text, i32 x, i32 y);
     void HouseEvent(class hero* eventHero, class mapCell* cell);
     CombatResult CombatMonsterEvent(
         class hero* eventHero,
@@ -430,7 +430,7 @@ public:
         class mapCell*,
         i32 mapX,
         i32 mapY,
-        i32 monstersAttack,
+        b32 monstersAttack,
         i32 combatX,
         i32 combatY,
         CreatureType secondaryType,
@@ -445,7 +445,7 @@ public:
     void DoWhirlpool(class hero* eventHero);
     void FizzleCenter(i32 fizzleType);
     void DoAIEvent(class mapCell* cell, class hero* eventHero, i32 x, i32 y);
-    i32 BarrierAIEvent(class mapCell* cell, class hero*);
+    b32 BarrierAIEvent(class mapCell* cell, class hero*);
     void PasswordAIEvent(class mapCell* cell, class hero*);
     void GenericSiteAIEvent(class mapCell* cell, class hero* eventHero);
     void RecruitSiteAIEvent(class mapCell* cell, class hero* eventHero);
@@ -457,7 +457,7 @@ public:
         i32* removeMonsterObject,
         i32 x,
         i32 y,
-        i32 defender,
+        b32 defender,
         i32 combatX,
         i32 combatY
     );
@@ -489,8 +489,8 @@ public:
         i32 randomSeed,
         i32 remotePlayer,
         CombatResult combatResult,
-        i32 retreatWin,
-        i32 combatSurrender
+        b32 retreatWin,
+        b32 combatSurrender
     );
     void ReceiveHeroTownData(
         char* packetData,
@@ -591,10 +591,10 @@ i32 SaveGame(void);
 MessageDispatchResult DimensionDoorHandler(struct tag_message& message);
 MessageDispatchResult TownPortalHandler(struct tag_message& message);
 void ComputeAdvNetControl(void);
-i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask);
+b32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask);
 MessageDispatchResult APanelHandler(struct tag_message& message);
 MessageDispatchResult CPanelHandler(struct tag_message& message);
-void UpdateSystemOptions(i32 initialDraw);
+void UpdateSystemOptions(b32 initialDraw);
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message);
 i32 GetMobilityFrame(i32 mobility);
 i32 GetManaFrame(i32 mana);

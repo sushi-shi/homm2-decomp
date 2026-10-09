@@ -701,7 +701,7 @@ void playerData::Read(i32 file) {
     ReadGameData(file, m_unusedAd, sizeof(m_unusedAd));
 }
 
-i32 playerData::NextHero(i32) {
+i32 playerData::NextHero(b32) {
     i32 curHero = -1;
     i32 i;
 
@@ -723,13 +723,13 @@ i32 playerData::NextHero(i32) {
     return -1;
 }
 
-i32 playerData::HasMobileHero(void) {
+b32 playerData::HasMobileHero(void) {
     i32 i;
     for (i = 0; i < m_heroCount; i++) {
         if (gpGame->IsMobile(m_heroIds[i]))
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 i32 GetNumObelisks(i32 player) {
@@ -797,7 +797,7 @@ typedef enum UltimateArtifactHintConstant {
 } UltimateArtifactHintConstant;
 
 void ComputeUALoc(i32 playerIndex) {
-    i32 puzzlePieces = gpGame->SetupPuzzlePieces(playerIndex, 1);
+    i32 puzzlePieces = gpGame->SetupPuzzlePieces(playerIndex, true);
     if (puzzlePieces < MINIMUM_PUZZLE_PIECES
         || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
         gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = 0;
@@ -860,7 +860,7 @@ typedef enum PuzzleSetupConstant {
     PUZZLE_FALLBACK_RETRY_LIMIT     = 100
 } PuzzleSetupConstant;
 
-i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
+i32 game::SetupPuzzlePieces(i32 player, b32 justCount) {
     i32 pieceCount = GetNumObelisks(player);
     i32 piecesBeyondObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float fraction = m_obeliskCount > 0
@@ -917,9 +917,9 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     return pieceCount;
 }
 
-i32 game::IsMobile(i32 heroId) {
+b32 game::IsMobile(i32 heroId) {
     if (heroId == -1)
-        return 0;
+        return false;
     hero* mobileHero = &m_heroRecs[heroId];
     mapCell* cell = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
     return mobileHero->m_remainingMobility >= CalcTerrainCost(
@@ -928,7 +928,7 @@ i32 game::IsMobile(i32 heroId) {
                mobileHero->m_remainingMobility,
                H2EnumIndex(mobileHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
                cell->m_isRoad,
-               0
+               false
            );
 }
 
@@ -936,10 +936,10 @@ fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
-i32 game::CreateBoat(i32 x, i32 y, i32 skipNotify) {
+i32 game::CreateBoat(i32 x, i32 y, b32 skipNotify) {
     i32 boatIndex = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIndex != -1) {
-        if (skipNotify == 0)
+        if (skipNotify == false)
             SendMapChange(MAP_CHANGE_BUILD_BOAT, 0, x, y, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
         m_boatSlots[boatIndex] = boatIndex;
         boatRecord* boat = &m_boats[boatIndex];
@@ -977,7 +977,7 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32, i8 target) {
     return -1;
 }
 
-i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
+i32 game::GetNewHeroId(i32, FactionType heroClass, b32 requireExperienced) {
 
     i32 heroIndex = -1;
     i32 attempts = 0;
@@ -1052,7 +1052,7 @@ void EncodeGameFileText(
     }
 }
 
-i32 game::SaveGame(const char* filename, i32 generateName, i8 baseFormat) {
+i32 game::SaveGame(const char* filename, b32 generateName, b8 baseFormat) {
     // Unsaveable runtime state is a save failure, not a load (read) error.
     const auto requireSaveableState = [](bool condition) {
         if (!condition)
@@ -1083,7 +1083,7 @@ i32 game::SaveGame(const char* filename, i32 generateName, i8 baseFormat) {
     emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
-        baseFormat = 1;
+        baseFormat = true;
     gpAdvManager->DemobilizeCurrHero();
 
     if (generateName) {
@@ -1269,7 +1269,7 @@ void game::SetupOrigData(void) {
     giMonthTypeExtra = 0;
     giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = 0;
-    m_cheated = 0;
+    m_cheated = false;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
     strcpy(m_saveName, save_names::NewGame);
@@ -1401,11 +1401,11 @@ void game::SetupOrigData(void) {
     while (!gbThisNetHumanPlayer[giCurWatchPlayer])
         giCurWatchPlayer = (giCurWatchPlayer + 1) % m_playerCount;
     giCurWatchPlayerBit = 1 << giCurWatchPlayer;
-    gpAdvManager->CheckSetEvilInterface(0, -1);
+    gpAdvManager->CheckSetEvilInterface(false, -1);
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
-void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
+void game::LoadGame(const char* filename, b32 originalDataOnly, b32) {
     char workData[SAVE_LEGACY_CLEAR_SIZE];
 
     char isHuman[GAME_PLAYER_COUNT];
@@ -1492,7 +1492,7 @@ void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
 
     ReadGameData(fileDescriptor, workData, SAVE_LEGACY_SERIALIZED_SIZE);
     ReadGameData(fileDescriptor, &gbInCampaign, sizeof(gbInCampaign));
-    if (gbInCampaign == 1) {
+    if (gbInCampaign == true) {
         ReadGameData(fileDescriptor, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
@@ -1619,7 +1619,7 @@ void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
     ReadGameData(fileDescriptor, chunkTag, sizeof(i32));
     ReadGameData(fileDescriptor, mapExtra, MAP_WIDTH * MAP_HEIGHT);
     ReadGameData(fileDescriptor, chunkTag, sizeof(i32));
-    m_worldMap.Read(fileDescriptor, 0);
+    m_worldMap.Read(fileDescriptor, false);
     RequireGameData(m_worldMap.width == MAP_WIDTH && m_worldMap.height == MAP_HEIGHT);
     RequireMapExtras(*this, false);
     ReadGameData(fileDescriptor, chunkTag, sizeof(i32));
@@ -1637,7 +1637,7 @@ void game::LoadGame(const char* filename, i32 originalDataOnly, i32) {
     LogStr("LG3");
     // Stable marker for external checks (tools/gameplay_roundtrip.py).
     platform::Host().Log(platform::LogLevel::Info, "save: loaded");
-    gpAdvManager->CheckSetEvilInterface(0, -1);
+    gpAdvManager->CheckSetEvilInterface(false, -1);
 }
 
 void game::GiveTroopsToNeutralTown(i32 townId) {
@@ -1916,7 +1916,7 @@ void game::NewMap(const char* filename) {
                 GetNewHeroId(
                     player,
                     m_castleRecs[m_players[player].m_townIds[selectedTown]].m_type,
-                    0
+                    false
                 );
             m_heroOwners[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
                 player;
@@ -2017,13 +2017,13 @@ void game::NewMap(const char* filename) {
                 < FACTION_COUNT)
                 startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
             m_players[player].m_availableHeroIds[0] =
-                GetNewHeroId(player, startClass, 0);
+                GetNewHeroId(player, startClass, false);
             m_heroOwners[m_players[player].m_availableHeroIds[0]] = HERO_AVAILABILITY_FOR_HIRE;
         }
     secondHero:
         startClass = (startClass + Random(1, H2EnumIndex(FACTION_COUNT) - 1)) % H2EnumIndex(FACTION_COUNT);
         m_players[player].m_availableHeroIds[1] =
-            GetNewHeroId(player, startClass, 0);
+            GetNewHeroId(player, startClass, false);
         m_heroOwners[m_players[player].m_availableHeroIds[1]] = HERO_AVAILABILITY_FOR_HIRE;
     }
 
@@ -2192,7 +2192,7 @@ void game::NewMap(const char* filename) {
     gpPhilAI->GetGameAIVars();
     gbInNewGameSetup = false;
     SetupNewRumour();
-    gpAdvManager->CheckSetEvilInterface(0, -1);
+    gpAdvManager->CheckSetEvilInterface(false, -1);
     return;
 }
 
@@ -2251,7 +2251,7 @@ void game::RandomizeEvents(void) {
                     cell->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell->m_objectMetadata = 0;
                     cell->m_triggerType = MAP_OBJECT_NONE;
-                    CreateBoat(xPosition, yPosition, 1);
+                    CreateBoat(xPosition, yPosition, true);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_SPHINX):
                     eventData =
@@ -2903,7 +2903,7 @@ i32 game::LoadMap(const char* filename) {
          + localization::TextEncodingName(localization::CurrentFileTextEncoding())
          + ", file=" + filename).c_str()
     );
-    m_worldMap.Read(handle, 1);
+    m_worldMap.Read(handle, true);
     RequireGameData(m_worldMap.width == m_mapHeader.width
                     && m_worldMap.height == m_mapHeader.height);
     SetMapSize(m_worldMap.width, m_worldMap.height);
@@ -2988,7 +2988,7 @@ i32 game::LoadMap(const char* filename) {
     return 0;
 }
 
-void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
+void game::ClaimTown(i32 townId, i32 player, b32 suppressVisibility) {
     i32 i;
     town* townRec;
     mapCell* cellPointer;
@@ -3029,7 +3029,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         m_castleRecs[townId].m_y,
         TILESET_FLAG32,
         GetPlayerColor(static_cast<i8>(player)) * TOWN_FLAG_FRAME_STRIDE,
-        1,
+        true,
         -1
     );
     cellPointer = m_worldMap.GetCell(m_castleRecs[townId].m_x + 1, m_castleRecs[townId].m_y);
@@ -3040,10 +3040,10 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
         TILESET_FLAG32,
         GetPlayerColor(static_cast<i8>(player)) * TOWN_FLAG_FRAME_STRIDE
             + TOWN_FLAG_RIGHT_FRAME,
-        1,
+        true,
         -1
     );
-    if (suppressVisibility != 0)
+    if (suppressVisibility != false)
         return;
     SetVisibility(m_castleRecs[townId].m_x, m_castleRecs[townId].m_y, player, giVisRangeTown);
     CheckEndGame(END_GAME_FORCE_NONE, false);
@@ -3108,7 +3108,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
     cell = m_worldMap.GetCell(x, y);
     if (player == -1) {
         m_worldMap.ChangeTilesetIndex(
-            cell, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, 1, -1
+            cell, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, true, -1
         );
     } else {
         m_worldMap.ChangeTilesetIndex(
@@ -3117,7 +3117,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
             y,
             TILESET_FLAG32,
             flagFrameBase + GetPlayerColor(static_cast<i8>(player)),
-            1,
+            true,
             -1
         );
         if (m_mines[mineId].resourceType == MINE_TYPE_MERCURY) {
@@ -3174,7 +3174,7 @@ game::ViewSpells(
             m_viewSpellsWindow->BroadcastMessage(message);
         }
         UpdateSpellWidgets();
-        gpWindowManager->DoDialog(m_viewSpellsWindow, ViewSpellsHandler, 0);
+        gpWindowManager->DoDialog(m_viewSpellsWindow, ViewSpellsHandler, false);
         delete m_viewSpellsWindow;
     }
     return m_viewSpell;
@@ -3523,9 +3523,9 @@ void game::ViewArmy(
     CreatureType monsterType,
     i32 numTroops,
     town* castle,
-    i32 disableDismiss,
+    b32 disableDismiss,
     ArmyFacing facing,
-    i32 quickView,
+    b32 quickView,
     hero* theHero,
     class army* theArmy,
     armyGroup* theGroup,
@@ -3557,7 +3557,7 @@ void game::ViewArmy(
     iViewArmyNumTroops = numTroops;
     gbAllowUpgrade = false;
 
-    if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
+    if (castle && (gpAdvManager->m_active == true || gpTownManager->m_active == true)) {
         for (loopIndex = H2EnumIndex(BUILDING_SLOT_DWELLING_SECOND);
              loopIndex <= H2EnumIndex(BUILDING_SLOT_DWELLING_SIXTH);
              loopIndex++) {
@@ -3595,7 +3595,7 @@ void game::ViewArmy(
         ->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[H2EnumIndex(monsterType)], 1));
     gpResourceManager->ReadBlock(&sViewArmyMonFrameInfo, sizeof(sViewArmyMonFrameInfo));
     ModifyFrameInfo(&sViewArmyMonFrameInfo, monsterType);
-    BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
+    BuildTempWalkSeq(&sViewArmyMonFrameInfo, false, true);
 
     viewArmyBaseX = VIEW_ARMY_MONSTER_BASE_X;
     strcpy(filename, cMonFilename[H2EnumIndex(monsterType)]);
@@ -3684,7 +3684,7 @@ void game::ViewArmy(
     if ((H2EnumIndex((monster->attributes) & (MONSTER_FLAGS_SHOOTER)))) {
         i32 remainingShots = armyMonster->shots;
         if (remainingShots > 0) {
-            if (gpCombatManager->m_active == 1)
+            if (gpCombatManager->m_active == true)
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], remainingShots);
             else
                 utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], remainingShots);
@@ -3710,7 +3710,7 @@ void game::ViewArmy(
         monster->hitPoints
     );
     strcat(details, gText);
-    if (gpCombatManager->m_active == 1) {
+    if (gpCombatManager->m_active == true) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("army.hit_points_left"),
@@ -3820,7 +3820,7 @@ void game::ViewArmy(
         QuickViewWait();
         gpWindowManager->RemoveWindow(m_viewArmyWindow);
     } else {
-        gpWindowManager->DoDialog(m_viewArmyWindow, ViewArmyHandler, 0);
+        gpWindowManager->DoDialog(m_viewArmyWindow, ViewArmyHandler, false);
         if (gbDismissArmy && theGroup) {
             theGroup->m_creatureTypes[groupIndex] = CREATURE_NONE;
             theGroup->m_creatureCounts[groupIndex] = 0;
@@ -4065,7 +4065,7 @@ i32 game::GetRandomNumTroops(CreatureType monsterType) {
 }
 
 void game::TurnOnAIMusic(void) {
-    gpSoundManager->StopAllSamples(1);
+    gpSoundManager->StopAllSamples(true);
     gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_AI_TURN);
     gbSoundEnabled = 0;
 }
@@ -4085,8 +4085,8 @@ void game::NextPlayer(void) {
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
         SaveGame(
             save_names::Autosave,
-            1,
-            0
+            true,
+            false
         );
     }
 
@@ -4115,7 +4115,7 @@ void game::NextPlayer(void) {
 
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer(1);
-        gpAdvManager->HideRoute(1, 0, 1);
+        gpAdvManager->HideRoute(true, false, true);
         gpAdvManager->CheckDimNextHeroBut();
         TurnOnAIMusic();
         platform::SetDialogMenusEnabled(false);
@@ -4125,7 +4125,7 @@ void game::NextPlayer(void) {
         if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
             gbThisNetGotAdventureControl = false;
             remotePlayer = gbGamePosToNetPos[giCurPlayer];
-            if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
+            if (!gpGame->TransmitSaveGame(remotePlayer, false, false))
                 ShutDown(NULL);
         }
         if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED)
@@ -4134,7 +4134,7 @@ void game::NextPlayer(void) {
         platform::SetDialogMenusEnabled(true);
         gpInputManager->Flush();
         gbAllBlack = true;
-        gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
+        gpAdvManager->CheckSetEvilInterface(true, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
             utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("player.turn"), cPlayerNames[giCurPlayer]);
@@ -4156,7 +4156,7 @@ void game::NextPlayer(void) {
 
     DoNewTurn();
     CheckEndGame(END_GAME_FORCE_NONE, false);
-    if (gbThisNetHumanPlayer[giCurPlayer] && gbSoundEnabled == 0
+    if (gbThisNetHumanPlayer[giCurPlayer] && gbSoundEnabled == false
         && giForceSwitchMusic == -1) {
         gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(
@@ -4165,7 +4165,7 @@ void game::NextPlayer(void) {
         gpAdvManager->SetEnvironmentOrigin(
             gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
             gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
-            1
+            true
         );
     }
     if (gbThisNetHumanPlayer[giCurPlayer])
@@ -4730,7 +4730,7 @@ void game::PerMonth(void) {
         }
     }
 
-    gpAdvManager->CompleteDraw(0);
+    gpAdvManager->CompleteDraw(false);
 }
 
 void game::ConvertObject(
@@ -4818,7 +4818,7 @@ void game::ConvertObject(
     }
 }
 
-void game::RandomizeTown(i32 x, i32 y, i32) {
+void game::RandomizeTown(i32 x, i32 y, b32) {
 
     i32 townId = GetTownId(x, y);
     town* castle = GetTown(townId);
@@ -5003,7 +5003,7 @@ void game::RandomizeMine(i32 x, i32 y) {
             y,
             TILESET_EXTRAOVR,
             H2EnumIndex(resType) - H2EnumIndex(MINE_TYPE_ORE),
-            0,
+            false,
             -1
         );
         trigger = MAP_OBJECT_MINE;
@@ -5085,13 +5085,13 @@ i32 game::GetRandomArtifactId(
     return H2EnumIndex(artifact);
 }
 
-i32 IsCursedItem(ArtifactType item) {
+b32 IsCursedItem(ArtifactType item) {
     if (item == ARTIFACT_FIZBIN_OF_MISFORTUNE || item == ARTIFACT_HIDEOUS_MASK
         || item == ARTIFACT_TAX_LIEN || item == ARTIFACT_ARM_OF_MARTYR
         || item == ARTIFACT_BROACH_SHIELDING || item == ARTIFACT_HEART_FIRE
         || item == ARTIFACT_HEART_ICE)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 void game::RandomizeHeroPool(void) {
@@ -5204,10 +5204,10 @@ void game::ProcessRandomObjects(void) {
                     cell->m_objectIndex = -1;
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_TOWN):
-                    RandomizeTown(x, y, 0);
+                    RandomizeTown(x, y, false);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_CASTLE):
-                    RandomizeTown(x, y, 1);
+                    RandomizeTown(x, y, true);
                     break;
                 case MAP_ACTION_TRIGGER(MAP_OBJECT_RANDOM_MONSTER):
                     minValue = 80;
@@ -5615,11 +5615,11 @@ void game::ShowComputerScreen(void) {
                 H2EnumIndex(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
             );
         gbAllBlack = true;
-        gpAdvManager->CompleteDraw(1);
-        gpAdvManager->UpdateHeroLocators(1, 1);
-        gpAdvManager->UpdateTownLocators(1, 1);
+        gpAdvManager->CompleteDraw(true);
+        gpAdvManager->UpdateHeroLocators(true, true);
+        gpAdvManager->UpdateTownLocators(true, true);
         gpAdvManager->UpdBottomView(true, true, true);
-        gpAdvManager->UpdateScreen(0, 1);
+        gpAdvManager->UpdateScreen(false, true);
         gbAllBlack = false;
         gbThisNetHumanPlayer[giCurPlayer] = saved;
     }
@@ -5627,7 +5627,7 @@ void game::ShowComputerScreen(void) {
 }
 
 void game::ShowHeroesLogo(void) {
-    if (gpAdvManager->m_heroesLogoShown == 0) {
+    if (gpAdvManager->m_heroesLogoShown == false) {
         gpAdvManager->m_heroesLogoShown = true;
         icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
         IconToBitmap(
@@ -5664,10 +5664,10 @@ void game::WaitForPlayer(const char* text, i32 player) {
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         gbSoundEnabled = 1;
         gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_NEW_MONTH);
-        gpAdvManager->CompleteDraw(1);
-        gpAdvManager->UpdateHeroLocators(1, 1);
-        gpAdvManager->UpdateTownLocators(1, 1);
-        gpAdvManager->UpdateScreen(0, 1);
+        gpAdvManager->CompleteDraw(true);
+        gpAdvManager->UpdateHeroLocators(true, true);
+        gpAdvManager->UpdateTownLocators(true, true);
+        gpAdvManager->UpdateScreen(false, true);
         ShowHeroesLogo();
         gbAllBlack = false;
         NormalDialog(text, 1, -1, -1, NORMAL_DIALOG_CREST, gpGame->m_players[player].m_color);
@@ -5675,10 +5675,10 @@ void game::WaitForPlayer(const char* text, i32 player) {
     }
 }
 
-i32 game::HasLateOverlay(i32 column, i32 row) {
+b32 game::HasLateOverlay(i32 column, i32 row) {
     mapCell* cell = WORLDMAP->GetCell(column, row);
     if (cell->m_drawOverlayOnTop)
-        return 1;
+        return true;
     mapCellExtra* extra;
 
     if (cell->m_extraIndex)
@@ -5687,13 +5687,13 @@ i32 game::HasLateOverlay(i32 column, i32 row) {
         extra = NULL;
     while (extra) {
         if (extra->drawOverlayOnTop)
-            return 1;
+            return true;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
         else
             extra = NULL;
     }
-    return 0;
+    return false;
 }
 
 void game::ConvertFlagToLateOverlay(i32 column, i32 row) {
@@ -5716,7 +5716,7 @@ void game::ConvertFlagToLateOverlay(i32 column, i32 row) {
     }
 }
 
-i32 game::HasObjectTilesetIndex(
+b32 game::HasObjectTilesetIndex(
     i32 column,
     i32 row,
     TilesetId tileset,
@@ -5724,7 +5724,7 @@ i32 game::HasObjectTilesetIndex(
 ) {
     mapCell* cell = WORLDMAP->GetCell(column, row);
     if (cell->ObjectTileset() == tileset && cell->m_objectIndex == index)
-        return 1;
+        return true;
     mapCellExtra* extra;
 
     if (cell->m_extraIndex)
@@ -5733,13 +5733,13 @@ i32 game::HasObjectTilesetIndex(
         extra = NULL;
     while (extra) {
         if (extra->ObjectTileset() == tileset && extra->objectIndex == index)
-            return 1;
+            return true;
         if (extra->nextIndex)
             extra = WORLDMAP->Extra(extra->nextIndex);
         else
             extra = NULL;
     }
-    return 0;
+    return false;
 }
 
 void game::ConvertAllToLateOverlay(i32 column, i32 row) {
@@ -5840,7 +5840,7 @@ void game::SetupTowns(void) {
             owner = -1;
         else
             owner = gcColorToPlayerPos[extra->color];
-        ClaimTown(townIndex, owner, 0);
+        ClaimTown(townIndex, owner, false);
         castle->m_originalOwner = static_cast<i8>(owner);
 
         if (extra->hasCustomArmy) {
@@ -6159,7 +6159,7 @@ void game::ProcessOnMapHeroes(void) {
                             );
                         }
                         mapHero->m_experience = 0;
-                        gpAdvManager->GiveExperience(mapHero, extra->experience, 1);
+                        gpAdvManager->GiveExperience(mapHero, extra->experience, true);
                         mapHero->CheckLevel();
                         mapHero->m_x = mapX;
                         mapHero->m_y = mapY;
@@ -6264,7 +6264,7 @@ void game::CheckHeroConsistency(void) {
                     || (totalHeroes < HERO_CONSISTENCY_POOL_THRESHOLD
                         && m_heroOwners[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
-                        GetNewHeroId(player, FACTION_ANY, 0);
+                        GetNewHeroId(player, FACTION_ANY, false);
                     m_heroOwners[m_players[player].m_availableHeroIds[slot]] =
                         HERO_AVAILABILITY_FOR_HIRE;
                 }
@@ -6344,7 +6344,7 @@ void game::CheckHeroConsistency(void) {
 #define samplesReady samplesReady3
 #define success success7
 
-i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSave) {
+b32 game::TransmitSaveGame(i32 remotePlayer, b32 playerExited, b32 useCurrentSave) {
     char filename[SAVE_PATH_CAPACITY];
     u32 transmitCrc;
     i32 packetsInBatch;
@@ -6353,7 +6353,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     i32 oldTrack;
     i32 batchCount;
     i32 chunkSize;
-    i32 result;
+    b32 result;
     i32 packetCount;
     char* reply;
     b32 success;
@@ -6379,7 +6379,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     transmitData = NULL;
     fileData = NULL;
     success = false;
-    result = 0;
+    result = false;
     acknowledged = NULL;
     oldTrack = -1;
     compressionCapacity = 0;
@@ -6392,15 +6392,15 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
     gbSoundEnabled = savedSoundEnabled;
 
     LogStr("Transmit Game Start");
-    if (gpAdvManager->m_active == 1)
+    if (gpAdvManager->m_active == true)
         BVResMsg(localization::Tr("network.data.sending"), RES_NONE, 0);
     AiPrint("Transmit Start - Compressing");
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
-    SaveGame(gConfig.rmtSCName, 0, 0);
+    SaveGame(gConfig.rmtSCName, false, false);
     if (!gbUseDiffCompression)
-        useCurrentSave = 1;
+        useCurrentSave = true;
     CreateDiffFile(
         gConfig.rmtSLName,
         gConfig.rmtSCName,
@@ -6491,7 +6491,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 playerExited, i32 useCurrentSav
                      sendPacketIndex < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
                      sendPacketIndex++) {
                     PollSound();
-                    CheckDoMain(0, 1);
+                    CheckDoMain(false, true);
                     if (!acknowledged[sendPacketIndex]) {
                         if (sendPacketIndex + 1 == packetCount)
                             chunkSize = fileSize - sendPacketIndex * REMOTE_SAVE_CHUNK_SIZE;
@@ -6567,7 +6567,7 @@ transmitCleanup:
         H2_FREE(acknowledged);
 
     AiPrint("Transmit End");
-    if (gpAdvManager->m_active == 1) {
+    if (gpAdvManager->m_active == true) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(true, true, true);
     }
@@ -6614,7 +6614,7 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success7
 
-i32 game::ReceiveSaveGame(
+b32 game::ReceiveSaveGame(
     i32 dataSize,
     i32 expectedCrc,
     i32 expectedTransmitCrc,
@@ -6624,7 +6624,7 @@ i32 game::ReceiveSaveGame(
     i32 receivedCrc;
     b32 finished;
     i32 oldTrack;
-    i32 result;
+    b32 result;
     char* received;
     RemoteSaveMessage* receivedPacket;
     i32 computedCrc;
@@ -6662,8 +6662,8 @@ i32 game::ReceiveSaveGame(
     oldTrack = -1;
     decompressedSize = 0;
 
-    gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
-    if (gpAdvManager->m_active == 1)
+    gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, false);
+    if (gpAdvManager->m_active == true)
         BVResMsg(localization::Tr("network.data.receiving"), RES_NONE, 0);
 
     samplesReady = gbSoundEnabled;
@@ -6679,7 +6679,7 @@ i32 game::ReceiveSaveGame(
         0,
         REMOTE_COMMAND_SAVE_INIT_RESPONSE,
         1,
-        1,
+        true,
         REMOTE_MESSAGE_DEFAULT
     );
     LogStr("End Transmit Init Confirm");
@@ -6697,7 +6697,7 @@ i32 game::ReceiveSaveGame(
     LogInt("FW2", remotePlayer);
     while (!finished) {
         PollSound();
-        CheckDoMain(0, 1);
+        CheckDoMain(false, true);
         if (lastPacketTime + REMOTE_WAIT_TIMEOUT < platform::Ticks()) {
             NormalDialog(localization::Tr("network.receive.retry"), NORMAL_DIALOG_CONFIRM);
             if (gpWindowManager->m_dialogResult == DIALOG_BUTTON_5)
@@ -6821,7 +6821,7 @@ receiveCleanup:
     if (success)
         CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint("Receive End");
-    if (gpAdvManager->m_active == 1) {
+    if (gpAdvManager->m_active == true) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(true, true, true);
     }
@@ -6863,8 +6863,8 @@ void game::DoNewTurn(void) {
     giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
     gpAdvManager->UpdBottomView(true, true, true);
     gpAdvManager->SetInitialMapOrigin();
-    gpAdvManager->CompleteDraw(0);
-    gpAdvManager->UpdateScreen(0, 0);
+    gpAdvManager->CompleteDraw(false);
+    gpAdvManager->UpdateScreen(false, false);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 
     if (gpCurPlayer->m_daysLeft >= 0) {
@@ -6877,7 +6877,7 @@ void game::DoNewTurn(void) {
     }
 
     if (gpCurPlayer->m_heroCount > 0) {
-        gpAdvManager->SetHeroContext(gpCurPlayer->NextHero(0), 0);
+        gpAdvManager->SetHeroContext(gpCurPlayer->NextHero(false), false);
     } else if (gpCurPlayer->m_townCount > 0) {
         gpAdvManager->SetTownContext(gpCurPlayer->m_townIds[0]);
     }
@@ -6947,7 +6947,7 @@ void game::DoNewTurn(void) {
     gpAdvManager->SetEnvironmentOrigin(
         gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
         gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
-        1
+        true
     );
 }
 
@@ -7163,7 +7163,7 @@ void CreateDiffFile(
     char* joinName,
     char* diffName,
     i32 remotePlayer,
-    i32 forceWhole
+    b32 forceWhole
 ) {
     i32 joinSize;
     u8* fullData;
@@ -7555,7 +7555,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     i32 i;
     for (i = 0; i < gpGame->m_mapEvents.count; i++) {
         event = static_cast<EventExtra*>(MapExtraRecord(gpGame->m_mapEvents.indices[i], map_records::Kind::MapEvent));
-        if (event->x == x && event->y == y && event->active != 0
+        if (event->x == x && event->y == y && event->active != false
             && event->players[gpGame->m_players[giCurPlayer].m_color] != 0)
             return event;
     }
@@ -7639,7 +7639,7 @@ void CheckValidAvailableHeroes(void) {
                     if (gpGame->m_players[candidatePlayer].m_availableHeroIds[availableSlot]
                         == gpGame->m_players[heroPlayer].m_heroIds[heroIndex]) {
                         gpGame->m_players[candidatePlayer].m_availableHeroIds[availableSlot] =
-                            static_cast<i8>(gpGame->GetNewHeroId(heroPlayer, FACTION_ANY, 0));
+                            static_cast<i8>(gpGame->GetNewHeroId(heroPlayer, FACTION_ANY, false));
                     }
                 }
             }
@@ -7668,7 +7668,7 @@ i32 game::CountShrines(i32 player) {
     i32 mapX;
     hero* occupier;
 
-    if (xIsExpansionMap == 0)
+    if (xIsExpansionMap == false)
         return 0;
     count = 0;
     for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {

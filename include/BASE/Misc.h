@@ -115,7 +115,7 @@ void ReadPrefs(void);
 void WritePrefsToFile(void);
 void WritePrefs(void);
 void BitmapToScreen(class bitmap* image);
-void SetPalette(i8* paletteData, i32 updateDisplay);
+void SetPalette(i8* paletteData, b32 updateDisplay);
 void BlitBitmapToScreenNoMouseCheck(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
 void BlitBitmapToScreen(class bitmap* image, i32 sourceX, i32 sourceY, i32 width, i32 height, i32 destinationX, i32 destinationY);
 void LogTruncate(void);
@@ -147,7 +147,7 @@ void AiPrint(const char* text);
 void AbsAiPrint(const char* text);
 void FadeTo(u8* source, u8* destination, i32 increment);
 void FadeToColorTable(u8* colorTable, i32 increment);
-i32 IsCycleColor(i32 color);
+b32 IsCycleColor(i32 color);
 void CreatePCXFile(const char* filename, u8* pixels, i32 width, i32 height, u8* paletteData);
 i32l FileSize(const char* filename);
 struct IconEntry* GetIconEntry(class icon* iconPointer, i32 index);
@@ -156,7 +156,7 @@ void SIncRandomize(i32 x, i32 y);
 void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
-void GetDataEntry(const char* prompt, char* destination, i32 maximumLength, char* initialText, i32 showCancel, i32 editImmediately);
+void GetDataEntry(const char* prompt, char* destination, i32 maximumLength, char* initialText, b32 showCancel, b32 editImmediately);
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 enum class DataEntryPhase : i32 {

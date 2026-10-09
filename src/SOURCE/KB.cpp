@@ -264,7 +264,7 @@ extern "C" void PollSound(void) {
         )
         && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = platform::Ticks() + MOUSE_UPDATE_INTERVAL;
-        gpMouseManager->NewUpdate(0);
+        gpMouseManager->NewUpdate(false);
     }
     if (platform::TickDeadlineExpired(
             static_cast<u32>(glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]),
@@ -283,7 +283,7 @@ extern "C" void PollSound(void) {
                 bDoColorCycle = false;
         }
         if (bDoColorCycle)
-            CycleColors(0);
+            CycleColors(false);
     }
     if (platform::TickDeadlineExpired(
             static_cast<u32>(glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]),
@@ -370,17 +370,17 @@ void DeleteMainClasses(void) {
 
 i32 EarlySetup(void) {
     if (bEarlySetupDone)
-        return 0;
+        return false;
     InitMainClasses();
     GetGraphicsInfo();
     ReadPrefs();
     if (!InterpretCommandLine())
-        return 1;
+        return true;
     LogTruncate();
     LogStr("ES1");
     InitVars();
     LogStr("ES2");
-    return 1;
+    return true;
 }
 
 i32 oldmain(void) {
@@ -393,8 +393,8 @@ i32 oldmain(void) {
 
     i32 netPlayer;
     i32 gamePlayer;
-    i32 result;
-    i32 transmissionResult;
+    b32 result;
+    b32 transmissionResult;
     char matchedNetPlayers[GAME_PLAYER_COUNT];
     char matchedGamePlayers[GAME_PLAYER_COUNT];
     OldMainNetBuffer netBuffer;
@@ -482,7 +482,7 @@ i32 oldmain(void) {
                 gpWindowManager
                     ->UpdateScreenRegion(0, 0, LOGICAL_SCREEN_WIDTH, LOGICAL_SCREEN_HEIGHT);
                 if (firstMainScreen)
-                    SetPalette(gPalette->m_data, 1);
+                    SetPalette(gPalette->m_data, true);
                 else
                     gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
                 firstMainScreen = false;
@@ -575,7 +575,7 @@ i32 oldmain(void) {
                 if (!gpInitWin)
                     MemError();
                 gbInSetupDialog = true;
-                gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, 0);
+                gpWindowManager->DoDialog(gpInitWin, InitMenuHandler, false);
                 delete gpInitWin;
                 gpInitWin = NULL;
                 command = gpWindowManager->m_dialogResult;
@@ -742,13 +742,13 @@ i32 oldmain(void) {
                         ShutDown(NULL);
                 }
                 for (player = 1; player < giNumHumanPlayers; player++) {
-                    if (!gpGame->TransmitSaveGame(player, 0, 1))
+                    if (!gpGame->TransmitSaveGame(player, false, true))
                         ShutDown(NULL);
                 }
                 memset(gbThisNetHumanPlayer, 0, GAME_PLAYER_COUNT);
                 gbThisNetHumanPlayer[giThisGamePos] = true;
                 iLastDiffSendTo = -1;
-                gpGame->SaveGame(gConfig.rmtRLName, 0, 0);
+                gpGame->SaveGame(gConfig.rmtRLName, false, false);
             }
             LogStr("DWM 4");
             if (gbRemoteOn && gbWaitForRemoteReceive) {
@@ -757,10 +757,10 @@ i32 oldmain(void) {
                 NormalDialog(localization::Tr("network.data.waiting_to_receive"), NORMAL_DIALOG_WAIT_CANCEL);
                 if (!gbFunctionComplete)
                     ShutDown(NULL);
-                gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
+                gpGame->LoadGame(gConfig.rmtRCName, false, true);
                 strcpy(gpGame->m_saveName, save_names::NewGame);
                 iLastDiffSendTo = -1;
-                gpGame->SaveGame(gConfig.rmtSLName, 0, 0);
+                gpGame->SaveGame(gConfig.rmtSLName, false, false);
             }
 
         initialize_game:
@@ -796,7 +796,7 @@ i32 oldmain(void) {
             ComputeAdvNetControl();
             gbGameInitialized = true;
             mainScreenLoaded = false;
-            gpSoundManager->StopAllSamples(1);
+            gpSoundManager->StopAllSamples(true);
             gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
             gMapX = 0;
             gMapY = 0;
@@ -815,7 +815,7 @@ i32 oldmain(void) {
                 if (gpExec->AddManager(gpAdvManager, -1))
                     ShutDown(localization::Tr("system.manager.add_failed"));
                 if (command == OLD_MAIN_NEW_GAME) {
-                    gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(0), 0);
+                    gpAdvManager->SetHeroContext(gpGame->m_players[0].NextHero(false), false);
                 }
                 if (command == OLD_MAIN_NEW_GAME || bForceCheckTimeEvent) {
                     bForceCheckTimeEvent = false;
@@ -844,7 +844,7 @@ i32 oldmain(void) {
                 giCurTurn
             );
 
-            if (giEndSequence != 1) {
+            if (giEndSequence != true) {
                 gpWindowManager->m_colorCycling = 0;
                 if (xIsExpansionMap)
                     PlaySmacker(EXPANSION_DEFEAT_VIDEO);
@@ -863,7 +863,7 @@ i32 oldmain(void) {
                 mainScreenLoaded = true;
                 gpSoundManager->PlayAmbientMusic(MUSIC_TRACK_MAIN_MENU);
             } else {
-                i32 campaignResult = 0;
+                b32 campaignResult = false;
                 if (gbInCampaign) {
                     campaignResult = gpGame->HandleCampaignWin();
                     if ((gpGame->m_campaignScenario + 1 == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER
@@ -1356,7 +1356,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
                 break;
         }
     }
-    if (shouldClose == 1) {
+    if (shouldClose == true) {
         message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
@@ -1364,7 +1364,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading) {
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, b32 withHeading) {
     char buffer[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
         utf8::Copy(buffer, sizeof(buffer), xNecromancerShrineDesc);
@@ -1485,30 +1485,30 @@ void GetMonsterCost(CreatureType monster, i32* const cost) {
     }
 }
 
-i32 CanBuild(town* townPointer, BuildingSlotType building) {
+b32 CanBuild(town* townPointer, BuildingSlotType building) {
     i32 reqBits;
     i32 curMask;
     if (H2BitTest(gpGame->m_townBuiltToday, townPointer->m_id))
-        return 0;
+        return false;
     if (building != BUILDING_SLOT_CASTLE && !(H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_CASTLE)))))
-        return 0;
+        return false;
     if (!xIsExpansionMap && building == BUILDING_SLOT_NECROMANCER_SHRINE
         && townPointer->m_type == FACTION_NECROMANCER)
-        return 0;
+        return false;
     if (building == BUILDING_SLOT_DOCK) {
         if (townPointer->CanBuildDock())
-            return 1;
+            return true;
         else
-            return 0;
+            return false;
     }
     if (building == BUILDING_SLOT_MAGE_GUILD && townPointer->m_mageGuildLevel >= TOWN_MAGE_GUILD_LEVEL_COUNT)
-        return 0;
+        return false;
     if (building == BUILDING_SLOT_TENT || building == BUILDING_SLOT_BOAT
         || building == BUILDING_SLOT_DISABLED_SECOND || building == BUILDING_SLOT_DISABLED_THIRD
         || building == BUILDING_SLOT_DISABLED_FOURTH || building == BUILDING_SLOT_DISABLED_LAST)
-        return 0;
+        return false;
     if (building < BUILDING_SLOT_DWELLING_FIRST || building > BUILDING_SLOT_DWELLING_LAST)
-        return 1;
+        return true;
     if ((building == BUILDING_SLOT_DWELLING_SECOND
          && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_2)))))
         || (building == BUILDING_SLOT_DWELLING_THIRD
@@ -1522,7 +1522,7 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
                 || (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
         || (building == BUILDING_SLOT_UPGRADE_LAST
             && (H2EnumIndex((townPointer->m_buildings) & (H2EnumIndex(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))))
-        return 0;
+        return false;
     reqBits = gHierarchyMask[H2EnumIndex(townPointer->m_type)][H2EnumIndex(building) - H2EnumIndex(BUILDING_SLOT_DWELLING_FIRST)];
     curMask = townPointer->m_buildings;
     if (curMask & H2EnumIndex(TOWN_BUILDING_UPGRADED_DWELLING_2))
@@ -1540,13 +1540,13 @@ i32 CanBuild(town* townPointer, BuildingSlotType building) {
     if ((reqBits & curMask) == reqBits) {
         if (townPointer->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_UPGRADE_FOURTH && townPointer->m_mageGuildLevel <= 1)
-            return 0;
-        return 1;
+            return false;
+        return true;
     }
-    return 0;
+    return false;
 }
 
-i32 CanBuy(town* townPointer, BuildingSlotType type) {
+b32 CanBuy(town* townPointer, BuildingSlotType type) {
     i32 buffer[H2EnumIndex(RES_COUNT)];
     playerData* player;
     i32 resourceIndex;
@@ -1554,8 +1554,8 @@ i32 CanBuy(town* townPointer, BuildingSlotType type) {
     player = &gpGame->m_players[giCurPlayer];
     for (resourceIndex = 0; resourceIndex < H2EnumIndex(RES_COUNT); resourceIndex++)
         if (player->m_resources[resourceIndex] < buffer[resourceIndex])
-            return 0;
-    return 1;
+            return false;
+    return true;
 }
 
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
@@ -1781,7 +1781,7 @@ void PlayerDead(i32 player) {
             gpGame->ClaimMine(i, -1);
     }
     for (i = currentPlayer->m_heroCount - 1; i >= 0; i--) {
-        GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(1);
+        GetHeroSlot(currentPlayer->m_heroIds[i])->Deallocate(true);
     }
     for (i = 0; i < HERO_AVAILABLE_SLOT_COUNT; i++) {
         if (gpGame->m_heroOwners[currentPlayer->m_availableHeroIds[i]] == HERO_AVAILABILITY_FOR_HIRE)
@@ -2286,10 +2286,10 @@ void CheckEndGame(
         giEndSequence = false;
     }
 
-    if (giEndSequence == 1 && gbGameOver) {
+    if (giEndSequence == true && gbGameOver) {
         winFlag = true;
     }
-    if (giEndSequence == 0 && gbGameOver) {
+    if (giEndSequence == false && gbGameOver) {
         defeated = true;
     }
 
@@ -2358,7 +2358,7 @@ void CheckEndGame(
                 gpGame->m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
                 gpGame->m_campaignScenario + 1
             );
-            gpGame->SaveGame(campaignSaveName, 1, 0);
+            gpGame->SaveGame(campaignSaveName, true, false);
         }
     } else if (xIsPlayingExpansionCampaign && winFlag) {
         xCampaign.Autosave();
@@ -2698,8 +2698,8 @@ i32 AddScoreToHighScore(
             enteredPlayerName,
             HIGH_SCORE_NAME_LENGTH,
             NULL,
-            0,
-            1
+            false,
+            true
         );
         memset(&entries[entry], 0, sizeof(HighScoreEntry));
         utf8::Copy(entries[entry].playerName, enteredPlayerName);
@@ -2709,7 +2709,7 @@ i32 AddScoreToHighScore(
         entries[entry].difficultyRating = difficultyRating;
         entries[entry].cheated = gpGame->m_cheated;
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
-            entries[entry].cheated = 1;
+            entries[entry].cheated = true;
 
         file = platform::FileOpen(filename, platform::FileMode::Write);
         if (file == -1)
@@ -2735,7 +2735,7 @@ void BVResMsg(const char* text, ResourceType resourceType, i32 quantity) {
 }
 
 void GOut(const char* text) {
-    if (gpAdvManager->m_active == 1)
+    if (gpAdvManager->m_active == true)
         AiPrint(text);
 }
 
@@ -2746,8 +2746,8 @@ i32 NetPosToGamePos(i32 netPosition) {
     return -1;
 }
 
-i32 WaitForOtherPlayer(void) {
-    i32 result = 0;
+b32 WaitForOtherPlayer(void) {
+    b32 result = false;
     KbRemotePacket* data;
     PollSound();
     data = reinterpret_cast<KbRemotePacket*>(GetRemoteData(1));
@@ -2785,7 +2785,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     i32l messageTime;
     heroWindow* netWindow;
-    i32 result;
+    b32 result;
     i32 textWidth;
     b32 savedShowIt;
     b32 updateInput;
@@ -2884,7 +2884,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (remoteData->command) {
                     case REMOTE_COMMAND_GROUP_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
-                        if (gpAdvManager->m_active == 1) {
+                        if (gpAdvManager->m_active == true) {
                             bShowIt = savedShowIt;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData->payload.data);
                             bShowIt = true;
@@ -3051,7 +3051,7 @@ void PopNetBox(char* text, i32 netPlayer) {
         gbDrawWindowBackground = true;
         redrawSavedShowIt = bShowIt;
         bShowIt = true;
-        gpAdvManager->RedrawAdvScreen(1, 0);
+        gpAdvManager->RedrawAdvScreen(1, false);
         bShowIt = redrawSavedShowIt;
     } else {
         gpWindowManager->RemoveWindow(netWindow);
@@ -3382,16 +3382,16 @@ void UnloadSystemwideIcons(void) {
 
 void EarlyShutDownSystem(void) {}
 
-i32 GameUnsaved(void) {
-    if ((gpAdvManager && gpAdvManager->m_active == 1)
-        || (gpCombatManager && gpCombatManager->m_active == 1)
-        || (gpTownManager && gpTownManager->m_active == 1))
-        return 1;
+b32 GameUnsaved(void) {
+    if ((gpAdvManager && gpAdvManager->m_active == true)
+        || (gpCombatManager && gpCombatManager->m_active == true)
+        || (gpTownManager && gpTownManager->m_active == true))
+        return true;
     else
-        return 0;
+        return false;
 }
 
-i32 HandleAppSpecificMenuCommands(i32 command) {
+b32 HandleAppSpecificMenuCommands(i32 command) {
     b32 menuChanged;
     hero* currentHeroRec;
     i32 loopIndex;
@@ -3408,13 +3408,13 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         gConfig.musicVolume = ConfigVolumeLevelFromOrdinal(command - APP_MENU_MUSIC_FIRST);
         gpSoundManager->AdjustMusicVolumes();
         WritePrefs();
-        return 0;
+        return false;
     }
     if (command >= APP_MENU_SOUND_FIRST && command <= APP_MENU_SOUND_LAST) {
         gConfig.soundVolume = ConfigVolumeLevelFromOrdinal(command - APP_MENU_SOUND_FIRST);
         gpSoundManager->AdjustSoundVolumes();
         WritePrefs();
-        return 0;
+        return false;
     }
 
     switch (command) {
@@ -3456,7 +3456,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 localization::Tr("game.confirm.load")
             );
         confirmMenuCommand:
-            if (gpAdvManager->m_active == 1) {
+            if (gpAdvManager->m_active == true) {
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_YES)
                     break;
@@ -3494,7 +3494,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_CHEAT_REVEAL:
-            gpGame->m_cheated = 1;
+            gpGame->m_cheated = true;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             gpGame->SetVisibility(
@@ -3505,13 +3505,13 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             );
             if (currentHeroRec != NULL)
                 gpAdvManager->Reseed(0, 0);
-            gpAdvManager->UpdateRadar(1, 0);
-            gpAdvManager->CompleteDraw(0);
-            gpAdvManager->UpdateScreen(0, 0);
+            gpAdvManager->UpdateRadar(1, false);
+            gpAdvManager->CompleteDraw(false);
+            gpAdvManager->UpdateScreen(false, false);
             break;
 
         case APP_MENU_CHEAT_MOVEMENT:
-            gpGame->m_cheated = 1;
+            gpGame->m_cheated = true;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL)
@@ -3519,7 +3519,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_CHEAT_SPELLS:
-            gpGame->m_cheated = 1;
+            gpGame->m_cheated = true;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL) {
@@ -3533,7 +3533,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             break;
 
         case APP_MENU_CHEAT_RESOURCES:
-            gpGame->m_cheated = 1;
+            gpGame->m_cheated = true;
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             for (loopIndex = 0; loopIndex < H2EnumIndex(RES_COUNT); loopIndex++)
@@ -3545,14 +3545,14 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
 
         default:
             if (command >= APP_MENU_BUILDING_FIRST && command < APP_MENU_BUILDING_LAST) {
-                gpGame->m_cheated = 1;
+                gpGame->m_cheated = true;
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
                 giDebugBuildingToBuild = command - APP_MENU_BUILDING_FIRST;
                 break;
             }
             if (command >= APP_MENU_ARMY_FIRST && command < APP_MENU_ARMY_LAST) {
-                gpGame->m_cheated = 1;
+                gpGame->m_cheated = true;
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
                 if (gpCurPlayer->CurrentHero() != -1) {
@@ -3567,7 +3567,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 break;
             }
             if (command >= APP_MENU_SECONDARY_FIRST && command < APP_MENU_SECONDARY_LAST) {
-                gpGame->m_cheated = 1;
+                gpGame->m_cheated = true;
                 if (gbInCampaign)
                     gpGame->m_campaignCheated = 1;
                 secondarySkillIndex = HeroSecondarySkillFromOrdinal(
@@ -3596,14 +3596,14 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                     &gpCombatManager->m_armies[H2EnumIndex(gpCombatManager->m_currentArmySide)]
                                               [gpCombatManager->m_currentArmyIndex]
                 );
-                gpCombatManager->DrawFrame(1, 0, 0, 0, 0, 1, 1);
+                gpCombatManager->DrawFrame(true, false, false, false, 0, true, true);
             }
-            return 1;
+            return true;
     }
 
     if (menuChanged)
         WritePrefs();
-    return 0;
+    return false;
 }
 
 void UpdateSystemOptionsMenu(void) {
@@ -3700,7 +3700,7 @@ void UpdateSystemOptionsMenu(void) {
     platform::SetMenuItemChecked(
         currentMenu,
         APP_MENU_VIEW_ENEMY_MOVES,
-        gConfig.blackoutComputer == 0
+        gConfig.blackoutComputer == false
     );
 }
 
@@ -3721,7 +3721,7 @@ void EarlyResizeWindow(i32, i32, i32, i32) {
         return;
 }
 
-i32 InMapArea(i32 x, i32 y) {
+b32 InMapArea(i32 x, i32 y) {
     return x >= ADVENTURE_VIEW_BORDER && x < ADVENTURE_VIEW_SIZE && y >= ADVENTURE_VIEW_BORDER
            && y < ADVENTURE_VIEW_SIZE;
 }
@@ -4009,7 +4009,7 @@ void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles) {
 void HandleRemoteDeadPlayerExit(i32 position) {
     SPlayerExit exitInfo;
     if (position == giThisGamePos) {
-        if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, 1, 0))
+        if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, true, false))
             ShutDown(NULL);
         RemoteCleanup();
     } else {
@@ -4056,7 +4056,7 @@ void HandleRemoteSuddenExit(void) {
         sizeof(exitInfo),
         REMOTE_COMMAND_PLAYER_EXIT,
         0,
-        0,
+        false,
         REMOTE_MESSAGE_RELIABLE
     );
     LogStr("HRSE2");
@@ -4072,7 +4072,7 @@ void DropDownToOnePlayer(void) {
     ComputeAdvNetControl();
 }
 
-void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32 forwardedReport) {
+void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, b32 forwardedReport) {
     b32 showExitMessage;
     char playerExitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
     i32 netPosition;
@@ -4103,7 +4103,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
                 PLAYER_EXIT_MESSAGE_TIME
             );
         } else if (!exitInfo.continueGame) {
-            gpGame->SaveGame(save_names::PlayerExit, 1, 0);
+            gpGame->SaveGame(save_names::PlayerExit, true, false);
             utf8::Format(
                 gText, GLOBAL_TEXT_BUFFER_SIZE,
                 localization::Tr("network.player_exit.host_terminated"),
@@ -4184,7 +4184,7 @@ void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
 
     localPlayerLost = false;
     lLastHeartbeatReceive[exitInfo.netPosition] = PLAYER_EXIT_HEARTBEAT_DISABLED;
-    gpGame->SaveGame(save_names::PlayerExit, 1, 0);
+    gpGame->SaveGame(save_names::PlayerExit, true, false);
 
     if (exitInfo.eliminated) {
         exitInfo.continueGame = true;
@@ -4261,7 +4261,7 @@ exitInfoProcessed:
         }
         if (localPlayerLost)
             goto playerExitHandled;
-        ReceiveHostReportsPlayerExit(0, exitInfo, 1);
+        ReceiveHostReportsPlayerExit(0, exitInfo, true);
     }
 
 playerExitHandled:
@@ -5113,13 +5113,13 @@ void NormalDialog(
     );
 
     if (dialogType == NORMAL_DIALOG_WAIT_CANCEL || dialogType == NORMAL_DIALOG_WAIT_OK) {
-        gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, 0);
+        gpWindowManager->DoDialog(pNormalDialogWindow, WaitHandler, false);
     } else if (dialogType == NORMAL_DIALOG_QUICK_VIEW) {
         gpWindowManager->AddWindow(pNormalDialogWindow, -1, 1);
         QuickViewWait();
         gpWindowManager->RemoveWindow(pNormalDialogWindow);
     } else {
-        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, 0);
+        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, false);
     }
 
     delete pNormalDialogWindow;

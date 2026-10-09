@@ -363,7 +363,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             if (quickView)
                                 break;
                             HeroView(m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_id, true, false);
-                            gpAdvManager->RedrawAdvScreen(1, 0);
+                            gpAdvManager->RedrawAdvScreen(1, false);
                             Update();
                             DrawSwapWin();
                             Reset();
@@ -374,7 +374,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             if (quickView)
                                 break;
                             HeroView(m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_id, true, false);
-                            gpAdvManager->RedrawAdvScreen(1, 0);
+                            gpAdvManager->RedrawAdvScreen(1, false);
                             Update();
                             DrawSwapWin();
                             Reset();
@@ -528,9 +528,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             [message.payload.widget.id
                                              - CONTROL_LEFT_ARMY_FIRST],
                                         NULL,
-                                        0,
+                                        false,
                                         ARMY_FACING_RIGHT,
-                                        1,
+                                        true,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)],
                                         NULL,
                                         &m_heroes[H2EnumIndex(SWAP_SIDE_LEFT)]->m_army,
@@ -599,9 +599,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                             [message.payload.widget.id
                                              - CONTROL_RIGHT_ARMY_FIRST],
                                         NULL,
-                                        0,
+                                        false,
                                         ARMY_FACING_RIGHT,
-                                        1,
+                                        true,
                                         m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)],
                                         NULL,
                                         &m_heroes[H2EnumIndex(SWAP_SIDE_RIGHT)]->m_army,
@@ -688,7 +688,7 @@ void swapManager::ViewMon(void) {
         NULL,
         m_heroes[H2EnumIndex(m_selectedSide)]->m_army.GetNumArmies() == 1,
         ARMY_FACING_RIGHT,
-        0,
+        false,
         m_heroes[H2EnumIndex(m_selectedSide)],
         NULL,
         &m_heroes[H2EnumIndex(m_selectedSide)]->m_army,
@@ -914,7 +914,7 @@ void swapManager::SplitMons(void) {
     message.payload.widget.id = TOWN_SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_childWindow->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, 0);
+    gpWindowManager->DoDialog(gpTownManager->m_childWindow, SplitArmyHandler, false);
     delete gpTownManager->m_childWindow;
 
     if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {

@@ -174,7 +174,7 @@ void fullMap::Write(i32 handle) {
     WriteMapData(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
-void fullMap::Read(i32 handle, i32 convert) {
+void fullMap::Read(i32 handle, b32 convert) {
     i32 extraIndex;
     oldMapCell* oldCells;
     i32 x, y;
@@ -228,7 +228,7 @@ void fullMap::ChangeTilesetIndex(
     i32 y,
     TilesetId tileset,
     i32 index,
-    i32 overlay,
+    b32 overlay,
     i32 link [[maybe_unused]]
 ) {
     i32 extraIndex;
@@ -238,7 +238,7 @@ void fullMap::ChangeTilesetIndex(
     extra = NULL;
     newTileset = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
 
-    if (overlay == 0) {
+    if (overlay == false) {
         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->ObjectTileset() != tileset) {
             extraIndex = cell->m_extraIndex;
             while (extraIndex != 0) {

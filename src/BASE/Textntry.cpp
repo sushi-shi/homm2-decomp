@@ -275,7 +275,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                         redraw = true;
                         switch (event.payload.keyboard.keyCode) {
                             case INPUT_SCAN_ESCAPE:
-                                if (gbAllowTextEntryEscape == 0)
+                                if (gbAllowTextEntryEscape == false)
                                     break;
                                 strcpy(edit, original);
                                 done++;

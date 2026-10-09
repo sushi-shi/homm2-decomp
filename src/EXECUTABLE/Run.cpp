@@ -24,7 +24,7 @@ i32 RunGame(const char* commandLine) {
     localization::Initialize(commandLine);
     memset(gcCommandLine, 0, sizeof(gcCommandLine));
     strncpy(gcCommandLine, commandLine, COMMAND_LINE_LIMIT);
-    if (EarlySetup() == 0)
+    if (EarlySetup() == false)
         return 0;
 
     srand(static_cast<u32>(platform::Ticks()));

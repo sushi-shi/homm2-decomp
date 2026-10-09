@@ -14,6 +14,6 @@ public:
     heroWindow* m_window;
     bankBox(i32 x, i32 y, class playerData* player);
     ~bankBox();
-    void Update(i32 drawWindow);
+    void Update(b32 drawWindow);
 };
 #endif

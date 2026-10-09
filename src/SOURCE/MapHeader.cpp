@@ -67,12 +67,12 @@ localization::TextEncoding GetMapHeaderTextEncoding(const SMapHeader* header) {
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     if (header == nullptr)
-        return 0;
+        return false;
     *header = {};
     utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, "%s%s", gcMapPath, filename);
     i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1) {
-        return 0;
+        return false;
     }
     const bool complete = platform::FileReadExact(file, header, sizeof(*header));
     platform::FileClose(file);
@@ -81,7 +81,7 @@ i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
         platform::Host().Log(platform::LogLevel::Warning,
             (std::string("Invalid map '") + filename + "': " + error).c_str());
         *header = {};
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
