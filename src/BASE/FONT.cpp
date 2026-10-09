@@ -102,7 +102,7 @@ void font::DrawStringExecute(
 
         const i32 glyph = FontGlyphIndex(codePoint, localization::ActiveFontProfile(), m_glyphIcon->m_frameCount);
         if (glyph != 0) {
-            if (mode == FONT_DRAW_DEFAULT && m_highlight == 0)
+            if (mode == FONT_DRAW_DEFAULT && m_highlight == false)
                 IconToBitmap(
                     m_glyphIcon,
                     gpWindowManager->m_screen,
@@ -117,7 +117,7 @@ void font::DrawStringExecute(
                     0
                 );
             else if (mode == FONT_DRAW_YELLOW
-                     || (mode == FONT_DRAW_DEFAULT && m_highlight != 0))
+                     || (mode == FONT_DRAW_DEFAULT && m_highlight != false))
                 IconToBitmapColorTable(
                     m_glyphIcon,
                     gpWindowManager->m_screen,

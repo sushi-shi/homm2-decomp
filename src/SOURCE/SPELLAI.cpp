@@ -66,7 +66,7 @@ typedef enum CombatSpellEvaluationConstant {
     SPELL_AI_MIRROR_VALUE_DIVISOR       = 2
 } CombatSpellEvaluationConstant;
 
-i32 combatManager::DoSpellAI(CombatSide side, i32 retreating) {
+b32 combatManager::DoSpellAI(CombatSide side, b32 retreating) {
     SpellType chosenSpell;
     i32 effect;
     H2SteppedEnumStorage<SpellType, i32> spell;
@@ -80,12 +80,12 @@ i32 combatManager::DoSpellAI(CombatSide side, i32 retreating) {
     bestHexWork = -1;
 
     if (m_heroes[H2EnumIndex(side)] == NULL)
-        return 0;
+        return false;
 
     for (spell = H2EnumIndex(COMBAT_ATTACKER_SIDE); H2EnumIndex(spell) < COMBAT_SIDE_COUNT; spell++) {
         if (m_heroes[H2EnumIndex(spell)] != NULL
             && m_heroes[H2EnumIndex(spell)]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
-            return 0;
+            return false;
     }
 
     for (spell = SPELL_FIREBALL; H2EnumIndex(spell) < KB_SPELL_TABLE_CAPACITY; spell++) {
@@ -120,9 +120,9 @@ i32 combatManager::DoSpellAI(CombatSide side, i32 retreating) {
         giNextAction = ACTION_CAST_SPELL;
         giNextActionExtra = H2EnumIndex(chosenSpell);
         giNextActionGridIndex = bestHexWork;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
@@ -134,7 +134,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     i32 effect;
     army* targetCreature;
     CombatSpellAITargetMode spellMode;
-    i32 bDone;
+    b32 bDone;
     i32 team;
     float durationFactor;
     b32 isMindControlled;
@@ -143,7 +143,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     i32 wallSectionIndex;
     i32 sumEffect;
 
-    bDone = 0;
+    bDone = false;
     team = 0;
     hexCell = SPELL_AI_FIRST_HEX;
     durationFactor = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
@@ -277,16 +277,21 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
         switch (spell) {
             case SPELL_CURE:
-                EffectSpellCure(&effect, H2EnumIndex(m_currentSide), hexCell, 1);
+                EffectSpellCure(&effect, H2EnumIndex(m_currentSide), hexCell, true);
                 break;
             case SPELL_MASS_CURE:
-                EffectSpellCure(&effect, H2EnumIndex(m_currentSide), -1, 1);
+                EffectSpellCure(&effect, H2EnumIndex(m_currentSide), -1, true);
                 break;
             case SPELL_DISPEL:
-                EffectSpellCure(&effect, H2EnumIndex(targetCreature->m_side), targetCreature->m_index, 0);
+                EffectSpellCure(
+                    &effect,
+                    H2EnumIndex(targetCreature->m_side),
+                    targetCreature->m_index,
+                    false
+                );
                 break;
             case SPELL_MASS_DISPEL:
-                EffectSpellCure(&effect, SPELL_AI_ANY_SIDE, -1, 0);
+                EffectSpellCure(&effect, SPELL_AI_ANY_SIDE, -1, false);
                 break;
             case SPELL_RESURRECT:
             case SPELL_TRUE_RESURRECT:
@@ -504,7 +509,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                     &cureAmount,
                     H2EnumIndex(targetCreature->m_side),
                     targetCreature->m_index,
-                    0
+                    false
                 );
                 effect += cureAmount;
                 break;
@@ -643,7 +648,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 effect = 0;
                 break;
             case SPELL_EARTHQUAKE:
-                if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0) {
+                if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != false) {
                     wallsDestroyed = 0;
                     for (wallSectionIndex = 0; wallSectionIndex < COMBAT_WALL_SECTION_COUNT; wallSectionIndex++) {
                         if (m_wallStates[wallSectionIndex + H2EnumIndex(COMBAT_WALL_SLOT_SECTION_FIRST)]
@@ -692,7 +697,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
         switch (spellMode) {
             case SPELL_AI_GLOBAL:
-                bDone = 1;
+                bDone = true;
                 break;
             case SPELL_AI_SUM_FRIENDLY:
             case SPELL_AI_SUM_ENEMY:
@@ -709,7 +714,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 
 
                 if (hexCell > SPELL_AI_AREA_LAST_HEX)
-                    bDone = 1;
+                    bDone = true;
         }
     }
 }
@@ -926,7 +931,7 @@ void combatManager::ClearEffects(void) {
     i32 index;
     for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; side++) {
         for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++)
-            gArmyEffected[H2EnumIndex(side)][index] = 0;
+            gArmyEffected[H2EnumIndex(side)][index] = false;
     }
 }
 
@@ -937,20 +942,20 @@ void combatManager::NextPos(i32* hex) {
         (*hex)++;
 }
 
-i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
+b32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
     while (startHex <= SPELL_AI_LAST_HEX) {
         if (H2EnumIndex(m_hexCells[startHex].m_occupantSide) == side
             || (side == SPELL_AI_ANY_SIDE && H2EnumIndex(m_hexCells[startHex].m_occupantSide) >= 0)) {
             *hex = startHex;
-            return 0;
+            return false;
         }
         NextPos(&startHex);
     }
     *hex = -1;
-    return 1;
+    return true;
 }
 
-i32 combatManager::FirstResurrectable(
+b32 combatManager::FirstResurrectable(
     i32 startHex,
     i32* hex,
     SpellType spell
@@ -958,15 +963,15 @@ i32 combatManager::FirstResurrectable(
     while (startHex <= SPELL_AI_LAST_HEX) {
         if (FindResurrectArmyIndex(m_currentSide, spell, startHex) != -1) {
             *hex = startHex;
-            return 0;
+            return false;
         }
         NextPos(&startHex);
     }
     *hex = -1;
-    return 1;
+    return true;
 }
 
-void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
+void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, b32 cure) {
     i32 sideWork;
     b32 turnSpent;
     i32 armyValueResult;
@@ -992,7 +997,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 continue;
             if (m_armies[sideWork][index].IsAlive()) {
                 combatTarget = &m_armies[sideWork][index];
-                if (cure == 1) {
+                if (cure == true) {
                     curePointsTotal =
                         m_spellPower[H2EnumIndex(m_currentSide)] * SPELL_CURE_HIT_POINTS_PER_POWER;
                     if (curePointsTotal > combatTarget->m_hitPointsLost)
@@ -1071,7 +1076,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 }
             }
         }
-        if (cure == 1)
+        if (cure == true)
             positiveEffectResult = 0;
     if (sideWork == H2EnumIndex(m_currentSide))
             *effect += -negativeEffectResult - positiveEffectResult;
@@ -1288,7 +1293,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                     currentHex = GetNextChainLightningTarget(
                         &m_armies[H2EnumIndex(m_hexCells[currentHex].m_occupantSide)]
                                  [m_hexCells[currentHex].m_occupantIndex],
-                        0
+                        false
                     );
                 }
                 step++;

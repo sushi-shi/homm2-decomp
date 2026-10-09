@@ -82,7 +82,7 @@ def check(root: Path) -> list[str]:
     try:
         monochrome_body = function_body(
             composed_body,
-            re.compile(r"\bif\s*\(\s*gbColorMice\s*==\s*0\s*\)"),
+            re.compile(r"\bif\s*\(\s*gbColorMice\s*==\s*(?:0|false)\s*\)"),
             "BlitBitmapToScreen monochrome path",
         )
     except ValueError as error:

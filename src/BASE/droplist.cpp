@@ -479,7 +479,7 @@ void dropListWidget::ProcessSelectDialog(void) {
                 break;
 
             case MESSAGE_LEFT_BUTTON_UP:
-                if (firstRelease != 0) {
+                if (firstRelease != false) {
                     firstRelease = false;
                     m_icon->DrawToBuffer(
                         m_owner->m_posX + m_dropButtonX,

@@ -28,7 +28,7 @@ i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     i32 player;
 
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != false) {
         NormalDialog(localization::Tr("network.tcp.fullscreen_warning"), 1);
         SetFullScreenStatus(false);
     }
@@ -78,7 +78,7 @@ i16 wsnet_init(void) {
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         }
-        if (gbFunctionComplete == 0)
+        if (gbFunctionComplete == false)
             ShutDown(NULL);
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         giWaitType = DIALOG_WAIT_WINSOCK_GUESTS;
@@ -122,7 +122,7 @@ i16 wsnet_init(void) {
         }
     } else {
         do {
-            if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
+            if (giTCPHostStatus != -true && strlen(gcTCPAddress) > 0) {
                 strcpy(cWSTextBuffer, gcTCPAddress);
                 strcpy(
                     gcTCPAddress,
@@ -134,8 +134,8 @@ i16 wsnet_init(void) {
                     cWSTextBuffer,
                     IP_ADDRESS_ENTRY_LIMIT,
                     NULL,
-                    0,
-                    1
+                    false,
+                    true
                 );
             }
             giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
@@ -151,10 +151,10 @@ i16 wsnet_init(void) {
             localization::Tr("network.tcp.host.searching")
         );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
-        if (gbFunctionComplete == 0)
+        if (gbFunctionComplete == false)
             ShutDown(NULL);
     }
-    return 0;
+    return false;
 }
 
 void wsnet_term(void) {
@@ -189,7 +189,7 @@ void wsSendMessage(
     i32 error;
 
     packetBuffer[0] = static_cast<u8>(type);
-    if (size != 0)
+    if (size != false)
         memcpy(packetBuffer + 1, data, size);
     peerAddress.port = WS_TRANSPORT_PORT;
     if (destination == 0) {
@@ -291,7 +291,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             break;
         case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-                if (gbRemoteGameOpen != 0) {
+                if (gbRemoteGameOpen != false) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
                         if (giNetPosToDCOPos[player] == sender
                             || &gsNetPlayerInfo[player]
@@ -411,7 +411,7 @@ i32 wsWaitForHost(void) {
             if (iWSNextTickCount > platform::Ticks())
                 return 0;
             wsProcessMessages();
-            if (bHostFound != 0) {
+            if (bHostFound != false) {
                 iWSWaitForHostStatus++;
                 return 0;
             }
@@ -438,7 +438,7 @@ i32 wsWaitForHost(void) {
             break;
         case 1:
             wsProcessMessages();
-            if (bStartUpInfoReceived != 0)
+            if (bStartUpInfoReceived != false)
                 return 1;
             break;
     }

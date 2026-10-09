@@ -74,8 +74,8 @@ public:
     playerAIData m_aiData;
     void Write(i32 file);
     void Read(i32 file);
-    i32 NextHero(i32);
-    i32 HasMobileHero(void);
+    i32 NextHero(b32);
+    b32 HasMobileHero(void);
     i32 BuildingsOwned(FactionType townType, BuildingSlotType buildingIndex, i32 buildState);
     i32 NumOfGivenArtifact(ArtifactType artifact);
     i32 CurrentHero(void) {

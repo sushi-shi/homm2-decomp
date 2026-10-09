@@ -60,11 +60,11 @@ static u8 gInputCharacterMapCp1251[CP1251_ASCII_COUNT] = {
     0xe3, 0xec, 0xf6, 0xf7, 0xed, 0xff, 0xd5, 0x7c, 0xda, 0x7e, 0x7f
 };
 
-i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData) {
+b32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData) {
     if (gpInputManager == NULL)
-        return 1;
-    if (gpInputManager->m_active != 1)
-        return 1;
+        return true;
+    if (gpInputManager->m_active != true)
+        return true;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
@@ -143,7 +143,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
         }
         gpInputManager->m_keyPrefixPending = 0;
 
-        if (gpWindowManager->m_active == 1) {
+        if (gpWindowManager->m_active == true) {
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12
                 && (event->payload.keyboard.modifiers
                     & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT))
@@ -166,13 +166,13 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
     return event->type == MESSAGE_NONE;
 }
 
-i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
+b32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
-        return 1;
-    if (gpInputManager->m_active != 1)
-        return 1;
-    if (gpInputManager->m_mouseMessageActive != 0)
-        return 1;
+        return true;
+    if (gpInputManager->m_active != true)
+        return true;
+    if (gpInputManager->m_mouseMessageActive != false)
+        return true;
     gpInputManager->m_mouseMessageActive = true;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
@@ -212,8 +212,8 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             event->payload.mouse.screenX = event->payload.mouse.x;
             event->payload.mouse.screenY = event->payload.mouse.y;
 
-            if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0
-                && CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0
+            if (CURRENT_GRAPHICS_CONFIG.fullScreen == false
+                && CURRENT_GRAPHICS_CONFIG.colorMouseCursor == false
                 && iLastBWOnScreenCheck < platform::Ticks()
                 && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
                 && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
@@ -228,7 +228,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     }
 
     if (message == platform::INPUT_MESSAGE_MOUSE_MOVE && gpMouseManager != NULL) {
-        CheckChangeCursor(event->payload.mouse.x, event->payload.mouse.y, 0);
+        CheckChangeCursor(event->payload.mouse.x, event->payload.mouse.y, false);
     }
 
     if (event->type != MESSAGE_NONE) {
@@ -262,7 +262,7 @@ static void PlatformEventHandler(const platform::Event& event) {
             );
             break;
         case Type::TextInput: {
-            if (gpInputManager == NULL || gpInputManager->m_active != 1) {
+            if (gpInputManager == NULL || gpInputManager->m_active != true) {
                 break;
             }
             const char* cursor = event.text.c_str();
@@ -388,7 +388,7 @@ static inline void InitializeEmptyEvent(tag_message& event) {
 tag_message inputManager::GetEvent(void) {
     tag_message event;
     PollSound();
-    if (gpInputManager->m_active != 1 || m_readIndex == m_writeIndex) {
+    if (gpInputManager->m_active != true || m_readIndex == m_writeIndex) {
         InitializeEmptyEvent(event);
     } else {
         event = m_eventRing[m_readIndex];
@@ -403,7 +403,7 @@ tag_message inputManager::GetEvent(void) {
 tag_message inputManager::PeekEvent(void) {
     tag_message event;
     PollSound();
-    if (gpInputManager->m_active != 1 || m_readIndex == m_writeIndex) {
+    if (gpInputManager->m_active != true || m_readIndex == m_writeIndex) {
         InitializeEmptyEvent(event);
     } else {
         event = m_eventRing[m_readIndex];
@@ -607,36 +607,37 @@ void inputManager::MakeScanCodeTable(void) {
     m_scanCodeTable[H2EnumIndex(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
 }
 
-void CheckChangeCursor(i32 x, i32 y, i32 force) {
-    if (bInCheckChangeCursor != 0)
+void CheckChangeCursor(i32 x, i32 y, b32 force) {
+    if (bInCheckChangeCursor != false)
         return;
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0 && force == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != false && force == false)
         return;
-    if (CURRENT_GRAPHICS_CONFIG.colorMouseCursor == 0)
+    if (CURRENT_GRAPHICS_CONFIG.colorMouseCursor == false)
         return;
 
     bInCheckChangeCursor = true;
-    if (force != 0 || (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT)) {
-        if (bLastMouseOffscreen != 0) {
+    if (force != false
+        || (x >= 0 && x < LOGICAL_SCREEN_WIDTH && y >= 0 && y < LOGICAL_SCREEN_HEIGHT)) {
+        if (bLastMouseOffscreen != false) {
             bLastMouseOffscreen = false;
             gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
         }
         if (bLastOnscreenMouseColor != gbColorMice)
             gpMouseManager->SetColorMice(true);
-    } else if (bLastMouseOffscreen == 0) {
+    } else if (bLastMouseOffscreen == false) {
         bLastMouseOffscreen = true;
         bLastOnscreenMouseColor = gbColorMice;
-        if (gbColorMice != 0)
+        if (gbColorMice != false)
             gpMouseManager->SetColorMice(false);
     }
     bInCheckChangeCursor = false;
 }
 
 void inputManager::ForceMouseMove(void) {
-    if (gpInputManager->m_mouseMessageActive != 0)
+    if (gpInputManager->m_mouseMessageActive != false)
         return;
 
-    if (gpInputManager->m_mouseMessageActive != 0)
+    if (gpInputManager->m_mouseMessageActive != false)
         return;
     gpInputManager->m_mouseMessageActive = true;
 

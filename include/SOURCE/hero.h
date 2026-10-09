@@ -174,22 +174,22 @@ public:
         return (H2EnumIndex((m_eventFlags) & (HERO_EVENT_EMBARKED)));
     }
     hero(void);
-    void Read(i32 file, i8 expansion);
-    void Write(i32 file, i8 expansion);
+    void Read(i32 file, b8 expansion);
+    void Write(i32 file, b8 expansion);
     void GetArmyStrengths(u32l* const);
-    i32 HasArtifact(ArtifactType artifact);
+    b32 HasArtifact(ArtifactType artifact);
     i32 CalcMobility(void);
-    i32 HasSpell(SpellType spell);
+    b32 HasSpell(SpellType spell);
     SpellType GetNthSpell(HeroSpellType type, i32 spellNumber);
     i32 GetNumSpells(HeroSpellType type);
     void UseSpell(SpellType spell);
     void AddSpell(SpellType spell, i32);
     void HeroScreenUpdate(void);
     void UpdateArmies(void);
-    void ViewStat(i32 stat, i32 quickView);
+    void ViewStat(i32 stat, b32 quickView);
     void ViewArtifact(ArtifactType artifact, b32 quickView, i32 scrollSpell);
-    i32 Dismiss(void);
-    void Deallocate(i32 updateMap);
+    b32 Dismiss(void);
+    void Deallocate(b32 updateMap);
     i32 GetExperience(i32 level);
     i32 GetLevel(i32 experienceValue);
     void ApplyBattleWinTemps(void);
@@ -213,7 +213,7 @@ public:
     class town* GetOccupiedTown(void);
     i8 Stats(HeroPrimaryStat stat);
     i8 GetSSLevel(HeroSecondarySkill skill);
-    void DoSSLevelDialog(HeroSecondarySkill skill, i32 quickView);
+    void DoSSLevelDialog(HeroSecondarySkill skill, b32 quickView);
     void CheckAnduranPieces(b32 showDialog);
 };
 #pragma pack(pop)

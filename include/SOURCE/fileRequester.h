@@ -126,13 +126,13 @@ public:
     virtual i32 Open(i32 id) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message& message) override;
-    i32 InitializeFiles(const char* directory, const char* pattern, i32 countOnly);
-    i32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
+    i32 InitializeFiles(const char* directory, const char* pattern, b32 countOnly);
+    b32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
     void SetupFiles(void);
     void CleanUpData(void);
     void SetOK(i32 enabled);
     void DoKnob(void);
-    void Update(i32 drawWindow);
+    void Update(b32 drawWindow);
     const char* GetFilename(void);
 };
 extern FileRequesterMapSizeFilter giMapSizeFilter;

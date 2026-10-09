@@ -59,11 +59,11 @@ i32 qtyToTrade = 0;
 i32 iTradeRatio = 0;
 i32 rightResource = 0;
 i32 maxUnitsToTrade = 0;
-i32 bIsMarketPlace = 0;
+b32 bIsMarketPlace = false;
 class heroWindow* tpWindow = NULL;
 class iconWidget* tradeKnob = NULL;
 
-void DoTradingPost(i32 isMarketplace, float efficiency) {
+void DoTradingPost(b32 isMarketplace, float efficiency) {
 
     bIsMarketPlace = isMarketplace;
     fTradingPostEfficiency = efficiency;
@@ -91,12 +91,12 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     if (tradeKnob == NULL)
         MemError();
     tpWindow->AddWidget(tradeKnob, -1);
-    UpdateTradingPost(0);
-    gpWindowManager->DoDialog(tpWindow, TradingPostHandler, 0);
+    UpdateTradingPost(false);
+    gpWindowManager->DoDialog(tpWindow, TradingPostHandler, false);
     delete tpWindow;
 }
 
-void UpdateTradingPost(i32 draw) {
+void UpdateTradingPost(b32 draw) {
     tag_message messageTemp;
     i32 index;
     OfferSide sideCurrent;
@@ -108,7 +108,7 @@ void UpdateTradingPost(i32 draw) {
 
     messageTemp.type = MESSAGE_WIDGET;
     const char* tradingPlace = localization::Tr(
-        bIsMarketPlace != 0 ? "trading.marketplace.title" : "trading.post.title"
+        bIsMarketPlace != false ? "trading.marketplace.title" : "trading.post.title"
     );
     if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
         if (bLeftDenominated != 0) {
@@ -133,7 +133,7 @@ void UpdateTradingPost(i32 draw) {
             requestedValue,
             gResourceNames[leftResource]
         );
-    } else if (bTradeMade != 0) {
+    } else if (bTradeMade != false) {
         utf8::Format(
             gText, GLOBAL_TEXT_BUFFER_SIZE,
             localization::Tr("trading.bargain"),
@@ -233,7 +233,7 @@ void UpdateTradingPost(i32 draw) {
         );
     else
         tradeKnob->m_x = TRADING_POST_KNOB_X;
-    if (draw != 0) {
+    if (draw != false) {
         tpWindow->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
         gpWindowManager->UpdateScreenRegion(
             tpX + REDRAW_X_OFFSET,
@@ -286,7 +286,7 @@ void DoTradeKnob(struct tag_message message) {
             if (qtyToTrade > iMaxUnitsToTrade)
                 qtyToTrade = iMaxUnitsToTrade;
             gpMouseManager->Main(message);
-            UpdateTradingPost(1);
+            UpdateTradingPost(true);
         }
         platform::PumpEvents();
         message = gpInputManager->GetEvent();
@@ -298,7 +298,7 @@ void DoTradeKnob(struct tag_message message) {
             }
         }
     }
-    UpdateTradingPost(1);
+    UpdateTradingPost(true);
 }
 
 void SetupNewTrade(void) {
@@ -407,7 +407,7 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
         }
     }
     if (redraw)
-        UpdateTradingPost(1);
+        UpdateTradingPost(true);
     if (exitFlag) {
         message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;

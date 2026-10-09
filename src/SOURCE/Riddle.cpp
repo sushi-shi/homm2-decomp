@@ -6,7 +6,7 @@
 
 i32 RiddleStringsEqual(const char* answer, const char* expected) {
     if (answer == nullptr || expected == nullptr)
-        return 0;
+        return false;
 
     // Retail compares a four-character field, padded with NULs for short
     // answers. Keep those rules while counting characters rather than bytes.
@@ -29,8 +29,8 @@ i32 RiddleStringsEqual(const char* answer, const char* expected) {
     for (std::size_t index = 0; index < count && prefix[index] != 0; ++index) {
         const utf8::Decoded decoded = utf8::Decode(answer);
         if (!decoded.valid || utf8::ToLower(decoded.codePoint) != utf8::ToLower(prefix[index]))
-            return 0;
+            return false;
         answer += decoded.length;
     }
-    return 1;
+    return true;
 }

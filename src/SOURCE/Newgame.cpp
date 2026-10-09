@@ -404,7 +404,7 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
-i32 game::NewGame(void) {
+b32 game::NewGame(void) {
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfo[GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
@@ -415,9 +415,9 @@ i32 game::NewGame(void) {
     b32 result;
     b8 mapMatchesType;
     char* mapExt;
-    i32 mapHeaderRead;
+    b32 mapHeaderRead;
     i32 textBufferIndex;
-    i32 transmitResult;
+    b32 transmitResult;
 
     result = true;
     m_newGameWindow = NULL;
@@ -426,7 +426,7 @@ i32 game::NewGame(void) {
         choiceWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (choiceWindow == NULL)
             MemError();
-        gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
+        gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, false);
         delete choiceWindow;
         switch (NewGameMapChoiceFromCode(static_cast<i16>(gpWindowManager->m_dialogResult))) {
             case MAP_CHOICE_STANDARD:
@@ -436,7 +436,7 @@ i32 game::NewGame(void) {
                 xIsExpansionMap = true;
                 break;
             case MAP_CHOICE_CANCEL:
-                return 0;
+                return false;
         }
     }
 
@@ -512,7 +512,7 @@ i32 game::NewGame(void) {
 
                     gbNewGameDialogOver = false;
                     platform::StartTextInput();
-                    gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+                    gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, false);
                     platform::StopTextInput();
                     delete m_newGameWindow;
                     if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
@@ -580,7 +580,7 @@ i32 game::NewGame(void) {
                 ShutDown(NULL);
         }
 
-        LoadGame("origdata.bin", 1, 0);
+        LoadGame("origdata.bin", true, false);
         if (giNumHumanPlayers > 1) {
             if (iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 m_newGameWindow =
@@ -604,7 +604,7 @@ i32 game::NewGame(void) {
             giNumHumanPlayers > 1 && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT;
         if (networkChatInput)
             platform::StartTextInput();
-        gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+        gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, false);
         if (networkChatInput)
             platform::StopTextInput();
         delete m_newGameWindow;
@@ -966,11 +966,11 @@ cleanup:
         utf8::Format(gText, GLOBAL_TEXT_BUFFER_SIZE, localization::Tr("new_game.rating"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
-        DrawNGKPDisplayString(0);
+        DrawNGKPDisplayString(false);
     }
 
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
-        i32 sendResult;
+        b32 sendResult;
         i32 oldNetworkId;
         i32 swapPlayerTemp;
         i32 setupSlot;
@@ -1060,7 +1060,7 @@ cleanup:
             }
             if (static_cast<i32>(platform::Ticks()) > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
-                gpGame->DrawNGKPDisplayString(1);
+                gpGame->DrawNGKPDisplayString(true);
             }
         }
 
@@ -1464,25 +1464,25 @@ cleanup:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i32 game::ProcessNGKeyPress(struct tag_message& message) {
+b32 game::ProcessNGKeyPress(struct tag_message& message) {
     char workText[GAME_KEY_BUFFER_SIZE];
     i32 widthResult;
 
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
-        return 0;
+        return false;
 
     if (message.type == MESSAGE_TEXT_INPUT) {
         const std::uint32_t codePoint =
             static_cast<std::uint32_t>(message.payload.keyboard.keyCode);
         if (codePoint < ' ' || codePoint == '{' || codePoint == '}')
-            return 0;
+            return false;
 
         char encoded[4];
         const std::size_t encodedLength = utf8::Encode(codePoint, encoded);
         const std::size_t textLength = strlen(cNGKPCore);
         if (encodedLength == 0 || textLength + encodedLength >= GAME_CHAT_TEXT_LIMIT
             || textLength + encodedLength >= GAME_KEY_BUFFER_SIZE)
-            return 0;
+            return false;
 
         strcpy(workText, cNGKPCore);
         memmove(
@@ -1499,7 +1499,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             strcpy(cNGKPCore, workText);
             NGKPcursorIndex = oldCursor;
         }
-        return 0;
+        return false;
     }
 
     switch (message.payload.keyboard.keyCode) {
@@ -1537,7 +1537,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_ENTER:
-            return 1;
+            return true;
 
         case INPUT_SCAN_BACKSPACE:
             if (NGKPcursorIndex > 0) {
@@ -1552,8 +1552,8 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
     }
 
-    DrawNGKPDisplayString(1);
-    return 0;
+    DrawNGKPDisplayString(true);
+    return false;
 }
 
 void game::NGKPSetupDisplayString(char* text, u16 cursor) {
@@ -1579,8 +1579,8 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
         cNGKPDisplay[cursor + 1] = 0;
 }
 
-void game::DrawNGKPDisplayString(i32 updateScreen) {
-    if (gbNewGameDialogOver != 0)
+void game::DrawNGKPDisplayString(b32 updateScreen) {
+    if (gbNewGameDialogOver != false)
         return;
 
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
@@ -1920,7 +1920,7 @@ void game::ShowScenInfo(void) {
         window->BroadcastMessage(message);
     }
 
-    gpWindowManager->DoDialog(window, EventWindowHandler, 0);
+    gpWindowManager->DoDialog(window, EventWindowHandler, false);
     delete window;
 }
 
@@ -1986,7 +1986,7 @@ void game::GetLossConditionText(char* text) {
 
 void game::GetVictoryConditionText(char* text) {
     town* targetTown;
-    i32 localPlayerFirst;
+    b32 localPlayerFirst;
     hero* victoryHero;
     char firstSide[GAME_SIDE_TEXT_SIZE];
     char secondSideValue[GAME_SIDE_TEXT_SIZE];
@@ -2147,7 +2147,7 @@ static void FormatScenarioSideList(
     }
 }
 
-i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
+b32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     char colorNames[GAME_PLAYER_COUNT][GAME_SIDE_TEXT_SIZE];
     char playerList[GAME_SIDE_TEXT_SIZE];
     i32 sideCount;
@@ -2165,7 +2165,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
 
     onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer;
     sideCount = lastPlayer - firstPlayer + 1;
-    otherPlayerCount = sideCount - (onSide != 0);
+    otherPlayerCount = sideCount - (onSide != false);
 
     listIndex = 0;
     for (i = firstPlayer; i <= lastPlayer; ++i) {

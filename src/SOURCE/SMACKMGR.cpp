@@ -67,10 +67,10 @@ void ConvertSmackerPalette(u8* paletteData) {
 
 void DoAdvance(
     platform::MovieId movie,
-    i32 drawFrame,
-    i32 advanceFrame,
-    i32 updatePalette,
-    i32 skipPalette
+    b32 drawFrame,
+    b32 advanceFrame,
+    b32 updatePalette,
+    b32 skipPalette
 ) {
     platform::MovieFrame frame;
     if (drawFrame && platform::MovieDraw(movie, frame)) {
@@ -295,7 +295,13 @@ void SmackManagerMain(void) {
                 && (bSmackNum != CONGRATS
                     || platform::MovieFrameIndex(smk1)
                         != platform::MovieFrameCount(smk1) - 1)) {
-                DoAdvance(smk1, 1, 1, primaryStarted || !SmackOptions[bSmackNum].fadeIn, 0);
+                DoAdvance(
+                    smk1,
+                    true,
+                    true,
+                    primaryStarted || !SmackOptions[bSmackNum].fadeIn,
+                    false
+                );
             }
             if (platform::MovieFrameIndex(smk1) > 0 || platform::MovieFrameCount(smk1) <= 1) {
                 if (!primaryStarted) {
@@ -337,15 +343,15 @@ void SmackManagerMain(void) {
                 } else {
                     drawLastFrame = false;
                 }
-                DoAdvance(smk2, drawLastFrame, advanceLastFrame, 0, 1);
+                DoAdvance(smk2, drawLastFrame, advanceLastFrame, false, true);
                 gbLastFramePlayed = true;
                 while (platform::MovieWaiting(smk2))
                     platform::PumpEvents();
             } else {
                 if (bSmackNum == EXPANSION_CAMPAIGN)
-                    DoAdvance(smk2, 1, 1, 0, 1);
+                    DoAdvance(smk2, true, true, false, true);
                 else
-                    DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
+                    DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, true, false, true);
             }
             if (smk2 != platform::kInvalidMovie && platform::MovieFrameIndex(smk2) > 0)
                 companionStarted = true;
@@ -566,7 +572,7 @@ void ShutDownSmacker(void) {
     smk2 = platform::kInvalidMovie;
 }
 
-i32 PlaySmacker(i32 smackNumber) {
+b32 PlaySmacker(i32 smackNumber) {
     i32 oldUpdateFlags;
     i8 savedPalette[PALETTE_DATA_SIZE];
 
@@ -615,16 +621,16 @@ ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
     return EXPANSION_CAMPAIGN_NONE;
 }
 
-i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
+b8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     if (x < rect->x)
-        return 0;
+        return false;
     if (x >= rect->x + rect->width)
-        return 0;
+        return false;
     if (y < rect->y)
-        return 0;
+        return false;
     if (y >= rect->y + rect->height)
-        return 0;
-    return 1;
+        return false;
+    return true;
 }
 
 icon* backImage = NULL;

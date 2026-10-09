@@ -35,7 +35,7 @@ typedef enum ArmyFlightConstant {
 
 }
 
-i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
+b32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell;
     i32 candidateHex;
 
@@ -46,11 +46,11 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     }
     if (!ValidHex(candidateHex) || candidateHex % COMBAT_GRID_ROW_LENGTH == 0
         || candidateHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
-        return 0;
+        return false;
     }
     if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_SIDE_NONE
         || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
-        return 0;
+        return false;
     }
     if ((H2EnumIndex((m_monster.attributes) & (MONSTER_FLAGS_WIDE)))) {
         candidateHex = GetAdjacentCellIndex(
@@ -69,10 +69,10 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                     gpCombatManager->m_currentArmyIndex
                 ))
             && !cell->m_blocked) {
-            return 1;
+            return true;
         } else {
             if (!tryOtherSide) {
-                return 0;
+                return false;
             } else {
                 candidateHex = GetAdjacentCellIndex(
                     hex,
@@ -81,7 +81,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                 if (ValidHex(candidateHex)) {
                     cell = &gpCombatManager->m_hexCells[candidateHex];
                 } else {
-                    return 0;
+                    return false;
                 }
                 if ((cell->m_occupantSide == COMBAT_SIDE_NONE
                      || HEX_HAS_OCCUPANT(
@@ -93,18 +93,18 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
                     if (fittingHex) {
                         *fittingHex = candidateHex;
                     }
-                    return 1;
+                    return true;
                 } else {
-                    return 0;
+                    return false;
                 }
             }
         }
     } else {
-        return 1;
+        return true;
     }
 }
 
-i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
+b32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 enemyHex;
     u32 directionMask;
     i32 adjHex;
@@ -120,16 +120,16 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     CombatHexDirection moveDirection;
 
     if (!ValidHex(destination)) {
-        return 0;
+        return false;
     }
     if (m_targetSide < COMBAT_ATTACKER_SIDE || m_targetSide > COMBAT_DEFENDER_SIDE
         || m_targetIndex < 0
         || m_targetIndex > COMBAT_ARMY_SLOT_COUNT - 1) {
         if (CanFit(destination, 0, NULL)) {
             m_moveTargetHex = destination;
-            return 1;
+            return true;
         } else {
-            return 0;
+            return false;
         }
     }
 
@@ -140,7 +140,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         enemyHex = targetArmy->m_hex;
     }
     if (!ValidHex(enemyHex)) {
-        return 0;
+        return false;
     }
 
     attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
@@ -155,7 +155,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             )) {
             m_attackDirection = moveDirection;
             m_moveTargetHex = m_hex;
-            return 1;
+            return true;
         } else {
             attackMask |= 1 << H2EnumIndex(moveDirection);
         }
@@ -186,7 +186,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
                     }
                 }
             }
-            return 1;
+            return true;
         } else {
             directionMask |= 1 << H2EnumIndex(direction);
         }
@@ -203,16 +203,16 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             if (ValidHex(adjHex) && CanFit(adjHex, 0, NULL)) {
                 m_moveTargetHex = adjHex;
                 m_attackDirection = GetBestDirection(m_moveTargetHex, enemyHex, 0);
-                return 1;
+                return true;
             } else {
                 directionMask |= 1 << H2EnumIndex(direction);
             }
         }
     }
-    return 0;
+    return false;
 }
 
-i32 army::FlyTo(void) {
+b32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
@@ -296,7 +296,7 @@ bool army::IsCloseMove(i32 destination) {
     return false;
 }
 
-i32 army::FlyTo(i32 destination) {
+b32 army::FlyTo(i32 destination) {
     std::vector<i32> chargeAffectedHexes;
     float xPosition;
     float yRate;
@@ -328,7 +328,7 @@ i32 army::FlyTo(i32 destination) {
 
     gCloseMove = IsCloseMove(destination);
     if (!ValidHex(destination)) {
-        return 0;
+        return false;
     }
 
     column = m_hex % COMBAT_GRID_ROW_LENGTH;
@@ -351,7 +351,7 @@ i32 army::FlyTo(i32 destination) {
         }
     }
     if (m_facingChanged) {
-        gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(true, false, false, false, COMBAT_FRAME_DELAY, true, true);
     }
 
     endX = gpCombatManager->m_hexCells[destination].m_x;
@@ -388,7 +388,7 @@ i32 army::FlyTo(i32 destination) {
         frameCount = 0;
         frameStart = 0;
         midCount = 0;
-        gpCombatManager->DrawFrame(0, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+        gpCombatManager->DrawFrame(false, false, false, false, COMBAT_FRAME_DELAY, true, true);
         gpWindowManager->m_screen->CopyTo(
             gpCombatManager->m_backgroundBuffer,
             0,
@@ -494,7 +494,7 @@ i32 army::FlyTo(i32 destination) {
                 giMaxExtentX = giMaxExtentY;
                 gbComputeExtent = true;
                 gbSaveBiggestExtent = true;
-                DrawToBuffer(static_cast<i32>(xPosition), static_cast<i32>(yPosition), 0);
+                DrawToBuffer(static_cast<i32>(xPosition), static_cast<i32>(yPosition), false);
                 gbComputeExtent = false;
                 gbSaveBiggestExtent = false;
                 if (giMinExtentX < 0)
@@ -592,11 +592,11 @@ i32 army::FlyTo(i32 destination) {
         }
         ChargingDamage(chargeAffectedHexes);
     }
-    gpCombatManager->DrawFrame(1, 0, 0, 0, COMBAT_FRAME_DELAY, 1, 1);
+    gpCombatManager->DrawFrame(true, false, false, false, COMBAT_FRAME_DELAY, true, true);
     if (ironfist::HasCreatureAttribute(m_monsterType, ironfist::CreatureAttribute::Charger)) {
         RevertChargingMoveAnimation();
     }
     gpCombatManager->TestRaiseDoor();
     gpCombatManager->CheckBurnCreature(this);
-    return 1;
+    return true;
 }

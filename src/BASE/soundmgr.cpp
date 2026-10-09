@@ -63,7 +63,7 @@ bool OpenAudioBackend(SoundBackendKind backend) {
 void soundManager::ShutdownSoundBackends(void) {
     if (m_backend == SOUND_BACKEND_NONE)
         return;
-    StopAllSamples(1);
+    StopAllSamples(true);
     MIDIShutdown();
     platform::Audio().Close();
     gActiveSamples.clear();
@@ -166,7 +166,7 @@ i32 soundManager::Open(i32) {
 }
 
 void soundManager::Close(void) {
-    if (m_active != 1)
+    if (m_active != true)
         return;
     ShutdownSoundBackends();
     m_active = false;
@@ -176,11 +176,11 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-void soundManager::StopAllSamples(i32 stopMusic) {
+void soundManager::StopAllSamples(b32 stopMusic) {
     if (!gbSoundEnabled)
         return;
     m_musicFadeSteps = 0;
-    if (stopMusic != 0)
+    if (stopMusic != false)
         MIDIStop(m_musicTrack);
     for (sample* sampleResource : gActiveSamples) {
         if (sampleResource != NULL && sampleResource->m_playbackData.activeSample != 0) {
@@ -325,9 +325,9 @@ void soundManager::MemorySample(class sample* sampleResource) {
     sound.samples = playback.data;
     sound.byteCount = playback.size;
     sound.sampleRate = H2EnumIndex(playback.sampleRate);
-    sound.channels = playback.stereo != 0 ? 2 : 1;
+    sound.channels = playback.stereo != false ? 2 : 1;
     sound.bitsPerSample = playback.sampleFormat == FORMAT_16_BIT ? 16 : 8;
-    const i32 loops = playback.looping != 0 ? -1 : 0;
+    const i32 loops = playback.looping != false ? -1 : 0;
     playback.activeSample = platform::Audio().PlaySound(
         sound,
         ConvertVolume(playback.volume, SOUND_VOLUME_EFFECT),
@@ -344,7 +344,7 @@ void soundManager::ServiceSound(void) {
     PurgeFinishedSamples();
 }
 
-i32 soundManager::MusicPlaying(void) {
+b32 soundManager::MusicPlaying(void) {
     return gbSoundEnabled && MIDIIsPlaying();
 }
 

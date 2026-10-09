@@ -248,7 +248,7 @@ struct HighScoreEntry {
     i32 score;
     i32 days;
     i32 difficultyRating;
-    char cheated;
+    bchar cheated;
     char reserved[HIGH_SCORE_RESERVED_SIZE];
 };
 #pragma pack(pop)
@@ -393,7 +393,7 @@ extern "C" void PollSound(void);
 void ForcePollSound(void);
 void InitMainClasses(void);
 void DeleteMainClasses(void);
-i32 EarlySetup(void);
+b32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char character);
 typedef enum Cp1251CaseConstant {
@@ -421,14 +421,14 @@ i32 InterpretCommandLine(void);
 MessageDispatchResult InitMenuHandler(struct tag_message& message);
 MessageDispatchResult NullHandler(struct tag_message& message);
 MessageDispatchResult RecruitHeroHandler(tag_message& message);
-const char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 withHeading);
+const char* GetBuildingInfo(FactionType race, BuildingSlotType building, b32 withHeading);
 const char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const destination, i32 mageLevel);
 const char* GetMonsterName(CreatureType monster);
 const char* GetMonsterPluralName(CreatureType monster);
 void GetMonsterCost(CreatureType monster, i32* const cost);
-i32 CanBuild(town* townPointer, BuildingSlotType building);
-i32 CanBuy(town* townPointer, BuildingSlotType type);
+b32 CanBuild(town* townPointer, BuildingSlotType building);
+b32 CanBuy(town* townPointer, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
 MessageDispatchResult WaitHandler(tag_message& message);
 MessageDispatchResult EventWindowHandler(struct tag_message& message);
@@ -443,7 +443,7 @@ i32 AddScoreToHighScore(i32 score, i32 days, i32 difficultyRating, HighScoreType
 void BVResMsg(const char* text, ResourceType resourceType, i32 quantity);
 void GOut(const char* text);
 i32 NetPosToGamePos(i32 netPosition);
-i32 WaitForOtherPlayer(void);
+b32 WaitForOtherPlayer(void);
 void PopNetBox(char* text, i32 netPlayer);
 void AddNetBoxLine(const char* text, char color);
 void ShutDown(const char* message);
@@ -458,13 +458,13 @@ const char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
 void UnloadSystemwideIcons(void);
 void EarlyShutDownSystem(void);
-i32 GameUnsaved(void);
-i32 HandleAppSpecificMenuCommands(i32 command);
+b32 GameUnsaved(void);
+b32 HandleAppSpecificMenuCommands(i32 command);
 void UpdateSystemOptionsMenu(void);
 void CleanUpMenus(void);
 void UpdateAppSpecificMenus(void* hMenu);
 void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h);
-i32 InMapArea(i32 x, i32 y);
+b32 InMapArea(i32 x, i32 y);
 void SetupDynamicWindow(
     i32 x,
     i32 y,
@@ -486,7 +486,7 @@ void TestDynamicWindow(i32 widthInTiles, i32 heightInTiles);
 void HandleRemoteDeadPlayerExit(i32 position);
 void HandleRemoteSuddenExit(void);
 void DropDownToOnePlayer(void);
-void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, i32 forwardedReport);
+void ReceiveHostReportsPlayerExit(i32 hostNetPosition, struct SPlayerExit exitInfo, b32 forwardedReport);
 void ReceiveRemotePlayerExit(struct SPlayerExit exitInfo);
 i32 CheckMem(void);
 i32 GetManaCost(SpellType spell, hero* heroPointer);

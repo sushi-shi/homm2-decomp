@@ -101,7 +101,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     u8* colorTable,
     i8* shear
 ) {
-    if (gbComputeExtent != 0) {
+    if (gbComputeExtent != false) {
         if (orientation != ICON_DRAW_NORMAL) {
             limits->right = x - GetIconEntry(this, frame)->x;
             limits->left = limits->right - GetIconEntry(this, frame)->w + 1;
@@ -113,7 +113,7 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             limits->top = y + GetIconEntry(this, frame)->y;
             limits->bottom = limits->top + GetIconEntry(this, frame)->h - 1;
         }
-        if (gbSaveBiggestExtent != 0) {
+        if (gbSaveBiggestExtent != false) {
             if (limits->left < giMinExtentX)
                 giMinExtentX = limits->left;
             if (limits->top < giMinExtentY)
@@ -123,21 +123,21 @@ IconDrawResult icon::CombatClipDrawToBuffer(
             if (limits->bottom > giMaxExtentY)
                 giMaxExtentY = limits->bottom;
         }
-        if (gbReturnAfterComputeExtent != 0)
+        if (gbReturnAfterComputeExtent != false)
             return ICON_DRAW_SKIPPED;
     }
 
-    if (gbLimitToExtent != 0
-        && (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
+    if (gbLimitToExtent != false
+        && (gbCurrArmyDrawn == false || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY))
         return ICON_DRAW_SKIPPED;
 
     // DrawFrame restores only this rectangle. Every variant must stay inside
     // it, or shadows outside the restored area are applied again each frame.
-    const i32 clipX = gbLimitToExtent != 0 ? giMinExtentX : 0;
-    const i32 clipY = gbLimitToExtent != 0 ? giMinExtentY : 0;
-    const i32 clipW = gbLimitToExtent != 0 ? giMaxExtentX - giMinExtentX + 1 : LOGICAL_SCREEN_WIDTH;
-    const i32 clipH = gbLimitToExtent != 0 ? giMaxExtentY - giMinExtentY + 1 : DRAW_COMBAT_HEIGHT;
+    const i32 clipX = gbLimitToExtent != false ? giMinExtentX : 0;
+    const i32 clipY = gbLimitToExtent != false ? giMinExtentY : 0;
+    const i32 clipW = gbLimitToExtent != false ? giMaxExtentX - giMinExtentX + 1 : LOGICAL_SCREEN_WIDTH;
+    const i32 clipH = gbLimitToExtent != false ? giMaxExtentY - giMinExtentY + 1 : DRAW_COMBAT_HEIGHT;
 
     if (shear != NULL) {
         if (orientation == ICON_DRAW_NORMAL)
@@ -284,12 +284,12 @@ void icon::FillToBuffer(
         );
         return;
     }
-    if (gbLimitToExtent != 0 && limits != NULL) {
+    if (gbLimitToExtent != false && limits != NULL) {
         limits->left = x + GetIconEntry(this, frame)->x;
         limits->right = limits->left + GetIconEntry(this, frame)->w - 1;
         limits->top = y + GetIconEntry(this, frame)->y;
         limits->bottom = limits->top + GetIconEntry(this, frame)->h - 1;
-        if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
+        if (gbCurrArmyDrawn == false || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY)
             return;
     }

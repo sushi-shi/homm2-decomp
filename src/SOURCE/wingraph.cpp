@@ -42,7 +42,7 @@ void InitGraphics(void) {
     mode.width = LOGICAL_SCREEN_WIDTH;
     mode.height = LOGICAL_SCREEN_HEIGHT;
     platform::DisplaySettings settings;
-    settings.fullscreen = CURRENT_GRAPHICS_CONFIG.fullScreen != 0;
+    settings.fullscreen = CURRENT_GRAPHICS_CONFIG.fullScreen != false;
     platform::ReadDisplaySettings(platform::Files(), settings);
     mode.fullscreen = settings.fullscreen;
     mode.scaling = settings.scaling;
@@ -84,7 +84,7 @@ void CleanUpWinGraphics(void) {
 }
 
 void SetFullScreenStatus(b32 fullScreen) {
-    if (gDisplayOpen && platform::Video().SetFullscreen(fullScreen != 0)) {
+    if (gDisplayOpen && platform::Video().SetFullscreen(fullScreen != false)) {
         CURRENT_GRAPHICS_CONFIG.fullScreen = platform::Video().Settings().fullscreen;
         platform::SetMenuVisible(!CURRENT_GRAPHICS_CONFIG.fullScreen);
     }

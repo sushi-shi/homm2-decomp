@@ -271,13 +271,13 @@ public:
     void Init(CreatureType monsterType, i32 quantity, CombatSide side, i32 index, i32 hex, i32 armyGroupSlot);
     void LoadResources(void);
     void FreeResources(void);
-    void DrawToBuffer(i32 x, i32 y, i32 quantityOverlayOnly);
+    void DrawToBuffer(i32 x, i32 y, b32 quantityOverlayOnly);
     void Wince(void);
-    void Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing);
+    void Walk(CombatHexDirection direction, b32 finishStanding, b32 skipDrawing);
     void SpecialAttack(void);
     void DirDoAttack(CombatHexDirection direction);
-    void DoHydraAttack(i32);
-    void DoAttack(i32 retaliation);
+    void DoHydraAttack(b32);
+    void DoAttack(b32 retaliation);
     void SetChargingMoveAnimation(ChargingDirection direction);
     void RevertChargingMoveAnimation(void);
     void SetJumpingAnimation(void);
@@ -289,21 +289,21 @@ public:
     i32 AttackTo(void);
     i32 AttackTo(i32 destination);
     void CheckLuck(void);
-    void DamageEnemy(class army* target, i32* damageResult, i32* killedResult, i32 rangedAttack, i32 retaliation);
+    void DamageEnemy(class army* target, i32* damageResult, i32* killedResult, b32 rangedAttack, i32 retaliation);
     i32 Damage(i32l damage, SpellType spell);
-    void PowEffect(CombatEffectType effect, i32 resetLimits, i32 effectX, i32 effectY);
+    void PowEffect(CombatEffectType effect, b32 resetLimits, i32 effectX, i32 effectY);
     u32l Strength(void);
-    i32 LeaveNoBody(void);
-    void ProcessDeath(i32 immediate);
-    void SpellEffect(CombatEffectType effect, i32 effectFrameDelay, i32 animateCreature);
+    b32 LeaveNoBody(void);
+    void ProcessDeath(b32 immediate);
+    void SpellEffect(CombatEffectType effect, i32 effectFrameDelay, b32 animateCreature);
     void CancelSpellType(ArmySpellCancelType cancelType);
     void CancelIndividualSpell(ArmySpellInfluence influence);
-    i32 SetSpellInfluence(ArmySpellInfluence influence, i32 rounds);
+    b32 SetSpellInfluence(ArmySpellInfluence influence, i32 rounds);
     void DecrementSpellRounds(void);
     void GoBerserk(void);
-    void MoveAttack(i32 destination, i32 moveOnly);
+    void MoveAttack(i32 destination, b32 moveOnly);
     float SpellCastWorkChance(SpellType spell);
-    i32 SpellCastWorks(SpellType spell);
+    b32 SpellCastWorks(SpellType spell);
     void DispelGood(void);
     void Cure(i32 amount);
     i32 MidX(void);
@@ -311,19 +311,19 @@ public:
     i32 TopY(void);
     i32 RightX(void);
     i32 LeftX(void);
-    i32 OtherArmyAdjacent(CombatSide side, i32 index);
+    b32 OtherArmyAdjacent(CombatSide side, i32 index);
     i32 GetPowBaseY(void);
-    i32 CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex);
-    i32 ValidFlight(i32 destination, ArmyPathTarget pathMode);
-    i32 FlyTo(void);
-    i32 FlyTo(i32 destination);
-    i32 FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, ArmyPathTarget pathMode);
-    i32 ValidPath(i32 targetHex, ArmyPathTarget pathMode);
+    b32 CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex);
+    b32 ValidFlight(i32 destination, ArmyPathTarget pathMode);
+    b32 FlyTo(void);
+    b32 FlyTo(i32 destination);
+    i32 FindPath(i32 sourceHex, i32 targetHex, i32, b32 ignoreSpeed, ArmyPathTarget pathMode);
+    b32 ValidPath(i32 targetHex, ArmyPathTarget pathMode);
     i32 GetMoveMask(i32 sourceHex);
     i32 GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHex);
-    i32 ValidMove(CombatHexDirection direction);
-    i32 ValidMove(i32 sourceHex, CombatHexDirection direction);
-    i32 ValidAttack(i32 sourceHex, CombatHexDirection direction, ArmyAttackTarget targetMode, i32 requiredTargetHex, i32* attackHex);
+    b32 ValidMove(CombatHexDirection direction);
+    b32 ValidMove(i32 sourceHex, CombatHexDirection direction);
+    b32 ValidAttack(i32 sourceHex, CombatHexDirection direction, ArmyAttackTarget targetMode, i32 requiredTargetHex, i32* attackHex);
     i32 GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction);
     bool IsCloseMove(i32 destination);
     void ArcJump(i32 fromHex, i32 toHex);
@@ -334,9 +334,9 @@ public:
     bool FlightThroughObstacles(i32 destination);
     bool IsEnemyCreatureHex(i32 hexIndex);
     void MoveAttackNonFlyer(i32 startHex, i32 attackMask);
-    i32 ValidRange(i32 targetHex);
+    b32 ValidRange(i32 targetHex);
     CombatHexDirection GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask);
-    i32 IsAlive(void) {
+    b32 IsAlive(void) {
         return m_monsterType >= CREATURE_PEASANT && m_quantity > 0;
     }
 };
@@ -354,7 +354,7 @@ extern b32 gbGenieHalf;
 
 extern SMonFrameInfo sViewArmyMonFrameInfo;
 
-void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing);
+void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, b32 finishStanding, b32 skipDrawing);
 void BuildTeleporterTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing, bool closeMove);
 void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType);
 

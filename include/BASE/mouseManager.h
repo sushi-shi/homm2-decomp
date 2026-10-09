@@ -47,7 +47,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void SetPointer(const char* name, i32 frame, MouseCursorType cursorType);
     void SetPointer(i32 frame);
-    void NewUpdate(i32 force);
+    void NewUpdate(b32 force);
     void MouseCoords(i32& x, i32& y);
     void SaveAndDraw(void);
     void RestoreUnderlying(void);
@@ -55,7 +55,7 @@ public:
     void ReallyShowPointer(void);
     void HideColorPointer(void);
     void ShowColorPointer(void);
-    i32 IsVis(void);
+    b32 IsVis(void);
     void CheckUpdateMousePos(void);
     void SetColorMice(b32 enabled);
 };
