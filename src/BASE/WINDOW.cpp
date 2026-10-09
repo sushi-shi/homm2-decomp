@@ -275,7 +275,8 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
     MessageDispatchResult dispatchResult = MESSAGE_DISPATCH_CONTINUE;
     widget* currentWidget = m_widgetListHead;
     while (currentWidget != NULL) {
-        switch (dispatchResult = currentWidget->Main(message)) {
+        dispatchResult = currentWidget->Main(message);
+        switch (dispatchResult) {
             case MESSAGE_DISPATCH_CONTINUE:
                 break;
             case MESSAGE_DISPATCH_CONSUME:
