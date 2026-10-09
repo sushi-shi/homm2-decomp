@@ -26,15 +26,30 @@ no longer observed, so the manifest cannot silently become a stale allowlist.
 When one declaration statement owns Boolean and non-Boolean declarators, the
 candidate is marked ``requires_declaration_split``: its type token must not be
 changed until the declaration is split.
-Boolean parameters are inventoried separately: their incoming domain belongs
+Boolean parameter storage is inventoried separately: its incoming domain belongs
 to the function contract and is not itself a bad write.
 
-Parameters are inventoried but normally remain rejected until a separate
-call-site proof establishes their incoming domain. The same scan inventories
-arguments to recovered Boolean parameters: numeric ``0``/``1`` arguments and
-arguments outside a proven Boolean domain fail ``--check``. Aggregate byte
-writes and external deserialization remain review boundaries rather than
-inferred Boolean evidence.
+Function contracts are proven over the whole program as well. A function
+returning ``i32``, ``i8`` or plain char is a result candidate when every
+``return`` yields ``0``/``1``, a comparison or logical value, Boolean storage,
+or a source this proof also establishes (another candidate result or
+candidate storage), with an observed domain of exactly ``{0, 1}``. Virtual
+methods, operators and results a caller uses numerically (arithmetic,
+indexing, ``switch``, comparison with a non-Boolean) keep their integer type
+and are listed with the reason. A parameter is a candidate when
+every call site's argument (or the parameter's default) and every write in the
+body are proven the same way; a function whose address is taken has callers
+the scan cannot see, so its parameters stay integral, and a parameter its body
+uses numerically (an index, an operand) keeps its integer type. Already Boolean results
+must keep returning proven values: a numeric ``0``/``1`` return or default
+argument, or an unproven return, fails ``--check`` like the corresponding
+storage write. The scan also inventories arguments to recovered Boolean
+parameters: numeric ``0``/``1`` arguments and arguments outside a proven
+Boolean domain fail ``--check``, as does an ``==``/``!=`` comparison of a
+Boolean value with a numeric ``0``/``1``. Aggregate byte writes and external
+deserialization remain review boundaries rather than inferred Boolean
+evidence. ``b32``/``b8``/``bchar`` are typedefs, so a retype never changes a
+decorated name; the literal spellings are checked by the byte gates.
 
 Run inside ``nix develop .#build``::
 
@@ -48,6 +63,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import ctypes
 import functools
 import gc
 import importlib
@@ -72,7 +88,7 @@ from homm2.clang_options import ClangMode
 from homm2.core.paths import REPO
 
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 RETAIL_DATABASE = Path("build/clangd/compile_commands.json")
 PORTABLE_DATABASE = Path("build/compile_commands.json")
 RETAIL_EXCEPTION_MANIFEST = Path("config/reviews/bool_exceptions.tsv")
@@ -217,11 +233,11 @@ def _reviewed_exceptions(
                 f"{RETAIL_EXCEPTION_MANIFEST}: expected columns "
                 + ", ".join(RETAIL_EXCEPTION_FIELDS))
         rows = [ReviewedException(**row) for row in reader]
-    allowed = {"call", "parse-diagnostic", "write"}
+    allowed = {"call", "parse-diagnostic", "return", "write"}
     invalid = [
         row for row in rows
         if (row.category not in allowed or not row.file or not row.detail or not row.reason
-            or (row.category in {"call", "write"}
+            or (row.category in {"call", "return", "write"}
                 and (not row.qualified_name or not row.write_kind))
             or (row.category == "parse-diagnostic"
                 and (row.qualified_name or row.write_kind)))
@@ -286,6 +302,35 @@ def _integer_literal(text: str) -> int | None:
     return int(literal, base)
 
 
+def _evaluated_integer(cursor: ci.Cursor) -> int | None:
+    """An integer literal's value from clang itself.
+
+    A literal written inside a macro body has no usable tokens at its
+    expansion site, so its spelling cannot be read back from the cursor.
+    """
+    lib = ci.conf.lib
+    if not getattr(_evaluated_integer, "registered", False):
+        lib.clang_Cursor_Evaluate.argtypes = [ci.Cursor]
+        lib.clang_Cursor_Evaluate.restype = ctypes.c_void_p
+        lib.clang_EvalResult_getKind.argtypes = [ctypes.c_void_p]
+        lib.clang_EvalResult_getKind.restype = ctypes.c_int
+        lib.clang_EvalResult_getAsLongLong.argtypes = [ctypes.c_void_p]
+        lib.clang_EvalResult_getAsLongLong.restype = ctypes.c_longlong
+        lib.clang_EvalResult_dispose.argtypes = [ctypes.c_void_p]
+        lib.clang_EvalResult_dispose.restype = None
+        _evaluated_integer.registered = True
+    result = lib.clang_Cursor_Evaluate(cursor)
+    if not result:
+        return None
+    try:
+        # CXEval_Int == 1
+        if lib.clang_EvalResult_getKind(result) != 1:
+            return None
+        return int(lib.clang_EvalResult_getAsLongLong(result))
+    finally:
+        lib.clang_EvalResult_dispose(result)
+
+
 def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
     """Return the expression's proven subset of ``{0, 1}``, or ``None``."""
     children = list(cursor.get_children())
@@ -296,7 +341,7 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
         return (0, 1)
     if cursor.kind == ci.CursorKind.INTEGER_LITERAL:
         tokens = _tokens(cursor)
-        value = _integer_literal(tokens[-1]) if tokens else None
+        value = _integer_literal(tokens[-1]) if len(tokens) == 1 else _evaluated_integer(cursor)
         return (value,) if value in (0, 1) else None
     if cursor.kind == ci.CursorKind.ENUM_CONSTANT_DECL:
         value = cursor.enum_value
@@ -308,6 +353,15 @@ def _boolean_domain(cursor: ci.Cursor) -> tuple[int, ...] | None:
             return (value,) if value in (0, 1) else None
         if referenced.type.spelling in BOOLEAN_TYPES:
             return (0, 1)
+    # An unsigned one-bit field can hold nothing but 0 or 1.
+    if cursor.kind == ci.CursorKind.MEMBER_REF_EXPR and cursor.referenced is not None \
+            and cursor.referenced.kind == ci.CursorKind.FIELD_DECL \
+            and cursor.referenced.is_bitfield() \
+            and cursor.referenced.get_bitfield_width() == 1 \
+            and cursor.referenced.type.get_canonical().kind in (
+                ci.TypeKind.UCHAR, ci.TypeKind.USHORT, ci.TypeKind.UINT,
+                ci.TypeKind.ULONG, ci.TypeKind.BOOL):
+        return (0, 1)
     if cursor.kind in WRAPPER_KINDS and len(children) == 1:
         return _boolean_domain(children[0])
     if cursor.kind == ci.CursorKind.CONDITIONAL_OPERATOR and len(children) == 3:
@@ -745,6 +799,686 @@ def analyze_boolean_call_arguments(
     return rows
 
 
+FUNCTION_DECL_KINDS = {
+    ci.CursorKind.FUNCTION_DECL,
+    ci.CursorKind.CXX_METHOD,
+    ci.CursorKind.CONSTRUCTOR,
+}
+RESULT_DECL_KINDS = {
+    ci.CursorKind.FUNCTION_DECL,
+    ci.CursorKind.CXX_METHOD,
+}
+DISCARDED_CONTEXT_KINDS = {
+    ci.CursorKind.COMPOUND_STMT,
+    ci.CursorKind.CASE_STMT,
+    ci.CursorKind.DEFAULT_STMT,
+    ci.CursorKind.LABEL_STMT,
+}
+NUMERIC_RESULT_USE = "numeric"
+
+
+def _strip_wrappers(cursor: ci.Cursor) -> ci.Cursor:
+    while cursor.kind in WRAPPER_KINDS:
+        children = list(cursor.get_children())
+        if len(children) != 1:
+            break
+        cursor = children[0]
+    return cursor
+
+
+def _value_dependency(cursor: ci.Cursor) -> list[str] | None:
+    """Name the integer source a whole-program fixpoint may still prove Boolean.
+
+    A value read from a not-yet-Boolean function result or scalar is not a
+    proof by itself; the scan resolves it once every write of that source has
+    been proven. The dependency is ``[kind, usr]`` with kind ``function`` or
+    ``storage``.
+    """
+    cursor = _strip_wrappers(cursor)
+    referenced = cursor.referenced
+    if referenced is None:
+        return None
+    if cursor.kind == ci.CursorKind.CALL_EXPR and referenced.kind in RESULT_DECL_KINDS:
+        if referenced.result_type.spelling in SOURCE_BOOLEAN_TARGETS:
+            return ["function", referenced.get_usr()]
+        return None
+    if cursor.kind in REFERENCE_KINDS and referenced.kind in STORAGE_DECL_KINDS:
+        spelling, depth = _storage_type(referenced.type)
+        if not depth and spelling in SOURCE_BOOLEAN_TARGETS:
+            return ["storage", _field_usr(referenced)]
+    return None
+
+
+def _flow(cursor: ci.Cursor, kind: str, repo: Path) -> dict | None:
+    """A value flowing into a Boolean contract: its write and open dependency."""
+    domain = _boolean_domain(cursor)
+    write = _write(cursor, kind, repo, domain)
+    if write is None:
+        return None
+    stripped = _strip_wrappers(cursor)
+    referenced = stripped.referenced if stripped.kind == ci.CursorKind.DECL_REF_EXPR else None
+    return {
+        "write": asdict(write),
+        "dependency": None if domain is not None else _value_dependency(cursor),
+        # A named enumerator is a stronger domain than a truth value, even
+        # when its value happens to be 0 or 1.
+        "enumerator": referenced is not None
+                      and referenced.kind == ci.CursorKind.ENUM_CONSTANT_DECL,
+    }
+
+
+_COMMENT = re.compile(r"//[^\n]*|/\*.*?\*/", re.S)
+
+
+def _result_type_span(cursor: ci.Cursor, repo: Path, declared_type: str) -> SourceSpan | None:
+    """The one result-type token before a function declarator's name.
+
+    libclang yields no tokens for a declaration whose extent starts in a macro
+    (the ``VA(...)`` annotation), so the prefix is read from the source text.
+    Parenthesized groups are skipped; a result spelled through an
+    ``H2_ENUM_*`` macro already carries a stronger domain.
+    """
+    start, name = cursor.extent.start, cursor.location
+    if start.file is None or name.file is None or str(start.file) != str(name.file):
+        return None
+    relative = _project_relative(str(name.file), repo)
+    if relative is None:
+        return None
+    try:
+        source = (repo / relative).read_bytes()
+    except OSError:
+        return None
+    prefix = source[start.offset:name.offset].decode("utf-8", "replace")
+    prefix = _COMMENT.sub(lambda match: " " * len(match.group()), prefix)
+    depth = 0
+    matches = []
+    for token in re.finditer(r"[A-Za-z_][A-Za-z_0-9]*|[()]", prefix):
+        spelling = token.group()
+        if spelling == "(":
+            depth += 1
+        elif spelling == ")":
+            depth -= 1
+        elif depth == 0 and spelling.startswith("H2_ENUM_"):
+            return None
+        elif depth == 0 and spelling == declared_type:
+            matches.append(token.start())
+    if len(matches) != 1:
+        return None
+    offset = start.offset + len(prefix[:matches[0]].encode("utf-8"))
+    line = source.count(b"\n", 0, offset) + 1
+    column = offset - (source.rfind(b"\n", 0, offset) + 1) + 1
+    return SourceSpan(file=relative, line=line, column=column, start=offset,
+                      end=offset + len(declared_type))
+
+
+def _result_use(node: ci.Cursor, parents: list[ci.Cursor]) -> str:
+    """Classify how a call's integer result is consumed by its caller."""
+    index = len(parents) - 1
+    while index >= 0 and parents[index].kind in WRAPPER_KINDS:
+        node = parents[index]
+        index -= 1
+    if index < 0:
+        return "discarded"
+    parent = parents[index]
+    children = list(parent.get_children())
+    position = next((i for i, child in enumerate(children) if child == node), -1)
+    kind = parent.kind
+    if kind in (ci.CursorKind.IF_STMT, ci.CursorKind.WHILE_STMT,
+                ci.CursorKind.SWITCH_STMT):
+        if position:
+            return "discarded"
+        return "condition" if kind != ci.CursorKind.SWITCH_STMT else NUMERIC_RESULT_USE
+    if kind == ci.CursorKind.DO_STMT:
+        return "condition" if position == len(children) - 1 else "discarded"
+    if kind == ci.CursorKind.FOR_STMT:
+        return "condition" if position != len(children) - 1 else "discarded"
+    if kind == ci.CursorKind.UNARY_OPERATOR:
+        tokens = _tokens(parent)
+        return "condition" if tokens and tokens[0] == "!" else NUMERIC_RESULT_USE
+    if kind == ci.CursorKind.BINARY_OPERATOR:
+        operator = parent.spelling
+        if operator in ("&&", "||"):
+            return "condition"
+        if operator in ("==", "!=") and len(children) == 2 and position in (0, 1):
+            other = children[1 - position]
+            return ("comparison" if _boolean_domain(other) is not None
+                    or _value_dependency(other) is not None else NUMERIC_RESULT_USE)
+        if operator == "=":
+            return "assignment" if position == 1 else "store"
+        if operator == ",":
+            return "discarded" if position == 0 else "value"
+        return NUMERIC_RESULT_USE
+    if kind == ci.CursorKind.COMPOUND_ASSIGNMENT_OPERATOR and position == 0:
+        return "store"
+    if kind == ci.CursorKind.CONDITIONAL_OPERATOR:
+        return "condition" if position == 0 else "value"
+    if kind == ci.CursorKind.RETURN_STMT:
+        return "return"
+    if kind == ci.CursorKind.VAR_DECL:
+        return "initializer"
+    if kind == ci.CursorKind.CALL_EXPR:
+        return "argument"
+    if kind in DISCARDED_CONTEXT_KINDS:
+        return "discarded"
+    return NUMERIC_RESULT_USE
+
+
+def _is_callee(node: ci.Cursor, parents: list[ci.Cursor]) -> bool:
+    index = len(parents) - 1
+    while index >= 0 and parents[index].kind in WRAPPER_KINDS:
+        node = parents[index]
+        index -= 1
+    if index < 0 or parents[index].kind != ci.CursorKind.CALL_EXPR:
+        return False
+    children = list(parents[index].get_children())
+    return bool(children) and children[0] == node
+
+
+def _function_entry(cursor: ci.Cursor, repo: Path) -> dict | None:
+    declaration = _span(cursor, repo)
+    if declaration is None:
+        return None
+    result_type = (cursor.result_type.spelling
+                   if cursor.kind in RESULT_DECL_KINDS else "")
+    result_span = (_result_type_span(cursor, repo, result_type)
+                   if result_type in TRACKED_TYPES else None)
+    parameters = []
+    for index, parameter in enumerate(cursor.get_arguments()):
+        declared_type, depth = _storage_type(parameter.type)
+        if depth or declared_type not in TRACKED_TYPES:
+            continue
+        type_span = _type_span(parameter, repo, declared_type)
+        defaults = [child for child in parameter.get_children()
+                    if child.kind not in (ci.CursorKind.TYPE_REF,
+                                          ci.CursorKind.ANNOTATE_ATTR,
+                                          ci.CursorKind.NAMESPACE_REF)]
+        default = _flow(defaults[-1], "default-argument", repo) if defaults else None
+        parameters.append({
+            "index": index,
+            "name": parameter.spelling,
+            "declared_type": declared_type,
+            "enum_domain": "H2_ENUM_" in _declaration_text(parameter, repo),
+            "type_spans": [asdict(type_span)] if type_span is not None else [],
+            "unspanned": type_span is None,
+            "default": default,
+            "storage_usr": _field_usr(parameter) if cursor.is_definition() else None,
+        })
+    return {
+        "usr": cursor.get_usr(),
+        "qualified_name": _qualified_record(cursor),
+        "name": cursor.spelling,
+        "result_type": result_type,
+        "result_type_spans": [asdict(result_span)] if result_span is not None else [],
+        "result_unspanned": result_type in SOURCE_BOOLEAN_TARGETS and result_span is None,
+        "declarations": [asdict(declaration)],
+        "defined": cursor.is_definition(),
+        "virtual": cursor.kind == ci.CursorKind.CXX_METHOD and cursor.is_virtual_method(),
+        "variadic": cursor.type.kind == ci.TypeKind.FUNCTIONPROTO
+                    and cursor.type.is_function_variadic(),
+        "operator": cursor.spelling.startswith("operator"),
+        "parameters": parameters,
+    }
+
+
+def analyze_function_contracts(translation: ci.TranslationUnit, repo: Path) -> dict:
+    """Collect result and parameter contracts of project functions in one TU.
+
+    The rows are merged across the program by :func:`_function_contracts`:
+    every ``return`` of a function returning ``i32``, ``i8`` or plain char,
+    every argument passed to such a parameter (or its default), how each call
+    result is consumed, and every reference that takes a function's address.
+    """
+    functions: dict[str, dict] = {}
+    returns = []
+    arguments = []
+    result_uses = []
+    address_taken = []
+    parameter_uses = []
+    parents: list[ci.Cursor] = []
+    owners: list[str | None] = []
+
+    def visit(cursor: ci.Cursor) -> None:
+        kind = cursor.kind
+        owner_pushed = False
+        if kind in FUNCTION_DECL_KINDS:
+            entry = _function_entry(cursor, repo)
+            if entry is not None:
+                current = functions.setdefault(entry["usr"], entry)
+                if current is not entry:
+                    _merge_function_entry(current, entry)
+            if cursor.is_definition():
+                owners.append(cursor.get_usr() if entry is not None else None)
+                owner_pushed = True
+        elif kind == ci.CursorKind.RETURN_STMT and owners and owners[-1] is not None:
+            children = list(cursor.get_children())
+            if children:
+                flow = _flow(children[0], "return", repo)
+                if flow is not None:
+                    returns.append({"function": owners[-1], **flow})
+        elif kind == ci.CursorKind.CALL_EXPR and cursor.referenced is not None \
+                and cursor.referenced.kind in FUNCTION_DECL_KINDS:
+            callee = cursor.referenced
+            usr = callee.get_usr()
+            supplied = list(cursor.get_arguments())
+            location = _span(cursor, repo)
+            for index, parameter in enumerate(callee.get_arguments()):
+                declared_type, depth = _storage_type(parameter.type)
+                if depth or declared_type not in TRACKED_TYPES:
+                    continue
+                # libclang lists an omitted defaulted argument as an expression
+                # without a source extent; the parameter's default carries its proof.
+                if index < len(supplied) and supplied[index].extent.start.file is not None:
+                    flow = _flow(supplied[index], "call-argument", repo)
+                    if flow is None:
+                        continue
+                elif location is not None:
+                    flow = {"write": None, "dependency": None,
+                            "call": asdict(location)}
+                else:
+                    continue
+                arguments.append({"function": usr, "index": index, **flow})
+            if callee.kind in RESULT_DECL_KINDS \
+                    and callee.result_type.spelling in TRACKED_TYPES:
+                use = _result_use(cursor, parents)
+                write = _write(cursor, "result-use", repo, None)
+                if write is not None:
+                    result_uses.append({"function": usr, "use": use,
+                                        "write": asdict(write)})
+        elif kind == ci.CursorKind.DECL_REF_EXPR and cursor.referenced is not None \
+                and cursor.referenced.kind == ci.CursorKind.PARM_DECL \
+                and _storage_type(cursor.referenced.type) in (
+                    (name, 0) for name in SOURCE_BOOLEAN_TARGETS):
+            if _result_use(cursor, parents) == NUMERIC_RESULT_USE:
+                write = _write(cursor, "numeric-use", repo, None)
+                if write is not None:
+                    parameter_uses.append({"function": _field_usr(cursor.referenced),
+                                           "write": asdict(write)})
+        elif kind in (ci.CursorKind.DECL_REF_EXPR, ci.CursorKind.MEMBER_REF_EXPR) \
+                and cursor.referenced is not None \
+                and cursor.referenced.kind in FUNCTION_DECL_KINDS \
+                and not _is_callee(cursor, parents):
+            write = _write(cursor, "address-taken", repo, None)
+            if write is not None:
+                address_taken.append({"function": cursor.referenced.get_usr(),
+                                      "write": asdict(write)})
+        parents.append(cursor)
+        for child in cursor.get_children():
+            visit(child)
+        parents.pop()
+        if owner_pushed:
+            owners.pop()
+
+    visit(translation.cursor)
+    return {
+        "functions": list(functions.values()),
+        "returns": returns,
+        "arguments": arguments,
+        "result_uses": result_uses,
+        "address_taken": address_taken,
+        "parameter_uses": parameter_uses,
+    }
+
+
+def _merge_function_entry(current: dict, entry: dict) -> None:
+    for key in ("declarations", "result_type_spans"):
+        current[key] = sorted({tuple(sorted(item.items())): item
+                               for item in current[key] + entry[key]}.values(),
+                              key=lambda item: (item["file"], item["start"]))
+    for key in ("defined", "virtual", "variadic", "operator", "result_unspanned"):
+        current[key] = current[key] or entry[key]
+    by_index = {item["index"]: item for item in current["parameters"]}
+    for parameter in entry["parameters"]:
+        known = by_index.get(parameter["index"])
+        if known is None:
+            current["parameters"].append(parameter)
+            by_index[parameter["index"]] = parameter
+            continue
+        known["type_spans"] = sorted(
+            {tuple(sorted(item.items())): item
+             for item in known["type_spans"] + parameter["type_spans"]}.values(),
+            key=lambda item: (item["file"], item["start"]))
+        known["enum_domain"] = known["enum_domain"] or parameter["enum_domain"]
+        known["unspanned"] = known["unspanned"] or parameter["unspanned"]
+        known["name"] = known["name"] or parameter["name"]
+        known["default"] = known["default"] or parameter["default"]
+        known["storage_usr"] = known["storage_usr"] or parameter["storage_usr"]
+        if known["declared_type"] != parameter["declared_type"]:
+            known["declared_type"] = "<inconsistent>"
+    current["parameters"].sort(key=lambda item: item["index"])
+
+
+def _function_contracts(
+    parsed: list[dict],
+    storage: list[FieldFacts],
+    exceptions: dict[tuple[str, str, str, str, str], ReviewedException],
+    used_exceptions: set[tuple[str, str, str, str, str]],
+) -> dict:
+    """Prove Boolean function results and parameters across the whole program.
+
+    A result is Boolean when every ``return`` yields a value in ``{0, 1}``, a
+    Boolean-typed value, or a value whose source this fixpoint also proves; a
+    parameter when every argument (or default) and every write in its body is.
+    Both need the observed domain to be exactly ``{0, 1}``. The fixpoint is
+    greatest: mutually dependent contracts stand or fall together.
+    """
+    functions: dict[str, dict] = {}
+    for batch in parsed:
+        for entry in batch["functions"]:
+            current = functions.get(entry["usr"])
+            if current is None:
+                functions[entry["usr"]] = json.loads(json.dumps(entry))
+            else:
+                _merge_function_entry(current, entry)
+
+    def unique(rows: Iterable[dict], key) -> list[dict]:
+        return list({key(item): item for item in rows}.values())
+
+    def write_key(item: dict) -> tuple:
+        write = item.get("write") or item.get("call") or {}
+        return (item["function"], item.get("index"), write.get("file"),
+                write.get("start"), write.get("end"))
+
+    returns = unique((row for batch in parsed for row in batch["returns"]), write_key)
+    arguments = unique((row for batch in parsed for row in batch["arguments"]), write_key)
+    result_uses = unique((row for batch in parsed for row in batch["result_uses"]),
+                         write_key)
+    address_taken = unique((row for batch in parsed for row in batch["address_taken"]),
+                           write_key)
+    # Keyed by the defining PARM_DECL's identity (stored in "function").
+    parameter_uses: dict[str, list[dict]] = {}
+    for row in unique((row for batch in parsed for row in batch["parameter_uses"]),
+                      write_key):
+        parameter_uses.setdefault(row["function"], []).append(row)
+
+    returns_by_function: dict[str, list[dict]] = {}
+    for row in returns:
+        returns_by_function.setdefault(row["function"], []).append(row)
+    arguments_by_parameter: dict[tuple[str, int], list[dict]] = {}
+    for row in arguments:
+        arguments_by_parameter.setdefault((row["function"], row["index"]), []).append(row)
+    uses_by_function: dict[str, list[dict]] = {}
+    for row in result_uses:
+        uses_by_function.setdefault(row["function"], []).append(row)
+    taken: dict[str, list[dict]] = {}
+    for row in address_taken:
+        taken.setdefault(row["function"], []).append(row)
+    storage_by_usr = {item.usr: item for item in storage}
+    eligible_storage = {item.usr for item in storage if item.eligible}
+
+    # Parameters own their incoming domain: their storage rows carry only the
+    # writes made inside the body.
+    def body_writes(parameter: dict) -> tuple[list[Write], list[Write]]:
+        facts = storage_by_usr.get(parameter.get("storage_usr") or "")
+        if facts is None:
+            return [], []
+        unknown = [write for write in facts.unknown_writes
+                   if write.kind != "incoming-parameter"]
+        return sorted(facts.writes), sorted(unknown)
+
+    result_reasons: dict[str, list[str]] = {}
+    for usr, function in functions.items():
+        if function["result_type"] not in SOURCE_BOOLEAN_TARGETS:
+            continue
+        reasons = []
+        if not function["defined"]:
+            reasons.append("no-definition")
+        if function["virtual"]:
+            reasons.append("virtual")
+        if function["operator"]:
+            reasons.append("operator")
+        if function["result_unspanned"] or not function["result_type_spans"]:
+            reasons.append("result-type-not-spelled")
+        rows = returns_by_function.get(usr, [])
+        if not rows:
+            reasons.append("no-return")
+        if any(row["write"]["domain"] is None and row["dependency"] is None
+               for row in rows):
+            reasons.append("non-boolean-return")
+        if any(row.get("enumerator") for row in rows):
+            reasons.append("enumerator-return")
+        if any(row["use"] == NUMERIC_RESULT_USE for row in uses_by_function.get(usr, [])):
+            reasons.append("numeric-caller-use")
+        result_reasons[usr] = reasons
+
+    parameter_reasons: dict[tuple[str, int], list[str]] = {}
+    for usr, function in functions.items():
+        for parameter in function["parameters"]:
+            if parameter["declared_type"] not in SOURCE_BOOLEAN_TARGETS:
+                continue
+            key = (usr, parameter["index"])
+            reasons = []
+            if parameter["enum_domain"]:
+                reasons.append("enum-domain")
+            if not function["defined"]:
+                reasons.append("no-definition")
+            if function["virtual"]:
+                reasons.append("virtual")
+            if function["operator"] or function["variadic"]:
+                reasons.append("operator-or-variadic")
+            if usr in taken:
+                reasons.append("address-taken")
+            if parameter["unspanned"] or not parameter["type_spans"]:
+                reasons.append("parameter-type-not-spelled")
+            rows = arguments_by_parameter.get(key, [])
+            if not rows:
+                reasons.append("no-call")
+            for row in rows:
+                flow = row if row["write"] is not None else parameter["default"]
+                if flow is None:
+                    reasons.append("missing-default")
+                elif flow["write"]["domain"] is None and flow["dependency"] is None:
+                    reasons.append("non-boolean-argument")
+                elif flow.get("enumerator"):
+                    reasons.append("enumerator-argument")
+            _, unknown = body_writes(parameter)
+            if unknown:
+                reasons.append("non-boolean-body-write")
+            if parameter_uses.get(parameter.get("storage_usr") or ""):
+                reasons.append("numeric-body-use")
+            parameter_reasons[key] = sorted(set(reasons))
+
+    storage_parameter = {
+        parameter["storage_usr"]: (usr, parameter["index"])
+        for usr, function in functions.items()
+        for parameter in function["parameters"]
+        if parameter.get("storage_usr")
+    }
+
+    def dependency_holds(dependency: list[str] | None, results: set[str],
+                         parameters: set[tuple[str, int]]) -> bool:
+        if dependency is None:
+            return True
+        kind, usr = dependency
+        if kind == "function":
+            return usr in results
+        if usr in storage_parameter:
+            return storage_parameter[usr] in parameters
+        return usr in eligible_storage
+
+    def domain(flows: Iterable[dict | None]) -> set[int]:
+        values: set[int] = set()
+        for flow in flows:
+            if flow is None:
+                continue
+            if flow["dependency"] is not None:
+                values.update((0, 1))
+            else:
+                values.update(flow["write"]["domain"] or ())
+        return values
+
+    results = {usr for usr, reasons in result_reasons.items() if not reasons}
+    parameters = {key for key, reasons in parameter_reasons.items() if not reasons}
+    changed = True
+    while changed:
+        changed = False
+        for usr in sorted(results):
+            rows = returns_by_function.get(usr, [])
+            if not all(dependency_holds(row["dependency"], results, parameters)
+                       for row in rows) or domain(rows) != {0, 1}:
+                results.discard(usr)
+                result_reasons[usr].append(
+                    "insufficient-observed-domain" if domain(rows) != {0, 1}
+                    else "unproven-dependency")
+                changed = True
+        for key in sorted(parameters):
+            function = functions[key[0]]
+            parameter = next(item for item in function["parameters"]
+                             if item["index"] == key[1])
+            flows = [row if row["write"] is not None else parameter["default"]
+                     for row in arguments_by_parameter.get(key, [])]
+            writes, _ = body_writes(parameter)
+            values = domain(flows) | {value for write in writes
+                                      for value in (write.domain or ())}
+            if not all(dependency_holds(flow["dependency"], results, parameters)
+                       for flow in flows) or values != {0, 1}:
+                parameters.discard(key)
+                parameter_reasons[key].append(
+                    "insufficient-observed-domain" if values != {0, 1}
+                    else "unproven-dependency")
+                changed = True
+
+    def return_row(row: dict) -> dict:
+        return {key: value for key, value in row.items() if key != "function"}
+
+    def emit_result(usr: str) -> dict:
+        function = functions[usr]
+        uses = uses_by_function.get(usr, [])
+        return {
+            "usr": usr,
+            "qualified_name": function["qualified_name"],
+            "declared_type": function["result_type"],
+            "target_type": SOURCE_BOOLEAN_TARGETS.get(function["result_type"]),
+            "declarations": function["declarations"],
+            "result_type_spans": function["result_type_spans"],
+            "returns": [return_row(row) for row in sorted(
+                returns_by_function.get(usr, []),
+                key=lambda row: (row["write"]["file"], row["write"]["start"]))],
+            "result_uses": {use: sum(row["use"] == use for row in uses)
+                            for use in sorted({row["use"] for row in uses})},
+            "numeric_result_uses": [row["write"] for row in uses
+                                    if row["use"] == NUMERIC_RESULT_USE],
+            "reasons": sorted(set(result_reasons.get(usr, []))),
+        }
+
+    def emit_parameter(key: tuple[str, int]) -> dict:
+        function = functions[key[0]]
+        parameter = next(item for item in function["parameters"]
+                         if item["index"] == key[1])
+        writes, unknown = body_writes(parameter)
+        return {
+            "usr": key[0],
+            "function": function["qualified_name"],
+            "qualified_name": f"{function['qualified_name']}::"
+                              f"{parameter['name'] or 'argument-' + str(key[1] + 1)}",
+            "index": key[1],
+            "name": parameter["name"],
+            "declared_type": parameter["declared_type"],
+            "target_type": SOURCE_BOOLEAN_TARGETS.get(parameter["declared_type"]),
+            "declarations": function["declarations"],
+            "type_spans": parameter["type_spans"],
+            "arguments": [return_row(row) for row in arguments_by_parameter.get(key, [])],
+            "default": parameter["default"],
+            "body_writes": [asdict(write) for write in writes],
+            "unknown_body_writes": [asdict(write) for write in unknown],
+            "numeric_body_uses": [row["write"] for row in
+                                  parameter_uses.get(parameter.get("storage_usr") or "", [])],
+            "reasons": sorted(set(parameter_reasons.get(key, []))),
+        }
+
+    # Already Boolean results must keep returning provably Boolean values, and
+    # their 0/1 literals read as false/true.
+    numeric_returns = []
+    unproven_returns = []
+    accepted_unproven_returns = []
+    numeric_result_uses = []
+    for usr, function in sorted(functions.items(),
+                                key=lambda item: item[1]["qualified_name"]):
+        if function["result_type"] not in BOOLEAN_TYPES:
+            continue
+        for row in sorted(returns_by_function.get(usr, []),
+                          key=lambda row: (row["write"]["file"], row["write"]["start"])):
+            write = row["write"]
+            item = {"qualified_name": function["qualified_name"],
+                    "declared_type": function["result_type"], "write": write}
+            if write["replacement"] is not None:
+                numeric_returns.append(item)
+            elif write["domain"] is None:
+                key = ("return", write["file"], function["qualified_name"],
+                       write["kind"], write["expression"])
+                exception = exceptions.get(key)
+                if exception is None:
+                    unproven_returns.append(item)
+                else:
+                    used_exceptions.add(key)
+                    accepted_unproven_returns.append({**item, "reason": exception.reason})
+        numeric_result_uses.extend(
+            {"qualified_name": function["qualified_name"], "write": row["write"]}
+            for row in uses_by_function.get(usr, [])
+            if row["use"] == NUMERIC_RESULT_USE)
+
+    numeric_defaults = [
+        {"qualified_name": f"{function['qualified_name']}::{parameter['name']}",
+         "declared_type": parameter["declared_type"],
+         "write": parameter["default"]["write"]}
+        for function in sorted(functions.values(), key=lambda item: item["qualified_name"])
+        for parameter in function["parameters"]
+        if parameter["declared_type"] in BOOLEAN_TYPES and parameter["default"]
+        and parameter["default"]["write"]["replacement"] is not None
+    ]
+
+    return {
+        "boolean_numeric_default_arguments": numeric_defaults,
+        "result_candidates": [emit_result(usr) for usr in sorted(
+            results, key=lambda usr: functions[usr]["qualified_name"])],
+        "rejected_results": [emit_result(usr) for usr in sorted(
+            set(result_reasons) - results,
+            key=lambda usr: functions[usr]["qualified_name"])],
+        "parameter_candidates": [emit_parameter(key) for key in sorted(
+            parameters, key=lambda key: (functions[key[0]]["qualified_name"], key[1]))],
+        "rejected_parameters": [emit_parameter(key) for key in sorted(
+            set(parameter_reasons) - parameters,
+            key=lambda key: (functions[key[0]]["qualified_name"], key[1]))],
+        "boolean_numeric_returns": numeric_returns,
+        "boolean_unproven_returns": unproven_returns,
+        "accepted_boolean_unproven_returns": accepted_unproven_returns,
+        "boolean_numeric_result_uses": numeric_result_uses,
+    }
+
+
+def _boolean_operand(cursor: ci.Cursor) -> bool:
+    cursor = _strip_wrappers(cursor)
+    if cursor.kind in (ci.CursorKind.INTEGER_LITERAL, ci.CursorKind.CXX_BOOL_LITERAL_EXPR):
+        return False
+    if cursor.type.spelling in BOOLEAN_TYPES or cursor.type.kind == ci.TypeKind.BOOL:
+        return True
+    referenced = cursor.referenced
+    return (cursor.kind in REFERENCE_KINDS and referenced is not None
+            and referenced.kind in STORAGE_DECL_KINDS
+            and _storage_type(referenced.type)[0] in BOOLEAN_TYPES)
+
+
+def analyze_boolean_comparisons(translation: ci.TranslationUnit, repo: Path) -> list[dict]:
+    """Inventory ``==``/``!=`` comparisons of a Boolean value with a 0/1 literal."""
+    rows = []
+    for cursor in translation.cursor.walk_preorder():
+        if cursor.kind != ci.CursorKind.BINARY_OPERATOR or cursor.spelling not in ("==", "!="):
+            continue
+        children = list(cursor.get_children())
+        if len(children) != 2:
+            continue
+        for operand, other in ((children[0], children[1]), (children[1], children[0])):
+            if not _boolean_operand(operand):
+                continue
+            literal = _strip_wrappers(other)
+            if literal.kind != ci.CursorKind.INTEGER_LITERAL:
+                continue
+            write = _write(literal, "boolean-comparison", repo, _boolean_domain(literal))
+            if write is None or write.replacement is None:
+                continue
+            rows.append({"expression": _expression(cursor), "write": asdict(write)})
+    return rows
+
+
 def _command_arguments(entry: dict) -> list[str]:
     arguments = entry.get("arguments")
     if arguments:
@@ -827,47 +1561,58 @@ def _portable_clang_args(repo: Path, entry: dict) -> list[str]:
     return args
 
 
+def parse_translation_unit(index: ci.Index, source: Path, clang_args: list[str],
+                           repo: Path) -> dict:
+    """Parse one source and return its storage, argument and contract rows."""
+    source = source.resolve()
+    translation = index.parse(str(source), args=clang_args)
+    diagnostics = []
+    for diagnostic in translation.diagnostics:
+        if diagnostic.severity < ci.Diagnostic.Error or diagnostic.location.file is None:
+            continue
+        relative = _project_relative(str(diagnostic.location.file), repo)
+        if relative is not None:
+            diagnostics.append({
+                "file": relative,
+                "line": diagnostic.location.line,
+                "column": diagnostic.location.column,
+                "translation_unit": source.relative_to(repo.resolve()).as_posix(),
+                "message": diagnostic.spelling,
+            })
+    rows = []
+    for facts in analyze_translation_unit(translation, source, repo):
+        row = asdict(facts)
+        row["declarations"] = [asdict(item) for item in sorted(facts.declarations)]
+        row["type_spans"] = [asdict(item) for item in sorted(facts.type_spans)]
+        row["writes"] = [asdict(item) for item in sorted(facts.writes)]
+        row["unknown_writes"] = [asdict(item) for item in sorted(facts.unknown_writes)]
+        row["read_locations"] = sorted(facts.read_locations)
+        row["translation_units"] = sorted(facts.translation_units)
+        rows.append(row)
+    parsed = {
+        "rows": rows,
+        "call_arguments": analyze_boolean_call_arguments(translation, repo),
+        "comparisons": analyze_boolean_comparisons(translation, repo),
+        "diagnostics": diagnostics,
+        **analyze_function_contracts(translation, repo),
+    }
+    del translation
+    gc.collect()
+    return parsed
+
+
 def _parse_batch(arguments: tuple[Path, list[dict], bool]) -> dict:
     repo, entries, portable = arguments
     configure_libclang()
     index = ci.Index.create()
-    rows = []
-    call_arguments = []
-    diagnostics = []
+    out: dict[str, list] = {}
     for entry in entries:
         source = (Path(entry["directory"]) / entry["file"]).resolve()
         clang_args = (_portable_clang_args(repo, entry) if portable else
                       _clang_args(repo, source, mode=ClangMode.RETAIL_ANALYSIS))
-        translation = index.parse(str(source), args=clang_args)
-        for diagnostic in translation.diagnostics:
-            if diagnostic.severity < ci.Diagnostic.Error or diagnostic.location.file is None:
-                continue
-            relative = _project_relative(str(diagnostic.location.file), repo)
-            if relative is not None:
-                diagnostics.append({
-                    "file": relative,
-                    "line": diagnostic.location.line,
-                    "column": diagnostic.location.column,
-                    "translation_unit": source.relative_to(repo).as_posix(),
-                    "message": diagnostic.spelling,
-                })
-        for facts in analyze_translation_unit(translation, source, repo):
-            row = asdict(facts)
-            row["declarations"] = [asdict(item) for item in sorted(facts.declarations)]
-            row["type_spans"] = [asdict(item) for item in sorted(facts.type_spans)]
-            row["writes"] = [asdict(item) for item in sorted(facts.writes)]
-            row["unknown_writes"] = [asdict(item) for item in sorted(facts.unknown_writes)]
-            row["read_locations"] = sorted(facts.read_locations)
-            row["translation_units"] = sorted(facts.translation_units)
-            rows.append(row)
-        call_arguments.extend(analyze_boolean_call_arguments(translation, repo))
-        del translation
-        gc.collect()
-    return {
-        "rows": rows,
-        "call_arguments": call_arguments,
-        "diagnostics": diagnostics,
-    }
+        for key, values in parse_translation_unit(index, source, clang_args, repo).items():
+            out.setdefault(key, []).extend(values)
+    return out
 
 
 def _entries(
@@ -973,6 +1718,18 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         worker = importlib.import_module("homm2.audit.bool_fields")._parse_batch
         with ProcessPoolExecutor(max_workers=min(worker_count, len(batches))) as pool:
             parsed = list(pool.map(worker, batches))
+    return build_report(repo, parsed, translation_units=len(entries),
+                        filters=filters, portable=portable)
+
+
+def build_report(repo: Path, parsed: list[dict], *, translation_units: int,
+                 filters: Iterable[str] = (), portable: bool = False) -> dict:
+    """Merge parsed translation-unit rows into the whole-program report."""
+    filters = tuple(filters)
+    parsed = [{key: batch.get(key, []) for key in (
+        "rows", "call_arguments", "comparisons", "diagnostics", "functions", "returns",
+        "arguments", "result_uses", "address_taken", "parameter_uses")}
+        for batch in parsed]
     raw = [row for batch in parsed for row in batch["rows"]]
     call_arguments = sorted({
         (
@@ -1098,6 +1855,11 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
             continue
         used_exceptions.add(key)
         accepted_unproven_call_arguments.append({**item, "reason": exception.reason})
+    contracts = _function_contracts(parsed, fields, exceptions, used_exceptions)
+    numeric_comparisons = sorted({
+        (item["write"]["file"], item["write"]["start"]): item
+        for batch in parsed for item in batch["comparisons"]
+    }.values(), key=lambda item: (item["write"]["file"], item["write"]["start"]))
     unused_exceptions = []
     if not filters and not portable:
         unused_exceptions = [
@@ -1109,7 +1871,7 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         "schema_version": SCHEMA_VERSION,
         "whole_program": not filters,
         "filters": list(filters),
-        "translation_units": len(entries),
+        "translation_units": translation_units,
         "parse_diagnostics": unexpected_diagnostics,
         "accepted_parse_diagnostics": accepted_parse_diagnostics,
         "parse_clean": not unexpected_diagnostics,
@@ -1142,7 +1904,30 @@ def scan(repo: Path = REPO, *, jobs: int = 0,
         "boolean_parameters": boolean_parameters,
         "b32_numeric_literal_writes": numeric_literal_writes,
         "b32_unproven_writes": unproven_boolean_writes,
+        "boolean_numeric_comparisons": numeric_comparisons,
+        **contracts,
     }
+
+
+def check_failures(report: dict) -> list[str]:
+    """Name every actionable kind of remaining Boolean cleanup in a report."""
+    kinds = {
+        "parse_diagnostics": "parse diagnostics",
+        "unused_retail_exceptions": "stale reviewed exceptions",
+        "candidates": "integer storage with a proven Boolean domain",
+        "b32_numeric_literal_writes": "numeric 0/1 writes to Boolean storage",
+        "b32_unproven_writes": "unproven writes to Boolean storage",
+        "boolean_numeric_call_arguments": "numeric 0/1 Boolean arguments",
+        "boolean_unproven_call_arguments": "unproven Boolean arguments",
+        "boolean_numeric_default_arguments": "numeric 0/1 Boolean default arguments",
+        "boolean_numeric_comparisons": "Boolean values compared with numeric 0/1",
+        "result_candidates": "integer results whose every return is Boolean",
+        "parameter_candidates": "integer parameters whose every argument is Boolean",
+        "boolean_numeric_returns": "numeric 0/1 returns from Boolean functions",
+        "boolean_unproven_returns": "unproven returns from Boolean functions",
+    }
+    return [f"{len(report[key])} {label}" for key, label in kinds.items()
+            if report.get(key)]
 
 
 def _text(report: dict, include_rejected: bool) -> str:
@@ -1159,6 +1944,15 @@ def _text(report: dict, include_rejected: bool) -> str:
         f"{len(report.get('accepted_boolean_unproven_writes', []))} reviewed retail writes; "
         f"{len(report.get('boolean_numeric_call_arguments', []))} numeric and "
         f"{len(report.get('boolean_unproven_call_arguments', []))} unproven Boolean arguments",
+        f"[bool-contracts] {len(report.get('result_candidates', []))} Boolean result "
+        f"candidates, {len(report.get('rejected_results', []))} integer results kept; "
+        f"{len(report.get('parameter_candidates', []))} Boolean parameter candidates, "
+        f"{len(report.get('rejected_parameters', []))} integer parameters kept; "
+        f"{len(report.get('boolean_numeric_returns', []))} numeric and "
+        f"{len(report.get('boolean_unproven_returns', []))} unproven Boolean returns; "
+        f"{len(report.get('accepted_boolean_unproven_returns', []))} reviewed retail returns; "
+        f"{len(report.get('boolean_numeric_result_uses', []))} numeric uses of Boolean results; "
+        f"{len(report.get('boolean_numeric_comparisons', []))} numeric Boolean comparisons",
     ]
     for item in report.get("parse_diagnostics", []):
         lines.append(
@@ -1182,7 +1976,55 @@ def _text(report: dict, include_rejected: bool) -> str:
             lines.append(
                 f"  {write['file']}:{write['line']} {write['kind']}: "
                 f"{write['expression']} -> {write['domain']}")
+    for item in report.get("result_candidates", []):
+        location = item["result_type_spans"][0]
+        lines.append(
+            f"RESULT-CANDIDATE {location['file']}:{location['line']} "
+            f"{item['qualified_name']} {item['declared_type']}->{item['target_type']} "
+            f"({len(item['returns'])} returns, "
+            f"{len(item['result_type_spans'])} declarations)")
+        for row in item["returns"]:
+            write = row["write"]
+            proof = (f"via {row['dependency'][0]}" if row["dependency"]
+                     else str(write["domain"]))
+            lines.append(f"  {write['file']}:{write['line']} return "
+                         f"{write['expression']} -> {proof}")
+    for item in report.get("parameter_candidates", []):
+        location = item["type_spans"][0]
+        lines.append(
+            f"PARAMETER-CANDIDATE {location['file']}:{location['line']} "
+            f"{item['qualified_name']} {item['declared_type']}->{item['target_type']} "
+            f"({len(item['arguments'])} call sites, "
+            f"{len(item['type_spans'])} declarations)")
     if include_rejected:
+        for item in report.get("rejected_results", []):
+            location = item["declarations"][0]
+            lines.append(
+                f"RESULT-KEPT {location['file']}:{location['line']} "
+                f"{item['qualified_name']}: {', '.join(item['reasons'])}")
+        for item in report.get("rejected_parameters", []):
+            location = item["declarations"][0]
+            lines.append(
+                f"PARAMETER-KEPT {location['file']}:{location['line']} "
+                f"{item['qualified_name']}: {', '.join(item['reasons'])}")
+        for key, label in (("boolean_numeric_default_arguments", "BOOL-DEFAULT-LITERAL"),
+                           ("boolean_numeric_returns", "BOOL-RETURN-LITERAL"),
+                           ("boolean_unproven_returns", "BOOL-RETURN-UNPROVEN")):
+            for item in report.get(key, []):
+                write = item["write"]
+                lines.append(
+                    f"{label} {write['file']}:{write['line']} "
+                    f"{item['qualified_name']}: {write['expression']}"
+                    + (f" -> {write['replacement']}" if write["replacement"] else ""))
+        for item in report.get("boolean_numeric_comparisons", []):
+            write = item["write"]
+            lines.append(f"BOOL-COMPARE-LITERAL {write['file']}:{write['line']} "
+                         f"{item['expression']}: {write['expression']} -> "
+                         f"{write['replacement']}")
+        for item in report.get("boolean_numeric_result_uses", []):
+            write = item["write"]
+            lines.append(f"BOOL-RESULT-NUMERIC {write['file']}:{write['line']} "
+                         f"{item['qualified_name']}: {write['expression']}")
         for item in report["rejected"]:
             location = item["declarations"][0]
             reasons = item["unknown_writes"] or [{
@@ -1240,8 +2082,9 @@ def main(argv: list[str] | None = None) -> int:
         help="include rejected storage and Boolean write/argument details in text")
     parser.add_argument(
         "--check", action="store_true",
-        help=("fail when an integer Boolean candidate, numeric 0/1 write, or "
-              "unproven write, parse diagnostic, or stale retail exception remains"))
+        help=("fail when an integer Boolean storage, result or parameter candidate, "
+              "a numeric 0/1 write, argument or return, an unproven Boolean value, "
+              "a parse diagnostic, or a stale retail exception remains"))
     parser.add_argument(
         "--tu", action="append", default=[],
         help="limit evidence to matching source paths (partial report; not whole-program proof)")
@@ -1266,14 +2109,17 @@ def main(argv: list[str] | None = None) -> int:
         args.output.write_text(output)
     else:
         print(output, end="")
-    return int(bool(args.check and (
-        report.get("parse_diagnostics")
-        or report.get("unused_retail_exceptions")
-        or report.get("eligible_storage", report["eligible_fields"])
-        or report["b32_numeric_literal_writes"]
-        or report["b32_unproven_writes"]
-        or report.get("boolean_numeric_call_arguments")
-        or report.get("boolean_unproven_call_arguments"))))
+    if not args.check:
+        return 0
+    failures = check_failures(report)
+    if failures:
+        print("homm2 audit bool-fields --check: " + "; ".join(failures) + ".\n"
+              "Retype each RESULT/PARAMETER/storage CANDIDATE (i32->b32, i8->b8, "
+              "char->bchar) at every listed declaration and spell its 0/1 literals "
+              "false/true; `--all` lists literal and unproven sites. A retail-proven "
+              "truth value that is not 0/1 belongs in "
+              f"{RETAIL_EXCEPTION_MANIFEST} with its reason.", file=sys.stderr)
+    return int(bool(failures))
 
 
 if __name__ == "__main__":

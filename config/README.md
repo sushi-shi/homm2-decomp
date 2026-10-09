@@ -45,8 +45,8 @@ for `EDT2PL.exe`). Addresses are image RVAs.
 ## Reviews (`reviews/`)
 
 - `bool_exceptions.tsv`, `cast_exceptions.tsv`: reviewed exceptions of the
-  Boolean-field and cast audits (`homm2 audit bool-fields`, `homm2 audit
-  casts`).
+  Boolean audit of storage, function results and parameters (`homm2 audit
+  bool-fields`) and of the cast audit (`homm2 audit casts`).
 - `constants.tsv`: the per-file numeric-literal checklist (`pending`,
   `reviewed`, `third-party`) of `homm2 verify constants`.
 - `enum-reuse.tsv`: the enum and constant reuse review ledger
