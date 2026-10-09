@@ -61,7 +61,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     tag_message windowMessage;
 
     result = false;
-    if (gbShowHighScore != 0)
+    if (gbShowHighScore != false)
         gbShowHighScore = false;
 
     if (glTimers[HIGH_SCORE_TIMER_SLOT] < KBTickCount()) {
@@ -117,7 +117,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
             break;
     }
 
-    if (result == 1) {
+    if (result == true) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
         return MESSAGE_DISPATCH_FORWARD;
@@ -167,7 +167,7 @@ void highScoreManager::Update(void) {
     m_window->BroadcastMessage(hsMessage);
 
     for (rank = 0; rank < HIGH_SCORE_ENTRY_COUNT; rank++) {
-        if (noScoreFile != 0)
+        if (noScoreFile != false)
             highScore.score = HIGH_SCORE_EMPTY;
         else
             READ_FILE_VALUE(inputFile, highScore);
@@ -248,7 +248,7 @@ void highScoreManager::Update(void) {
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_DAYS_OFFSET;
         if (highScore.score != HIGH_SCORE_EMPTY) {
-            if (m_showCampaignScores == 0)
+            if (m_showCampaignScores == false)
                 sprintf(gText, "%d", highScore.days);
             else
                 sprintf(gText, "%d", highScore.score);
@@ -266,7 +266,7 @@ void highScoreManager::Update(void) {
             gText,
             ""
         );
-        if (m_showCampaignScores == 0 && highScore.score != HIGH_SCORE_EMPTY)
+        if (m_showCampaignScores == false && highScore.score != HIGH_SCORE_EMPTY)
             sprintf(gText, "%d", highScore.score);
         m_window->BroadcastMessage(hsMessage);
 
@@ -314,6 +314,6 @@ void highScoreManager::Update(void) {
             m_window->BroadcastMessage(hsMessage);
         }
     }
-    if (noScoreFile == 0)
+    if (noScoreFile == false)
         close(inputFile);
 }

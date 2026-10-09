@@ -109,16 +109,16 @@ public:
     u16 m_turnsOwned;
     char m_name[TOWN_NAME_CAPACITY];
     town(void);
-    i32 HasGarrison(void);
+    b32 HasGarrison(void);
     i32 OccupyingHero(void) {
         return m_occupyingHeroId;
     }
     void GiveSpells(class hero* targetHero);
     void XformToCastle(void);
-    void View(i32 noFade);
+    void View(b32 noFade);
     void Deallocate(void);
     void BuildBuilding(BuildingSlotType building);
-    i32 CanBuildDock(void);
+    b32 CanBuildDock(void);
     void CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel);
 };
 #pragma pack(pop)

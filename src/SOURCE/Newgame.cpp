@@ -360,7 +360,7 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
-i32 game::NewGame(void) {
+b32 game::NewGame(void) {
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfo[GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
@@ -371,9 +371,9 @@ i32 game::NewGame(void) {
     b32 result;
     b8 mapMatchesType;
     char* mapExt;
-    i32 mapHeaderRead;
+    b32 mapHeaderRead;
     i32 textBufferIndex;
-    i32 transmitResult;
+    b32 transmitResult;
 
     result = true;
     m_newGameWindow = NULL;
@@ -382,7 +382,7 @@ i32 game::NewGame(void) {
         choiceWindow = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "x_mapmnu.bin");
         if (choiceWindow == NULL)
             MemError();
-        gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
+        gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, false);
         delete choiceWindow;
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case H2EnumIndex(MAP_CHOICE_STANDARD):
@@ -392,7 +392,7 @@ i32 game::NewGame(void) {
                 xIsExpansionMap = true;
                 break;
             case H2EnumIndex(MAP_CHOICE_CANCEL):
-                return 0;
+                return false;
         }
     }
 
@@ -467,7 +467,7 @@ i32 game::NewGame(void) {
                     m_newGameWindow->BroadcastMessage(windowMessage);
 
                     gbNewGameDialogOver = false;
-                    gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+                    gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, false);
                     delete m_newGameWindow;
                     if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
                         result = false;
@@ -536,7 +536,7 @@ i32 game::NewGame(void) {
                 ShutDown(NULL);
         }
 
-        LoadGame("origdata.bin", 1, 0);
+        LoadGame("origdata.bin", true, false);
         if (giNumHumanPlayers > 1) {
             if (iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 m_newGameWindow =
@@ -556,7 +556,7 @@ i32 game::NewGame(void) {
         UpdateNewGameWindow();
         gbNewGameShadowHidden = false;
         gbNewGameDialogOver = false;
-        gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, 0);
+        gpWindowManager->DoDialog(m_newGameWindow, NewGameHandler, false);
         delete m_newGameWindow;
         if (gpWindowManager->m_dialogResult == GAME_DIALOG_CANCEL) {
             result = false;
@@ -917,11 +917,11 @@ cleanup:
         sprintf(gText, "%s %d%%", localization::Tr("new_game.rating.label"), gpGame->m_difficultyRating);
         message.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(message);
-        DrawNGKPDisplayString(0);
+        DrawNGKPDisplayString(false);
     }
 
     MessageDispatchResult NewGameHandler(struct tag_message& message) {
-        i32 sendResult;
+        b32 sendResult;
         i32 oldNetworkId;
         i32 swapPlayerTemp;
         i32 setupSlot;
@@ -1014,7 +1014,7 @@ cleanup:
             }
             if (KBTickCount() > glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, NGKPcursorIndex);
-                gpGame->DrawNGKPDisplayString(1);
+                gpGame->DrawNGKPDisplayString(true);
             }
         }
 
@@ -1416,14 +1416,14 @@ cleanup:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-i32 game::ProcessNGKeyPress(struct tag_message& message) {
+b32 game::ProcessNGKeyPress(struct tag_message& message) {
     char buffer[GAME_KEY_BUFFER_SIZE];
     char keyChar;
     i32 scanCode;
     i32 widthResult;
 
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
-        return 0;
+        return false;
 
     switch (message.payload.keyboard.keyCode) {
         case INPUT_SCAN_ESCAPE:
@@ -1455,7 +1455,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
         default:
             gpInputManager->AsciiConvert(message);
             if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_ENTER)
-                return 1;
+                return true;
 
             if (message.payload.keyboard.keyCode == INPUT_KEY_CODE_DELETE) {
                 if (NGKPcursorIndex > 0) {
@@ -1531,8 +1531,8 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
     }
 
-    DrawNGKPDisplayString(1);
-    return 0;
+    DrawNGKPDisplayString(true);
+    return false;
 }
 
 void game::NGKPSetupDisplayString(char* text, u16 cursor) {
@@ -1558,8 +1558,8 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
         cNGKPDisplay[cursor + 1] = 0;
 }
 
-void game::DrawNGKPDisplayString(i32 updateScreen) {
-    if (gbNewGameDialogOver != 0)
+void game::DrawNGKPDisplayString(b32 updateScreen) {
+    if (gbNewGameDialogOver != false)
         return;
 
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
@@ -1896,7 +1896,7 @@ void game::ShowScenInfo(void) {
         window->BroadcastMessage(message);
     }
 
-    gpWindowManager->DoDialog(window, EventWindowHandler, 0);
+    gpWindowManager->DoDialog(window, EventWindowHandler, false);
     delete window;
 }
 
@@ -1958,7 +1958,7 @@ void game::GetLossConditionText(char* text) {
 
 void game::GetVictoryConditionText(char* text) {
     town* targetTown;
-    i32 localPlayerFirst;
+    b32 localPlayerFirst;
     hero* victoryHero;
     char firstSide[GAME_SIDE_TEXT_SIZE];
     char secondSideValue[GAME_SIDE_TEXT_SIZE];
@@ -2050,7 +2050,7 @@ void game::GetVictoryConditionText(char* text) {
     }
 }
 
-i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
+b32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     char colorStr[GAME_SIDE_TEXT_SIZE];
     i32 sideCount;
     i32 i;
@@ -2068,7 +2068,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer;
 
     sideCount = lastPlayer - firstPlayer + 1;
-    otherPlayerCount = sideCount - (onSide != 0);
+    otherPlayerCount = sideCount - (onSide != false);
 
     if (onSide) {
         if (otherPlayerCount != 0) {

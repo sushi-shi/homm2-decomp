@@ -47,7 +47,7 @@ static const char* gNbListenName =
     "*";
 
 
-i32 is_netbios_avail(void) {
+b32 is_netbios_avail(void) {
     NetbiosControlBlock controlBlock;
     memset(&controlBlock, 0, sizeof(controlBlock));
     for (gNetbiosLana = 0; gNetbiosLana < NETBIOS_MAX_LANA; gNetbiosLana++) {
@@ -59,9 +59,9 @@ i32 is_netbios_avail(void) {
     }
     if (gNetbiosLana < NETBIOS_MAX_LANA) {
         gNetbiosAvail = 1;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 extern "C" u16 __cdecl nb_init(u16 maxNames [[maybe_unused]], u16 localNameSession) {
@@ -76,7 +76,7 @@ extern "C" u16 __cdecl nb_init(u16 maxNames [[maybe_unused]], u16 localNameSessi
     memset(&gNbSessBuf, -1, sizeof(gNbSessBuf));
     memset(gNbRcvData, -1, sizeof(gNbRcvData));
     memset(&gNbEvents, 0, NETBIOS_THREAD_EVENTS_SIZE);
-    if (is_netbios_avail() == 0)
+    if (is_netbios_avail() == false)
         return 1;
     if (gNetbiosAvail != 0) {
         gNbMaxSess = localNameSession;

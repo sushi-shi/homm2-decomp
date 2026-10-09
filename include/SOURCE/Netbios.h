@@ -18,10 +18,10 @@ enum class NetbiosWaitState : i8 {
 };
 using enum NetbiosWaitState;
 
-i8 InitNetHost(void);
-i8 InitNetGuest(void);
-i8 WaitForHost(void);
-i8 WaitForGuest(void);
+b8 InitNetHost(void);
+b8 InitNetGuest(void);
+b8 WaitForHost(void);
+b8 WaitForGuest(void);
 i32 nbnet_init(void);
 
 extern H2SteppedEnumStorage<NetbiosSetupState, i8> iInitNetHostStatus;

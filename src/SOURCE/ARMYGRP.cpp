@@ -28,23 +28,23 @@ armyGroup::armyGroup(void) {
 
 void armyGroup::View(i32) {}
 
-i32 armyGroup::HasAllUndead(void) {
+b32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && !(gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes
                  & MONSTER_FLAGS_UNDEAD))
-            return 0;
+            return false;
     }
-    return 1;
+    return true;
 }
 
-i32 armyGroup::HasSomeUndead(void) {
+b32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && (H2EnumIndex((gMonsterDatabase[H2EnumIndex(m_creatureTypes[slot])].attributes) & (MONSTER_FLAGS_UNDEAD))))
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
@@ -121,12 +121,12 @@ void armyGroup::Dismiss(i32 slot) {
     m_creatureCounts[slot] = 0;
 }
 
-i32 armyGroup::IsMember(CreatureType creatureType) {
+b32 armyGroup::IsMember(CreatureType creatureType) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] == creatureType)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
@@ -167,12 +167,12 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
     return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 }
 
-i32 armyGroup::CanJoin(CreatureType creatureType) {
+b32 armyGroup::CanJoin(CreatureType creatureType) {
     if (IsMember(creatureType))
-        return 1;
+        return true;
     if (IsMember(CREATURE_NONE))
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 i32 armyGroup::GetNumArmies(void) {
@@ -184,7 +184,7 @@ i32 armyGroup::GetNumArmies(void) {
     return numArmies;
 }
 
-i32 armyGroup::Add(
+b32 armyGroup::Add(
     CreatureType creatureType, i32 quantity, i32 slot
 ) {
     i32 searchSlot;
@@ -206,13 +206,13 @@ i32 armyGroup::Add(
         }
     }
     if (slot >= ARMY_GROUP_SLOT_COUNT || slot < 0)
-        return 0;
+        return false;
 
     m_creatureTypes[slot] = creatureType;
     if (m_creatureCounts[slot] < 0)
         m_creatureCounts[slot] = 0;
     m_creatureCounts[slot] += quantity;
-    return 1;
+    return true;
 }
 
 void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {

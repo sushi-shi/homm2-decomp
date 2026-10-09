@@ -217,7 +217,7 @@ void eventsManager::EditCell(i32 x, i32 y) {
     sprintf(text, "%d", gEditCell->m_overlayLink);
     message.payload.widget.id = textBase + CELL_FIELD_OVERLAY_LINK;
     gEditDialog->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gEditDialog, CellWindowHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, CellWindowHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult == EVENTS_DIALOG_CANCEL)
         *gMap.GetCell(x, y) = original;
@@ -360,7 +360,7 @@ void eventsManager::EditMonster(i32 x, i32 y, b32 ultimateArtifact) {
     SET_WIDGET_MESSAGE(message, WIDGET_COMMAND_SET_TEXT, MONSTER_WINDOW_COUNT);
     message.payload.widget.data.text = buffer;
     gEditDialog->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gEditDialog, MonsterWindowHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, MonsterWindowHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         gEditManager->m_mapChanged = true;
@@ -505,7 +505,7 @@ b32 NewMapDialog(void) {
         gNewMapWindow->AddWidget(gDensityKnobs[i], -1);
     }
     UpdateNewMapWindow();
-    gpWindowManager->DoDialog(gNewMapWindow, NewMapWindowHandler, 0);
+    gpWindowManager->DoDialog(gNewMapWindow, NewMapWindowHandler, false);
     delete gNewMapWindow;
     gNewMapWindow = NULL;
     BalanceTerrainPercents(NEW_MAP_NO_TERRAIN);

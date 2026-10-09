@@ -122,7 +122,7 @@ struct NetbiosThreadEvents {
     void* handles[NETBIOS_THREAD_EVENT_COUNT];
 };
 
-i32 is_netbios_avail(void);
+b32 is_netbios_avail(void);
 extern "C" u16 __cdecl nb_init(u16 maxNames, u16 localNameSession);
 extern "C" void __fastcall nb_term(void);
 extern "C" u16 __cdecl nb_rcv(i16 maxLength, void* buffer);

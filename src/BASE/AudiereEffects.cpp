@@ -69,7 +69,7 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
     gAudiereEffects.buffer = sampleResource->m_playbackData.data;
     gAudiereEffects.sampleRate = H2EnumIndex(sampleResource->m_playbackData.sampleRate);
     gAudiereEffects.frameCount = sampleResource->m_playbackData.size;
-    if (sampleResource->m_playbackData.stereo != 0) {
+    if (sampleResource->m_playbackData.stereo != false) {
         gAudiereEffects.channelCount = AUDIERE_CHANNELS_STEREO;
         gAudiereEffects.frameCount >>= 1;
     } else {
@@ -100,7 +100,7 @@ void PlayAudiereSample(class sample* sampleResource, audiere::AudioDevicePtr dev
         );
         gAudiereEffects.sampleList->stream->setVolume(convertedVolume);
         gAudiereEffects.sampleList->stream->setRepeat(
-            sampleResource->m_playbackData.looping != 0 ? true : false
+            sampleResource->m_playbackData.looping != false ? true : false
         );
         gAudiereEffects.sampleList->stream->play();
     }

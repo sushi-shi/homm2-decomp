@@ -70,7 +70,7 @@ i32 eventsManager::EditSphinx(i32 extra) {
         gEditDialog->BroadcastMessage(message);
     }
     FillInSphinxEdit(&gSphinx);
-    gpWindowManager->DoDialog(gEditDialog, EditSphinxHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditSphinxHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         len = strlen(gSphinxText) + sizeof(gSphinx);
@@ -157,7 +157,7 @@ MessageDispatchResult EditSphinxHandler(struct tag_message& message) {
                             } else {
                                 GetDataEntry(
                                     localization::Tr("editor.sphinx.enter_answer"),
-                                    newAnswer, SPHINX_ANSWER_LENGTH, NULL, 0, 1);
+                                    newAnswer, SPHINX_ANSWER_LENGTH, NULL, false, true);
                                 strcpy(gSphinx.answers[gSphinx.answerCount], newAnswer);
                                 gSphinx.answerCount++;
                                 request.type = MESSAGE_WIDGET;

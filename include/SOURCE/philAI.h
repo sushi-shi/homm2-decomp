@@ -64,12 +64,12 @@ public:
     void DoAllHeroInteractions(void);
     void CheckForCreatureUpgrades(void);
     void CheckBuyStuff(void);
-    i32 GoodAdjacent(MapDirection* direction);
+    b32 GoodAdjacent(MapDirection* direction);
     void CheckReload(void);
     void CheckBerserk(void);
     void DimensionDoorTo(i32 x, i32 y);
-    i32 DoAnywhereDDoorTownGate(i32 targetValue);
-    i32 DoDimensionDoor(class hero* pHero);
+    b32 DoAnywhereDDoorTownGate(i32 targetValue);
+    b32 DoDimensionDoor(class hero* pHero);
     void SetupRelativeHeroStrengths(void);
     void DoAI(i32 player);
     void GetGameAIVars(void);
@@ -115,8 +115,8 @@ public:
     void GetTurnAttentionValue(i32 player);
     i32 RVConversion(i32* const resources);
     float TurnsToBuy(i32* const resources);
-    i32 RVOfPosition(i32 x, i32 y, i32 hasAdjacentMonster, i32 adjacentMonsterX, i32 adjacentMonsterY, i32 beyondTurnMobility, i32 turnEndX, i32 turnEndY, i32 eventMode, i32 extraDistance);
-    i32 StrategicValueOfPosition(i32 targetX, i32 targetY, i32 immediate, i32 checkEnemies, i32* liveChance, i32 extraDistance);
+    i32 RVOfPosition(i32 x, i32 y, b32 hasAdjacentMonster, i32 adjacentMonsterX, i32 adjacentMonsterY, b32 beyondTurnMobility, i32 turnEndX, i32 turnEndY, i32 eventMode, i32 extraDistance);
+    i32 StrategicValueOfPosition(i32 targetX, i32 targetY, b32 immediate, b32 checkEnemies, i32* liveChance, i32 extraDistance);
     i32 ValueOfTown(class town* townPointer);
     void TurnCostResource(i32 player);
     float TurnValueOfObelisk(i32 player);
@@ -129,8 +129,8 @@ public:
         i32 townId = 0,
         i32 applySiegeAttackerModifiers = 0
     );
-    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, i32 isFree, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
-    i32 QuickCombat(
+    void EvaluateOneTimeCreaturePurchase(CreatureType creature, i32 availableCount, b32 isFree, i32& purchaseCount, i32& purchaseValue, i32& replacementSlot);
+    b32 QuickCombat(
         class armyGroup* attacker,
         class hero* attackerHero,
         class armyGroup* defender,
@@ -140,10 +140,10 @@ public:
         float& attackerCasualtyFraction,
         float& defenderCasualtyFraction
     );
-    void HeroInteractionAtHero(class hero* firstHero, class hero* secondHero, i32 evaluateOnly, i32* value);
-    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, i32 evaluateOnly, i32* value);
-    void RedistributeTroops(class armyGroup* sourceArmy, class armyGroup* destinationArmy, i32 preserveOne, i32 preferFast, i32 sourceStrength, i32 destinationStrength, i32 transferBudget);
-    i32 ChooseGoldOrExperience(i32, i32);
+    void HeroInteractionAtHero(class hero* firstHero, class hero* secondHero, b32 evaluateOnly, i32* value);
+    void HeroInteractionAtTown(class hero* heroPointer, class town* townPointer, b32 evaluateOnly, i32* value);
+    void RedistributeTroops(class armyGroup* sourceArmy, class armyGroup* destinationArmy, b32 preserveOne, b32 preferFast, i32 sourceStrength, i32 destinationStrength, i32 transferBudget);
+    b32 ChooseGoldOrExperience(i32, i32);
     void ChooseEvaluateBattle(
         class armyGroup* attackerArmy,
         class hero* attackerHero,
@@ -155,18 +155,18 @@ public:
         i32& worthFighting,
         i32& battleValue
     );
-    i32 ChooseToFightForArtifact(ArtifactType artifact, CreatureType monster, i32 quantity);
+    b32 ChooseToFightForArtifact(ArtifactType artifact, CreatureType monster, i32 quantity);
     i32 NetValueOfArtifact(i32 artifact, i32 goldCost, i32 resourceType, i32 resourceCost);
     i32 ChooseToPayRansomOnHero(i32);
     void BuildBuilding(class town* townPointer, BuildingSlotType building);
     void BuildHero(class town* townPointer, i32 availableHeroIndex);
     void BuildCreature(class town* townPointer, i32 dwelling, i32 purchaseCount);
-    i32 CanBuyBHC(struct BHC& purchase);
-    i32 CombatMonsterEvent(
+    b32 CanBuyBHC(struct BHC& purchase);
+    b32 CombatMonsterEvent(
         class hero* heroPointer, CreatureType monType, i32* pCount, class mapCell* cell
     );
-    i32 FightEvent(class hero* heroPointer, class mapCell* cell, i32 evaluateOnly);
-    i32 DamageGroup(class armyGroup* armyGroupPointer, class hero* loser, class hero*, float casualtyFraction);
+    i32 FightEvent(class hero* heroPointer, class mapCell* cell, b32 evaluateOnly);
+    b32 DamageGroup(class armyGroup* armyGroupPointer, class hero* loser, class hero*, float casualtyFraction);
     void IncrementHourGlass(void);
     void TownEvent(class mapCell* cell, class hero* heroPointer, i32 x, i32 y);
     i32 ComputeUpgradeValue(CreatureType baseCreatureType, CreatureType upgradedCreatureType);
@@ -190,13 +190,13 @@ public:
     i32 EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChance);
 };
 
-void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y);
-void CheckDoMain(i32 unused, i32 doMain);
+void ResetHeroRVs(b32 nearbyOnly, i32 x, i32 y);
+void CheckDoMain(b32 unused, b32 doMain);
 void ShowStatus(void);
 void ValidateHero(hero* pHero);
 void InitAIMapVars(void);
 void CloseAIMapVars(void);
-i32 OnMySide(i32 player);
+b32 OnMySide(i32 player);
 
 extern b32 bHeroBuiltThisTurn;
 extern float gafAITurnCostResource[H2EnumIndex(RES_COUNT)];

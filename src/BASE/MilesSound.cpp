@@ -34,11 +34,11 @@ namespace {
 
     inline i32 MilesSampleFormat(SamplePlaybackData* sampleData) {
         if (sampleData->sampleFormat != FORMAT_8_BIT) {
-            if (sampleData->stereo != 0)
+            if (sampleData->stereo != false)
                 return MILES_DIG_F_STEREO_16;
             else
                 return MILES_DIG_F_MONO_16;
-        } else if (sampleData->stereo != 0) {
+        } else if (sampleData->stereo != false) {
             return MILES_DIG_F_STEREO_8;
         } else {
             return MILES_DIG_F_MONO_8;
@@ -83,7 +83,7 @@ void AllocateMilesSampleHandles(struct _DIG_DRIVER* driver) {
 }
 
 void SetMilesSampleHandleVolume(struct _SAMPLE* sampleHandle, i32 volume) {
-    if (gMilesSamples.ready == 0)
+    if (gMilesSamples.ready == false)
         return;
     i32 index = 0;
     i32 foundIndex = -1;
@@ -132,7 +132,7 @@ void PlayMilesSample(class sample* sampleResource) {
     if (sampleResource == NULL)
         return;
     SamplePlaybackData* sampleData = &sampleResource->m_playbackData;
-    if (gMilesSamples.ready == 0 || sampleData->volume == 0)
+    if (gMilesSamples.ready == false || sampleData->volume == 0)
         return;
     {
         SampleChannelStruct* channelData = &SCS[sampleData->channelType];
@@ -163,7 +163,7 @@ void PlayMilesSample(class sample* sampleResource) {
         i32 formatMode = MilesSampleFormat(sampleData);
         AIL_set_sample_type(handle, formatMode, 0);
         AIL_set_sample_playback_rate(handle, H2EnumIndex(sampleData->sampleRate));
-        AIL_set_sample_loop_count(handle, sampleData->looping == 0);
+        AIL_set_sample_loop_count(handle, sampleData->looping == false);
         AIL_set_sample_address(handle, sampleData->data, sampleData->size);
         AIL_set_sample_volume(
             handle,
