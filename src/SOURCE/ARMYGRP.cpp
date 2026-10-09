@@ -33,27 +33,27 @@ VA(0x00421741, 0xd)
 void armyGroup::View(i32) {}
 
 VA(0x0042174e, 0x5a)
-i32 armyGroup::HasAllUndead(void) {
+b32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && !(gMonsterDatabase[IDX(m_creatureTypes[slot])].attributes
                  & MONSTER_FLAGS_UNDEAD))
-            return 0;
+            return false;
     }
-    return 1;
+    return true;
 }
 
 VA(0x004217a8, 0x5a)
-i32 armyGroup::HasSomeUndead(void) {
+b32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
             && HAS(
                 gMonsterDatabase[IDX(m_creatureTypes[slot])].attributes,
                 MONSTER_FLAGS_UNDEAD
             ))
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 VA(0x00421802, 0x231)
@@ -133,12 +133,12 @@ void armyGroup::Dismiss(i32 slot) {
 }
 
 VA(0x00421a56, 0x40)
-i32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
+b32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] == creatureType)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 #if H2_RETAIL_COMPILER
@@ -191,12 +191,12 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 alignmentMode) {
 #endif
 
 VA(0x00421bba, 0x3b)
-i32 armyGroup::CanJoin(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
+b32 armyGroup::CanJoin(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     if (IsMember(creatureType))
-        return 1;
+        return true;
     if (IsMember(CREATURE_NONE))
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x00421bf5, 0x48)
@@ -210,7 +210,7 @@ i32 armyGroup::GetNumArmies(void) {
 }
 
 VA(0x00421c3d, 0xdf)
-i32 armyGroup::Add(
+b32 armyGroup::Add(
     H2_ENUM_PARAM(CreatureType, i32) creatureType, i32 quantity, i32 slot
 ) {
     i32 searchSlot;
@@ -232,13 +232,13 @@ i32 armyGroup::Add(
         }
     }
     if (slot >= ARMY_GROUP_SLOT_COUNT || slot < 0)
-        return 0;
+        return false;
 
     m_creatureTypes[slot] = creatureType;
     if (m_creatureCounts[slot] < 0)
         m_creatureCounts[slot] = 0;
     m_creatureCounts[slot] += quantity;
-    return 1;
+    return true;
 }
 
 VA(0x00421d1c, 0x6b)

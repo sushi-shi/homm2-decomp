@@ -70,9 +70,9 @@ u8 dpnet_stat(i16, u16);
 i16 __cdecl dpnet_sess(i32, i32, ...);
 void dpProcessMessages(void);
 void dpEvaluateMessage(u32l size, i32 sender);
-i32 dpWaitForFirstGuest(void);
+b32 dpWaitForFirstGuest(void);
 i32 dpWaitForExtraGuests(void);
-i32 dpWaitForHost(void);
+b32 dpWaitForHost(void);
 void DPSD(i32 result, H2_CONST char* file, i32 line);
 
 extern struct IDirectPlay* lpIDC;

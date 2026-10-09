@@ -39,6 +39,6 @@ struct CombatRemotePacket {
 SIZE(CombatRemotePacket, 0x100);
 
 MessageDispatchResult WinCombatHandler(struct tag_message& message);
-i32 InCombatArea(i32 x, i32 y);
+b32 InCombatArea(i32 x, i32 y);
 
 #endif // HOMM2_SOURCE_COMMAND_H

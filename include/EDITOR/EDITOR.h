@@ -112,7 +112,7 @@ extern b32 gGenerateUnseen;
 extern b32 gGeneratingUnseen;
 extern i32 gObjectClass;
 #define gNextObjectLink gNextObjectLinkValue // spelling fixes .bss order
-extern i32 gNextObjectLink;
+extern b32 gNextObjectLink;
 // The map's land cells, as RemoveSmallRegions last counted them.
 #define gLandCellCount gLandCellCountInfoCore // spelling fixes .bss order
 extern i32 gLandCellCount;
@@ -201,7 +201,7 @@ void FileError(H2_CONST char* filename);
 void ShutDown(H2_CONST char* message);
 i32 InterpretCommandLine(void);
 void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text);
-i32 EarlySetup(void);
+b32 EarlySetup(void);
 void MemError(void);
 void InitMainClasses(void);
 void DeleteMainClasses(void);
@@ -210,8 +210,8 @@ void QuickViewWait(void);
 void UpdateAppSpecificMenus(void* hMenu);
 void CleanUpMenus(void);
 void EarlyShutDownSystem(void);
-i32 GameUnsaved(void);
-i32 HandleAppSpecificMenuCommands(i32 command);
+b32 GameUnsaved(void);
+b32 HandleAppSpecificMenuCommands(i32 command);
 void EarlyResizeWindow(i32 x, i32 y, i32 width, i32 height);
 void UpdateSystemOptionsMenu(void);
 void SetWinText(heroWindow* window, i32 id);

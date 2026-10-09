@@ -136,24 +136,25 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     sprintf(
         gText,
         "view%s.icn",
-        iconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
+        iconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == false
+                          && drawAllTerrains == false
                           ? LEGEND_WORLD
                           : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
     );
     SET_WIDGET_MESSAGE(legendMessage, WIDGET_COMMAND_SET_ICON, WORLD_ICON_WIDGET);
     legendMessage.payload.widget.data.text = gText;
     window->BroadcastMessage(legendMessage);
-    gpWindowManager->DoDialog(window, ViewWorldDialogHandler, 0);
+    gpWindowManager->DoDialog(window, ViewWorldDialogHandler, false);
     delete window;
 
-    UpdateRadar(1, 0);
+    UpdateRadar(1, false);
     VWCleanup();
     gbInViewWorld = false;
     gpWindowManager->m_colorCycling = 0;
-    RedrawAdvScreen(1, 0);
+    RedrawAdvScreen(1, false);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     gpWindowManager->m_colorCycling = 1;
-    SetPalette(palette, 1);
+    SetPalette(palette, true);
 }
 
 VA(0x004ae26a, 0x51)
@@ -224,7 +225,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
         IDX(giViewWorldScale)
     );
     pVWLetters = gpResourceManager->GetIcon(gText);
-    UpdateRadar(1, 0);
+    UpdateRadar(1, false);
 }
 
 #if H2_RETAIL_COMPILER
@@ -769,7 +770,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         iVWMapOriginY = MAP_WIDTH - iVWViewableCells;
                     if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
                         iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
-                    gpAdvManager->UpdateRadar(1, 0);
+                    gpAdvManager->UpdateRadar(1, false);
                     gpAdvManager->VWCompleteDraw();
 
                     eventMessage.type = MESSAGE_NONE;
@@ -812,7 +813,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                                 iVWMapOriginX = MAP_WIDTH - iVWViewableCells;
                             if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
                                 iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
-                            gpAdvManager->UpdateRadar(1, 0);
+                            gpAdvManager->UpdateRadar(1, false);
                             gpAdvManager->VWCompleteDraw();
                             lastMouseMove.type = MESSAGE_NONE;
                         }

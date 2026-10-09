@@ -353,7 +353,7 @@ void FadeIn(i32 increment) {
     if (currentPalette == NULL)
         MemError();
     done = false;
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == false)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(currentPalette->m_data, 0, PALETTE_DATA_SIZE);
     for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
@@ -373,7 +373,7 @@ void FadeIn(i32 increment) {
         }
         DelayTil(&delayTime);
     }
-    if (done == 0) {
+    if (done == false) {
         i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
@@ -394,7 +394,7 @@ void FadeOut(i32 increment) {
     if (currentPalette == NULL)
         MemError();
     done = false;
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen == 0)
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen == false)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(currentPalette->m_data, gpBufferPalette->m_data, PALETTE_DATA_SIZE);
     for (i = 0; i < PALETTE_LEVEL_COUNT; i += increment) {
@@ -414,7 +414,7 @@ void FadeOut(i32 increment) {
         UpdatePalette(currentPalette->m_data);
         DelayTil(&delayTime);
     }
-    if (done == 0) {
+    if (done == false) {
         i = PALETTE_CHANNEL_MAX;
         goto fadeStep;
     }
@@ -1457,7 +1457,7 @@ void WritePrefs(void) {
 }
 
 VA(0x004bf2b0, 0x3f)
-i32 IsCDDrive(i32 driveIndex) {
+b32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, "A:\\");
     gText[0] += driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
@@ -1596,14 +1596,14 @@ void BitmapToScreen(class bitmap* image) {
 #endif
 
 VA(0x004bf700, 0x5b)
-void SetPalette(i8* paletteData, i32 updateDisplay) {
+void SetPalette(i8* paletteData, b32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, PALETTE_DATA_SIZE);
     memcpy(
         gCyclePal,
         paletteData + IDX(CYCLE_RANGE_ONE_FIRST) * IDX(PALETTE_CHANNEL_COUNT),
         sizeof(gCyclePal)
     );
-    if (updateDisplay != 0)
+    if (updateDisplay != false)
         UpdatePalette(gpBufferPalette->m_data);
 }
 
@@ -1639,7 +1639,7 @@ void BlitBitmapToScreen(
     i32 destinationX,
     i32 destinationY
 ) {
-    if (gbColorMice == 0) {
+    if (gbColorMice == false) {
         BlitBitmapToScreenVesa(image, sourceX, sourceY, width, height, destinationX, destinationY);
         return;
     }
@@ -1651,7 +1651,7 @@ void BlitBitmapToScreen(
     }
     gBlitRight = destinationX + width - 1;
     gBlitBottom = destinationY + height - 1;
-    if (gpMouseManager->IsVis() == 0 || gBlitRight < gpMouseManager->m_savedLeft
+    if (gpMouseManager->IsVis() == false || gBlitRight < gpMouseManager->m_savedLeft
         || destinationX > gpMouseManager->m_cursorRight
         || gBlitBottom < gpMouseManager->m_savedTop
         || destinationY > gpMouseManager->m_cursorBottom) {
@@ -1900,7 +1900,7 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 #endif
 
 VA(0x004c0050, 0x44)
-i32 IsCycleColor(i32 color) {
+b32 IsCycleColor(i32 color) {
     return (color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
 }
@@ -2091,8 +2091,8 @@ void GetDataEntry(
     char* destination,
     i32 maximumLength,
     H2_CONST char* initialText,
-    i32 showCancel,
-    i32 editImmediately
+    b32 showCancel,
+    b32 editImmediately
 ) {
     MouseCursorType savedCursorType;
     i16 H2_UNUSED(widgetId);
@@ -2122,13 +2122,13 @@ void GetDataEntry(
 
     textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
     nHeight = textLines * PROMPT_LINE_HEIGHT;
-    if (showCancel != 0)
+    if (showCancel != false)
         nHeight += CANCEL_PROMPT_HEIGHT;
     nHeight += ROW_TOP_MARGIN;
     nRows = (nHeight - ROW_ROUNDING_BIAS) / ROW_HEIGHT;
     if (nRows > MAX_ROW_COUNT)
         nRows = MAX_ROW_COUNT;
-    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
+    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != false ? CANCEL_Y_OFFSET : 0);
 
     sprintf(windowName, "evntwin%d.bin", nRows);
     DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
@@ -2164,7 +2164,7 @@ void GetDataEntry(
     DataEntryWin->BroadcastMessage(message);
     message.payload.widget.id = DIALOG_BUTTON_6;
     DataEntryWin->BroadcastMessage(message);
-    if (showCancel == 0) {
+    if (showCancel == false) {
         message.payload.widget.id = ENTRY_CANCEL_BUTTON;
         DataEntryWin->BroadcastMessage(message);
     }
@@ -2192,12 +2192,12 @@ void GetDataEntry(
     inBoxY = entryY + INPUT_BOX_Y_OFFSET;
     DataEntryWin->AddWidget(pText, WINDOW_Z_ORDER_TOP);
 
-    if (editImmediately != 0) {
+    if (editImmediately != false) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = false;
     } else
         bDataEntryTime = ENTRY_PHASE_READY;
-    gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
+    gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, false);
     delete DataEntryWin;
     gpMouseManager->SetPointer(
         "",
@@ -2261,7 +2261,7 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
                         message.payload.widget.data.text = cDEDest;
                         DataEntryWin->BroadcastMessage(message);
                         DataEntryWin->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, ENTRY_TEXT_WIDGET, ENTRY_TEXT_WIDGET);
-                        if (gbTextEntryEscaped != 0)
+                        if (gbTextEntryEscaped != false)
                             break;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = ENTRY_TEXT_WIDGET;

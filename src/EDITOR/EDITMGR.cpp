@@ -5183,7 +5183,7 @@ editManager::editManager(void) {
     m_cursorX = 0;
     m_cursorY = 0;
     m_window = NULL;
-    gNextObjectLink = 1;
+    gNextObjectLink = true;
     m_zoomLevel = 0;
     gMap.Init(MAP_HEIGHT, MAP_WIDTH);
     gUndoMap.Init(MAP_HEIGHT, MAP_WIDTH);
@@ -5426,7 +5426,7 @@ MessageDispatchResult editManager::Main(tag_message& message) {
     i32 hint;
     i32 choice;
     i32 overlayType;
-    i32 newMap;
+    b32 newMap;
     i32 mapX;
     i32 cellTrigger;
     i32 mapY;
@@ -6931,9 +6931,9 @@ DATA(0x004a3a48) i32 gEditErrorCount;
 // barrier whose tent is missing.
 VA(0x004062c0, 0x2de)
 void editManager::CheckObjects(void) {
-    char barrierColors[KB_BARRIER_COLOR_NAME_COUNT];
+    bchar barrierColors[KB_BARRIER_COLOR_NAME_COUNT];
     i32 gates[EDIT_TRAVEL_GATE_KINDS];
-    char tentColors[KB_BARRIER_COLOR_NAME_COUNT];
+    bchar tentColors[KB_BARRIER_COLOR_NAME_COUNT];
     i32 x;
     i32 whirlpools;
     i32 y;
@@ -6941,8 +6941,8 @@ void editManager::CheckObjects(void) {
 
     whirlpools = 0;
     for (i = 0; i < KB_BARRIER_COLOR_NAME_COUNT; i++) {
-        barrierColors[i] = 0;
-        tentColors[i] = 0;
+        barrierColors[i] = false;
+        tentColors[i] = false;
     }
     gates[0] = 0;
     gates[1] = 0;
@@ -6950,9 +6950,9 @@ void editManager::CheckObjects(void) {
     for (y = 0; y < MAP_HEIGHT; y++) {
         for (x = 0; x < MAP_WIDTH; x++) {
             if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_BARRIER))
-                barrierColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = 1;
+                barrierColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = true;
             if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_TRAVELER_TENT))
-                tentColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = 1;
+                tentColors[gMap.CellAt(x, y)->m_objectMetadata & EDIT_BARRIER_COLOR_MASK] = true;
             if (gMap.CellAt(x, y)->m_triggerType == MAP_ACTION_TRIGGER(MAP_OBJECT_STONE_LITHS))
                 gates[gMap.CellAt(x, y)->m_objectIndex % EDIT_TRAVEL_GATE_FRAMES
                       / EDIT_TRAVEL_GATE_KIND_FRAMES]++;
@@ -8059,7 +8059,7 @@ void editManager::ClearArea(i32 x, i32 y, i32 width, i32 height, i32 H2_UNUSED(m
 // Erases every cell part and extra part of the placement `link` (scanning
 // the map until nothing is left), noting roads and streams for ClearArea.
 VA(0x00409d47, 0x1c6)
-void editManager::RemoveLinkedObject(i32 link) {
+void editManager::RemoveLinkedObject(b32 link) {
     i32 idx;
     b32 changed;
     mapCellExtra* extra;
@@ -8132,8 +8132,8 @@ void editManager::ResetArea(i32 x, i32 y, i32 width, i32 height) {
     for (i = x; i < x + width; i++) {
         for (j = y; j < y + height; j++) {
             memset(gMap.CellAt(i, j), 0, sizeof(mapCell));
-            gMap.CellAt(i, j)->m_objectLink = 0;
-            gMap.CellAt(i, j)->m_overlayLink = 0;
+            gMap.CellAt(i, j)->m_objectLink = false;
+            gMap.CellAt(i, j)->m_overlayLink = false;
             gMap.CellAt(i, j)->m_extraIndex = 0;
             gMap.CellAt(i, j)->m_terrainImageIndex
                 = ChooseGroundTile(IDX(TERRAIN_WATER), EDIT_SHAPE_PLAIN, true, i, j, false, 1.0f);
@@ -8440,7 +8440,7 @@ H2_ENUM_END(EditBlendTerrain)
 // The test stops at the view's width from the screen's edge, 16 pixels short
 // of the view's right and bottom edges.
 VA(0x0040b0bd, 0x41)
-i32 InMapArea(i32 x, i32 y) {
+b32 InMapArea(i32 x, i32 y) {
     return x >= EDIT_VIEW_LEFT && x < EDIT_VIEW_PIXELS && y >= EDIT_VIEW_TOP
         && y < EDIT_VIEW_PIXELS;
 }
@@ -8527,7 +8527,7 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
                 // A constant condition: retail keeps its compiled test.
                 if (1) {
                     waterUp = waterDown = waterRight = waterLeft = sameUp = sameDown = sameRight = sameLeft
-                        = sameUpLeft = sameUpRight = sameDownLeft = sameDownRight = 0;
+                        = sameUpLeft = sameUpRight = sameDownLeft = sameDownRight = false;
                     if (!y || IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) == thisTerrain)
                         sameUp = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x, y - 1)))
@@ -8681,9 +8681,9 @@ borders:
             if (thisTerrain == IDX(TERRAIN_BEACH))
                 continue;
             otherUpRight = otherUpLeft = otherDownRight = otherDownLeft = otherUp = otherDown = otherRight
-                = otherLeft = 0;
+                = otherLeft = false;
             waterUpRight = waterUpLeft = waterDownRight = waterDownLeft = waterUp = waterDown = waterRight
-                = waterLeft = 0;
+                = waterLeft = false;
             if (thisTerrain != IDX(TERRAIN_DIRT)) {
                 if (y > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x, y - 1)))
                     otherUp = true;
@@ -9278,22 +9278,22 @@ void editManager::CheckScreenScroll(void) {
         if (mouseX >= 0 && mouseX < LOGICAL_SCREEN_WIDTH && mouseY >= 0 && mouseY < LOGICAL_SCREEN_HEIGHT) {
             if (mouseX < EDIT_SCROLL_BORDER) {
                 if (mouseY < EDIT_SCROLL_BORDER)
-                    ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_NORTH_WEST, true);
                 else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER))
-                    ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_SOUTH_WEST, true);
                 else
-                    ScreenScroll(MAP_DIRECTION_WEST, 1);
+                    ScreenScroll(MAP_DIRECTION_WEST, true);
             } else if (mouseX > LOGICAL_SCREEN_WIDTH - IDX(EDIT_SCROLL_BORDER) - 1) {
                 if (mouseY < EDIT_SCROLL_BORDER)
-                    ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_NORTH_EAST, true);
                 else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER))
-                    ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_SOUTH_EAST, true);
                 else
-                    ScreenScroll(MAP_DIRECTION_EAST, 1);
+                    ScreenScroll(MAP_DIRECTION_EAST, true);
             } else if (mouseY < EDIT_SCROLL_BORDER) {
-                ScreenScroll(MAP_DIRECTION_NORTH, 1);
+                ScreenScroll(MAP_DIRECTION_NORTH, true);
             } else if (mouseY > LOGICAL_SCREEN_HEIGHT - IDX(EDIT_SCROLL_BORDER)) {
-                ScreenScroll(MAP_DIRECTION_SOUTH, 1);
+                ScreenScroll(MAP_DIRECTION_SOUTH, true);
             }
         }
         if (gpMouseManager->m_cursorFrame >= ADVENTURE_POINTER_SCROLL_FIRST
@@ -9740,7 +9740,7 @@ i32 FileOptions(void) {
     window = new heroWindow(EDIT_FILE_MENU_X, EDIT_FILE_MENU_Y, "ecpanel.bin");
     if (window == NULL)
         MemError();
-    gpWindowManager->DoDialog(window, FileOptionsHandler, 0);
+    gpWindowManager->DoDialog(window, FileOptionsHandler, false);
     delete window;
     result = EDIT_FILE_MENU_NONE;
     switch (gpWindowManager->m_dialogResult) {
@@ -9864,7 +9864,7 @@ void editManager::SystemOptions(void) {
         MemError();
     SetWinText(gSystemOptionsWindow, EDITOR_WIN_TEXT_SYSTEM_OPTIONS);
     UpdateEditorSystemOptions(true);
-    gpWindowManager->DoDialog(gSystemOptionsWindow, EditorSystemOptionsHandler, 0);
+    gpWindowManager->DoDialog(gSystemOptionsWindow, EditorSystemOptionsHandler, false);
     delete gSystemOptionsWindow;
     if (gPrefsChanged)
         WritePrefs();

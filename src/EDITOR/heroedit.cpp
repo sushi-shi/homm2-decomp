@@ -117,7 +117,7 @@ void eventsManager::EditHero(i32 x, i32 y, b32 jailed) {
         }
     }
     FillInHeroEdit(&gHeroEdit);
-    gpWindowManager->DoDialog(gEditDialog, EditHeroHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditHeroHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         gEditManager->m_mapChanged = true;

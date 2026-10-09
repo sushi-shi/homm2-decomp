@@ -17,8 +17,8 @@ i32 CalcTerrainCost(
     i32 diagonal,
     i32 mobility,
     i32 pathfindingLevel,
-    i32 sourceHasRoad,
-    i32 destinationHasRoad
+    b32 sourceHasRoad,
+    b32 destinationHasRoad
 );
 
 #endif // HOMM2_SOURCE_FINDPATH_H

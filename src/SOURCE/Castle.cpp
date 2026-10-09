@@ -104,10 +104,10 @@ namespace {
     // The recruit slot is refused once a hero has been recruited from this
     // castle dialog, when the player cannot pay, when the roster is full, or
     // when a hero is standing in the town.
-    inline i32 CannotRecruitHero(void) {
+    inline b32 CannotRecruitHero(void) {
         b32 cannot;
 
-        if (!(gpTownManager->m_heroRecruited != 0
+        if (!(gpTownManager->m_heroRecruited != false
               || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
               || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
               || gpTownManager->m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE))
@@ -124,7 +124,7 @@ namespace {
 #define rowPosition rowPos
 #endif
 VA(0x00424320, 0xf10)
-void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
+void townManager::SetupCastle(heroWindow* window, b32 updateOnly) {
     u32l captainQuarters;
     i32 H2_UNUSED(tileX);
     i32 H2_UNUSED(tileY);
@@ -367,7 +367,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         stateFrame = FRAME_CANNOT_AFFORD;
     else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY || m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
         stateFrame = FRAME_CANNOT_BUILD;
-    else if (m_heroRecruited != 0)
+    else if (m_heroRecruited != false)
         stateFrame = FRAME_BUILT;
     else
         stateFrame = FRAME_NONE;
@@ -401,7 +401,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     terrainIconFrame = (IDX(CELL_TERRAIN(gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y))) - 1)
                        * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
     raceBase = IDX(m_town->m_type) * RACE_ICON_FRAMES;
-    if (updateOnly == 0) {
+    if (updateOnly == false) {
         backFrame = 0;
         for (rowPosition = BACKGROUND_TERRAIN_FIRST_ROW; rowPosition <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPosition) {
             for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
@@ -447,7 +447,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 ++backFrame;
             }
         }
-        if (xIsExpansionMap == 0 && m_town->m_type == FACTION_NECROMANCER) {
+        if (xIsExpansionMap == false && m_town->m_type == FACTION_NECROMANCER) {
             backgroundWidget = new iconWidget(
                 EXPANSION_OVERLAY_X,
                 EXPANSION_OVERLAY_Y,
@@ -481,12 +481,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     i32 heroChoiceIndex;
     i32 whichBuilding;
     b32 quickFlag;
-    i32 result;
+    b32 result;
     i16 H2_UNUSED(statusWidgetId);
 
     statusWidgetId = IDX(CONTROL_STATUS_TEXT);
     whichBuilding = IDX(BUILDING_SLOT_NONE);
-    result = 0;
+    result = false;
     hoverMessage = false;
 
     if (message.type == MESSAGE_MOUSE_MOVE || message.type == MESSAGE_WIDGET) {
@@ -692,7 +692,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_NOTIFY_DESELECT:
                 if (message.payload.widget.id == CONTROL_CLOSE)
-                    result = 1;
+                    result = true;
                 break;
             case WIDGET_NOTIFY_SELECT:
             case WIDGET_NOTIFY_RIGHT_CLICK:
@@ -710,7 +710,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
-                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, 1);
+                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, true);
                         gpTownManager->m_buildingWindow->DrawWindow();
                         break;
 
@@ -725,7 +725,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             break;
                         }
                         gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
-                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, 1);
+                        gpTownManager->SetupCastle(gpTownManager->m_buildingWindow, true);
                         gpTownManager->m_buildingWindow->DrawWindow();
                         break;
 
@@ -793,7 +793,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 if (quickFlag) {
                                     HeroView(gpCurPlayer->AvailableHeroId(heroChoiceIndex), true, false);
                                     casWin->DrawWindow();
-                                    gpTownManager->m_bankBox->Update(1);
+                                    gpTownManager->m_bankBox->Update(true);
                                     gpWindowManager
                                         ->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, NULL);
                                 } else {
@@ -810,7 +810,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         }
     }
 
-    if (result != 0) {
+    if (result != false) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;

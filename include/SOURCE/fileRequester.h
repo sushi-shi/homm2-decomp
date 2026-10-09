@@ -123,13 +123,13 @@ public:
     virtual i32 Open(i32 id) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
-    i32 InitializeFiles(char* directory, char* pattern, i32 countOnly);
-    i32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
+    i32 InitializeFiles(char* directory, char* pattern, b32 countOnly);
+    b32 MapExistsForFilter(FileRequesterMapSizeFilter filter);
     void SetupFiles(void);
     void CleanUpData(void);
     void SetOK(i32 enabled);
     void DoKnob(void);
-    void Update(i32 drawWindow);
+    void Update(b32 drawWindow);
     H2_CONST char* GetFilename(void);
 };
 #pragma pack(pop)

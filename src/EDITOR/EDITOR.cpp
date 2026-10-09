@@ -3528,7 +3528,7 @@ DATA(0x004a45d8) i32 gUnusedData4a45d8Instance[2];
 DATA(0x004a45e0) inputManager* gpInputManager;
 DATA(0x004a45e4) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 // The placement link the next placed object's parts share (mapCell).
-DATA(0x004a45f4) i32 gNextObjectLink;
+DATA(0x004a45f4) b32 gNextObjectLink;
 DATA(0x004a45f8) char gcCommandLine[GLOBAL_COMMAND_LINE_SIZE];
 DATA(0x004a4638) configStruct gConfig;
 // Unread storage; the name is the compiled spelling that keeps the name-hash order.
@@ -3550,14 +3550,14 @@ extern "C" void PollSound(void) {
     gbInPollSound = true;
     if (glTimers[GLOBAL_MOUSE_TIMER_SLOT] < KBTickCount() && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + EDITOR_MOUSE_UPDATE_INTERVAL;
-        gpMouseManager->NewUpdate(0);
+        gpMouseManager->NewUpdate(false);
     }
     if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + EDITOR_COLOR_CYCLE_INTERVAL;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] += EDITOR_NON_PALETTED_CYCLE_DELAY;
-        CycleColors(0);
+        CycleColors(false);
     }
     gbInPollSound = false;
 }
@@ -3607,7 +3607,7 @@ i32 oldmain(void) {
         window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpemain.bin");
         if (!window)
             MemError();
-        gpWindowManager->DoDialog(window, SetupMainHandler, 0);
+        gpWindowManager->DoDialog(window, SetupMainHandler, false);
         delete window;
         result = gpWindowManager->m_dialogResult;
         gbInSetupDialog = false;
@@ -3782,12 +3782,12 @@ void EarlyShutdown(H2_CONST char* caption, H2_CONST char* text) {
 }
 
 VA(0x004109d9, 0x149)
-i32 EarlySetup(void) {
+b32 EarlySetup(void) {
     CDRomSetupResult result;
     i32 i;
 
     if (bEarlySetupDone)
-        return 0;
+        return false;
     sprintf(cAggPathName, "%s%s", ".\\DATA\\", "heroes2.agg");
     DEFAULT_AGGREGATE_NAME = cAggPathName;
     sprintf(cExpAggPathName, "%s%s", ".\\DATA\\", "heroes2x.agg");
@@ -3796,7 +3796,7 @@ i32 EarlySetup(void) {
     GetGraphicsInfo();
     ReadPrefs();
     if (!InterpretCommandLine())
-        return 1;
+        return true;
     LogTruncate();
     result = SetupCDDrive();
     if (result == CD_ROM_DRIVE_UNAVAILABLE) {
@@ -3830,7 +3830,7 @@ i32 EarlySetup(void) {
     for (i = 0; i < GLOBAL_TIMER_COUNT; i++)
         glTimers[i] = 0;
     hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
-    return 1;
+    return true;
 }
 
 VA(0x00410b22, 0x24)
@@ -3984,7 +3984,7 @@ void NormalDialog(
         QuickViewWait();
         gpWindowManager->RemoveWindow(pNormalDialogWindow);
     } else {
-        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, 0);
+        gpWindowManager->DoDialog(pNormalDialogWindow, EventWindowHandler, false);
     }
     delete pNormalDialogWindow;
 }
@@ -4025,10 +4025,10 @@ MessageDispatchResult EventWindowHandler(struct tag_message& message) {
 VA(0x004112ae, 0x80)
 void QuickViewWait(void) {
     tag_message event;
-    i32 done;
+    b32 done;
 
     gpMouseManager->ReallyHidePointer();
-    done = 0;
+    done = false;
     while (!done) {
         PollSound();
         Process1WindowsMessage();
@@ -4109,12 +4109,12 @@ void EarlyShutDownSystem(void) {
 }
 
 VA(0x00411482, 0xa)
-i32 GameUnsaved(void) {
-    return 1;
+b32 GameUnsaved(void) {
+    return true;
 }
 
 VA(0x0041148c, 0xc2)
-i32 HandleAppSpecificMenuCommands(i32 command) {
+b32 HandleAppSpecificMenuCommands(i32 command) {
     switch (command) {
         case EDITOR_MENU_PALETTE_CYCLING:
             gConfig.editorPaletteCycling = 1 - gConfig.editorPaletteCycling;
@@ -4133,9 +4133,9 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             PostMessageA(hwndApp, WM_CLOSE, 0, 0);
             break;
         default:
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 VA(0x0041154e, 0x12)

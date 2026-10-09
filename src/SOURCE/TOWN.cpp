@@ -24,12 +24,12 @@ town::town(void) {
 }
 
 VA(0x004a404a, 0x3f)
-i32 town::HasGarrison(void) {
+b32 town::HasGarrison(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_army.m_creatureTypes[slot] != CREATURE_NONE)
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 VA(0x004a4089, 0xde)
@@ -92,7 +92,7 @@ void town::XformToCastle(void) {
 }
 
 VA(0x004a420c, 0xc4)
-void town::View(i32 noFade) {
+void town::View(b32 noFade) {
     bEnteringTown = true;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
         gAdvDisposeLevel = ADV_DISPOSE_FULL;
@@ -105,7 +105,7 @@ void town::View(i32 noFade) {
         gpWindowManager->FadeScreen(FADE_OUT, FADE_SPEED_STANDARD, NULL);
     gpExec->CallManager(gpTownManager);
     if (m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
-        gpAdvManager->SetHeroContext(m_occupyingHeroId, 0);
+        gpAdvManager->SetHeroContext(m_occupyingHeroId, false);
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
     bEnteringTown = false;
 }
@@ -201,7 +201,7 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
 }
 
 VA(0x004a4645, 0x1e)
-i32 town::CanBuildDock(void) {
+b32 town::CanBuildDock(void) {
     return m_boatX != TOWN_DOCK_COORDINATE_NONE;
 }
 

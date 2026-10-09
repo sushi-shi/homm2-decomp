@@ -20,8 +20,8 @@ struct combatRemoteData {
     i8 setupCombatY;
     i32 randomSeed;
     H2_ENUM_STORAGE(CombatResult, i8) combatResult;
-    i8 retreatWin;
-    i8 combatSurrender;
+    b8 retreatWin;
+    b8 combatSurrender;
     i8 firstOwner;
     i32 firstGold;
     i8 secondOwner;

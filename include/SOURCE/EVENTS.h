@@ -312,10 +312,10 @@ H2_ENUM_BEGIN(EventEffectConstant)
     EVENT_FIZZLE_STEPS               = 65
 H2_ENUM_END(EventEffectConstant)
 
-i8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString);
+b8 StrEqNoCase(H2_CONST char* firstString, H2_CONST char* sndString);
 i32 GiveArtifact(class hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra = -1);
 void GiveTakeArtifactStat(class hero* targetHero, ArtifactType artifact, b32 take);
-i32 RiddleStringsEqual(H2_CONST char* answer, H2_CONST char* expected);
+b32 RiddleStringsEqual(H2_CONST char* answer, H2_CONST char* expected);
 
 H2_ENUM_BEGIN(EventStatModifier)
     TEMPLE_MORALE_BONUS = 2,

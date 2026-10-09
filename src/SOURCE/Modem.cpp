@@ -44,7 +44,7 @@ void ModemSetup(i32 mode) {
     com_init(static_cast<u8>(gConfig.comPort[gbDirectConnect]), COM_BAUD_19200, 0);
     LogStr("MS2");
 
-    if (gbDirectConnect == 0) {
+    if (gbDirectConnect == false) {
         for (resetAttempt = 0; resetAttempt < RESET_ATTEMPT_COUNT; ++resetAttempt) {
             if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
                 sprintf(command, gConfig.modemInitString);
@@ -62,13 +62,13 @@ void ModemSetup(i32 mode) {
     LogStr("MS3");
     switch (mode) {
         case IDX(REMOTE_GAME_MODEM_HOST):
-            if (gbDirectConnect == 0 && Dial() != 0) {
+            if (gbDirectConnect == false && Dial() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;
             }
             break;
         case IDX(REMOTE_GAME_MODEM_GUEST):
-            if (gbDirectConnect == 0 && Wait() != 0) {
+            if (gbDirectConnect == false && Wait() != 0) {
                 RemoteCleanup();
                 GameMode = REMOTE_GAME_NONE;
             }
@@ -77,7 +77,7 @@ void ModemSetup(i32 mode) {
             return;
     }
 
-    if (gbDirectConnect != 0) {
+    if (gbDirectConnect != false) {
         LogStr("MS4");
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
@@ -88,7 +88,7 @@ void ModemSetup(i32 mode) {
 Нажмите 'ОТМЕНА', чтобы прервать ожидание." */
         );
         NormalDialog(directConnectMessage, NORMAL_DIALOG_WAIT_CANCEL);
-        if (gbFunctionComplete == 0)
+        if (gbFunctionComplete == false)
             ShutDown(NULL);
         LogStr("MS5");
     } else {
@@ -141,25 +141,25 @@ void GUIModemCommand(H2_CONST char* message, H2_CONST char* command) {
     giWaitType = DIALOG_WAIT_MODEM_COMMAND;
     strcpy(cModemCommand, command);
     NormalDialog(message, NORMAL_DIALOG_WAIT_CANCEL);
-    if (gbFunctionComplete == 0)
+    if (gbFunctionComplete == false)
         ShutDown(NULL);
 }
 
 VA(0x00472fd4, 0x7e)
-i8 GUIModemCommandExec(void) {
+b8 GUIModemCommandExec(void) {
     i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
-        return 0;
+        return false;
 
     iLastActionTime = KBTickCount();
     commandLength = strlen(cModemCommand);
     if (iModemCommandPos < commandLength) {
         write_buffer(cModemCommand + iModemCommandPos, 1);
         ++iModemCommandPos;
-        return 0;
+        return false;
     } else {
         write_buffer("\r", 1);
-        return 1;
+        return true;
     }
 }
 
@@ -187,16 +187,16 @@ i8 GUIModemResponse(H2_CONST char* message, H2_CONST char* response) {
     strcpy(GUIMRresp, response);
     giWaitType = DIALOG_WAIT_MODEM_RESPONSE;
     NormalDialog(message, NORMAL_DIALOG_WAIT_CANCEL);
-    if (gbFunctionComplete == 0)
+    if (gbFunctionComplete == false)
         ShutDown(NULL);
     return 0;
 }
 
 VA(0x00473128, 0xb3)
-i8 GUIModemResponseExec(void) {
+b8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
-        return 0;
+        return false;
     if (GUIMRc == '\n' || GUIMRrespptr == MODEM_RESPONSE_SIZE - 1) {
         GUIMRresponse[GUIMRrespptr] = 0;
         if (GUIMRrespptr > MODEM_RESPONSE_TRUNCATE_INDEX) {
@@ -208,23 +208,23 @@ i8 GUIModemResponseExec(void) {
             GUIMRresponse[GUIMRrespptr] = static_cast<char>(GUIMRc);
             ++GUIMRrespptr;
         }
-        return 0;
+        return false;
     }
 compareResponse:
     if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
         GUIMRrespptr = 0;
-        return 0;
+        return false;
     } else {
-        return 1;
+        return true;
     }
 }
 
 VA(0x004731db, 0x42)
-i32 write_buffer(H2_CONST char* buffer, i32 length) {
+b32 write_buffer(H2_CONST char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
-        return 0;
+        return false;
     com_snd(0, 0, static_cast<u16>(length), buffer, 0);
-    return 1;
+    return true;
 }
 
 VA(0x0047321d, 0x33)
@@ -283,7 +283,7 @@ void Connect(void) {
 }
 
 VA(0x00473408, 0x1e4)
-i32 WaitForDirectConnect(void) {
+b32 WaitForDirectConnect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     switch (WFDCStage) {
         case MODEM_CONNECTION_INIT_STAGE: {
@@ -300,9 +300,9 @@ i32 WaitForDirectConnect(void) {
             if (ReadPacket()) {
                 packet[packetlen] = 0;
                 if (packetlen != HANDSHAKE_PACKET_SIZE)
-                    return 0;
+                    return false;
                 if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
-                    return 0;
+                    return false;
                 if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
                     sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
                     GOut(gText);
@@ -323,15 +323,15 @@ i32 WaitForDirectConnect(void) {
                 ++WFDCStage;
             break;
         case MODEM_CONNECTION_READY_STAGE:
-            if (ReadPacket() == 0)
-                return 1;
+            if (ReadPacket() == false)
+                return true;
             break;
     }
-    return 0;
+    return false;
 }
 
 VA(0x004735ec, 0x100)
-char ReadPacket(void) {
+bchar ReadPacket(void) {
     i32 input;
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - IDX(INPUT_QUEUE_GUARD)) {
         LogStr("OverFlow1");
@@ -339,7 +339,7 @@ char ReadPacket(void) {
         newpacket = true;
     }
 readPacketStart:
-    if (newpacket != 0) {
+    if (newpacket != false) {
         packetlen = 0;
         newpacket = false;
     }
@@ -347,12 +347,12 @@ readPacketStart:
     readNextByte:
         input = read_byte();
         if (input < 0)
-            return 0;
-        if (inescape != 0) {
+            return false;
+        if (inescape != false) {
             inescape = false;
             if (input == MODEM_PACKET_END) {
                 newpacket = true;
-                return 1;
+                return true;
             } else if (input == 0) {
                 newpacket = true;
                 goto readPacketStart;
@@ -400,7 +400,7 @@ void WriteModemPacket(H2_CONST char* buffer, i32 length) {
     ++encodedPosition;
     encoded[encodedPosition] = MODEM_PACKET_END;
     ++encodedPosition;
-    while (write_buffer(encoded, encodedPosition) == 0)
+    while (write_buffer(encoded, encodedPosition) == false)
         ForcePollSound();
 }
 

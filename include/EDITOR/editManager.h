@@ -380,7 +380,7 @@ public:
     b32 FindTown(i32 index, i32* x, i32* y);
     b32 FindHero(i32 index, i32* x, i32* y);
     // Erases every part of the placed object the link names.
-    void RemoveLinkedObject(i32 link);
+    void RemoveLinkedObject(b32 link);
 };
 #pragma pack(pop)
 SIZE(editManager, 0xea2);
@@ -432,7 +432,7 @@ void ShowStatusWarning(H2_CONST char* text);
 i32 ChooseGroundTile(i32 terrain, i32 shape, b32 vary, i32 x, i32 y, b32 force, float chance);
 // Whether screen point (x, y) lies on the map view, short of its last 16 pixels on the right and
 // bottom (the test compares with the view's width, not its right edge).
-i32 InMapArea(i32 x, i32 y);
+b32 InMapArea(i32 x, i32 y);
 // Numbers the parts of every catalogue entry (gOverlayTypes) by the frames
 // of its tileset.
 void FillInOverlayTiles(void);

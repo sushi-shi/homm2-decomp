@@ -1083,7 +1083,7 @@ b32 PlaceResourceMarker(overlayType* type, i32 x, i32 y, b32 requireMine) {
         y,
         TILESET_EXTRAOVR,
         type->frames[OVERLAY_GRID_ANCHOR],
-        0,
+        false,
         gNextObjectLink
     );
     return true;
@@ -1486,7 +1486,7 @@ i32 overlayManager::PickOverlay(i32 objectClass) {
     gpInputManager->Flush();
     gpWindowManager->AddWindow(m_picker, -1, 0);
     DrawPicker(true);
-    gpWindowManager->DoDialog(m_picker, PickerHandler, 0);
+    gpWindowManager->DoDialog(m_picker, PickerHandler, false);
     gpWindowManager->RemoveWindow(m_picker);
     delete m_picker;
     gpInputManager->Flush();

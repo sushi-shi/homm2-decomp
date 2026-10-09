@@ -89,7 +89,7 @@ H2_ENUM_BEGIN(CampaignTrackConstant)
 H2_ENUM_END(CampaignTrackConstant)
 
 VA(0x00421f00, 0x4f0)
-i32 game::HandleCampaignWin(void) {
+b32 game::HandleCampaignWin(void) {
     H2_ENUM_STORAGE_STEPPED(CampaignSide, i32) sideIndex;
     i32 mapIndex;
 
@@ -236,15 +236,15 @@ i32 game::HandleCampaignWin(void) {
                 }
             }
         }
-        gpGame->ShowCampaignInfo(0, 0);
+        gpGame->ShowCampaignInfo(false, 0);
         switch (gpWindowManager->m_dialogResult) {
             case CAMPAIGN_DIALOG_ACCEPT:
-                return 1;
+                return true;
             case CAMPAIGN_DIALOG_CANCEL:
-                return 0;
+                return false;
         }
     }
-    return 0;
+    return false;
 }
 
 VA(0x004223f0, 0x2e2)
@@ -351,7 +351,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
 }
 
 VA(0x004226d2, 0x40a)
-void game::ShowCampaignInfo(i32 viewOnly, i32) {
+void game::ShowCampaignInfo(b32 viewOnly, i32) {
     widget* trackWidget;
     i32 mapIndex;
     b32 savedInterface;
@@ -428,8 +428,8 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     gpSoundManager->SwitchAmbientMusic(
         m_campaignType == CAMPAIGN_ROLAND ? MUSIC_TRACK_CAMPAIGN_GOOD : MUSIC_TRACK_CAMPAIGN_EVIL
     );
-    CampaignInfoUpdate(0);
-    gpWindowManager->DoDialog(campWin, CampaignHandler, 0);
+    CampaignInfoUpdate(false);
+    gpWindowManager->DoDialog(campWin, CampaignHandler, false);
     delete campWin;
     gbUseEvilInterface = savedInterface;
 
@@ -447,7 +447,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
 
 #define index mapIndex // frame-slot spelling
 VA(0x00422adc, 0x8dc)
-void game::CampaignInfoUpdate(i32 redraw) {
+void game::CampaignInfoUpdate(b32 redraw) {
     i32 index;
     SCampaignChoice* choice;
     tag_message message;
@@ -662,7 +662,7 @@ VA(0x004233b8, 0x48a)
 MessageDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == true)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
@@ -705,7 +705,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                         iCurViewSide = iCurViewMap < CAMPAIGN_SWITCHING_SCENARIO
                                            ? gpGame->m_campaignStartingSide
                                            : gpGame->m_campaignType;
-                        gpGame->CampaignInfoUpdate(1);
+                        gpGame->CampaignInfoUpdate(true);
                         break;
                     case CAMPAIGN_BONUS_WIDGET_FIRST:
                     case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
@@ -714,7 +714,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                             && gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
                             gpGame->m_campaignChoice[IDX(iCurViewSide)][iCurViewMap] =
                                 message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST;
-                            gpGame->CampaignInfoUpdate(1);
+                            gpGame->CampaignInfoUpdate(true);
                         }
                         break;
                 }
@@ -808,7 +808,7 @@ void game::InitCampaignMap(void) {
     i32 heroPriority;
     i32 bestHeroSlot;
     i32 selectedChoice;
-    i32 H2_UNUSED(mapHeaderResultCampaign);
+    b32 H2_UNUSED(mapHeaderResultCampaign);
     CampaignBonusHeroPosition spellHeroSlot;
 
     selectedChoice = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
@@ -843,7 +843,7 @@ void game::InitCampaignMap(void) {
         m_campaignTotalDays = 0;
     strcpy(gMapName, m_mapFilename);
     mapHeaderResultCampaign = GetMapHeader(m_mapFilename, &m_mapHeader);
-    LoadGame("origdata.bin", 1, 0);
+    LoadGame("origdata.bin", true, false);
     InitNewGame(NULL);
 
     if (bonusChoice->type == CAMPAIGN_CHOICE_ALIGNMENT) {
@@ -971,7 +971,7 @@ void game::InitCampaignMap(void) {
     if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
         for (heroPositionValue = 0; heroPositionValue < GAME_HERO_COUNT; ++heroPositionValue) {
             if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
-                gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
+                gpGame->m_heroRecs[heroPositionValue].Deallocate(false);
         }
     }
 
@@ -1099,5 +1099,5 @@ DATA(0x004f0828) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUN
 DATA(0x005240b4) class heroWindow* campWin = NULL;
 DATA(0x005240ac) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
 DATA(0x005240a4) CampaignTrackType iCampaignTrackType;
-DATA(0x005240a8) i32 bCampaignViewOnly;
+DATA(0x005240a8) b32 bCampaignViewOnly;
 DATA(0x005240b0) i32 iCurViewMap;

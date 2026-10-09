@@ -84,9 +84,9 @@ struct SMapHeader {
 #pragma pack(pop)
 SIZE(SMapHeader, MAP_HEADER_SIZE);
 
-i32 GetMapHeader(H2_CONST char* filename, struct SMapHeader* header);
+b32 GetMapHeader(H2_CONST char* filename, struct SMapHeader* header);
 i32 CheckSumIsDemoOK(char*);
-i32 ShowThisMapGame(char* filename);
+b32 ShowThisMapGame(char* filename);
 i32 ShowThisMap(char*);
 
 #endif // HOMM2_SOURCE_REQUEST_H

@@ -84,13 +84,13 @@ void searchArray::SeedPosition(
     H2_ENUM_PARAM(MapDirection, i32) seedDirection,
     i32 maximumCost,
     i32 waterMode,
-    i32 findAdjacentMonster,
+    b32 findAdjacentMonster,
     i32 mobility,
     i32 pathfindingSkill,
     i32 targetX,
     i32 targetY,
-    i32 continueSeed,
-    i32 seedMonsterCells
+    b32 continueSeed,
+    b32 seedMonsterCells
 ) {
     DATA(0x00533da0) static b32 s_hasTarget;
     DATA(0x00533da4) static b32 s_hasAdjacentMonster;
@@ -100,9 +100,9 @@ void searchArray::SeedPosition(
     // Retail 0x00533db8: no code reads this cell. VC6 allocates an unreferenced
     // local static in the hash-ordered run but emits no symbol for it.
     static i32 H2_UNUSED(s_unusedInt);
-    DATA(0x00533dbc) static i32 s_targetHasRoad;
+    DATA(0x00533dbc) static b32 s_targetHasRoad;
     DATA(0x00533dc0) static i32 s_adjacentCost;
-    DATA(0x00533dc4) static i32 s_currentHasRoad;
+    DATA(0x00533dc4) static b32 s_currentHasRoad;
     DATA(0x00533dc8) static i32 s_adjacentX;
     DATA(0x00533dd0) static searchNode s_currentNode;
     DATA(0x00533ddc) static i32 s_mapY;
@@ -176,7 +176,7 @@ void searchArray::SeedPosition(
     }
 
     if (!continueSeed)
-        PushPoint(seedX, seedY, seedDirection, 0, maximumCost, 0, 0, 0, 0, 0, 0, 0);
+        PushPoint(seedX, seedY, seedDirection, 0, maximumCost, 0, false, 0, 0, false, 0, 0);
 
     s_currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
 
@@ -400,10 +400,10 @@ void searchArray::SeedPosition(
                                                 ),
                                             maximumCost,
                                             1,
-                                            0,
+                                            false,
                                             SEARCH_INVALID_COORDINATE,
                                             SEARCH_INVALID_COORDINATE,
-                                            0,
+                                            false,
                                             SEARCH_INVALID_COORDINATE,
                                             SEARCH_INVALID_COORDINATE
                                         );

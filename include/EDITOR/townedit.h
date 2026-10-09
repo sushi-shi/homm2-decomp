@@ -68,7 +68,7 @@ struct TownExtra {
     u8 hasCustomBuildings;
     u32 buildings;
     i8 mageGuildLevel;
-    i8 hasCustomArmy;
+    b8 hasCustomArmy;
     H2_ENUM_STORAGE(CreatureType, i8) troopTypes[ARMY_GROUP_SLOT_COUNT];
     i16 troopCounts[ARMY_GROUP_SLOT_COUNT];
     u8 hasCaptain;

@@ -19,10 +19,11 @@ typedef unsigned long u32l;
 typedef __int64 i64;
 typedef unsigned __int64 u64;
 
-// Boolean-int aliases for retail's integer boolean fields. VC6 has a real
-// `bool` with real `true`/`false` keywords, and the distinction is byte-visible:
-// an int-valued `c ? true : false` materialises a 32-bit temp (`xor reg,reg`
-// before the `setcc`), a bool-valued one materialises a byte.
+// Boolean-int aliases for retail's integer Boolean storage, results and
+// parameters. VC6 has a real `bool` with real `true`/`false` keywords, and the
+// distinction is byte-visible: an int-valued `c ? true : false` materialises a
+// 32-bit temp (`xor reg,reg` before the `setcc`), a bool-valued one
+// materialises a byte.
 typedef i32 b32;
 typedef i8 b8;
 // Boolean storage whose proven retail C++ type is plain char. Unlike b8, this

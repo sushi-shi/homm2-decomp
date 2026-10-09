@@ -105,7 +105,7 @@ public:
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
     void DeleteItem(i32 index);
-    void DrawLBStuff(i32 doUpdate);
+    void DrawLBStuff(b32 doUpdate);
     MessageDispatchResult ProcessMouseMessage(struct tag_message& message);
 };
 #pragma pack(pop)

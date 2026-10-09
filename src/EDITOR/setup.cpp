@@ -27,7 +27,7 @@ b32 SetupNewMap(void) {
     heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpenew.bin");
     if (window == NULL)
         MemError();
-    gpWindowManager->DoDialog(window, SetupNewMapHandler, 0);
+    gpWindowManager->DoDialog(window, SetupNewMapHandler, false);
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {
@@ -50,7 +50,7 @@ b32 SetupMapSize(void) {
     heroWindow* window = new heroWindow(SETUP_WINDOW_X, SETUP_WINDOW_Y, "stpesize.bin");
     if (window == NULL)
         MemError();
-    gpWindowManager->DoDialog(window, SetupMapSizeHandler, 0);
+    gpWindowManager->DoDialog(window, SetupMapSizeHandler, false);
     delete window;
 
     switch (gpWindowManager->m_dialogResult) {

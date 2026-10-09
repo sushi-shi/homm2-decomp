@@ -96,7 +96,7 @@ void advManager::DrawCursor(void) {
     i32 drawY;
     i32 drawFrame;
 
-    if (bShowIt == 0 || bSpecialHideCursor)
+    if (bShowIt == false || bSpecialHideCursor)
         return;
     if (gbDrawSavedCursor) {
         m_cursorDirection = S1cursorDirection;
@@ -279,7 +279,7 @@ void advManager::DrawCursorShadow(void) {
     i32 shadowPic;
     i32 drawY;
 
-    if (bShowIt == 0 || bSpecialHideCursor)
+    if (bShowIt == false || bSpecialHideCursor)
         return;
     if (gbDrawSavedCursor) {
         m_cursorDirection = S1cursorDirection;
@@ -399,8 +399,8 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         glTimers[1] = KBTickCount() + delayTime;
         if (gConfig.walkSpeeds[gbThisNetHumanPlayer[giCurPlayer]]
             != CONFIG_WALK_SPEED_INSTANT) {
-            if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
-                UpdateScreen(0, 0);
+            if (ComboDraw(m_mapOriginX, m_mapOriginY, false))
+                UpdateScreen(false, false);
             if (bShowIt)
                 DelayTil(&glTimers[1]);
         }
@@ -414,8 +414,8 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
     StopCursor(1);
     if (bShowIt)
         DelayTil(&glTimers[1]);
-    if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
-        UpdateScreen(0, 0);
+    if (ComboDraw(m_mapOriginX, m_mapOriginY, false))
+        UpdateScreen(false, false);
 }
 #if H2_RETAIL_COMPILER
 #undef increment
@@ -435,9 +435,9 @@ b32 advManager::GetMoveShowIt(
                 movingHero->m_y + dy,
                 giCurWatchPlayerBit
             )))
-        return 1;
+        return true;
     else
-        return 0;
+        return false;
 }
 
 #if H2_RETAIL_COMPILER
@@ -460,9 +460,9 @@ mapCell* advManager::MoveHero(
     i32* eventX,
     i32* eventY,
     i32* outOfMobility,
-    i32 processEvent,
+    b32 processEvent,
     i32* adjacentMonster,
-    i32 forceMove
+    b32 forceMove
 ) {
     mapCell* destinationCell;
     i32 halfSteps;
@@ -517,7 +517,7 @@ mapCell* advManager::MoveHero(
         movingHero->m_remainingMobility - terrainCost,
         IDX(movingHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         destinationCell->m_isRoad,
-        1
+        true
     );
 
     if (!forceMove && movingHero->m_remainingMobility < terrainCost) {
@@ -536,7 +536,7 @@ mapCell* advManager::MoveHero(
         static_cast<u8>(stopAfterMove),
         static_cast<u8>(direction)
     );
-    MobilizeCurrHero(0);
+    MobilizeCurrHero(false);
     *eventX = movingHero->m_x + directionX;
     *eventY = movingHero->m_y + directionY;
     if (m_cursorDirection != direction)
@@ -559,8 +559,8 @@ mapCell* advManager::MoveHero(
         boat->x = static_cast<i8>(movingHero->m_x);
         boat->y = static_cast<i8>(movingHero->m_y);
         StopCursor(1);
-        CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
-        UpdateScreen(0, 0);
+        CompleteDraw(m_mapOriginX, m_mapOriginY, false, true);
+        UpdateScreen(false, false);
         m_cursorActive = false;
     }
 
@@ -579,7 +579,7 @@ mapCell* advManager::MoveHero(
                     ADVENTURE_HERO_FIZZLE_SIZE,
                     ADVENTURE_HERO_FIZZLE_SIZE
                 );
-                CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
+                CompleteDraw(m_mapOriginX, m_mapOriginY, false, true);
                 gpWindowManager->FizzleForward(
                     ADVENTURE_HERO_FIZZLE_LEFT,
                     ADVENTURE_HERO_FIZZLE_TOP,
@@ -607,8 +607,8 @@ mapCell* advManager::MoveHero(
                 if (gpGame->GetTown(destinationCell->m_objectMetadata)->m_owner != giCurPlayer
                     && gpGame->GetTown(destinationCell->m_objectMetadata)->HasGarrison()) {
                     StopCursor(1);
-                    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
-                    UpdateScreen(0, 0);
+                    CompleteDraw(m_mapOriginX, m_mapOriginY, false, true);
+                    UpdateScreen(false, false);
                     movingHero->m_remainingMobility -= terrainCost;
                     if (movingHero->m_remainingMobility < nextTerrainCost) {
                         movingHero->m_remainingMobility = 0;
@@ -623,8 +623,8 @@ mapCell* advManager::MoveHero(
                 if (StopOnTrigger(destinationCell)) {
                 stoppingEvent:
                     StopCursor(1);
-                    CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
-                    UpdateScreen(0, 0);
+                    CompleteDraw(m_mapOriginX, m_mapOriginY, false, true);
+                    UpdateScreen(false, false);
                     movingHero->m_remainingMobility -= terrainCost;
                     if (movingHero->m_remainingMobility < nextTerrainCost) {
                         movingHero->m_remainingMobility = 0;
@@ -637,7 +637,7 @@ mapCell* advManager::MoveHero(
         }
     }
 
-    if (!ValidMove(direction, 0))
+    if (!ValidMove(direction, false))
         goto movementDone;
 
     if (movingHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
@@ -671,8 +671,8 @@ mapCell* advManager::MoveHero(
         MoveOrigin(directionX, directionY);
         movingHero->m_x += directionX;
         movingHero->m_y += directionY;
-        if (ComboDraw(0))
-            UpdateScreen(0, 0);
+        if (ComboDraw(false))
+            UpdateScreen(false, false);
         EveryOther = !EveryOther;
     } else {
         if (directionX == 1 && directionY == -1) {
@@ -711,9 +711,9 @@ mapCell* advManager::MoveHero(
                 m_scrollOffsetX += directionX * pixelsPerStep;
                 m_scrollOffsetY += directionY * pixelsPerStep;
             }
-            if (ComboDraw(0)) {
+            if (ComboDraw(false)) {
                 giLimitUpdMinX = -1;
-                UpdateScreen(0, 0);
+                UpdateScreen(false, false);
             }
             if (bShowIt)
                 DelayTilMilli(tick + stepDelay);
@@ -733,13 +733,13 @@ mapCell* advManager::MoveHero(
     if (mapEvent && !processEvent)
         stopAfterMove = 1;
     StopCursor(stopAfterMove);
-    if (processEvent && stopAfterMove && ComboDraw(0))
-        UpdateScreen(0, 0);
+    if (processEvent && stopAfterMove && ComboDraw(false))
+        UpdateScreen(false, false);
 
     SetEnvironmentOrigin(
         m_mapOriginX + CURSOR_MAP_DRAW_OFFSET,
         m_mapOriginY + CURSOR_MAP_DRAW_OFFSET,
-        0
+        false
     );
     step = GetCell(m_mapOriginX + CURSOR_MAP_DRAW_OFFSET, m_mapOriginY + CURSOR_MAP_DRAW_OFFSET)
                  ->m_terrainImageIndex;
@@ -785,7 +785,7 @@ mapCell* advManager::MoveHero(
     goto movementDone;
 
 movementDone:
-    UpdateRadar(1, 1);
+    UpdateRadar(1, true);
     gbHeroMoving = false;
     if (!forceMove) {
         if (oldHeroX != movingHero->m_x || oldHeroY != movingHero->m_y) {
@@ -919,8 +919,8 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
             -1
         )) {
         StopCursor(1);
-        CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
-        UpdateScreen(0, 0);
+        CompleteDraw(m_mapOriginX, m_mapOriginY, false, true);
+        UpdateScreen(false, false);
         monsterCell = GetCell(monsterX, monsterY);
         heroCell = GetCell(currentHero->m_x, currentHero->m_y);
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -931,7 +931,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
                 &removeMonster,
                 currentHero->m_x,
                 currentHero->m_y,
-                1,
+                true,
                 monsterX,
                 monsterY
             );
@@ -955,7 +955,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
 #endif
 
 VA(0x0043531b, 0x116)
-i32 advManager::ValidMoveWithEvent(
+b32 advManager::ValidMoveWithEvent(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
 ) {
@@ -971,20 +971,20 @@ i32 advManager::ValidMoveWithEvent(
     newY = movingHero->m_y + dirY;
     if (newX < 0 || newX > MAP_WIDTH - 1 || newY < 0
         || newY > MAP_HEIGHT - 1)
-        return 0;
+        return false;
 
     destinationCell = m_mapData->GetCell(newX, newY);
     switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
             if (movingHero->IsEmbarked()) {
                 if (gpGame->GetHero(destinationCell->m_objectMetadata)->IsEmbarked())
-                    return 1;
+                    return true;
                 else
-                    return 0;
+                    return false;
             }
-            return 1;
+            return true;
         default:
-            return ValidMove(direction, 1);
+            return ValidMove(direction, true);
     }
 }
 
@@ -999,7 +999,7 @@ i32 advManager::ValidMoveWithEvent(
 #define belowCurrentCell southNeighborCell_i
 #endif
 VA(0x00435431, 0x457)
-i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventMode) {
+b32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, b32 eventMode) {
     mapCell* destinationCell;
     i32 destinationMapY;
     i32 southDirection;
@@ -1026,30 +1026,30 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
 
     if (destinationMapX < -CURSOR_MAP_DRAW_OFFSET
         || destinationMapX > MAP_WIDTH - CURSOR_MAP_DRAW_OFFSET - 1)
-        return 0;
+        return false;
     if (destinationMapY < -CURSOR_MAP_DRAW_OFFSET
         || destinationMapY > MAP_HEIGHT - CURSOR_MAP_DRAW_OFFSET - 1)
-        return 0;
+        return false;
 
     destinationCell = m_mapData->GetCell(destinationCellX, destinationCellY);
     currentCell = m_mapData->GetCell(centerX, centerY);
     if (destinationCell->m_flags & IDX(MAP_CELL_OCCUPIED))
-        return 0;
+        return false;
 
     if (CELL_TERRAIN(destinationCell) == TERRAIN_WATER) {
         if (m_cursorType != HERO_TYPE_BOAT
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_BOAT))
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_SHIPWRECK)))
-            return 0;
+            return false;
         if (CELL_TERRAIN(currentCell) == TERRAIN_WATER && directionX != 0 && directionY != 0) {
             if (CELL_TERRAIN(m_mapData->GetCell(centerX + directionX, centerY)) != TERRAIN_WATER
                 || CELL_TERRAIN(m_mapData->GetCell(centerX, centerY + directionY))
                        != TERRAIN_WATER)
-                return 0;
+                return false;
         }
     } else if (m_cursorType == HERO_TYPE_BOAT
                && destinationCell->m_triggerType != MAP_OBJECT_COAST) {
-        return 0;
+        return false;
     }
 
     northDirection = (1 << IDX(direction)) & MAP_DIRECTIONS_NORTHWARD;
@@ -1057,11 +1057,11 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     if (northDirection) {
         if (CELL_HAS_NON_SHADOW_OBJECT(currentCell)
             && currentCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL)))
-            return 0;
+            return false;
         if (destinationCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             belowDestinationCell = m_mapData->GetCell(destinationCellX, destinationCellY + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(belowDestinationCell))
-                return 0;
+                return false;
         }
     }
     if (southDirection) {
@@ -1069,16 +1069,16 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
             && destinationCell->m_triggerType != (MAP_ACTION_TRIGGER(MAP_OBJECT_WHIRLPOOL))
             && (!eventMode || !(destinationCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 || !StopOnTrigger(destinationCell)))
-            return 0;
+            return false;
         if (currentCell->m_overlayIndex != MAPCELL_SPRITE_NONE) {
             belowCurrentCell =
                 m_mapData->GetCell(m_mapOriginX + m_cursorMapX, m_mapOriginY + m_cursorMapY + 1);
             if (CELL_HAS_NON_SHADOW_OBJECT(belowCurrentCell)
                 && !(belowCurrentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG))
-                return 0;
+                return false;
         }
     }
-    return 1;
+    return true;
 }
 #if H2_RETAIL_COMPILER
 #undef currentCell
@@ -1178,16 +1178,16 @@ void advManager::ProcessMapChange(SMapChange change) {
                 LogStr(gText);
                 break;
             }
-            gpAdvManager->SetHeroContext(change.id, 0);
+            gpAdvManager->SetHeroContext(change.id, false);
             eventCell = MoveHero(
                 change.movement.direction,
                 change.movement.stopAfterMove,
                 &eventX,
                 &eventY,
                 &outOfMobility,
-                1,
+                true,
                 &adjacentMonster,
-                1
+                true
             );
             if (eventCell != NULL) {
                 switch (eventCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
@@ -1206,36 +1206,36 @@ void advManager::ProcessMapChange(SMapChange change) {
         case MAP_CHANGE_TELEPORT_HERO:
             LogInt("MC Teleport Hero", change.x, change.y);
             mapHero = gpGame->GetHero(change.id);
-            TeleportTo(mapHero, change.x, change.y, 0, 1);
+            TeleportTo(mapHero, change.x, change.y, false, true);
             break;
 
         case MAP_CHANGE_CLAIM_MINE:
             LogInt("MC ClaimMine", LOG_UNUSED_VALUE);
             gpGame->ClaimMine(change.id, change.player);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_CLAIM_TOWN:
             LogInt("MC ClaimTown", LOG_UNUSED_VALUE);
-            gpGame->ClaimTown(change.id, change.player, 1);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            gpGame->ClaimTown(change.id, change.player, true);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_BUILD_BOAT:
             LogInt("MC BuildBoat", LOG_UNUSED_VALUE);
-            gpGame->CreateBoat(change.x, change.y, 1);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            gpGame->CreateBoat(change.x, change.y, true);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_ERASE_OBJECT:
             LogInt("MC Erase Object", change.x, change.y);
             eventCell = GetCell(change.x, change.y);
             EraseObj(eventCell, change.x, change.y);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_DEAD_HERO:
@@ -1243,9 +1243,9 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero = gpGame->GetHero(change.id);
             if (mapHero->m_x != change.x || mapHero->m_y != change.y)
                 break;
-            mapHero->Deallocate(1);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            mapHero->Deallocate(true);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_RECRUIT_HERO:
@@ -1263,9 +1263,9 @@ void advManager::ProcessMapChange(SMapChange change) {
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType =
                 MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION);
             gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata = change.id;
-            gpAdvManager->SetHeroContext(change.id, 0);
-            CompleteDraw(0);
-            UpdateScreen(0, 0);
+            gpAdvManager->SetHeroContext(change.id, false);
+            CompleteDraw(false);
+            UpdateScreen(false, false);
             break;
 
         case MAP_CHANGE_DEAD_PLAYER:
@@ -1327,13 +1327,13 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
             }
         }
 
-        UnwindMapChangeQueue(1, 1);
+        UnwindMapChangeQueue(1, true);
         goto retryInsert;
 
     duplicateChange:
         ++slot;
     }
-    UnwindMapChangeQueue(0, 1);
+    UnwindMapChangeQueue(0, true);
 }
 
 #if H2_RETAIL_COMPILER
@@ -1383,7 +1383,7 @@ void advManager::PurgeMapChangeQueue(void) {
 #define queueIndex pos1
 #endif
 VA(0x0043646b, 0x1b5)
-void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
+void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, b32 processChanges) {
     i32 queueCount;
     i32 unwoundChanges;
     i32 queueIndex;

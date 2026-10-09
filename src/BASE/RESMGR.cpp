@@ -234,7 +234,7 @@ class MIDIWrap* resourceManager::GetMIDIWrap(H2_CONST char* name) {
 
 VA(0x004b8670, 0x75)
 void resourceManager::Dispose(class resource* resourceToDispose) {
-    if (m_expunging != 0)
+    if (m_expunging != false)
         return;
     if (resourceToDispose != NULL) {
         resourceToDispose->m_refCount--;
@@ -326,7 +326,7 @@ void resourceManager::RemoveResource(class resource* resourceToRemove) {
 VA(0x004b8900, 0xaf)
 void resourceManager::Close(void) {
     i32 aggregateIndex;
-    if (m_active != 1)
+    if (m_active != true)
         return;
     Expunge();
     m_resourceListHead = NULL;
@@ -499,7 +499,7 @@ i32l resourceManager::ReadLong(void) {
 VA(0x004b8ea0, 0xa0)
 u32l resourceManager::MakeId(H2_CONST char* name, i32 translate) {
     strcpy(m_lastFileName, name);
-    if (gbUseEvilInterface != 0 && translate != 0) {
+    if (gbUseEvilInterface != false && translate != 0) {
         for (i32 translatedIndex = 0; translatedIndex < KB_INTERFACE_TYPE_COUNT;
              translatedIndex++) {
             if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)

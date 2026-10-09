@@ -468,7 +468,7 @@ DATA(0x00530c10) searchArray SVSearchArray;
 #define index idx
 #endif
 VA(0x0047e1ef, 0x187)
-void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
+void ResetHeroRVs(b32 nearbyOnly, i32 x, i32 y) {
     i32 index;
     i32 node;
 
@@ -476,7 +476,7 @@ void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
         return;
     for (node = 0; node < MAP_WIDTH; node++) {
         for (index = 0; index < MAP_HEIGHT; index++) {
-            if (nearbyOnly != 0) {
+            if (nearbyOnly != false) {
                 if (MANHATTAN_LENGTH(x - node, y - index) < NEARBY_RADIUS)
                     *(gaiHeroStrategicRVOfPos + node + index * MAP_WIDTH) = IDX(RV_UNSET);
             } else {
@@ -488,7 +488,7 @@ void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
     *(gaiHeroEventStratRVOfPos + x + y * MAP_WIDTH) = IDX(RV_UNSET);
     for (node = 0; node < GAME_HERO_COUNT; node++) {
         // Retail measures y against the hero's m_x, not m_y.
-        if (nearbyOnly == 0
+        if (nearbyOnly == false
             || MANHATTAN_LENGTH(x - gpGame->m_heroRecs[node].m_x, y - gpGame->m_heroRecs[node].m_x)
                    < NEARBY_RADIUS)
             gaiHeroLiveChance[node] = IDX(RV_UNSET);
@@ -502,29 +502,29 @@ void ResetHeroRVs(i32 nearbyOnly, i32 x, i32 y) {
 #define unused a1
 #endif
 VA(0x0047e376, 0x161)
-void CheckDoMain(i32 H2_UNUSED(unused), i32 doMain) {
+void CheckDoMain(b32 H2_UNUSED(unused), b32 doMain) {
     if (iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS < KBTickCount()
         || glTimers[0] < KBTickCount()) {
         Process1WindowsMessage();
         PollSound();
         if (glTimers[0] < KBTickCount()) {
-            if (doMain == 0) {
+            if (doMain == false) {
                 b32 oldShowIt = bShowIt;
                 i32 oldX = gpAdvManager->m_previousOriginX;
                 i32 oldY = gpAdvManager->m_previousOriginY;
                 gbDrawSavedCursor = true;
-                if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0)
+                if (gConfig.blackoutComputer == false && gbRemoteOn == false)
                     bShowIt = true;
                 else
                     bShowIt = false;
-                if (bShowIt == 0)
+                if (bShowIt == false)
                     bSpecialHideCursor = true;
                 if (gpAdvManager->ComboDraw(
                         gpAdvManager->m_previousOriginX,
                         gpAdvManager->m_previousOriginY,
-                        0
+                        false
                     ))
-                    gpAdvManager->UpdateScreen(0, 0);
+                    gpAdvManager->UpdateScreen(false, false);
                 else
                     gpAdvManager->UpdBottomView(false, true, true);
                 bShowIt = oldShowIt;
@@ -561,7 +561,7 @@ void philAI::DoAllHeroInteractions(void) {
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
         town* pTown = gpGame->GetTown(gpCurPlayer->m_townIds[i]);
         if (pTown->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE)
-            HeroInteractionAtTown(gpGame->GetHero(pTown->m_occupyingHeroId), pTown, 0, &iDummy);
+            HeroInteractionAtTown(gpGame->GetHero(pTown->m_occupyingHeroId), pTown, false, &iDummy);
     }
 }
 
@@ -711,7 +711,7 @@ void philAI::CheckBuyStuff(void) {
             if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
                 && gpAdvManager->GetCell(dockTown->m_boatX, dockTown->m_boatY)->m_triggerType
                        == MAP_OBJECT_NONE
-                && gpGame->CreateBoat(dockTown->m_boatX, dockTown->m_boatY, 0) != -1) {
+                && gpGame->CreateBoat(dockTown->m_boatX, dockTown->m_boatY, false) != -1) {
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
                 gpCurPlayer->m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
             }
@@ -767,7 +767,7 @@ inline hero* GetHeroSlot(i32 id) {
 #define targetY nb
 #endif
 VA(0x0047ed84, 0x2c9)
-i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
+b32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     i32 bestValue;
     i32 eventValue;
     float savedBerserkFactor;
@@ -787,7 +787,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType
          & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_STONE_LITHS)
-        return 0;
+        return false;
     for (directionIndex = MAP_DIRECTION_NORTH; IDX(directionIndex) < IDX(MAP_DIRECTION_COUNT);
          directionIndex++) {
         if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, directionIndex)) {
@@ -826,9 +826,9 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     fBerserkFactor = savedBerserkFactor;
     if (bestDirection != MAP_DIRECTION_NONE) {
         *direction = bestDirection;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef directionIndex
@@ -872,13 +872,13 @@ void philAI::CheckReload(void) {
         gpCurAIHero->m_direction,
         gpCurAIHero->m_mobility << 2,
         IDX(gpCurAIHero->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
-        0,
+        false,
         gpCurAIHero->m_remainingMobility,
         IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
-        0,
-        0
+        false,
+        false
     );
     for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
         for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
@@ -1028,7 +1028,7 @@ void philAI::CheckBerserk(void) {
 
 VA(0x0047f6be, 0x6c)
 void philAI::DimensionDoorTo(i32 x, i32 y) {
-    gpAdvManager->TeleportTo(gpCurAIHero, x, IDX(y), 0, 0);
+    gpAdvManager->TeleportTo(gpCurAIHero, x, IDX(y), false, false);
     if (gpCurAIHero->m_remainingMobility < AI_MINIMUM_TURN_MOBILITY)
         gpCurAIHero->m_remainingMobility = 0;
     else
@@ -1045,7 +1045,7 @@ void philAI::DimensionDoorTo(i32 x, i32 y) {
 #define landingIndex side
 #endif
 VA(0x0047f72a, 0x3b3)
-i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
+b32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     i32 monsterX;
     i32 bestX;
     i32 destinationX;
@@ -1061,7 +1061,7 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
     mapCell* cell;
 
     if (gpCurAIHero->IsEmbarked())
-        return 0;
+        return false;
     {
         bestX = -1;
         if (targetValue > 25)
@@ -1087,10 +1087,10 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                         posValue = RVOfPosition(
                             x,
                             y,
-                            0,
+                            false,
                             -1,
                             -1,
-                            0,
+                            false,
                             -1,
                             -1,
                             AI_EVENT_TARGET,
@@ -1144,12 +1144,12 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
                 }
                 if (bestX != -1) {
                     DimensionDoorTo(bestX, bestY);
-                    return 1;
+                    return true;
                 }
             }
         }
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef destinationX
@@ -1163,14 +1163,14 @@ i32 philAI::DoAnywhereDDoorTownGate(i32 targetValue) {
 #define length len
 #endif
 VA(0x0047fadd, 0x147)
-i32 philAI::DoDimensionDoor(hero* pHero) {
+b32 philAI::DoDimensionDoor(hero* pHero) {
     i32 i;
     i32 x, y;
     i32 length;
     i32 bestX, bestY;
     mapCell* cell;
     if (pHero->m_remainingMobility < AI_MINIMUM_SITE_MOBILITY)
-        return 0;
+        return false;
     bestX = -1;
     x = pHero->m_x;
     y = pHero->m_y;
@@ -1188,9 +1188,9 @@ i32 philAI::DoDimensionDoor(hero* pHero) {
         }
     }
     if (bestX == -1 || length <= 5)
-        return 0;
+        return false;
     DimensionDoorTo(bestX, bestY);
-    return 1;
+    return true;
 }
 #if H2_RETAIL_COMPILER
 #undef length
@@ -1281,7 +1281,7 @@ void philAI::DoAI(i32 player) {
 
     LogInt("DO AI 1", player);
     PollSound();
-    if (gbGameOver != 0)
+    if (gbGameOver != false)
         goto aiCleanup;
     if (giLimitPlayer != 0) {
         if (player != giLimitPlayer)
@@ -1324,7 +1324,7 @@ void philAI::DoAI(i32 player) {
         gpCurAIHero->m_army.GetMorale(gpCurAIHero, NULL, NULL);
         giHumanTownConquered = -1;
         iCurPlaceToVisit = 0;
-        if (gbGameOver != 0)
+        if (gbGameOver != false)
             goto aiCleanup;
 
         LogStr("\n\n\n\n");
@@ -1335,21 +1335,21 @@ void philAI::DoAI(i32 player) {
         CheckReload();
         CheckBerserk();
         giShowComputerRoute = false;
-        if (gConfig.blackoutComputer == 0 && gbRemoteOn == 0
+        if (gConfig.blackoutComputer == false && gbRemoteOn == false
             && MapExtraPosAndAdjacentsSet(
                 gpCurAIHero->m_x,
                 gpCurAIHero->m_y,
                 giCurWatchPlayerBit
             )) {
             bShowIt = true;
-            gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
+            gpAdvManager->SetHeroContext(gpCurAIHero->m_id, false);
         } else {
             bShowIt = false;
-            gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
+            gpAdvManager->SetHeroContext(gpCurAIHero->m_id, false);
         }
 
         heroDone = false;
-        ResetHeroRVs(0, 0, 0);
+        ResetHeroRVs(false, 0, 0);
         stepLimit = gpCurAIHero->IsEmbarked() ? 15 : 5;
         searchMobility = gpCurAIHero->m_mobility + 800;
         stepLimit =
@@ -1359,7 +1359,7 @@ void philAI::DoAI(i32 player) {
         );
 
         while (!heroDone && gpCurAIHero->m_remainingMobility >= AI_MINIMUM_SITE_MOBILITY) {
-            if (gbGameOver != 0) {
+            if (gbGameOver != false) {
                 goto aiCleanup;
             } else {
                 if (gpCurAIHero->m_remainingMobility == gpCurAIHero->m_mobility
@@ -1379,7 +1379,7 @@ void philAI::DoAI(i32 player) {
                 townId = gpGame->GetTownId(gpCurAIHero->m_x, gpCurAIHero->m_y);
                 if (townId != -1) {
                     townPointer = GetCastleSlot(townId);
-                    if (townPointer->m_threat != 0
+                    if (townPointer->m_threat != false
                         && (gpAdvManager
                                 ->GetCell(
                                     gpCurAIHero->m_destinationX,
@@ -1430,7 +1430,7 @@ void philAI::DoAI(i32 player) {
                 }
                 if (gpCurAIHero->m_destinationX != -1 && gpCurAIHero->m_destinationY != -1) {
                     eventCell = NULL;
-                    gpAdvManager->SetHeroContext(gpCurAIHero->m_id, 0);
+                    gpAdvManager->SetHeroContext(gpCurAIHero->m_id, false);
                     gpSearchArray->BuildPath(
                         gpCurAIHero->m_x,
                         gpCurAIHero->m_y,
@@ -1441,7 +1441,7 @@ void philAI::DoAI(i32 player) {
                     if (gpSearchArray->m_pathLength == 0) {
                         heroDone = true;
                     } else if (gpSearchArray->m_pathLength > 0) {
-                        gpAdvManager->UpdateScreen(0, 0);
+                        gpAdvManager->UpdateScreen(false, false);
                         if (targetValue > 1000 && gpCurAIHero->HasSpell(SPELL_DIMENSION_DOOR)
                             && gpCurAIHero->m_spellPoints >= AI_DIMENSION_DOOR_SPELL_POINTS
                             && DoDimensionDoor(gpCurAIHero))
@@ -1481,9 +1481,9 @@ void philAI::DoAI(i32 player) {
                                 &eventX,
                                 &eventY,
                                 &outOfMobility,
-                                1,
+                                true,
                                 &adjacentMonster,
-                                0
+                                false
                             );
                             steps++;
                             if (eventCell != NULL || outOfMobility != 0 || adjacentMonster != 0) {
@@ -1530,7 +1530,7 @@ void philAI::DoAI(i32 player) {
                             hiddenPointers--;
                         }
                         bShowIt = savedShow[0];
-                        gpAdvManager->UpdateRadar(1, 0);
+                        gpAdvManager->UpdateRadar(1, false);
                     } else {
                         heroDone = true;
                     }
@@ -1540,7 +1540,11 @@ void philAI::DoAI(i32 player) {
                             goto aiNextHero;
                         }
                         ValidateHero(gpCurAIHero);
-                        ResetHeroRVs(1, gpCurAIHero->m_destinationX, gpCurAIHero->m_destinationY);
+                        ResetHeroRVs(
+                            true,
+                            gpCurAIHero->m_destinationX,
+                            gpCurAIHero->m_destinationY
+                        );
                     }
                 } else {
                     heroDone = true;
@@ -1752,13 +1756,13 @@ firstWeekDone:
                 threatHeroPointer->m_direction,
                 threatHeroPointer->m_mobility + 100,
                 IDX(threatHeroPointer->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
-                1,
+                true,
                 threatHeroPointer->m_mobility + 100,
                 IDX(threatHeroPointer->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
                 -1,
                 -1,
-                0,
-                0
+                false,
+                false
             );
             for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
                 for (mapY = 0; mapY < MAP_WIDTH; mapY++) {
@@ -1964,7 +1968,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
         if (giCurTurn > 3 && curTown->m_turnsOwned < 3)
             continue;
         {
-            CheckDoMain(0, 0);
+            CheckDoMain(false, false);
             GetBestBuilding(curTown, choice, bhcValue);
             bhcValue = static_cast<float>(
                 bhcValue * ((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR)
@@ -1974,7 +1978,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
                 best = choice;
             }
 
-            CheckDoMain(0, 0);
+            CheckDoMain(false, false);
             GetBestCreature(curTown, choice, bhcValue);
             bhcValue = static_cast<float>(
                 bhcValue
@@ -1990,7 +1994,7 @@ void philAI::GetBestBHC(i32 H2_UNUSED(player), BHC& best) {
                 best = choice;
             }
 
-            CheckDoMain(0, 0);
+            CheckDoMain(false, false);
             if (gpCurPlayer->m_heroCount < giMaxHeroesForThisPlayer
                 && HAS(curTown->m_buildings, IDX(TOWN_BUILDING_CASTLE))) {
                 GetBestHero(curTown, choice, bhcValue);
@@ -2135,13 +2139,13 @@ i32 philAI::DetermineTargetPosition(
         gpCurAIHero->m_direction,
         dblMob,
         IDX(gpCurAIHero->m_eventFlags) & IDX(HERO_EVENT_EMBARKED),
-        1,
+        true,
         gpCurAIHero->m_remainingMobility,
         IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
-        0,
-        0
+        false,
+        false
     );
     gpSearchArray->GetNode(gpCurAIHero->m_x, gpCurAIHero->m_y).visited = 0;
 
@@ -2258,7 +2262,7 @@ i32 philAI::DetermineTargetPosition(
                                 goto candidate_scored;
                             }
                         }
-                        CheckDoMain(0, 0);
+                        CheckDoMain(false, false);
                         restMobility =
                             gpCurAIHero->m_mobility - gpSearchArray->GetNode(x, y).distance;
                         if (restMobility < 0)
@@ -2427,7 +2431,7 @@ void philAI::ProbableOutcomeOfBattle(
                 static_cast<float>(attStr * AI_BATTLE_WARRIOR_STRENGTH_FACTOR);
     } else {
         attStr = attFight;
-        if (gbHumanPlayer[enemyPlayer] != 0) {
+        if (gbHumanPlayer[enemyPlayer] != false) {
             defStrong =
                 static_cast<float>(defStrong * AI_BATTLE_HUMAN_DEFENDER_FACTOR);
         } else if (gpCurPlayer->m_aiPersonality == PLAYER_PERSONALITY_WARRIOR) {
@@ -2480,7 +2484,7 @@ void philAI::ProbableOutcomeOfBattle(
         lossWeight = static_cast<float>(
             gpCurPlayer->m_aiData.m_attentionWeights.turnCreatureAttention + AI_BATTLE_PLAYER_FACTOR_BASE
         );
-        if (gbHumanPlayer[enemyPlayer] != 0)
+        if (gbHumanPlayer[enemyPlayer] != false)
             outcomeValue = static_cast<i32>(
                 outcomeValue + expectedDefenderLossValue * gfAttackHumanBonus * lossWeight * lossWeight
             );
@@ -2533,7 +2537,7 @@ void philAI::ProbableOutcomeOfBattle(
         outcomeValue = static_cast<i32>(
             outcomeValue
             + (artsD + AI_BATTLE_DEFENDER_ARTIFACT_BASE)
-                  * (gbHumanPlayer[IDX(defenderHero->m_owner)] != 0 ? gfAttackHumanBonus
+                  * (gbHumanPlayer[IDX(defenderHero->m_owner)] != false ? gfAttackHumanBonus
                                                               : gfAttackComputerBonus)
                   * winChance
         );
@@ -3102,7 +3106,7 @@ void philAI::GetBestCreature(town* townPointer, BHC& best, float& bestValue) {
                     if (gpCurPlayer->m_aiPersonality == PLAYER_PERSONALITY_WARRIOR)
                         resourceValue =
                             static_cast<i32>(resourceValue * AI_CREATURE_WARRIOR_FACTOR);
-                    if (townPointer->m_threat != 0)
+                    if (townPointer->m_threat != false)
                         resourceValue <<= 1;
                     jitteredValue = static_cast<float>(
                         (Random(1, 10) + AI_CREATURE_RANDOM_BASE)
@@ -3481,10 +3485,10 @@ VA(0x00484642, 0x536)
 i32 philAI::RVOfPosition(
     i32 x,
     i32 y,
-    i32 hasAdjacentMonster,
+    b32 hasAdjacentMonster,
     i32 adjacentMonsterX,
     i32 adjacentMonsterY,
-    i32 beyondTurnMobility,
+    b32 beyondTurnMobility,
     i32 turnEndX,
     i32 turnEndY,
     i32 eventMode,
@@ -3527,12 +3531,13 @@ i32 philAI::RVOfPosition(
         currentStrategicValue = StrategicValueOfPosition(
             gpCurAIHero->m_x,
             gpCurAIHero->m_y,
-            0,
-            1,
+            false,
+            true,
             &currentLiveChance,
             0
         );
-        strategicDelta = StrategicValueOfPosition(x, y, 0, 1, &targetLiveChance, extraDistance);
+        strategicDelta =
+            StrategicValueOfPosition(x, y, false, true, &targetLiveChance, extraDistance);
         strategicDelta -= currentStrategicValue;
     }
     if (objectType == MAP_OBJECT_BOAT && strategicDelta < 0)
@@ -3544,7 +3549,7 @@ i32 philAI::RVOfPosition(
             ValueOfEventAtPosition(adjacentMonsterX, adjacentMonsterY, AI_EVENT_IMMEDIATE, &pathLiveChance);
     if (beyondTurnMobility) {
         turnEndValue =
-            StrategicValueOfPosition(turnEndX, turnEndY, 1, 1, &turnEndLiveChance, 0);
+            StrategicValueOfPosition(turnEndX, turnEndY, true, true, &turnEndLiveChance, 0);
         if (turnEndValue < 0)
             totalValue += turnEndValue;
     }
@@ -3684,8 +3689,8 @@ VA(0x00484b78, 0xa89)
 i32 philAI::StrategicValueOfPosition(
     i32 targetX,
     i32 targetY,
-    i32 immediate,
-    i32 checkEnemies,
+    b32 immediate,
+    b32 checkEnemies,
     i32* liveChance,
     i32 extraDistance
 ) {
@@ -3730,7 +3735,7 @@ i32 philAI::StrategicValueOfPosition(
         if (immediate)
             return 0;
         else
-            checkEnemies = 0;
+            checkEnemies = false;
     }
 
     if (bSVSearchArrayInUse) {
@@ -3758,13 +3763,13 @@ i32 philAI::StrategicValueOfPosition(
         MAP_DIRECTION_EAST,
         seedDist,
         IDX(inBoat),
-        0,
+        false,
         59999,
         IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         -1,
         -1,
-        0,
-        0
+        false,
+        false
     );
     search->GetNode(targetX, targetY).visited = 0;
 
@@ -3777,7 +3782,7 @@ i32 philAI::StrategicValueOfPosition(
                     || (checkEnemies
                         && cell->m_triggerType
                                == (MAP_ACTION_TRIGGER(MAP_OBJECT_HERO_INTERACTION)))) {
-                    CheckDoMain(0, 0);
+                    CheckDoMain(false, false);
                     eventPoints = static_cast<i32>(
                         (ValueOfEventAtPosition(xPosition, mapY, AI_EVENT_STRATEGIC, &iDummy) * 25)
                         / (search->GetNode(xPosition, mapY).distance + AI_STRATEGIC_DISTANCE_OFFSET)
@@ -3981,7 +3986,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     playerAI->m_obeliskValue = static_cast<i32>(
         playerAI->m_obeliskValue
         * (1.5
-           - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, 1))
+           - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, true))
                  / AI_OBELISK_VISITOR_COUNT_FLOAT)
     );
     playerAI->m_obeliskValue =
@@ -4296,7 +4301,7 @@ VA(0x00486369, 0x195)
 void philAI::EvaluateOneTimeCreaturePurchase(
     CreatureType creature,
     i32 availableCount,
-    i32 isFree,
+    b32 isFree,
     i32& purchaseCount,
     i32& purchaseValue,
     i32& replacementSlot
@@ -4310,7 +4315,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
     purchaseValue = 0;
     replacementSlot = CREATURE_PURCHASE_NO_SLOT;
     leastStackValue = CREATURE_PURCHASE_VALUE_LIMIT;
-    if (isFree != 0)
+    if (isFree != false)
         purchaseCount = availableCount;
     else
         purchaseCount = MaxBuyableCreatures(creature);
@@ -4321,7 +4326,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
         return;
     {
         purchaseFightValue = purchaseCount * gMonsterDatabase[IDX(creature)].fightValue;
-        if (gpCurAIHero->m_army.CanJoin(creature) == 0) {
+        if (gpCurAIHero->m_army.CanJoin(creature) == false) {
             for (armyIndex = 0; armyIndex < ARMY_GROUP_SLOT_COUNT; armyIndex++) {
                 if (gpCurAIHero->m_army.m_creatureTypes[armyIndex] == creature) {
                     replacementSlot = CREATURE_PURCHASE_NO_SLOT;
@@ -4344,7 +4349,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
             purchaseFightValue
             * gpGame->m_players[IDX(gpCurAIHero->m_owner)].m_aiData.m_fightValueResourceWeight
         );
-        if (isFree == 0) {
+        if (isFree == false) {
             GetMonsterCost(creature, costTemp);
             purchaseValue -= purchaseCount * RVConversion(costTemp);
         }
@@ -4372,7 +4377,7 @@ void philAI::EvaluateOneTimeCreaturePurchase(
 #define defenderCasualtyFraction defenderDamage
 #endif
 VA(0x004864fe, 0x645)
-i32 philAI::QuickCombat(
+b32 philAI::QuickCombat(
     armyGroup* attacker,
     hero* attackerHero,
     armyGroup* defender,
@@ -4448,7 +4453,7 @@ i32 philAI::QuickCombat(
     }
 
     diff = (roll > chanceWin ? roll - chanceWin : chanceWin - roll);
-    if (attackerWin != 0 && chanceWin > AI_QUICK_COMBAT_WIN_BONUS_THRESHOLD)
+    if (attackerWin != false && chanceWin > AI_QUICK_COMBAT_WIN_BONUS_THRESHOLD)
         diff = static_cast<float>(diff * (chanceWin + AI_QUICK_COMBAT_WIN_BONUS));
     if (diff > AI_BATTLE_FULL_CHANCE)
         diff = AI_BATTLE_FULL_CHANCE;
@@ -4468,9 +4473,9 @@ i32 philAI::QuickCombat(
         fracLost =
             static_cast<float>(fracLost - AI_QUICK_COMBAT_DAMAGE_PENALTY);
 
-    if (attackerWin != 0) {
+    if (attackerWin != false) {
         if (attackerHero != NULL) {
-            gpAdvManager->GiveExperience(attackerHero, defExp, 1);
+            gpAdvManager->GiveExperience(attackerHero, defExp, true);
             attackerHero->ApplyBattleWinTemps();
         }
         attackerHero->CheckLevel();
@@ -4487,7 +4492,7 @@ i32 philAI::QuickCombat(
         defenderCasualtyFraction = fracLost;
         attackerCasualtyFraction = AI_BATTLE_FULL_CHANCE;
         if (attackerCasualtyFraction >= AI_QUICK_COMBAT_DEFEAT_THRESHOLD && defenderHero != NULL) {
-            gpAdvManager->GiveExperience(defenderHero, defExp, 1);
+            gpAdvManager->GiveExperience(defenderHero, defExp, true);
             defenderHero->CheckLevel();
         }
     }
@@ -4503,10 +4508,10 @@ i32 philAI::QuickCombat(
     }
 
     gbRetreatWin = false;
-    if ((attackerWin == 0 || (attackerWin != 0 && defenderHero != NULL))
+    if ((attackerWin == false || (attackerWin != false && defenderHero != NULL))
         && Random(0, QUICK_COMBAT_RANDOM_LIMIT) < QUICK_COMBAT_RETREAT_CHANCE)
         gbRetreatWin = true;
-    if (gbRetreatWin == 0) {
+    if (gbRetreatWin == false) {
         if (attackerCasualtyFraction > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
             gpAdvManager->TransferArtifacts(attackerHero, defenderHero);
         else if (defenderCasualtyFraction > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
@@ -4516,7 +4521,7 @@ i32 philAI::QuickCombat(
     DamageGroup(attacker, attackerHero, defenderHero, attackerCasualtyFraction);
     DamageGroup(defender, defenderHero, attackerHero, defenderCasualtyFraction);
 
-    if (attackerWin != 0 && attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
+    if (attackerWin != false && attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         necroCount = static_cast<i32>(
             static_cast<float>(defenderCount) * AI_QUICK_COMBAT_NECROMANCY_FACTOR
             * static_cast<float>(attackerHero->GetSSLevel(HERO_SKILL_NECROMANCY))
@@ -4539,7 +4544,7 @@ i32 philAI::QuickCombat(
 
     defeated = NULL;
     winHero = NULL;
-    if (attackerWin != 0) {
+    if (attackerWin != false) {
         defeated = defenderHero;
         winHero = attackerHero;
     } else if (defenderCasualtyFraction <= AI_QUICK_COMBAT_NECROMANCY_THRESHOLD) {
@@ -4551,8 +4556,8 @@ i32 philAI::QuickCombat(
                != HERO_SKILL_LEVEL_NONE
         && winHero != NULL) {
         for (slot = 0; slot < IDX(SPELL_COUNT); slot++) {
-            if (defeated->HasSpell(SpellType(slot)) != 0
-                && winHero->HasSpell(SpellType(slot)) == 0
+            if (defeated->HasSpell(SpellType(slot)) != false
+                && winHero->HasSpell(SpellType(slot)) == false
                 && IDX(winHero->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) + 1
                        >= IDX(gsSpellInfo[slot].level)
                 && HAS(gsSpellInfo[slot].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)) {
@@ -4565,8 +4570,8 @@ i32 philAI::QuickCombat(
     attackerHero->ApplyBattleWinTemps();
     if (defenderHero != NULL)
         defenderHero->ApplyBattleWinTemps();
-    if (attackerWin != 0 && townBattle != 0)
-        gpGame->ClaimTown(townId, giCurPlayer, 0);
+    if (attackerWin != false && townBattle != 0)
+        gpGame->ClaimTown(townId, giCurPlayer, false);
     gbRetreatWin = false;
     return attackerWin;
 }
@@ -4602,7 +4607,7 @@ VA(0x00486b43, 0x38d)
 void philAI::HeroInteractionAtHero(
     hero* firstHero,
     hero* secondHero,
-    i32 evaluateOnly,
+    b32 evaluateOnly,
     i32* value
 ) {
     float transferFraction;
@@ -4622,11 +4627,11 @@ void philAI::HeroInteractionAtHero(
     hero* H2_UNUSED(savedHero);
 
     *value = 0;
-    if (evaluateOnly != 0 && firstHero->m_id != iAlphaMale
+    if (evaluateOnly != false && firstHero->m_id != iAlphaMale
         && secondHero->m_id != iAlphaMale)
         return;
     {
-        if (evaluateOnly == 0) {
+        if (evaluateOnly == false) {
             firstHero->m_lastHeroInteractionTurn = static_cast<i16>(giCurTurn);
             firstHero->m_lastInteractionHeroId = secondHero->m_id;
             secondHero->m_lastHeroInteractionTurn = static_cast<i16>(giCurTurn);
@@ -4666,7 +4671,7 @@ void philAI::HeroInteractionAtHero(
             recipientHero = firstHero;
             dominantShare = static_cast<float>(1.0 - dominantShare);
         }
-        if (evaluateOnly != 0 && recipientHero->m_id == iAlphaMale
+        if (evaluateOnly != false && recipientHero->m_id == iAlphaMale
             && dominantShare < AI_HERO_INTERACTION_ALPHA_SHARE) {
             // Retail's swap loses recipientHero: both end up as the old dominant hero.
             savedHero = recipientHero;
@@ -4689,7 +4694,7 @@ void philAI::HeroInteractionAtHero(
                 * (static_cast<float>(dominantFightValue + recipientFightValue)
                    * transferFraction)
             );
-            if (evaluateOnly != 0) {
+            if (evaluateOnly != false) {
                 for (statIndex = 0; statIndex < HERO_ARTIFACT_SLOT_COUNT; statIndex++) {
                     artifactType = recipientHero->m_artifacts[statIndex];
                     if (artifactType != ARTIFACT_NONE && artifactType != ARTIFACT_MAGIC_BOOK)
@@ -4701,8 +4706,8 @@ void philAI::HeroInteractionAtHero(
                     RedistributeTroops(
                         &dominantHero->m_army,
                         &recipientHero->m_army,
-                        1,
-                        1,
+                        true,
+                        true,
                         dominantFightValue,
                         recipientFightValue,
                         static_cast<i32>(
@@ -4714,8 +4719,8 @@ void philAI::HeroInteractionAtHero(
                     RedistributeTroops(
                         &recipientHero->m_army,
                         &dominantHero->m_army,
-                        1,
-                        1,
+                        true,
+                        true,
                         recipientFightValue,
                         dominantFightValue,
                         static_cast<i32>(
@@ -4758,7 +4763,7 @@ void philAI::HeroInteractionAtHero(
 #define destinationArmy secondArmy
 #endif
 VA(0x00486ed0, 0x7b7)
-void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 evaluateOnly, i32* value) {
+void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, b32 evaluateOnly, i32* value) {
     i32 townFV;
     i32 moveCount;
     armyGroup* sourceArmy;
@@ -4782,7 +4787,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 eva
     float curveTerm;
 
     *value = 0;
-    if (evaluateOnly != 0) {
+    if (evaluateOnly != false) {
         if (HAS(townPointer->m_buildings, AI_BUILDING_SHIPYARD_MASK)
             && giBestShipyardId != townPointer->m_id) {
             stackSlot = MANHATTAN_LENGTH(townPointer->m_x - heroPointer->m_x, townPointer->m_y - heroPointer->m_y);
@@ -4833,7 +4838,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 eva
     }
 
     if (HAS(townPointer->m_buildings, AI_BUILDING_MAGE_GUILD_MASK)
-        && (evaluateOnly != 0 || heroPointer->HasArtifact(ARTIFACT_MAGIC_BOOK))) {
+        && (evaluateOnly != false || heroPointer->HasArtifact(ARTIFACT_MAGIC_BOOK))) {
         *value += ManaRefreshValue(heroPointer, 1);
         for (castLvl = 1;
              castLvl
@@ -4895,7 +4900,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 eva
     townBetter = false;
     if (wantShare < townShare)
         townBetter = true;
-    if (evaluateOnly != 0) {
+    if (evaluateOnly != false) {
         if (battlePower < townFV)
             transferFactor = AI_WEAKER_ARMY_TRANSFER_FACTOR;
         else
@@ -4936,7 +4941,7 @@ void philAI::HeroInteractionAtTown(hero* heroPointer, town* townPointer, i32 eva
         if (!hasRoom)
             transferRating = 0;
         *value += transferRating;
-        if (townPointer->m_threat != 0 && townPointer->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
+        if (townPointer->m_threat != false && townPointer->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
             *value += AI_UNGUARDED_TOWN_VALUE;
     } else {
         townPointer->GiveSpells(NULL);
@@ -4985,8 +4990,8 @@ VA(0x00487687, 0x3d1)
 void philAI::RedistributeTroops(
     armyGroup* sourceArmy,
     armyGroup* destinationArmy,
-    i32 preserveOne,
-    i32 preferFast,
+    b32 preserveOne,
+    b32 preferFast,
     i32 sourceStrength,
     i32 H2_UNUSED(destinationStrength),
     i32 transferBudget
@@ -5004,7 +5009,7 @@ void philAI::RedistributeTroops(
     again = true;
     gbTroopReload = false;
     while (again) {
-        if (preserveOne != 0) {
+        if (preserveOne != false) {
             sourceCreatureCount = 0;
             for (fromIndex = 0; fromIndex < ARMY_GROUP_SLOT_COUNT; fromIndex++) {
                 if (sourceArmy->m_creatureTypes[fromIndex] != CREATURE_NONE)
@@ -5031,7 +5036,7 @@ void philAI::RedistributeTroops(
 
         if (bestSlot == AI_TROOP_EMPTY_SLOT) {
             bestVal = AI_TROOP_REDISTRIBUTION_WORST_VALUE;
-            if (preferFast != 0)
+            if (preferFast != false)
                 bestSpeed = AI_TROOP_REDISTRIBUTION_MIN_SPEED;
             else
                 bestSpeed = AI_TROOP_REDISTRIBUTION_MAX_SPEED;
@@ -5041,10 +5046,10 @@ void philAI::RedistributeTroops(
                     stackValue =
                         sourceArmy->m_creatureCounts[fromIndex]
                         * gMonsterDatabase[IDX(sourceArmy->m_creatureTypes[fromIndex])].fightValue;
-                    if ((preferFast != 0
+                    if ((preferFast != false
                          && gMonsterDatabase[IDX(sourceArmy->m_creatureTypes[fromIndex])].speed
                                 > bestSpeed)
-                        || (preferFast == 0
+                        || (preferFast == false
                             && gMonsterDatabase[IDX(sourceArmy->m_creatureTypes[fromIndex])].speed
                                    < bestSpeed)) {
                         bestSpeed =
@@ -5087,7 +5092,7 @@ void philAI::RedistributeTroops(
                     }
                 }
 
-                if (preserveOne != 0 && howMany >= sourceCreatureCount) {
+                if (preserveOne != false && howMany >= sourceCreatureCount) {
                     howMany = sourceCreatureCount - 1;
                     again = false;
                 }
@@ -5125,7 +5130,7 @@ void philAI::RedistributeTroops(
 #endif
 
 VA(0x00487a58, 0x23)
-i32 philAI::ChooseGoldOrExperience(i32, i32) {
+b32 philAI::ChooseGoldOrExperience(i32, i32) {
     return gpCurPlayer->m_resources[IDX(RES_GOLD)] > 4000;
 }
 
@@ -5198,7 +5203,7 @@ void philAI::ChooseEvaluateBattle(
 #define expectedDefenderLossValue remainB
 #endif
 VA(0x00487b1f, 0xbd)
-i32 philAI::ChooseToFightForArtifact(
+b32 philAI::ChooseToFightForArtifact(
     ArtifactType artifact,
     H2_ENUM_PARAM(CreatureType, i32) monster,
     i32 H2_UNUSED(quantity)
@@ -5235,9 +5240,9 @@ i32 philAI::ChooseToFightForArtifact(
     );
     score = static_cast<i32>(result + artValue * chance);
     if (score > 0)
-        return 1;
+        return true;
     else
-        return 0;
+        return false;
 }
 #if H2_RETAIL_COMPILER
 #undef index
@@ -5364,11 +5369,11 @@ void philAI::BuildHero(town* townPointer, i32 availableHeroIndex) {
     townPointer->GiveSpells(NULL);
 
     gpCurPlayer->m_availableHeroIds[availableHeroIndex] =
-        static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, FACTION_ANY, 1));
+        static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, FACTION_ANY, true));
     gpGame->m_heroOwners[gpCurPlayer->m_availableHeroIds[availableHeroIndex]] =
         HERO_AVAILABILITY_FOR_HIRE;
     bHeroBuiltThisTurn = true;
-    HeroInteractionAtTown(newHero, townPointer, 0, &iDummy);
+    HeroInteractionAtTown(newHero, townPointer, false, &iDummy);
     ShowStatus();
 }
 #if H2_RETAIL_COMPILER
@@ -5414,7 +5419,7 @@ void philAI::BuildCreature(town* townPointer, i32 dwelling, i32 purchaseCount) {
 
     weakestValue = AI_CREATURE_SELECTION_WORST_VALUE;
     lowSlot = AI_TROOP_EMPTY_SLOT;
-    if (hasRoom == 0) {
+    if (hasRoom == false) {
         for (slotIndex = 0; slotIndex < ARMY_GROUP_SLOT_COUNT; slotIndex++) {
             stackValue = static_cast<float>(
                 gMonsterDatabase[IDX(townPointer->m_army.m_creatureTypes[slotIndex])].fightValue
@@ -5462,32 +5467,32 @@ void philAI::BuildCreature(town* townPointer, i32 dwelling, i32 purchaseCount) {
 #define purchase bhc
 #endif
 VA(0x00488284, 0x117)
-i32 philAI::CanBuyBHC(BHC& purchase) {
+b32 philAI::CanBuyBHC(BHC& purchase) {
     i32 j;
     i32 index;
     i32 cost[IDX(RES_COUNT)];
     switch (purchase.type) {
         case PURCHASE_BUILDING:
             if (CanBuy(purchase.pTown, purchase.building))
-                return 1;
+                return true;
             break;
         case PURCHASE_HERO:
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= gHeroGoldCost
                 && purchase.pTown->m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE
-                && bHeroBuiltThisTurn == 0)
-                return 1;
+                && bHeroBuiltThisTurn == false)
+                return true;
             break;
         case PURCHASE_CREATURE:
             j = IDX(gDwellingType[IDX(purchase.pTown->m_type)][purchase.what]);
             if (purchase.num > purchase.pTown->m_dwellingAvailable[purchase.what])
-                return 0;
+                return false;
             GetMonsterCost(CreatureType(j), cost);
             for (index = 0; index < IDX(RES_COUNT); index++)
                 if (gpCurPlayer->m_resources[index] < cost[index] * purchase.num)
-                    return 0;
-            return 1;
+                    return false;
+            return true;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef purchase
@@ -5501,7 +5506,7 @@ i32 philAI::CanBuyBHC(BHC& purchase) {
 #define stackIndex kn
 #endif
 VA(0x0048839b, 0x156)
-i32 philAI::CombatMonsterEvent(
+b32 philAI::CombatMonsterEvent(
     hero* heroPointer,
     H2_ENUM_PARAM(CreatureType, i32) monType,
     i32* pCount,
@@ -5510,7 +5515,7 @@ i32 philAI::CombatMonsterEvent(
     i32 stackIndex;
     float defenderCasualtyFraction;
     float casualtyRatio;
-    i32 battleWon;
+    b32 battleWon;
     i32 total;
     CLEAR_ARMY_GROUP(*gpMonGroup);
     if (*pCount / ARMY_GROUP_SLOT_COUNT > 0) {
@@ -5529,9 +5534,9 @@ i32 philAI::CombatMonsterEvent(
     for (stackIndex = 0; stackIndex < ARMY_GROUP_SLOT_COUNT; stackIndex++)
         total += gpMonGroup->m_creatureCounts[stackIndex];
     *pCount = total;
-    if (battleWon != 0)
-        return 1;
-    return 0;
+    if (battleWon != false)
+        return true;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef battleWon
@@ -5559,8 +5564,8 @@ i32 philAI::CombatMonsterEvent(
 #define unusedValue unusedValue10
 #endif
 VA(0x004884f1, 0x623)
-i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
-    i32 combatResult;
+i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, b32 evaluateOnly) {
+    b32 combatResult;
     i32 monsterCount;
     float attackerCasualtyFraction;
     i32 H2_UNUSED(unusedValue);
@@ -5718,12 +5723,12 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
         worthFighting,
         battleValue
     );
-    if (evaluateOnly != 0)
+    if (evaluateOnly != false)
         return battleValue;
     if (worthFighting != 0
         && (combatResult =
                 QuickCombat(&heroPointer->m_army, heroPointer, gpMonGroup, NULL, 0, 0, attackerCasualtyFraction, defenderCasualtyFraction))
-               != 0) {
+               != false) {
         switch (eventType) {
             case MAP_OBJECT_SHIPWRECK:
                 switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5803,16 +5808,16 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, i32 evaluateOnly) {
 #define casualtyFraction dmg
 #endif
 VA(0x00488b14, 0x55)
-i32 philAI::DamageGroup(armyGroup* armyGroupPointer, hero* loser, hero*, float casualtyFraction) {
+b32 philAI::DamageGroup(armyGroup* armyGroupPointer, hero* loser, hero*, float casualtyFraction) {
     if (casualtyFraction < AI_QUICK_COMBAT_DEFEAT_THRESHOLD) {
         armyGroupPointer->DamageGroup(casualtyFraction);
-        return 0;
+        return false;
     } else {
         if (loser != NULL)
             gpAdvManager->HeroLoses(loser);
         else
             armyGroupPointer->DamageGroup(casualtyFraction);
-        return 1;
+        return true;
     }
 }
 #if H2_RETAIL_COMPILER
@@ -5828,7 +5833,7 @@ void philAI::IncrementHourGlass(void) {
     i32 heroCount = gpCurPlayer->m_heroCount;
     if (heroCount < HOURGLASS_PROSPECTIVE_HERO_LIMIT
         && gpCurPlayer->m_resources[IDX(RES_GOLD)] >= AI_HERO_PURCHASE_GOLD_FLOOR
-        && bHeroBuiltThisTurn == 0)
+        && bHeroBuiltThisTurn == false)
         heroCount++;
     iCurHourGlassPhase++;
     if (heroCount == 1) {
@@ -5856,7 +5861,7 @@ void philAI::IncrementHourGlass(void) {
 VA(0x00488c35, 0x1f6)
 void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
     town* pTown;
-    i32 H2_UNUSED(quickResult);
+    b32 H2_UNUSED(quickResult);
     float attackerCasualtyFraction;
     float defenderCasualtyFraction;
     hero* defenderHero;
@@ -5869,7 +5874,7 @@ void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
 
     if (pTown->m_owner != giCurPlayer) {
         if (pTown->HasGarrison()) {
-            if (pTown->m_owner < 0 || gbHumanPlayer[IDX(pTown->m_owner)] == 0) {
+            if (pTown->m_owner < 0 || gbHumanPlayer[IDX(pTown->m_owner)] == false) {
                 quickResult = QuickCombat(
                     &heroPointer->m_army,
                     heroPointer,
@@ -5899,12 +5904,12 @@ void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
                     TOWN_EVENT_USE_GARRISON
                 );
                 if (combatResult == COMBAT_RESULT_ATTACKER) {
-                    gpGame->ClaimTown(pTown->m_id, giCurPlayer, 0);
+                    gpGame->ClaimTown(pTown->m_id, giCurPlayer, false);
                     giHumanTownConquered = pTown->m_id;
                 }
             }
         } else {
-            gpGame->ClaimTown(pTown->m_id, giCurPlayer, 0);
+            gpGame->ClaimTown(pTown->m_id, giCurPlayer, false);
         }
     }
 
@@ -5912,10 +5917,10 @@ void philAI::TownEvent(mapCell* cell, hero* heroPointer, i32 x, i32 y) {
         pTown->m_occupyingHeroId = gpCurPlayer->CurrentHero();
         heroPointer->m_locationType = (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE));
         heroPointer->m_locationMetadata = pTown->m_id;
-        HeroInteractionAtTown(heroPointer, pTown, 0, &iDummy);
+        HeroInteractionAtTown(heroPointer, pTown, false, &iDummy);
     }
 
-    gpAdvManager->MobilizeCurrHero(0);
+    gpAdvManager->MobilizeCurrHero(false);
     pTown->GiveSpells(NULL);
 }
 #if H2_RETAIL_COMPILER
@@ -6465,7 +6470,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance)
             case MAP_OBJECT_GRAVEYARD:
             case MAP_OBJECT_SHIPWRECK:
             case MAP_OBJECT_DERELICT_SHIP:
-                eventRV = FightEvent(gpCurAIHero, theCell, 1);
+                eventRV = FightEvent(gpCurAIHero, theCell, true);
                 break;
             case MAP_OBJECT_PYRAMID:
                 if (!theCell->m_objectMetadata) {
@@ -6566,8 +6571,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance)
                             exitRV = StrategicValueOfPosition(
                                 gateX,
                                 gateY,
-                                0,
-                                0,
+                                false,
+                                false,
                                 &exitLiveChance,
                                 AI_TRAVEL_GATE_EXIT_DEPTH
                             );
@@ -6583,8 +6588,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 eventMode, i32* liveChance)
                 positionValue = StrategicValueOfPosition(
                     gpCurAIHero->m_x,
                     gpCurAIHero->m_y,
-                    0,
-                    0,
+                    false,
+                    false,
                     &exitLiveChance,
                     AI_TRAVEL_GATE_CURRENT_DEPTH
                 );
@@ -6903,7 +6908,7 @@ i32 philAI::EvaluateRecruitSite(mapCell* cell) {
             creatureType = IDX(CREATURE_WATER_ELEMENTAL);
             break;
     }
-    EvaluateOneTimeCreaturePurchase(CreatureType(creatureType), availableCount, 0, purchaseCount, purchaseValue, replacementSlot);
+    EvaluateOneTimeCreaturePurchase(CreatureType(creatureType), availableCount, false, purchaseCount, purchaseValue, replacementSlot);
     gbReduceByReload = false;
     return purchaseValue;
 }
@@ -6953,7 +6958,7 @@ void CloseAIMapVars(void) {
 }
 
 VA(0x0048b080, 0x1f0)
-i32 OnMySide(i32 player) {
+b32 OnMySide(i32 player) {
     if (player != SIDE_NO_PLAYER
         && (player == giCurPlayer
             || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
@@ -6981,9 +6986,9 @@ i32 OnMySide(i32 player) {
                        == SIDE_CAMPAIGN_SCENARIO_NINE
                 && gpGame->m_players[player].m_color != SIDE_FIRST_COLOR
                 && gpGame->m_players[player].m_color != SIDE_FOURTH_COLOR))) {
-        return 1;
+        return true;
     } else
-        return 0;
+        return false;
 }
 
 #if H2_RETAIL_COMPILER
@@ -7275,7 +7280,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
     EvaluateOneTimeCreaturePurchase(
         monsterType,
         monsterCount,
-        1,
+        true,
         purchaseCount,
         joinValue,
         replacementSlot
@@ -7363,7 +7368,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
 
         if (giCurTurn - gpCurAIHero->m_lastHeroInteractionTurn >= EVENT_INTERACTION_AGE
             || gpGame->GetHero(heroId)->m_id != gpCurAIHero->m_lastInteractionHeroId) {
-            HeroInteractionAtHero(gpCurAIHero, gpGame->GetHero(heroId), 1, &result);
+            HeroInteractionAtHero(gpCurAIHero, gpGame->GetHero(heroId), true, &result);
         }
         gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
     } else if (OnMySide(gpGame->m_heroOwners[heroId])) {
@@ -7498,7 +7503,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
             eventVal = 0;
             if (giCurTurn - gpCurAIHero->m_lastTownInteractionTurn >= EVENT_INTERACTION_AGE
                 || pTownRec->m_id != gpCurAIHero->m_lastInteractionTownId) {
-                HeroInteractionAtTown(gpCurAIHero, pTownRec, 1, &eventVal);
+                HeroInteractionAtTown(gpCurAIHero, pTownRec, true, &eventVal);
                 eventVal = static_cast<i32>(eventVal * gfHeroInteractionBonus[gpCurAIHero->m_id]);
             }
         }

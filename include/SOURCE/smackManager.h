@@ -128,12 +128,12 @@ SIZE(SSmackOptions, 45);
 SIZE(SmackMilesDigitalDriver, 0x50);
 SIZE(SmackSum, 0x54);
 
-void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette);
+void DoAdvance(Smack* smack, b32 drawFrame, b32 advanceFrame, b32 updatePalette, b32 skipPalette);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
-i32 PlaySmacker(i32 smackNumber);
+b32 PlaySmacker(i32 smackNumber);
 ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y);
-i8 PointInRect(i32 x, i32 y, struct tag_rect* rect);
+b8 PointInRect(i32 x, i32 y, struct tag_rect* rect);
 void PrintSummaryInfo(SmackSum* summary);
 
 extern b32 bSmackSound;

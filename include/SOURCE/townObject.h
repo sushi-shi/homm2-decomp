@@ -19,7 +19,7 @@ public:
     border* m_border;
     townObject(FactionType townType, H2_ENUM_PARAM(BuildingSlotType, i32) buildingId, char* iconBaseName);
     ~townObject();
-    void Draw(i32 advanceAnimation);
+    void Draw(b32 advanceAnimation);
 };
 #pragma pack(pop)
 SIZE(townObject, 0x18);

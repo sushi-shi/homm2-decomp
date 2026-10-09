@@ -52,7 +52,7 @@ void eventsManager::EditSpellScroll(i32* spell) {
     message.payload.widget.command = WIDGET_COMMAND_SET_SELECTION;
     message.payload.widget.data.value = *spell;
     gEditDialog->BroadcastMessage(message);
-    gpWindowManager->DoDialog(gEditDialog, EditSpellScrollHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditSpellScrollHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         *spell = gSpellScrollChoice;

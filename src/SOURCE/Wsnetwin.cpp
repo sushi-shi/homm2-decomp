@@ -36,7 +36,7 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 player;
 
-    if (CURRENT_GRAPHICS_CONFIG.fullScreen != 0) {
+    if (CURRENT_GRAPHICS_CONFIG.fullScreen != false) {
         sprintf(
             gText,
             /* Об инициировании TCP/IP соединения. Герои II переключатся в оконный режим, чтобы вы
@@ -116,7 +116,7 @@ i16 wsnet_init(void) {
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
         }
-        if (gbFunctionComplete == 0)
+        if (gbFunctionComplete == false)
             ShutDown(NULL);
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         giWaitType = DIALOG_WAIT_WINSOCK_GUESTS;
@@ -175,8 +175,8 @@ i16 wsnet_init(void) {
                 cWSTextBuffer,
                 IP_ADDRESS_ENTRY_LIMIT,
                 NULL,
-                0,
-                1
+                false,
+                true
             );
         }
         giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
@@ -194,7 +194,7 @@ i16 wsnet_init(void) {
              localization::Tr("network.tcp.host.searching")
         );
         NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_CANCEL);
-        if (gbFunctionComplete == 0)
+        if (gbFunctionComplete == false)
             ShutDown(NULL);
     }
     return 0;
@@ -360,7 +360,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             break;
         case NETWORK_PACKET_HERE_I_AM:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-                if (gbRemoteGameOpen != 0) {
+                if (gbRemoteGameOpen != false) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
                         if (giNetPosToDCOPos[player] == sender
                             || &gsNetPlayerInfo[player]
@@ -434,21 +434,21 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 }
 
 VA(0x004b2997, 0x1c)
-i32 wsWaitForFirstGuest(void) {
+b32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
     if (giNumHumanPlayers > 1)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x004b29b3, 0xaa)
-i32 wsWaitForExtraGuests(void) {
+b32 wsWaitForExtraGuests(void) {
     tag_message message;
 
     wsProcessMessages();
     if (giNumHumanPlayers != iWSLastMsgNumHumanPlayers) {
         if (giTCPHostStatus != -1 && giNumHumanPlayers >= giTCPNumPlayers)
-            return 1;
+            return true;
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             cWSTextBuffer,
@@ -464,19 +464,19 @@ i32 wsWaitForExtraGuests(void) {
         pNormalDialogWindow->BroadcastMessage(message);
         pNormalDialogWindow->DrawWindow();
     }
-    return 0;
+    return false;
 }
 
 VA(0x004b2a5d, 0xfd)
-i32 wsWaitForHost(void) {
+b32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
         case 0:
             if (iWSNextTickCount > KBTickCount())
-                return 0;
+                return false;
             wsProcessMessages();
-            if (bHostFound != 0) {
+            if (bHostFound != false) {
                 iWSWaitForHostStatus++;
-                return 0;
+                return false;
             }
             wsSendMessage(
                 0,
@@ -499,11 +499,11 @@ i32 wsWaitForHost(void) {
             break;
         case 1:
             wsProcessMessages();
-            if (bStartUpInfoReceived != 0)
-                return 1;
+            if (bStartUpInfoReceived != false)
+                return true;
             break;
     }
-    return 0;
+    return false;
 }
 
 DATA(0x005347b0) b32 bHostFound = false;

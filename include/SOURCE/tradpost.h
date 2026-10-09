@@ -26,8 +26,8 @@ H2_ENUM_BEGIN(TradingPostConstant)
     TRADING_POST_RIGHT_SELECT_FIRST = 0x6e
 H2_ENUM_END(TradingPostConstant)
 
-void DoTradingPost(i32 isMarketplace, float efficiency);
-void UpdateTradingPost(i32 draw);
+void DoTradingPost(b32 isMarketplace, float efficiency);
+void UpdateTradingPost(b32 draw);
 void ComputeTradeRatios(i32 sourceResource, i32 destinationResource, i32* ratio, i32* leftDenominated, i32* maxTrade);
 void DoTradeKnob(struct tag_message message);
 void SetupNewTrade(void);
@@ -42,7 +42,7 @@ extern b32 bTradeMade;
 extern float fTradingPostEfficiency;
 extern i32 tpX;
 extern i32 tpY;
-extern i32 bIsMarketPlace;
+extern b32 bIsMarketPlace;
 extern i32 bLeftDenominated;
 extern class heroWindow* tpWindow;
 extern i32 rightResource;

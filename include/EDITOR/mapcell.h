@@ -106,8 +106,8 @@ struct mapCellExtra {
 #ifdef HOMM2_EDITOR
     // The scenario editor links every placed object part to the placement
     // it belongs to, so erasing one part erases the whole object.
-    i32 objectLink;
-    i32 overlayLink;
+    b32 objectLink;
+    b32 overlayLink;
 #endif
 };
 #pragma pack(pop)
@@ -153,8 +153,8 @@ public:
     u16 m_extraIndex;
 #ifdef HOMM2_EDITOR
     // The placement each part belongs to (see mapCellExtra).
-    i32 m_objectLink;
-    i32 m_overlayLink;
+    b32 m_objectLink;
+    b32 m_overlayLink;
 #endif
 
     inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {

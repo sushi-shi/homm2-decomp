@@ -207,15 +207,15 @@ public:
     void ShiftQualChange(void);
     void ResetStrips(void);
     void Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building);
-    void DrawTown(i32 updateScreen, i32 drawFlags);
-    i32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32) building, i32 cannotBuy, i32 quickView);
+    void DrawTown(b32 updateScreen, b32 drawFlags);
+    b32 BuyBuild(H2_ENUM_PARAM(BuildingSlotType, i32) building, b32 cannotBuy, b32 quickView);
     void BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building);
     void SetupMage(class heroWindow* window);
-    i32 RecruitHero(i32 availableHeroIndex, i32 cannotRecruit);
+    b32 RecruitHero(i32 availableHeroIndex, b32 cannotRecruit);
     void DoTavern(void);
     void SetupWell(class heroWindow* window);
     void SetupThievesGuild(class heroWindow* window, i32 informationLevel);
-    void SetupCastle(class heroWindow* window, i32 updateOnly);
+    void SetupCastle(class heroWindow* window, b32 updateOnly);
 };
 #pragma pack(pop)
 SIZE(townManager, 0x17a);

@@ -64,7 +64,7 @@ DATA(0x00515c4c) static H2_CONST char* gNbListenName =
 #define controlBlock ncb
 #endif
 VA(0x00473da0, 0x94)
-i32 is_netbios_avail(void) {
+b32 is_netbios_avail(void) {
     NetbiosControlBlock controlBlock;
     memset(&controlBlock, 0, sizeof(controlBlock));
     for (gNetbiosLana = 0; gNetbiosLana < NETBIOS_MAX_LANA; gNetbiosLana++) {
@@ -76,9 +76,9 @@ i32 is_netbios_avail(void) {
     }
     if (gNetbiosLana < NETBIOS_MAX_LANA) {
         gNetbiosAvail = 1;
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef controlBlock
@@ -102,7 +102,7 @@ extern "C" u16 __cdecl nb_init(u16 H2_UNUSED(maxNames), u16 localNameSession) {
     memset(&gNbSessBuf, -1, sizeof(gNbSessBuf));
     memset(gNbRcvData, -1, sizeof(gNbRcvData));
     memset(&gNbEvents, 0, NETBIOS_THREAD_EVENTS_SIZE);
-    if (is_netbios_avail() == 0)
+    if (is_netbios_avail() == false)
         return 1;
     if (gNetbiosAvail != 0) {
         gNbMaxSess = localNameSession;

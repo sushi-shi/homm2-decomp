@@ -273,7 +273,7 @@ i32 soundManager::Open(i32) {
 
 VA(0x004b6000, 0x28)
 void soundManager::Close(void) {
-    if (m_active != 1)
+    if (m_active != true)
         return;
     ShutdownSoundBackends();
     m_active = false;
@@ -285,20 +285,20 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
 }
 
 VA(0x004b6040, 0xcb)
-void soundManager::StopAllSamples(i32 stopMusic) {
+void soundManager::StopAllSamples(b32 stopMusic) {
     if (!gbSoundEnabled)
         return;
 
     if (IsAudiereBackend(this)) {
         m_musicFadeSteps = 0;
-        if (stopMusic != 0)
+        if (stopMusic != false)
             StopAudiereMusic(m_musicTrack);
         StopAllAudiereSamples();
         return;
     }
     if (IsMilesBackend(this)) {
         m_musicFadeSteps = 0;
-        if (stopMusic != 0)
+        if (stopMusic != false)
             MIDIStop(m_musicTrack);
         StopAllMilesSamples();
     }
@@ -471,7 +471,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
         m_musicTrack = track;
         return;
     }
-    if (MusicPlaying() == 0) {
+    if (MusicPlaying() == false) {
         PlayAmbientMusic(track);
         return;
     }
@@ -514,7 +514,7 @@ void soundManager::ServiceSound(void) {
 }
 
 VA(0x004b6a40, 0x49)
-i32 soundManager::MusicPlaying(void) {
+b32 soundManager::MusicPlaying(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return AudiereMusicPlaying();
     if (m_backend == SOUND_BACKEND_MILES) {

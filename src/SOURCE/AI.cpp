@@ -46,20 +46,20 @@ H2_ENUM_BEGIN(ArmyFrontOffset)
 H2_ENUM_END(ArmyFrontOffset)
 
 VA(0x00415a60, 0x82b)
-i32 combatManager::AICheckRetreat(void) {
+b32 combatManager::AICheckRetreat(void) {
     if (m_combatTowns[IDX(m_currentSide)] != NULL)
-        return 0;
+        return false;
     if (m_heroes[IDX(m_currentSide)] == NULL)
-        return 0;
+        return false;
     if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
-        return 0;
+        return false;
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
         && gpGame->m_mapHeader.victoryConditionValue == m_heroes[IDX(m_currentSide)]->m_id)
-        return 0;
+        return false;
     if (gpGame->m_players[IDX(m_heroes[IDX(m_currentSide)]->m_owner)].m_townCount == 0
         && gpGame->m_players[IDX(m_heroes[IDX(m_currentSide)]->m_owner)].m_heroCount
                == COMBAT_AI_LAST_HERO_COUNT)
-        return 0;
+        return false;
 
     float chance;
     hero heroRec;
@@ -137,7 +137,7 @@ i32 combatManager::AICheckRetreat(void) {
     artifactValue = artifactTotals[IDX(m_currentSide)];
     if (artifactTotals[IDX(m_currentSide)] < COMBAT_AI_MIN_ARTIFACT_VALUE
         && m_heroes[IDX(m_currentSide)]->m_experience < COMBAT_AI_MIN_HERO_EXPERIENCE)
-        return 0;
+        return false;
 
     chance = COMBAT_AI_BASE_RETREAT_CHANCE;
     if (artifactValue > COMBAT_AI_HIGH_ARTIFACT_VALUE)
@@ -176,8 +176,8 @@ i32 combatManager::AICheckRetreat(void) {
                        force[IDX(COMBAT_ATTACKER_SIDE)] + force[IDX(COMBAT_DEFENDER_SIDE)]
                    );
     if (retreatRatio < chance)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 #define theyOutshoot stronger         // frame-slot spelling
@@ -254,7 +254,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     myShootPower = GetStrength(m_currentSide, shooterMask[IDX(m_currentSide)]);
     enemyShootPower = GetStrength(sideEnemy, shooterMask[IDX(sideEnemy)]);
 
-    if (m_inCastleCombat != 0) {
+    if (m_inCastleCombat != false) {
         if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                 == HERO_SKILL_LEVEL_NONE
             && !m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->HasArtifact(ARTIFACT_GOLDEN_BOW)) {
@@ -371,7 +371,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             }
             break;
         case COMBAT_AI_ATTACK_FLY:
-            if (ourOutshoot != 0 && theyOutshoot == 0) {
+            if (ourOutshoot != false && theyOutshoot == false) {
                 if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                     goto finish;
                 if (AttemptAttack(thisArmy, sideEnemy, shooterMask[IDX(sideEnemy)]))
@@ -402,7 +402,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
         case COMBAT_AI_ATTACK_WALK:
             if (COMBAT_AI_ATTACK_NONE)
                 goto finish;
-            if (ourOutshoot != 0 && theyOutshoot == 0) {
+            if (ourOutshoot != false && theyOutshoot == false) {
                 if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                     goto finish;
                 if (AttemptAttack(thisArmy, sideEnemy, shooterMask[IDX(sideEnemy)]))
@@ -453,7 +453,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             rowLimit[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
             rowLimit[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
             rowIndex = thisArmy->m_hex / COMBAT_GRID_ROW_LENGTH;
-            if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0
+            if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != false
                 && thisArmy->m_hex < rowLimit[rowIndex]) {
                 targetHex = rowLimit[rowIndex];
                 targetCell = &gpCombatManager->m_hexCells[targetHex];
@@ -840,7 +840,7 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
 #endif
 
 VA(0x00417f42, 0x178)
-i32 combatManager::AttemptAttack(
+b32 combatManager::AttemptAttack(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
     i32 targetArmy;
@@ -852,7 +852,7 @@ i32 combatManager::AttemptAttack(
         else
             targetArmy = GetBestArmy(side, mask);
         if (targetArmy == COMBAT_AI_NO_ARMY)
-            return 0;
+            return false;
 
         currentArmy->m_targetSide = side;
         currentArmy->m_targetIndex = targetArmy;
@@ -860,7 +860,7 @@ i32 combatManager::AttemptAttack(
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
             SET_NEXT_COMBAT_MOVE(targetHex);
-            return 1;
+            return true;
         }
         if (HAS(m_armies[IDX(side)][targetArmy].m_monster.attributes,
                 MONSTER_FLAGS_WIDE)
@@ -872,12 +872,12 @@ i32 combatManager::AttemptAttack(
             currentArmy->m_moveTargetHex = targetHex;
             if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
                 SET_NEXT_COMBAT_MOVE(targetHex);
-                return 1;
+                return true;
             }
         }
         mask &= ~(1 << targetArmy);
     }
-    return 0;
+    return false;
 }
 
 #if H2_RETAIL_COMPILER
@@ -885,7 +885,7 @@ i32 combatManager::AttemptAttack(
 #define destinationHex destHex
 #endif
 VA(0x004180ba, 0x144)
-i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
+b32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask =
         ~currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
@@ -898,7 +898,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     i32 destinationHex;
 
     if (availableMask == 0)
-        return 0;
+        return false;
 
     oneBit = COMBAT_AI_MASK_FIRST_BIT;
     enemyMask = 0;
@@ -923,9 +923,9 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         enemyArmy = GetBestArmy(OppositeCombatSide(m_currentSide), enemyMask);
     if (enemyArmy != COMBAT_AI_NO_ARMY) {
         SET_NEXT_COMBAT_MOVE(m_armies[IDX(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex);
-        return 1;
+        return true;
     } else {
-        return 0;
+        return false;
     }
 }
 #if H2_RETAIL_COMPILER
@@ -934,7 +934,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
 #endif
 
 VA(0x004181fe, 0x207)
-i32 combatManager::WalkTowardArmyFront(
+b32 combatManager::WalkTowardArmyFront(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
     i32 armyIndex;
@@ -949,7 +949,7 @@ i32 combatManager::WalkTowardArmyFront(
     currentArmy->m_targetIndex = COMBAT_AI_NO_ARMY;
     armyIndex = GetClosestArmy(currentArmy, side, mask);
     if (armyIndex == COMBAT_AI_NO_ARMY)
-        return 0;
+        return false;
 
     frontDelta = SINGLE_HEX_FRONT_OFFSET;
     frontHex = m_armies[IDX(side)][armyIndex].m_hex;
@@ -968,7 +968,7 @@ i32 combatManager::WalkTowardArmyFront(
         frontHex,
         currentArmy,
         ARMY_PATH_EXACT_TARGET_HEX,
-        0
+        false
     );
     currentArmy->m_monster.speed = oldSpeed;
     if (gpSearchArray->m_pathLength > 0) {
@@ -988,7 +988,7 @@ i32 combatManager::WalkTowardArmyFront(
             if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
                 left = 0;
         }
-        return 1;
+        return true;
     }
     return WalkTowardArmy(currentArmy, side, mask);
 }
@@ -997,7 +997,7 @@ i32 combatManager::WalkTowardArmyFront(
 #define targetPointer targetPtr
 #endif
 VA(0x00418405, 0x204)
-i32 combatManager::WalkTowardArmy(
+b32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
     i32 targetStack;
@@ -1013,7 +1013,7 @@ i32 combatManager::WalkTowardArmy(
     targetStack = GetClosestArmy(currentArmy, side, mask);
 
     if (targetStack == COMBAT_AI_NO_ARMY)
-        return 0;
+        return false;
 
     targetPointer = &m_armies[IDX(side)][targetStack];
     targetSquare = targetPointer->m_hex;
@@ -1025,7 +1025,7 @@ i32 combatManager::WalkTowardArmy(
         );
     if (atkMask != COMBAT_ALL_DIRECTIONS_BLOCKED) {
         giNextAction = ACTION_SKIP_TURN;
-        return 1;
+        return true;
     }
 
     prevSpeed = currentArmy->m_monster.speed;
@@ -1035,7 +1035,7 @@ i32 combatManager::WalkTowardArmy(
         targetSquare,
         currentArmy,
         ARMY_PATH_ASSIGNED_TARGET_HEX,
-        0
+        false
     );
     if (routeGot == 0
         && HAS(targetPointer->m_monster.attributes, MONSTER_FLAGS_WIDE) != 0) {
@@ -1053,7 +1053,7 @@ i32 combatManager::WalkTowardArmy(
                 targetSquare,
                 currentArmy,
                 ARMY_PATH_ASSIGNED_TARGET_HEX,
-                0
+                false
             );
     }
     currentArmy->m_monster.speed = prevSpeed;
@@ -1074,9 +1074,9 @@ i32 combatManager::WalkTowardArmy(
             if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
                 movement = 0;
         }
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef targetPointer

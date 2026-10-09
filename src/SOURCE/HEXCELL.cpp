@@ -42,7 +42,7 @@ void hexcell::DrawLowerDeadOccupants(void) {
                 &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             occupantFacing = occupant->m_facing;
             if (m_deadOccupantFootprintHalves[i] != occupantFacing)
-                occupant->DrawToBuffer(m_x, m_y, 0);
+                occupant->DrawToBuffer(m_x, m_y, false);
         }
     }
 }
@@ -65,7 +65,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
                 &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             occupantFacing = occupant->m_facing;
             if (m_deadOccupantFootprintHalves[i] != occupantFacing)
-                occupant->DrawToBuffer(m_x, m_y, 0);
+                occupant->DrawToBuffer(m_x, m_y, false);
         }
     }
 }
@@ -77,7 +77,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
 #define quantityOverlayOnly frame
 #endif
 VA(0x00464e4b, 0x10d)
-void hexcell::DrawOccupant(ArmyDrawState drawState, i32 quantityOverlayOnly) {
+void hexcell::DrawOccupant(ArmyDrawState drawState, b32 quantityOverlayOnly) {
     if (m_occupantSide != COMBAT_SIDE_NONE) {
         if (drawState != ARMY_DRAW_ALL) {
             if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_drawState

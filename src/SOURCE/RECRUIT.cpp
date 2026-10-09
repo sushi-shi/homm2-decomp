@@ -181,7 +181,7 @@ VA(0x0048c78d, 0xc8)
 void recruitUnit::Close(void) {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
-    if (m_noRoom != 0) {
+    if (m_noRoom != false) {
         NormalDialog(
             localization::Tr("recruit.garrison_full")
             ,
@@ -202,9 +202,9 @@ void recruitUnit::Close(void) {
         IDX(CLOSE_CONTROL),
         IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
     );
-    if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != 0 && m_refreshTown != 0) {
+    if (m_sourceType == RECRUIT_SOURCE_TOWN && m_recruited != false && m_refreshTown != false) {
         gpTownManager->ResetStrips();
-        gpTownManager->m_bankBox->Update(1);
+        gpTownManager->m_bankBox->Update(true);
     }
     m_active = false;
     KBChangeMenu(hmnuRecruitSave);
@@ -251,7 +251,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
             case WIDGET_NOTIFY_RIGHT_CLICK:
                 switch (message.payload.widget.id) {
                     case QUANTITY_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
                         m_window->BroadcastMessage(message);
@@ -268,7 +268,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             m_creatureType,
                             0,
                             NULL,
-                            1,
+                            true,
                             ARMY_FACING_RIGHT,
                             quickView,
                             NULL,
@@ -286,7 +286,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
             case WIDGET_NOTIFY_DESELECT:
                 switch (message.payload.widget.id) {
                     case INCREASE_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         ++m_quantity;
                         if (m_quantity > m_maximum)
@@ -296,7 +296,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case DECREASE_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         --m_quantity;
                         if (m_quantity < 0)
@@ -306,7 +306,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case MAXIMUM_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         m_quantity = m_maximum;
                         Update();
@@ -314,19 +314,19 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             ->DrawWindow(WINDOW_DRAW_UPDATE_SCREEN, 0, WINDOW_DRAW_ID_LIMIT);
                         break;
                     case CANCEL_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         m_quantity = 0;
                         done = true;
                         break;
                     case CONFIRM_CONTROL:
-                        if (quickView != 0)
+                        if (quickView != false)
                             break;
                         if (m_quantity == 0) {
                             done = true;
                             goto checkClose;
                         }
-                        if (m_army->CanJoin(m_creatureType) != 0) {
+                        if (m_army->CanJoin(m_creatureType) != false) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
                             done = true;
@@ -349,7 +349,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
         }
 
     checkClose:
-        if (done == 1) {
+        if (done == true) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
@@ -364,7 +364,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     i32 resourceIndex;
 
     m_sourceType = RECRUIT_SOURCE_EVENT;
-    m_refreshTown = 0;
+    m_refreshTown = false;
     m_army = army;
     m_creatureType = creatureType;
     m_available = available;
@@ -384,7 +384,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
 }
 
 VA(0x0048cdcb, 0xdf)
-recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
+recruitUnit::recruitUnit(class town* townData, i32 dwelling, b32 refreshTown) {
     i32 unitCosts[IDX(RES_COUNT)];
     i32 resourceIndex;
 

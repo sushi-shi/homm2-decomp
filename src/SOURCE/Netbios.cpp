@@ -23,7 +23,7 @@ H2_ENUM_BEGIN(NetbiosSetupConstant)
 H2_ENUM_END(NetbiosSetupConstant)
 
 VA(0x00473830, 0x11c)
-i8 InitNetHost(void) {
+b8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 H2_UNUSED(reserved);
     i32 needName;
@@ -47,7 +47,7 @@ i8 InitNetHost(void) {
             if (needName)
                 iInitNetHostStatus++;
             else
-                return 1;
+                return true;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
             sprintf(
@@ -66,16 +66,16 @@ i8 InitNetHost(void) {
         case SETUP_WAIT_FOR_LOCAL_NAME:
             needName = static_cast<u8>(nb_stat(HOST_SESSION));
             if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_NAME_REGISTERED))
-                return 1;
+                return true;
             else if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_ERROR)) {
             }
             break;
     }
-    return 0;
+    return false;
 }
 
 VA(0x0047394c, 0x19c)
-i8 InitNetGuest(void) {
+b8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
     b32 unregistered;
 
@@ -136,13 +136,13 @@ i8 InitNetGuest(void) {
                 sprintf(gText, localization::Tr("network.initialization_failed"));
                 ShutDown(gText);
             }
-            return 1;
+            return true;
     }
-    return 0;
+    return false;
 }
 
 VA(0x00473ae8, 0x3b)
-i8 WaitForHost(void) {
+b8 WaitForHost(void) {
     i32 status;
 
     switch (iWaitForHostStatus) {
@@ -152,14 +152,14 @@ i8 WaitForHost(void) {
                 NETBIOS_SESSION_ACTIVE
             );
             if (status != 0)
-                return 1;
+                return true;
             break;
     }
-    return 0;
+    return false;
 }
 
 VA(0x00473b23, 0xb3)
-i8 WaitForGuest(void) {
+b8 WaitForGuest(void) {
     i32 status;
 
     switch (iWaitForGuestStatus) {
@@ -169,7 +169,7 @@ i8 WaitForGuest(void) {
             );
             if (static_cast<NetbiosResult>(status) == NETBIOS_RESULT_SUCCESS)
                 iWaitForGuestStatus++;
-            return 0;
+            return false;
         case WAIT_POLL:
             status = !HAS(
                 static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION))),
@@ -187,10 +187,10 @@ i8 WaitForGuest(void) {
                     CONNECTED_SESSION,
                     DETACH_SOURCE_SESSION
                 );
-                return 1;
+                return true;
             }
     }
-    return 0;
+    return false;
 }
 
 VA(0x00473bd6, 0x18c)
@@ -203,14 +203,14 @@ i32 nbnet_init(void) {
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
             sprintf(gText, localization::Tr("network.netbios.initializing"));
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
             sprintf(gText, localization::Tr("network.waiting_guest.buka"));
             LogStr("GUON2");
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
             LogStr("GUON3");
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             LogStr("GUON4");
             break;
@@ -218,12 +218,12 @@ i32 nbnet_init(void) {
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
             sprintf(gText, localization::Tr("network.netbios.initializing"));
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
             sprintf(gText, localization::Tr("network.netbios.waiting_host"));
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             break;
     }

@@ -63,7 +63,7 @@ void ConvertSmackerPalette(u8* paletteData) {
 }
 
 VA(0x0049457f, 0x1ea)
-void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette) {
+void DoAdvance(Smack* smack, b32 drawFrame, b32 advanceFrame, b32 updatePalette, b32 skipPalette) {
     if (drawFrame && smack->NewPalette && !skipPalette) {
         memcpy(gPalette->m_data, smack->Palette, PALETTE_DATA_SIZE);
         ConvertSmackerPalette(reinterpret_cast<u8*>(gPalette->m_data));
@@ -355,7 +355,13 @@ void SmackManagerMain(void) {
             }
             if ((!primaryStarted || smk1->Frames > 1)
                 && (bSmackNum != CONGRATS || smk1->FrameNum != smk1->Frames - 1)) {
-                DoAdvance(smk1, 1, 1, primaryStarted || !SmackOptions[bSmackNum].fadeIn, 0);
+                DoAdvance(
+                    smk1,
+                    true,
+                    true,
+                    primaryStarted || !SmackOptions[bSmackNum].fadeIn,
+                    false
+                );
             }
             if (smk1->FrameNum > 0 || smk1->Frames <= 1) {
                 if (!primaryStarted) {
@@ -394,15 +400,15 @@ void SmackManagerMain(void) {
                 } else {
                     drawLastFrame = false;
                 }
-                DoAdvance(smk2, drawLastFrame, advanceLastFrame, 0, 1);
+                DoAdvance(smk2, drawLastFrame, advanceLastFrame, false, true);
                 gbLastFramePlayed = true;
                 while (SmackWait(smk2))
                     Process1WindowsMessage();
             } else {
                 if (bSmackNum == EXPANSION_CAMPAIGN)
-                    DoAdvance(smk2, 1, 1, 0, 1);
+                    DoAdvance(smk2, true, true, false, true);
                 else
-                    DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, 1, 0, 1);
+                    DoAdvance(smk2, SmackOptions[bSmackNum].drawCompanion, true, false, true);
             }
             if (smk2 && smk2->FrameNum > 0)
                 companionStarted = true;
@@ -645,13 +651,13 @@ void ShutDownSmacker(void) {
 }
 
 VA(0x0049592a, 0x13b)
-i32 PlaySmacker(i32 smackNumber) {
+b32 PlaySmacker(i32 smackNumber) {
     i32 oldUpdateFlags;
     i8 savedPalette[PALETTE_DATA_SIZE];
 
     xLastChoice = EXPANSION_CAMPAIGN_NONE;
     if (gbNoCDRom)
-        return 0;
+        return false;
 
     gbInSmackMgr = true;
     gbPlayedThrough = false;
@@ -697,16 +703,16 @@ ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
 }
 
 VA(0x00495ab4, 0x64)
-i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
+b8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     if (x < rect->x)
-        return 0;
+        return false;
     if (x >= rect->x + rect->width)
-        return 0;
+        return false;
     if (y < rect->y)
-        return 0;
+        return false;
     if (y >= rect->y + rect->height)
-        return 0;
-    return 1;
+        return false;
+    return true;
 }
 
 VA(0x00495b18, 0x243)

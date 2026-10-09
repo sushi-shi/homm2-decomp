@@ -271,11 +271,11 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
 
 VA(0x004cf2f0, 0x15)
 void listBoxWidget::Draw(void) {
-    DrawLBStuff(0);
+    DrawLBStuff(false);
 }
 
 VA(0x004cf310, 0x54e)
-void listBoxWidget::DrawLBStuff(i32 doUpdate) {
+void listBoxWidget::DrawLBStuff(b32 doUpdate) {
     i32 row;
     i32 x;
     i32 y;
@@ -392,7 +392,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 gbSendMouseMoveMessages = true;
                 if (m_selectedIndex != itemIndex) {
                     m_selectedIndex = itemIndex;
-                    DrawLBStuff(1);
+                    DrawLBStuff(true);
                 }
             } else {
                 if (y < m_scrollUpY + m_scrollUpHeight) {
@@ -416,7 +416,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                     if (m_topIndex > m_scrollRange)
                         m_topIndex = m_scrollRange;
                 }
-                DrawLBStuff(1);
+                DrawLBStuff(true);
             }
             break;
 
@@ -426,7 +426,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 m_scrollThumbDragging = 0;
                 m_scrollDownPressed = 0;
                 m_scrollUpPressed = 0;
-                DrawLBStuff(1);
+                DrawLBStuff(true);
             } else {
                 if (m_itemSelectionTracking) {
                     m_itemSelectionTracking = 0;
@@ -457,7 +457,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                     itemIndex = m_visibleItemCount - 1;
                 if (m_topIndex + itemIndex != m_selectedIndex) {
                     m_selectedIndex = m_topIndex + itemIndex;
-                    DrawLBStuff(1);
+                    DrawLBStuff(true);
                 }
             } else if (m_scrollThumbDragging) {
                 itemIndex = (y - m_scrollTrackY - LIST_BOX_SCROLL_DRAG_Y_ADJUSTMENT
@@ -469,7 +469,7 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                     itemIndex = m_scrollRange;
                 if (m_topIndex != itemIndex) {
                     m_topIndex = itemIndex;
-                    DrawLBStuff(1);
+                    DrawLBStuff(true);
                 }
             } else {
                 return MESSAGE_DISPATCH_CONTINUE;

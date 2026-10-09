@@ -16,10 +16,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosWaitState, i8)
     WAIT_POLL  = 1
 H2_ENUM_CLASS_END_SPLIT(NetbiosWaitState, i8)
 
-i8 InitNetHost(void);
-i8 InitNetGuest(void);
-i8 WaitForHost(void);
-i8 WaitForGuest(void);
+b8 InitNetHost(void);
+b8 InitNetGuest(void);
+b8 WaitForHost(void);
+b8 WaitForGuest(void);
 i32 nbnet_init(void);
 
 extern H2_ENUM_STORAGE_STEPPED(NetbiosSetupState, i8) iInitNetHostStatus;

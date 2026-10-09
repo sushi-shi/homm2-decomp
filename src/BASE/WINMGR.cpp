@@ -71,16 +71,16 @@ DATA(0x0053496c) i32 iDialogNestCount = 0;
 #include <SOURCE/KB.h>
 
 VA(0x004b6b80, 0x3ff)
-void CycleColors(i32 forceUpdate) {
+void CycleColors(b32 forceUpdate) {
     i8 savedColor[IDX(PALETTE_CHANNEL_COUNT)];
     iCycle1Count++;
     if (gpWindowManager == NULL)
         return;
     if (gpBufferPalette == NULL)
         return;
-    if (gpWindowManager->m_active != 1)
+    if (gpWindowManager->m_active != true)
         return;
-    if (gpWindowManager->m_colorCycling == 0 && forceUpdate == 0)
+    if (gpWindowManager->m_colorCycling == 0 && forceUpdate == false)
         return;
 
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT)
@@ -224,7 +224,7 @@ void CycleColors(i32 forceUpdate) {
         CYCLE_PALETTE_BYTES
     );
     iCycle2Count++;
-    if (forceUpdate == 0) {
+    if (forceUpdate == false) {
         iCycle3Count++;
         UpdatePalette(gpBufferPalette->m_data);
     }
@@ -262,7 +262,7 @@ VA(0x004b7020, 0x12e)
 i32 heroWindowManager::Open(i32 managerOrder) {
     InitVideo();
     memset(gpBufferPalette->m_data, 0, PALETTE_DATA_SIZE);
-    SetPalette(gpBufferPalette->m_data, 1);
+    SetPalette(gpBufferPalette->m_data, true);
     m_screen = new bitmap();
     if (m_screen == NULL)
         MemError();
@@ -288,7 +288,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
 #endif
 VA(0x004b7150, 0x91)
 void heroWindowManager::Close(void) {
-    if (m_active != 1)
+    if (m_active != true)
         return;
 
     heroWindow* window = m_windowListTail;
@@ -443,7 +443,7 @@ VA(0x004b74f0, 0x199)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
     MessageDispatchHandler handler,
-    i32 fade
+    b32 fade
 ) {
     tag_message message;
     b32 done;
@@ -456,17 +456,17 @@ i32 heroWindowManager::DoDialog(
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
         AddWindow(window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
-    if (fade != 0)
+    if (fade != false)
         gpWindowManager->FadeScreen(FADE_IN, FADE_SPEED_STANDARD, gPalette);
     gpInputManager->Flush();
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
     done = false;
-    while (done == 0) {
+    while (done == false) {
         PollSound();
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
-        if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
+        if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != false)) {
             result = window->BroadcastMessage(message);
             if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
@@ -479,7 +479,7 @@ i32 heroWindowManager::DoDialog(
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = true;
     }
-    if (done != 0) {
+    if (done != false) {
         if (window != NULL)
             RemoveWindow(window);
         gpInputManager->Flush();
@@ -536,7 +536,7 @@ void heroWindowManager::RedrawScreen(void) {
 VA(0x004b7740, 0x8f)
 void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 increment, class palette* currentPalette) {
     if (currentPalette != NULL)
-        SetPalette(currentPalette->m_data, 0);
+        SetPalette(currentPalette->m_data, false);
     switch (direction) {
         case FADE_IN: {
             u32 saved = m_colorCycling;
@@ -582,7 +582,7 @@ void heroWindowManager::ScreenShot(void) {
 
 VA(0x004b7840, 0x159)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
-    if (bShowIt == 0)
+    if (bShowIt == false)
         return;
     if (x < 0) {
         width += x;
@@ -634,7 +634,7 @@ void heroWindowManager::FizzleForward(
     i8* fizzleTable;
     i32 saveFlags;
 
-    if (bShowIt == 0)
+    if (bShowIt == false)
         return;
     gbEnlargeScreenBlit = false;
     tickStart = 0;

@@ -97,7 +97,7 @@ public:
     char m_unused3f[EXPANSION_CAMPAIGN_RUNTIME_GAP_SIZE];
     ExpansionCampaignMap m_viewMap;
     class heroWindow* m_window;
-    i32 m_viewOnly;
+    b32 m_viewOnly;
     ExpCampaign(void);
     ~ExpCampaign();
     void ResetMapChoices(void);
@@ -110,9 +110,9 @@ public:
     void SetMapWasPlayed(void);
     void InitNewCampaign(ExpansionCampaignId campaignId);
     void InitMap(void);
-    void ShowInfo(i32 viewOnly, i32);
-    void UpdateInfo(i32 redraw);
-    i32 HandleVictory(void);
+    void ShowInfo(b32 viewOnly, i32);
+    void UpdateInfo(b32 redraw);
+    b32 HandleVictory(void);
     void HandleVictory1(void);
     void HandleVictory2(void);
     void HandleVictory3(void);
@@ -123,7 +123,7 @@ public:
     void ReplaySmacker3(void);
     void ReplaySmacker4(void);
     u8 IsCompleted(void);
-    i8 IsThisMapCompleted(void);
+    b8 IsThisMapCompleted(void);
 
 private:
     static MessageDispatchResult MessageHandler(struct tag_message& message);
@@ -135,9 +135,9 @@ public:
     i32 CampaignID(void);
     H2_CONST char* JosephName(void);
     H2_CONST char* IvanName(void);
-    i8 IsSpecialGoldenBow(i32 x, i32 y);
-    i8 IsSpecialUA(void);
-    i8 IsSpecialLossCondition(i32 playerIndex);
+    b8 IsSpecialGoldenBow(i32 x, i32 y);
+    b8 IsSpecialUA(void);
+    b8 IsSpecialLossCondition(i32 playerIndex);
 };
 #pragma pack(pop)
 SIZE(ExpCampaign, 0x4f);

@@ -32,9 +32,9 @@ i32 wsnet_snd(i32 destination, i32 size, void* data);
 i16 wsnet_rcv(i16, u16, void* data);
 void wsProcessMessages(void);
 void wsEvaluateMessage(u32l size, i32 sender);
-i32 wsWaitForFirstGuest(void);
-i32 wsWaitForExtraGuests(void);
-i32 wsWaitForHost(void);
+b32 wsWaitForFirstGuest(void);
+b32 wsWaitForExtraGuests(void);
+b32 wsWaitForHost(void);
 
 extern b32 bHostFound;
 extern u32 sd_dg;

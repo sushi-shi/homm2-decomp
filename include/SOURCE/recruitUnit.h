@@ -27,7 +27,7 @@ public:
     i32 m_goldCost;
     H2_ENUM_STORAGE(ResourceType, i32) m_resourceType;
     i32 m_resourceCost;
-    i32 m_refreshTown;
+    b32 m_refreshTown;
     heroWindow* m_window;
     char m_unused56[4];
     armyGroup* m_army;
@@ -40,7 +40,7 @@ public:
     i32 m_resourceTotal;
     i32 m_quantity;
     recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available);
-    recruitUnit(class town* townData, i32 dwelling, i32 refreshTown);
+    recruitUnit(class town* townData, i32 dwelling, b32 refreshTown);
     virtual i32 Open(i32 priority) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;

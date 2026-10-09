@@ -99,7 +99,7 @@ H2_ENUM_END(ViewGeneralHoverHelp)
 #endif
 VA(0x004ad4b0, 0x6f9)
 i32 combatManager::ViewGeneral(
-    H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
+    H2_ENUM_PARAM(CombatSide, i32) side, b32 allowActions, b32 quickView
 ) {
     i16 H2_UNUSED(statsWidgetId);
     i16 H2_UNUSED(seventhControlWidgetId);
@@ -217,8 +217,8 @@ i32 combatManager::ViewGeneral(
     message.payload.widget.data.text = gText;
     generalWindow->BroadcastMessage(message);
 
-    if (m_heroes[IDX(side)] == NULL || allowActions == 0
-        || m_heroes[IDX(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == 0 || m_heroCastSpell[IDX(side)] != 0
+    if (m_heroes[IDX(side)] == NULL || allowActions == false
+        || m_heroes[IDX(side)]->HasArtifact(ARTIFACT_MAGIC_BOOK) == false || m_heroCastSpell[IDX(side)] != false
         || giCurGeneral != m_currentSide) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_ACTION_CAST_SPELL;
@@ -228,7 +228,7 @@ i32 combatManager::ViewGeneral(
         message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow->BroadcastMessage(message);
     }
-    if (allowActions == 0 || m_heroes[IDX(OppositeCombatSide(m_currentSide))] == NULL
+    if (allowActions == false || m_heroes[IDX(OppositeCombatSide(m_currentSide))] == NULL
         || giCurGeneral != m_currentSide
         || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -239,11 +239,11 @@ i32 combatManager::ViewGeneral(
         message.payload.widget.data.value = IDX(WIDGET_FLAGS_ARGUMENT_DIMMED);
         generalWindow->BroadcastMessage(message);
     }
-    if (allowActions == 0 || giCurGeneral != m_currentSide
+    if (allowActions == false || giCurGeneral != m_currentSide
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
             && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
-        || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
+        || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != false
+        || m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] != false || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_ACTION_RETREAT;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
@@ -253,16 +253,16 @@ i32 combatManager::ViewGeneral(
         generalWindow->BroadcastMessage(message);
     }
 
-    if (quickView != 0) {
+    if (quickView != false) {
         gpWindowManager->AddWindow(generalWindow, -1, 1);
         QuickViewWait();
         gpWindowManager->RemoveWindow(generalWindow);
     } else {
-        gpWindowManager->DoDialog(generalWindow, HandleViewGeneral, 0);
+        gpWindowManager->DoDialog(generalWindow, HandleViewGeneral, false);
     }
     delete generalWindow;
-    DrawFrame(1, 0, 0, 0, COMBAT_MOUSE_REDRAW_DELAY, 1, 1);
-    if (quickView == 0)
+    DrawFrame(true, false, false, false, COMBAT_MOUSE_REDRAW_DELAY, true, true);
+    if (quickView == false)
         DoCommand(static_cast<CombatMessageCommand>(gpWindowManager->m_dialogResult));
     return 0;
 }
@@ -408,7 +408,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             if (hintIndex == GENERAL_HOVER_HELP_HERO
                 && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
                 hintIndex = GENERAL_HOVER_HELP_CAPTAIN;
-            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex], 1, 0, 0);
+            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex], 1, false, false);
             return MESSAGE_DISPATCH_CONSUME;
     }
     if (handled) {
@@ -439,7 +439,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 #endif
 
 VA(0x004ade2f, 0x143)
-void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
+void combatManager::ViewArmy(army* viewedArmy, b32 quickView) {
         i32 xWnd;
         i16 H2_UNUSED(viewYOffsetConst);
         i32 yWindow;
@@ -479,7 +479,7 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
             viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
             m_combatTowns[IDX(side)],
-            1,
+            true,
             viewedArmy->m_facing,
             quickView,
             m_heroes[IDX(side)],

@@ -307,9 +307,9 @@ void ExpCampaign::InitMap(void) {
     if (m_currentMap == MAP_FIRST)
         m_mapStartDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
-    i32 H2_UNUSED(mapHeaderResult) =
+    b32 H2_UNUSED(mapHeaderResult) =
         GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
-    gpGame->LoadGame("origdata.bin", 1, 0);
+    gpGame->LoadGame("origdata.bin", true, false);
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = expansionCampaignDifficulty[IDX(m_campaignId)][IDX(m_currentMap)];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
@@ -432,7 +432,7 @@ void ExpCampaign::InitMap(void) {
                     for (heroSlot = 0; heroSlot < GAME_HERO_COUNT;
                          ++heroSlot) {
                         if (gpGame->m_heroRecs[heroSlot].m_portrait == HERO_DAINWIN)
-                            gpGame->m_heroRecs[heroSlot].Deallocate(0);
+                            gpGame->m_heroRecs[heroSlot].Deallocate(false);
                     }
                     break;
                 case AWARD_BATTLE_GARB:
@@ -474,7 +474,7 @@ void ExpCampaign::InitMap(void) {
 }
 
 VA(0x004b3aba, 0x34b)
-void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
+void ExpCampaign::ShowInfo(b32 viewOnly, i32) {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", ADVENTURE_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
@@ -524,15 +524,15 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 
     tag_message message;
     message.type = MESSAGE_WIDGET;
-    if (viewOnly == 0) {
+    if (viewOnly == false) {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(MUSIC_TRACK_CAMPAIGN_GOOD);
-    UpdateInfo(0);
-    gpWindowManager->DoDialog(m_window, MessageHandler, 0);
+    UpdateInfo(false);
+    gpWindowManager->DoDialog(m_window, MessageHandler, false);
     delete m_window;
     gbUseEvilInterface = savedTheme;
 
@@ -550,7 +550,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 }
 
 VA(0x004b3e05, 0x83d)
-void ExpCampaign::UpdateInfo(i32 redraw) {
+void ExpCampaign::UpdateInfo(b32 redraw) {
     SCampaignChoice* choice;
     tag_message message;
     char armyName[CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
@@ -609,7 +609,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
             strcat(gText, "\n");
         }
     }
-    if (hasVisibleAward == 0)
+    if (hasVisibleAward == false)
         sprintf(gText, localization::Tr("common.none"));
     m_window->BroadcastMessage(message);
 
@@ -773,7 +773,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         showScroll = false;
                         break;
                 }
-                if (showScroll != 0) {
+                if (showScroll != false) {
                     sprintf(
                         gText,
                         "%s %s",
@@ -793,7 +793,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     for (i = 0; i < CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
         message.payload.widget.id = i + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        if (m_viewOnly == 0 && m_mapsAvailable[IDX(m_viewMap)] != 0)
+        if (m_viewOnly == false && m_mapsAvailable[IDX(m_viewMap)] != 0)
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
             message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
@@ -806,12 +806,12 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
-    if (redraw != 0)
+    if (redraw != false)
         m_window->DrawWindow();
 }
 
 VA(0x004b4642, 0x131)
-i32 ExpCampaign::HandleVictory(void) {
+b32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
     i32 map;
 
@@ -835,7 +835,7 @@ i32 ExpCampaign::HandleVictory(void) {
             break;
     }
     if (IsCompleted())
-        return 0;
+        return false;
 
     m_currentMap = MAP_NONE;
     for (map = 0; map < m_mapCount; ++map) {
@@ -845,10 +845,10 @@ i32 ExpCampaign::HandleVictory(void) {
                 m_currentMap = static_cast<ExpansionCampaignMap>(map);
         }
     }
-    ShowInfo(0, 0);
+    ShowInfo(false, 0);
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_ACCEPT)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x004b4773, 0x145)
@@ -1133,10 +1133,10 @@ u8 ExpCampaign::IsCompleted(void) {
 }
 
 VA(0x004b4e30, 0x24)
-i8 ExpCampaign::IsThisMapCompleted(void) {
+b8 ExpCampaign::IsThisMapCompleted(void) {
     if (m_mapsPlayed[IDX(m_currentMap)])
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x004b4e54, 0x2ae)
@@ -1176,17 +1176,17 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         if (giDebugLevel >= 1 || xCampaign.m_mapsAvailable[map]
                             || xCampaign.m_mapsPlayed[map]) {
                             xCampaign.m_viewMap = static_cast<ExpansionCampaignMap>(map);
-                            xCampaign.UpdateInfo(1);
+                            xCampaign.UpdateInfo(true);
                         }
                         break;
                     case CAMPAIGN_BONUS_WIDGET_0:
                     case CAMPAIGN_BONUS_WIDGET_1:
                     case CAMPAIGN_BONUS_WIDGET_2:
-                        if (xCampaign.m_viewOnly == 0
+                        if (xCampaign.m_viewOnly == false
                             && xCampaign.m_mapsAvailable[IDX(xCampaign.m_viewMap)]) {
                             xCampaign.m_bonusChoices[IDX(xCampaign.m_viewMap)] =
                                 message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST;
-                            xCampaign.UpdateInfo(1);
+                            xCampaign.UpdateInfo(true);
                         }
                         break;
                 }
@@ -1199,7 +1199,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         xCampaign.m_window->DrawWindow();
                         break;
                     case CAMPAIGN_DIALOG_ACCEPT:
-                        if (xCampaign.m_viewOnly == 0) {
+                        if (xCampaign.m_viewOnly == false) {
                             if (xCampaign.m_mapsAvailable[IDX(xCampaign.m_viewMap)]) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
                             } else {
@@ -1242,7 +1242,7 @@ void ExpCampaign::Autosave(void) {
             xShortCampaignNames[IDX(m_campaignId)],
             IDX(m_currentMap) + 1
         );
-        gpGame->SaveGame(gText, 1, 0);
+        gpGame->SaveGame(gText, true, false);
     }
 }
 
@@ -1279,29 +1279,29 @@ H2_CONST char* ExpCampaign::IvanName(void) {
 }
 
 VA(0x004b5233, 0x30)
-i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
+b8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
     if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS
         && m_currentMap == MAP_DES_ELVEN_LANDS
         && x == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_X && y == EXPANSION_CAMPAIGN_GOLDEN_BOW_EVENT_Y)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x004b5263, 0x22)
-i8 ExpCampaign::IsSpecialUA(void) {
+b8 ExpCampaign::IsSpecialUA(void) {
     if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE
         && m_currentMap == MAP_WIZ_POWERS_END)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }
 
 VA(0x004b5285, 0x50)
-i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
+b8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
     playerData* player = &gpGame->m_players[playerIndex];
 
     if (playerIndex == EXPANSION_CAMPAIGN_MAIN_PLAYER
         && m_campaignId == EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY
         && m_currentMap == MAP_POL_ABYSS && player->m_heroCount == 0)
-        return 1;
-    return 0;
+        return true;
+    return false;
 }

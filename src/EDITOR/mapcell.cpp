@@ -454,7 +454,7 @@ void fullMap::Read(i32 handle, i32 H2_UNUSED(convert)) {
 #define oldCells tmp1  // frame-slot spelling
 #define oldExtras tmp2 // frame-slot spelling
 VA(0x004726f9, 0x258)
-void fullMap::Read(i32 handle, i32 convert) {
+void fullMap::Read(i32 handle, b32 convert) {
     i32 extraIndex;
     oldMapCell* oldCells;
     i32 x, y;
@@ -504,7 +504,7 @@ void fullMap::ChangeTilesetIndex(
     i32 y,
     H2_ENUM_PARAM(TilesetId, i32) tileset,
     i32 index,
-    i32 overlay,
+    b32 overlay,
     i32 H2_UNUSED(link)
 ) {
     i32 extraIndex;
@@ -519,7 +519,7 @@ void fullMap::ChangeTilesetIndex(
 #endif
     newTileset = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
 
-    if (overlay == 0) {
+    if (overlay == false) {
         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
             extraIndex = cell->m_extraIndex;
             while (extraIndex != 0) {

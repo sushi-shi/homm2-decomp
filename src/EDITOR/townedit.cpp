@@ -97,7 +97,7 @@ void eventsManager::EditTown(i32 x, i32 y) {
         gEditDialog->BroadcastMessage(msg);
     }
     FillInTownEdit(&gTownEdit);
-    gpWindowManager->DoDialog(gEditDialog, EditTownHandler, 0);
+    gpWindowManager->DoDialog(gEditDialog, EditTownHandler, false);
     delete gEditDialog;
     if (gpWindowManager->m_dialogResult != EVENTS_DIALOG_CANCEL) {
         gEditManager->m_mapChanged = true;

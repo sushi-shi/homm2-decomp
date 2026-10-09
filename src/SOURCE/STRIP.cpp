@@ -147,7 +147,7 @@ void strip::DrawIcons(i32 drawWindow) {
             iconsCurrent = false;
     }
 
-    if (iconsCurrent == 0) {
+    if (iconsCurrent == false) {
         for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
             oldIcons[slot] = m_creatureIcons[slot];
             oldCreatureTypes[slot] = m_cachedCreatureTypes[slot];
@@ -228,7 +228,7 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     if (m_window == NULL)
         MemError();
     gpWindowManager->AddWindow(m_window, WINDOW_Z_ORDER_TOP, WINDOW_DRAW_UPDATE_SCREEN);
-    Update(1);
+    Update(true);
 }
 
 VA(0x004a212b, 0x34)
@@ -241,7 +241,7 @@ bankBox::~bankBox() {
 #define currentText str
 #endif
 VA(0x004a215f, 0xc0)
-void bankBox::Update(i32 drawWindow) {
+void bankBox::Update(b32 drawWindow) {
     char currentText[BOX_TEXT_SIZE];
     tag_message message;
     i32 resource;

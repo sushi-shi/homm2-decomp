@@ -101,7 +101,7 @@ i16 dpnet_init(void) {
 
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
             iLastMsgNumHumanPlayers = giNumHumanPlayers;
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
@@ -132,7 +132,7 @@ i16 dpnet_init(void) {
 
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_CANCEL);
-            if (gbFunctionComplete == 0)
+            if (gbFunctionComplete == false)
                 ShutDown(NULL);
         }
     }
@@ -293,7 +293,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                         return;
                     }
                 }
-                if (gbRemoteGameOpen != 0) {
+                if (gbRemoteGameOpen != false) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
                     gsNetPlayerInfo[giNumHumanPlayers] =
                         *static_cast<SNetPlayerInfo*>(messageData);
@@ -330,7 +330,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 #define result rv
 #endif
 VA(0x00437177, 0x16a)
-i32 dpWaitForFirstGuest(void) {
+b32 dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
     i32 result;
 
@@ -367,9 +367,9 @@ i32 dpWaitForFirstGuest(void) {
         case FIRST_GUEST_WAIT_FOR_PLAYER:
             dpProcessMessages();
             if (giNumHumanPlayers > 1)
-                return 1;
+                return true;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef result
@@ -400,7 +400,7 @@ i32 dpWaitForExtraGuests(void) {
 #define result rv
 #endif
 VA(0x0043735d, 0x396)
-i32 dpWaitForHost(void) {
+b32 dpWaitForHost(void) {
     DPSESSIONDESC session;
     i32 result;
     char text[STATUS_TEXT_SIZE];
@@ -413,7 +413,7 @@ i32 dpWaitForHost(void) {
             if (iWaitForHostWaitCount != 0) {
                 iWaitForHostWaitCount--;
                 DelayMilli(DP_TRANSPORT_RETRY_DELAY);
-                return 0;
+                return false;
             }
             iSessionToTry = 0;
             memset(&session, 0, sizeof(session));
@@ -430,7 +430,7 @@ i32 dpWaitForHost(void) {
             iEnumCount++;
             if (result == DPERR_NOSESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
-                return 0;
+                return false;
             }
             if (result != DP_OK)
                 DPSD(result, RETAIL_FILE, 548);
@@ -494,11 +494,11 @@ i32 dpWaitForHost(void) {
             break;
         case HOST_WAIT_FOR_STARTUP:
             dpProcessMessages();
-            if (bStartUpInfoReceived != 0)
-                return 1;
+            if (bStartUpInfoReceived != false)
+                return true;
             break;
     }
-    return 0;
+    return false;
 }
 #if H2_RETAIL_COMPILER
 #undef result
@@ -509,7 +509,7 @@ void DPSD(i32 result, H2_CONST char* file, i32 line) {
     i32 H2_UNUSED(flag);
     char errorText[REMOTE_ERROR_TEXT_SIZE];
 
-    if (bInDPSD != 0)
+    if (bInDPSD != false)
         return;
     bInDPSD = true;
     flag = 0;
