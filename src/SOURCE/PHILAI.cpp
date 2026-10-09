@@ -4943,10 +4943,9 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, b32 evaluateOnly) {
     );
     if (evaluateOnly != false)
         return battleValue;
-    if (worthFighting != 0
-        && (combatResult =
-                QuickCombat(&heroPointer->m_army, heroPointer, gpMonGroup, NULL, 0, 0, attackerCasualtyFraction, defenderCasualtyFraction))
-               != false) {
+    if (worthFighting != 0) {
+        combatResult = QuickCombat(&heroPointer->m_army, heroPointer, gpMonGroup, NULL, 0, 0, attackerCasualtyFraction, defenderCasualtyFraction);
+        if (combatResult != false) {
         switch (eventType) {
             case MAP_OBJECT_SHIPWRECK:
                 switch (UndeadEventLevelFromCode(cell->m_objectMetadata)) {
@@ -5001,7 +5000,8 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, b32 evaluateOnly) {
             default:
                 break;
         }
-        cell->m_objectMetadata = FIGHT_EVENT_EMPTY;
+            cell->m_objectMetadata = FIGHT_EVENT_EMPTY;
+        }
     }
     return 0;
 }
