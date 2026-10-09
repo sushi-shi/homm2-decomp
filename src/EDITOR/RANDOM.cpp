@@ -945,7 +945,8 @@ void editManager::PlaceCastles(void) {
     b32 castlePlaced;
     u8* reachedGrids[GAME_PLAYER_COUNT];
 
-    tileX = tileY = 0;
+    tileY = 0;
+    tileX = tileY;
     for (slot = 0; slot < GAME_PLAYER_COUNT; slot++) {
         cutOff[slot] = false;
         extraLiths[slot] = false;
@@ -964,7 +965,8 @@ void editManager::PlaceCastles(void) {
     }
     continents = 0;
     for (regionId = 1; regionId < RANDOM_MAP_REGION_LIMIT; regionId++) {
-        foundX = foundY = EDIT_NO_CELL;
+        foundY = EDIT_NO_CELL;
+        foundX = foundY;
         for (tileX = 0; tileX < MAP_WIDTH; tileX++) {
             for (tileY = 0; tileY < MAP_HEIGHT; tileY++) {
                 if (CELL_TERRAIN(gMap.CellAt(tileX, tileY)) != TERRAIN_WATER
@@ -973,7 +975,8 @@ void editManager::PlaceCastles(void) {
                     foundX = tileX;
                     foundY = tileY;
                     MAP_GRID_CELL(regionGrid, tileX, tileY) = regionId;
-                    tileX = tileY = RANDOM_MAP_END_SCAN;
+                    tileY = RANDOM_MAP_END_SCAN;
+                    tileX = tileY;
                 }
             }
         }
@@ -1030,16 +1033,28 @@ void editManager::PlaceCastles(void) {
         }
     }
     if (shareValue[rank[1]] > 80.0) {
-        castleRegion[0] = castleRegion[1] = castleRegion[2] = castleRegion[3] = castleRegion[4]
-            = castleRegion[5] = rank[1];
+        castleRegion[5] = rank[1];
+        castleRegion[4] = castleRegion[5];
+        castleRegion[3] = castleRegion[4];
+        castleRegion[2] = castleRegion[3];
+        castleRegion[1] = castleRegion[2];
+        castleRegion[0] = castleRegion[1];
         regionsUsed = 1;
     } else if (shareValue[rank[1]] > 40.0 && shareValue[rank[2]] < 10.0) {
-        castleRegion[0] = castleRegion[1] = castleRegion[2] = castleRegion[3] = castleRegion[4]
-            = castleRegion[5] = rank[1];
+        castleRegion[5] = rank[1];
+        castleRegion[4] = castleRegion[5];
+        castleRegion[3] = castleRegion[4];
+        castleRegion[2] = castleRegion[3];
+        castleRegion[1] = castleRegion[2];
+        castleRegion[0] = castleRegion[1];
         regionsUsed = 1;
     } else if (shareValue[rank[1]] < 55.0 && shareValue[rank[2]] > 25.0) {
-        castleRegion[0] = castleRegion[2] = castleRegion[4] = rank[1];
-        castleRegion[1] = castleRegion[3] = castleRegion[5] = rank[2];
+        castleRegion[4] = rank[1];
+        castleRegion[2] = castleRegion[4];
+        castleRegion[0] = castleRegion[2];
+        castleRegion[5] = rank[2];
+        castleRegion[3] = castleRegion[5];
+        castleRegion[1] = castleRegion[3];
         regionsUsed = 2;
     } else if (shareValue[rank[1]] < 50.0 && shareValue[rank[2]] > 15.0
                && shareValue[rank[3]] > 15.0 && shareValue[rank[4]] > 15.0) {
@@ -1060,8 +1075,12 @@ void editManager::PlaceCastles(void) {
         castleRegion[5] = rank[1];
         regionsUsed = 4;
     } else {
-        castleRegion[0] = castleRegion[1] = castleRegion[2] = castleRegion[3] = castleRegion[4]
-            = castleRegion[5] = rank[1];
+        castleRegion[5] = rank[1];
+        castleRegion[4] = castleRegion[5];
+        castleRegion[3] = castleRegion[4];
+        castleRegion[2] = castleRegion[3];
+        castleRegion[1] = castleRegion[2];
+        castleRegion[0] = castleRegion[1];
         regionsUsed = 1;
     }
     ShowStatusText(localization::Tr("editor.random.status.castles"));
@@ -1721,7 +1740,14 @@ void editManager::PlaceTreasures(i32 density, i32 monsterDensity) {
             && gMap.CellAt(x, y)->m_objectTileset == TILESET_NONE) {
             gEditManager->ClearArea(x, y, 1, 1, EDIT_CLEAR_ALL, false, false);
             roll = Random(0, 100);
-            northWestOpen = southWestOpen = northEastOpen = southEastOpen = northBlocked = southBlocked = eastBlocked = westBlocked = false;
+            westBlocked = false;
+            eastBlocked = westBlocked;
+            southBlocked = eastBlocked;
+            northBlocked = southBlocked;
+            southEastOpen = northBlocked;
+            northEastOpen = southEastOpen;
+            southWestOpen = northEastOpen;
+            northWestOpen = southWestOpen;
             if (y == 0 || CELL_TERRAIN(gMap.CellAt(x, y - 1)) == TERRAIN_WATER
                 || (gMap.CellAt(x, y - 1)->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !gMap.CellAt(x, y - 1)->m_objectGroundLayer

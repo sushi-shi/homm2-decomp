@@ -718,7 +718,8 @@ mapCell* advManager::MoveHero(
             if (bShowIt)
                 DelayTilMilli(tick + stepDelay);
         }
-        giDeferObjDrawX = giDeferObjDrawY = -1;
+        giDeferObjDrawY = -1;
+        giDeferObjDrawX = giDeferObjDrawY;
         gbNoBorder = false;
         DrawAdventureBorder();
         gbEnlargeScreenBlit = true;

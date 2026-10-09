@@ -146,7 +146,8 @@ b32 AppInit(
         giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
     else
         giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
-    windowRectangle.left = windowRectangle.top = 0;
+    windowRectangle.top = 0;
+    windowRectangle.left = windowRectangle.top;
     windowRectangle.right = CURRENT_GRAPHICS_CONFIG.width - 1;
     windowRectangle.bottom = CURRENT_GRAPHICS_CONFIG.height - 1;
     AdjustWindowRect(&windowRectangle, giCurWindowsStyleFlags, CURRENT_GRAPHICS_CONFIG.showMenu);

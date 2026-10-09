@@ -1982,8 +1982,10 @@ void townManager::ResetStrips(void) {
         m_targetStrip->m_selectedSlot = -1;
     m_heroStrip->Draw();
     m_garrisonStrip->Draw();
-    m_sourceStrip = m_targetStrip = NULL;
-    m_swapArmySlot = m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
+    m_targetStrip = NULL;
+    m_sourceStrip = NULL;
+    m_pendingArmySlot = TOWN_ARMY_SLOT_NONE;
+    m_swapArmySlot = TOWN_ARMY_SLOT_NONE;
 }
 
 VA(0x004a88d6, 0x79)

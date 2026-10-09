@@ -1521,7 +1521,9 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
 
     drives = GetLogicalDrives();
     memset(cdrom, 0, CD_DRIVE_SLOT_COUNT);
-    for (i = CD_FIRST_DRIVE_INDEX, j = 0; i < CD_DRIVE_SLOT_COUNT; ++i) {
+    i = CD_FIRST_DRIVE_INDEX;
+    j = 0;
+    for (; i < CD_DRIVE_SLOT_COUNT; ++i) {
         if (drives & (1 << i)) {
             if (IsCDDrive(i)) {
                 cdrom[j] = i;

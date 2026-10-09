@@ -1295,7 +1295,9 @@ void sortIt(void) {
                     qsortFull(lower, upper);
 
                     if (freqHere < 65535) {
-                        for (j = lower, k = 0; j <= upper; j++, k++) {
+                        j = lower;
+                        k = 0;
+                        for (; j <= upper; j++, k++) {
                             Int32 a2update = zptr[j];
                             SETREST16(a2update, k);
                             if (a2update < (4 * NUM_FULLGT_UNROLLINGS))

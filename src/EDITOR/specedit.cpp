@@ -880,7 +880,8 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gSpecWindow->BroadcastMessage(message);
                     if (IDX(gEditMapHeader.victoryCondition) != message.payload.widget.data.value) {
                         gEditMapHeader.victoryCondition = static_cast<MapVictoryCondition>(message.payload.widget.data.value);
-                        gEditMapHeader.victoryConditionValue = gEditMapHeader.victoryConditionY = 0;
+                        gEditMapHeader.victoryConditionY = 0;
+                        gEditMapHeader.victoryConditionValue = gEditMapHeader.victoryConditionY;
                         FillVictoryConditionList();
                         update = true;
                     }
@@ -901,7 +902,8 @@ MessageDispatchResult SpecificationsHandler(struct tag_message& message) {
                     gSpecWindow->BroadcastMessage(message);
                     if (IDX(gEditMapHeader.lossCondition) != message.payload.widget.data.value) {
                         gEditMapHeader.lossCondition = static_cast<MapLossCondition>(message.payload.widget.data.value);
-                        gEditMapHeader.lossConditionValue = gEditMapHeader.lossConditionY = 0;
+                        gEditMapHeader.lossConditionY = 0;
+                        gEditMapHeader.lossConditionValue = gEditMapHeader.lossConditionY;
                         FillLossConditionList();
                         update = true;
                     }

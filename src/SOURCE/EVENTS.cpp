@@ -529,7 +529,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_HILL_FORT:
-            firstUpgrade = secondUpgrade = thirdUpgrade = CREATURE_NONE;
+            thirdUpgrade = CREATURE_NONE;
+            secondUpgrade = thirdUpgrade;
+            firstUpgrade = secondUpgrade;
             if (eventHero->CreatureTypeCount(CREATURE_OGRE))
                 firstUpgrade = CREATURE_OGRE;
             if (eventHero->CreatureTypeCount(CREATURE_ORC)) {
@@ -605,7 +607,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FREEMANS_FOUNDRY:
-            firstUpgrade = secondUpgrade = thirdUpgrade = CREATURE_NONE;
+            thirdUpgrade = CREATURE_NONE;
+            secondUpgrade = thirdUpgrade;
+            firstUpgrade = secondUpgrade;
             if (eventHero->CreatureTypeCount(CREATURE_PIKEMAN))
                 firstUpgrade = CREATURE_PIKEMAN;
             if (eventHero->CreatureTypeCount(CREATURE_SWORDSMAN)) {
@@ -8090,7 +8094,9 @@ void advManager::ReceiveHeroTownData(
     *combatTown = NULL;
     *secondHero = NULL;
     *secondArmy = NULL;
-    firstHeroPresent = secondHeroPresent = townPresent = false;
+    townPresent = false;
+    secondHeroPresent = townPresent;
+    firstHeroPresent = secondHeroPresent;
     *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
     *x = EVENTS_REMOTE_COMBAT(packet)->x;
     *y = EVENTS_REMOTE_COMBAT(packet)->y;

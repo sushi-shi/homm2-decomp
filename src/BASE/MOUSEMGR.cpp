@@ -179,35 +179,38 @@ void mouseManager::SetPointer(H2_CONST char* name, i32 frame, MouseCursorType cu
         } else {
             type = cursorType;
         }
-        if (type != m_cursorType && (m_cursorType = type, gbColorMice != false)) {
-            b32 wasCursorReady = m_cursorReady;
-            m_cursorReady = false;
-            if (m_cursorIcon != NULL)
-                gpResourceManager->Dispose(m_cursorIcon);
-            char cursorResourceName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
-            if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-                sprintf(
-                    cursorResourceName,
-                    MOUSE_MANAGER_ADVENTURE_ICON
+        if (type != m_cursorType) {
+            m_cursorType = type;
+            if (gbColorMice != false) {
+                b32 wasCursorReady = m_cursorReady;
+                m_cursorReady = false;
+                if (m_cursorIcon != NULL)
+                    gpResourceManager->Dispose(m_cursorIcon);
+                char cursorResourceName[RESOURCE_MANAGER_NAME_BUFFER_SIZE];
+                if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
+                    sprintf(
+                        cursorResourceName,
+                        MOUSE_MANAGER_ADVENTURE_ICON
+                    );
+                else if (m_cursorType == MOUSE_CURSOR_SPELL)
+                    sprintf(
+                        cursorResourceName,
+                        MOUSE_MANAGER_SPELL_ICON
+                    );
+                else
+                    sprintf(
+                        cursorResourceName,
+                        MOUSE_MANAGER_COMBAT_ICON
+                    );
+                m_cursorIcon = gpResourceManager->GetIcon(cursorResourceName);
+                H2_ASSERT(
+                    frame != MOUSE_KEEP_CURRENT_FRAME,
+                    MOUSE_MANAGER_SOURCE_FILE,
+                    398
                 );
-            else if (m_cursorType == MOUSE_CURSOR_SPELL)
-                sprintf(
-                    cursorResourceName,
-                    MOUSE_MANAGER_SPELL_ICON
-                );
-            else
-                sprintf(
-                    cursorResourceName,
-                    MOUSE_MANAGER_COMBAT_ICON
-                );
-            m_cursorIcon = gpResourceManager->GetIcon(cursorResourceName);
-            H2_ASSERT(
-                frame != MOUSE_KEEP_CURRENT_FRAME,
-                MOUSE_MANAGER_SOURCE_FILE,
-                398
-            );
-            m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
-            m_cursorReady = wasCursorReady;
+                m_cursorFrame = MOUSE_INVALID_CURSOR_FRAME;
+                m_cursorReady = wasCursorReady;
+            }
         }
         SetPointer(frame);
         gpResourceManager->RestorePosition();

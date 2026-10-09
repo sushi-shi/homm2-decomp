@@ -787,7 +787,8 @@ i32 oldmain(void) {
                     sizeof(netBuffer.setup.players)
                 );
                 giThisGamePos = NetPosToGamePos(0);
-                gbUseRegularCompression = gbUseDiffCompression = true;
+                gbUseDiffCompression = true;
+                gbUseRegularCompression = gbUseDiffCompression;
                 if (giHighMemBuffer < OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT)
                     gbUseRegularCompression = false;
                 for (player = 0; player < giNumHumanPlayers; player++) {

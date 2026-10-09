@@ -1332,7 +1332,7 @@ class mapCell* advManager::DoAdvCommand(void) {
             if (selectedHero == NULL) {
                 break;
             }
-            selectedHero->m_destinationX = m_commandTargetX,
+            selectedHero->m_destinationX = m_commandTargetX;
             selectedHero->m_destinationY = m_commandTargetY;
             goto continue_route;
         case ADVMGR_COMMAND_CONTINUE_ROUTE:
@@ -4099,7 +4099,8 @@ void advManager::UpdateRadar(i32 updateScreen, b32 partial) {
     }
 
     gpAdvManager->m_heroesLogoShown = false;
-    xrem = ymod = 0;
+    ymod = 0;
+    xrem = ymod;
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
             line = gpWindowManager->m_screen->m_pixels
@@ -10275,8 +10276,8 @@ b32 advManager::DoVisions(hero* visionHero) {
              ++tryY) {
             spot = GetCell(tryX, tryY);
             if (spot->m_triggerType == (MAP_ACTION_TRIGGER(MAP_OBJECT_MONSTER))) {
-                if ((dist = MANHATTAN_LENGTH(visionHero->m_x - tryX, visionHero->m_y - tryY))
-                    < nearDist) {
+                dist = MANHATTAN_LENGTH(visionHero->m_x - tryX, visionHero->m_y - tryY);
+                if (dist < nearDist) {
                     nearDist = dist;
                     bestX = tryX;
                     bestY = tryY;

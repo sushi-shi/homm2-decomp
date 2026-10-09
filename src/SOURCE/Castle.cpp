@@ -175,7 +175,8 @@ void townManager::SetupCastle(heroWindow* window, b32 updateOnly) {
         }
     }
 
-    m_affordableBuildings = m_buildableBuildings = 0;
+    m_buildableBuildings = 0;
+    m_affordableBuildings = 0;
     for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
         if (CanBuy(m_town, castleSlotsUse[slotNum]))
             m_affordableBuildings |= 1L << IDX(castleSlotsUse[slotNum]);

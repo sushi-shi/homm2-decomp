@@ -5194,7 +5194,8 @@ editManager::editManager(void) {
     m_tool = EDIT_TOOL_NONE;
     m_toolManager = NULL;
     m_mapChanged = false;
-    m_placedX = m_placedY = EDIT_NO_CELL;
+    m_placedY = EDIT_NO_CELL;
+    m_placedX = EDIT_NO_CELL;
     m_extraCount = EDIT_MANAGER_FIRST_EXTRA;
     m_placedState = -1;
 }
@@ -5262,8 +5263,10 @@ i32 editManager::Open(i32 priority) {
     gpWindowManager->AddWindow(m_window, -1, 1);
     m_groundTiles[0] = gpResourceManager->GetTileset("ground32.til");
     m_cloudTiles[0] = gpResourceManager->GetTileset("clof32.til");
-    for (i = 0; i < EDIT_MANAGER_TILESET_COUNT; i++)
-        m_objectIcons[i][0] = m_objectIcons[i][1] = NULL;
+    for (i = 0; i < EDIT_MANAGER_TILESET_COUNT; i++) {
+        m_objectIcons[i][1] = NULL;
+        m_objectIcons[i][0] = NULL;
+    }
     for (i = 0; i < EDIT_MANAGER_TILESET_COUNT; i++) {
         if (strlen(gTilesetFiles[i]) > 1)
             m_objectIcons[i][0] = gpResourceManager->GetIcon(gTilesetFiles[i]);
@@ -5449,8 +5452,10 @@ MessageDispatchResult editManager::Main(tag_message& message) {
         memset(&move, 0, sizeof(move));
         move.type = MESSAGE_MOUSE_MOVE;
         gpMouseManager->MouseCoords(mouseX, mouseY);
-        move.payload.mouse.screenX = move.payload.mouse.x = mouseX;
-        move.payload.mouse.screenY = move.payload.mouse.y = mouseY;
+        move.payload.mouse.x = mouseX;
+        move.payload.mouse.screenX = move.payload.mouse.x;
+        move.payload.mouse.y = mouseY;
+        move.payload.mouse.screenY = move.payload.mouse.y;
         m_toolManager->Main(move);
         UpdateMapView();
         return MESSAGE_DISPATCH_CONTINUE;
@@ -5502,9 +5507,11 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                             if (!LoadMap(gMapFileName)) {
                                 ProtectShippedMap();
                                 m_mapChanged = false;
-                                m_placedX = m_placedY = EDIT_NO_CELL;
+                                m_placedY = EDIT_NO_CELL;
+                                m_placedX = EDIT_NO_CELL;
                             }
-                            m_viewX = m_viewY = 0;
+                            m_viewY = 0;
+                            m_viewX = 0;
                             m_window->DrawWindow(WINDOW_DRAW_BUFFER_ONLY);
                             DrawRadar(true);
                             DrawMap();
@@ -5520,7 +5527,8 @@ MessageDispatchResult editManager::Main(tag_message& message) {
                                     strcat(gText, localization::Tr("editor.map.saved.original"));
                                 NormalDialog(gText, NORMAL_DIALOG_INFO);
                                 m_mapChanged = false;
-                                m_placedX = m_placedY = EDIT_NO_CELL;
+                                m_placedY = EDIT_NO_CELL;
+                                m_placedX = EDIT_NO_CELL;
                             }
                             break;
                         case EDIT_CONTROL_QUIT:
@@ -6123,7 +6131,8 @@ void editManager::DrawRadar(b32 H2_UNUSED(updateScreen)) {
 
     line = gpWindowManager->m_screen->m_pixels + EDIT_RADAR_OFFSET;
     dst = line;
-    xPhase = rowPhase = 0;
+    rowPhase = 0;
+    xPhase = rowPhase;
     for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
         dst = line;
         switch (MAP_HEIGHT) {
@@ -8195,7 +8204,8 @@ void editManager::InitializeMap(b32 random, i32 width, i32 height) {
         gMap.Init(MAP_HEIGHT, MAP_WIDTH);
         gUndoMap.Init(MAP_HEIGHT, MAP_WIDTH);
         ResetArea(0, 0, MAP_WIDTH, MAP_HEIGHT);
-        m_viewX = m_viewY = 0;
+        m_viewY = 0;
+        m_viewX = 0;
     }
     memset(&gEditMapHeader, 0, sizeof(gEditMapHeader));
     gEditMapHeader.difficulty = DIFFICULTY_NORMAL;
@@ -8526,8 +8536,18 @@ void editManager::BlendTerrain(i32 H2_UNUSED(terrain), b32 H2_UNUSED(generating)
                 thisTerrain = IDX(CELL_TERRAIN(gMap.CellAt(x, y)));
                 // A constant condition: retail keeps its compiled test.
                 if (1) {
-                    waterUp = waterDown = waterRight = waterLeft = sameUp = sameDown = sameRight = sameLeft
-                        = sameUpLeft = sameUpRight = sameDownLeft = sameDownRight = false;
+                    sameDownRight = false;
+                    sameDownLeft = sameDownRight;
+                    sameUpRight = sameDownLeft;
+                    sameUpLeft = sameUpRight;
+                    sameLeft = sameUpLeft;
+                    sameRight = sameLeft;
+                    sameDown = sameRight;
+                    sameUp = sameDown;
+                    waterLeft = sameUp;
+                    waterRight = waterLeft;
+                    waterDown = waterRight;
+                    waterUp = waterDown;
                     if (!y || IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) == thisTerrain)
                         sameUp = true;
                     else if (!CELL_TERRAIN(gMap.CellAt(x, y - 1)))
@@ -8680,10 +8700,22 @@ borders:
             thisTerrain = IDX(CELL_TERRAIN(cell));
             if (thisTerrain == IDX(TERRAIN_BEACH))
                 continue;
-            otherUpRight = otherUpLeft = otherDownRight = otherDownLeft = otherUp = otherDown = otherRight
-                = otherLeft = false;
-            waterUpRight = waterUpLeft = waterDownRight = waterDownLeft = waterUp = waterDown = waterRight
-                = waterLeft = false;
+            otherLeft = false;
+            otherRight = otherLeft;
+            otherDown = otherRight;
+            otherUp = otherDown;
+            otherDownLeft = otherUp;
+            otherDownRight = otherDownLeft;
+            otherUpLeft = otherDownRight;
+            otherUpRight = otherUpLeft;
+            waterLeft = false;
+            waterRight = waterLeft;
+            waterDown = waterRight;
+            waterUp = waterDown;
+            waterDownLeft = waterUp;
+            waterDownRight = waterDownLeft;
+            waterUpLeft = waterDownRight;
+            waterUpRight = waterUpLeft;
             if (thisTerrain != IDX(TERRAIN_DIRT)) {
                 if (y > 0 && IDX(CELL_TERRAIN(gMap.CellAt(x, y - 1))) != thisTerrain && CELL_TERRAIN(gMap.CellAt(x, y - 1)))
                     otherUp = true;
@@ -9674,7 +9706,8 @@ b32 editManager::FindArtifact(i32 index, i32* x, i32* y) {
             }
         }
     }
-    *x = *y = -1;
+    *y = -1;
+    *x = -1;
     return false;
 }
 
@@ -9701,7 +9734,8 @@ b32 editManager::FindTown(i32 index, i32* x, i32* y) {
             }
         }
     }
-    *x = *y = -1;
+    *y = -1;
+    *x = -1;
     return false;
 }
 
@@ -9726,7 +9760,8 @@ b32 editManager::FindHero(i32 index, i32* x, i32* y) {
             }
         }
     }
-    *x = *y = -1;
+    *y = -1;
+    *x = -1;
     return false;
 }
 

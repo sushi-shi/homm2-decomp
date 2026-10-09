@@ -131,7 +131,7 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	f0c48d771bb2
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	6e97a740e2f6
 BASE/Bzip	?shellTrivial@@YIXXZ	100.0000	78273e158f0b
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	c178c8ce00b9
-BASE/Bzip	?sortIt@@YIXXZ	100.0000	eebdc98a40c4
+BASE/Bzip	?sortIt@@YIXXZ	100.0000	344f10e76e65
 BASE/Bzip	?spotBlock@@YIXH@Z	100.0000	fadac213e6bc
 BASE/Bzip	?stripe@@YIXXZ	100.0000	9e1b328c6673
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000	a5528a24065d
@@ -218,7 +218,7 @@ BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	100.0000	1e045a210a1f
 BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	100.0000	2493c0e48787
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	100.0000	8064efa3be3f
-BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	3a6953eda77e
+BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	9f29938dbb3f
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	0d6f2a691836
 BASE/Midi	?MIDIIsPlaying@@YI_NXZ	100.0000	1cef32d6c5b4
 BASE/Midi	?MIDIPlay@@YIXAAH0H@Z	100.0000	515370be1dfb
@@ -279,7 +279,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	100.0000	ee23f77f6613
 BASE/Misc	?SetGameDefaults@@YIXXZ	100.0000	4a1dd4dd0417
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	44fff69415e8
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	8495e3312d8c
-BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	9421a0725f31
+BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	6edaa63701ce
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	100.0000	a5cd20bd63e5
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	100.0000	a673a3de7934
@@ -355,11 +355,11 @@ BASE/WIDGET	?Close@widget@@QAEXXZ	100.0000	f728306d5a57
 BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	68df938d8f57
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	100.0000	6bd2ece82a02
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	13cb729f54d5
-BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	6dde390901c4
-BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	ab722fc9daf7
-BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	e42bfcc2fb0f
+BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	44f824897517
+BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	e594561bd5d5
+BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	7603693ba2f0
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	4fc7db5f0327
-BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	3ddeb9f0d8ce
+BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	67a6a1c4a35b
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	e5aafc82e4f1
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	0e54dd7b9f4c
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	100.0000	e39de57c4b23
@@ -367,7 +367,7 @@ BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	ba06a873bf10
 BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	100.0000	2f1c844b8e8b
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	1d6432adbcf5
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	e441c85f6aa6
-BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	cbd07dd35cc6
+BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	7379244ed4bc
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	b01eecebcd16
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	f30559a466ff
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	2f4484d118f7
@@ -382,7 +382,7 @@ BASE/WINMGR	?CycleColors@@YIXH@Z	100.0000	bdffa89e48f1
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	100.0000	759af4099c8a
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	2e2c6c0bc195.3e185ae21be4
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	100.0000	ac4adbbd6c49
-BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	a52ba7a90345
+BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	54c1e040d820
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	64912fae8a6c
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	ad9def206a5e
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	dcd7ce3959af
@@ -480,10 +480,10 @@ SOURCE/ADVMGR	?DemobilizeCurrHero@advManager@@QAEXXZ	100.0000	e0da403c533e
 SOURCE/ADVMGR	?DimensionDoor@advManager@@QAEXXZ	100.0000	0a04385f20ff
 SOURCE/ADVMGR	?DimensionDoorHandler@@YIHAAUtag_message@@@Z	100.0000	c28cb53792b0
 SOURCE/ADVMGR	?DisableButtons@advManager@@QAEXXZ	100.0000	003a1842ac2d
-SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	100.0000	a60980f92961
+SOURCE/ADVMGR	?DoAdvCommand@advManager@@QAEPAVmapCell@@XZ	100.0000	877e4add1e1f
 SOURCE/ADVMGR	?DoHeroKnob@advManager@@QAEXXZ	100.0000	24064129222b
 SOURCE/ADVMGR	?DoTownKnob@advManager@@QAEXXZ	100.0000	94a91eb1264f
-SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	36bb37c96a1f
+SOURCE/ADVMGR	?DoVisions@advManager@@QAEHPAVhero@@@Z	100.0000	9fca11a1acfa
 SOURCE/ADVMGR	?DrawAdventureBorder@advManager@@QAEXXZ	100.0000	62c039e7d432
 SOURCE/ADVMGR	?DrawCell@advManager@@QAEXHHHHHH@Z	100.0000	378c5ea9e771
 SOURCE/ADVMGR	?EnableButtons@advManager@@QAEXXZ	100.0000	ebd8f6d8a7d5
@@ -540,7 +540,7 @@ SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	100.0000	cfd97c118180
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	ac1e56a35f5f
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	100.0000	56299cb545f8
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	1992fdb22c01
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	100.0000	395a1260e7da
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	100.0000	0cece379eebc
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	100.0000	80426208f95b
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	100.0000	af2df581120a
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	0a71e37db8b5
@@ -623,7 +623,7 @@ SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	100.0000	f4f2251c4115
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	100.0000	e61231df2594
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	a0b6e860755c
 SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	e41fd89aaaee
-SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	100.0000	e41e77832a2c
+SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	100.0000	9136c4a7e44e
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	100.0000	3feb9bfd7354
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	100.0000	0a51d26ad212
 SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	26ed83e577b0
@@ -639,10 +639,10 @@ SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	100.0000	e5135247a68e
 SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	3c0c8dc6c691
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	2497244dca4d
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	fb94ab0eedd2
-SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	013a1e21df02
+SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	c8425bc61648
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	9bcbc1f1819f
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	100.0000	64fdabde0ef0
-SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	f73d4dce0953
+SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	f4d0114632b2
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	100.0000	e6524a951904
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	3ce99943f8d4
 SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	100.0000	c8ff984ab0b7
@@ -682,8 +682,8 @@ SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	100.0000	
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	100.0000	8b83f9048487
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	bd6383bac4ac
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	100.0000	8c3862d92571
-SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	100.0000	3c10db938c39
-SOURCE/COMMAND	?ResetRound@combatManager@@QAEXXZ	100.0000	fe4fcd499fc4
+SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	100.0000	722d8df4d4a9
+SOURCE/COMMAND	?ResetRound@combatManager@@QAEXXZ	100.0000	c8e47705b3a1
 SOURCE/COMMAND	?RightClick@combatManager@@QAEHH@Z	100.0000	b771b8b7d75b
 SOURCE/COMMAND	?SetCombatDirections@combatManager@@QAEXH@Z	100.0000	0ed67373ec75
 SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	b4a3270ccdc1
@@ -701,7 +701,7 @@ SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	f001e2d1b8d7
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	0dce0b9dd04e
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	a4998dc2cb65
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	451de9dcf5d2
-SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	bdbc1262bc89
+SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	100.0000	27056b2e42b1
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	100.0000	76b7aa5ba54f
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	9817f3742cf0
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	b1f5e2610cf8
@@ -722,7 +722,7 @@ SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	c6ef928dafe1
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	05919826afee
 SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	100.0000	423fbdef51de
-SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	ee5cc17f4ec9
+SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	e11bacf24c8e
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	69430a221a18
 SOURCE/DRAWING	?ClearCombatMessages@combatManager@@QAEXH@Z	100.0000	e1a436313fd6
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	0ca4e5f64c22
@@ -743,7 +743,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	100.0000	a7851568c8a5
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	6d65e4a57aac
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	8935a8542110
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	86958366c2e8
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	5249930d4a01
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	100.0000	26b71a4cee5c
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	513b63843f4a
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	4fd997614fe0
@@ -767,7 +767,7 @@ SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	28c1
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	b99b9bb7ea66
 SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	4bf5dedd8768
 SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	100.0000	319fa61e3f87
-SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	100.0000	b29beebe230c
+SOURCE/EVENTS	?ReceiveHeroTownData@advManager@@QAEXPADPAH11PAPAVhero@@PAPAVarmyGroup@@PAPAVtown@@23111PAC55@Z	100.0000	fb191cfa21a1
 SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	100.0000	ae7675c2dbdd
 SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	9749fe059c81
 SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	9594d8c8f2b6
@@ -1016,7 +1016,7 @@ SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	100.0000	035c2e1ab7a6
 SOURCE/KB	?WaitEndSample@@YIXPAPAVsample@@H@Z	100.0000	c526c35032e2
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	5e3cf46f868f
 SOURCE/KB	?WaitHandler@@YIHAAUtag_message@@@Z	100.0000	fddb8d63da9d
-SOURCE/KB	?oldmain@@YIHXZ	100.0000	17ea5bfad31f
+SOURCE/KB	?oldmain@@YIHXZ	100.0000	af46938fc754
 SOURCE/KB	?toupper@@YIDD@Z	100.0000	7ef88e561c06
 SOURCE/KB	@PollSound@0	100.0000	7ec8709415d5
 SOURCE/Modem	?Connect@@YIXXZ	100.0000	7e100589fadf
@@ -1102,7 +1102,7 @@ SOURCE/PHILAI	?DamageGroup@philAI@@QAEHPAVarmyGroup@@PAVhero@@1M@Z	100.0000	19f4
 SOURCE/PHILAI	?DetermineHeroToMove@philAI@@QAEPAVhero@@H@Z	100.0000	dbc8a1ffdb08
 SOURCE/PHILAI	?DetermineTargetPosition@philAI@@QAEHAAH0H0@Z	100.0000	47ea21c37442
 SOURCE/PHILAI	?DimensionDoorTo@philAI@@QAEXHH@Z	100.0000	052627b93e4b
-SOURCE/PHILAI	?DoAI@philAI@@QAEXH@Z	100.0000	4196314b4392
+SOURCE/PHILAI	?DoAI@philAI@@QAEXH@Z	100.0000	3864b59ae3f4
 SOURCE/PHILAI	?DoAllHeroInteractions@philAI@@QAEXXZ	100.0000	75fa2cedf70b
 SOURCE/PHILAI	?DoAnywhereDDoorTownGate@philAI@@QAEHH@Z	100.0000	d11ece973754
 SOURCE/PHILAI	?DoDimensionDoor@philAI@@QAEHPAVhero@@@Z	100.0000	ea22ee813bc6
@@ -1117,7 +1117,7 @@ SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	8
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	4790a55b9566
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	100.0000	d1a9bd421442
 SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	100.0000	70f973d704af
-SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	100.0000	b7971a2f7053
+SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	100.0000	c33a2fa68d8e
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	100.0000	75c4cf8b762a
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	5f7ca759b6c8
 SOURCE/PHILAI	?GetBestBHC@philAI@@QAEXHAAUBHC@@@Z	100.0000	01e845f773c2
@@ -1324,7 +1324,7 @@ SOURCE/TOWNMGR	?Main@townManager@@UAEHAAUtag_message@@@Z	100.0000	6e393c8c95c4
 SOURCE/TOWNMGR	?Open@townManager@@UAEHH@Z	100.0000	fc52754b7946
 SOURCE/TOWNMGR	?RecruitHero@townManager@@QAEHHH@Z	100.0000	f4ed3b7a3ffa
 SOURCE/TOWNMGR	?RedrawTownScreen@townManager@@QAEXXZ	100.0000	2222f447b4b7
-SOURCE/TOWNMGR	?ResetStrips@townManager@@QAEXXZ	100.0000	8d9b949fddc6
+SOURCE/TOWNMGR	?ResetStrips@townManager@@QAEXXZ	100.0000	83ba762d33b0
 SOURCE/TOWNMGR	?SetArmyCommand@townManager@@QAEXH@Z	100.0000	71aa71093e4b
 SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	100.0000	169e6c310a37
 SOURCE/TOWNMGR	?SetupExtraStuff@townManager@@QAEXXZ	100.0000	c11292107d10
@@ -1396,7 +1396,7 @@ SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	100.0000	d1c048a4126a
 SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	100.0000	4e85b59910f2
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	100.0000	5029d88be61f
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	7fe2d921f763
-SOURCE/comwin	?com_init@@YIFEHH@Z	100.0000	4d7c70482d8a
+SOURCE/comwin	?com_init@@YIFEHH@Z	100.0000	2d75b603f988
 SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	79fe8dd26270
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	d3dfb2830a60
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	3af4623c9b92
@@ -1425,7 +1425,7 @@ SOURCE/kbwin	?AppAbout@@YGHPAXIIJ@Z	100.0000	cebe58086bdb
 SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	100.0000	c2e327024b46
 SOURCE/kbwin	?AppExit@@YIXXZ	100.0000	5d5226685dd1
 SOURCE/kbwin	?AppIdle@@YIHXZ	100.0000	e56177564a5b
-SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	100.0000	552d24346e8d
+SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	100.0000	14bcbb42ab18
 SOURCE/kbwin	?AppWndProc@@YGJPAXIIJ@Z	100.0000	7e205058d5ef
 SOURCE/kbwin	?InitVideo@@YIXXZ	100.0000	8a6cdef92d87
 SOURCE/kbwin	?KBChangeMenu@@YIXPAX@Z	100.0000	36466bd379d2

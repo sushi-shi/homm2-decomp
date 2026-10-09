@@ -358,10 +358,14 @@ void combatManager::InitNonVisualVars(void) {
     m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] = false;
     m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE)] = false;
     m_combatResult = COMBAT_RESULT_PENDING;
-    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
-    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
-    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
-    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
+    m_heroLossReactionPlayed[1] = 0;
+    m_heroLossReactionPlayed[0] = 0;
+    m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = 0;
+    m_heroLossReactionPending[1] = 0;
+    m_heroLossReactionPending[0] = 0;
+    m_heroOpponentLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = 0;
     m_eagleEyeSpell[IDX(COMBAT_ATTACKER_SIDE)] = SPELL_NONE;
     m_eagleEyeSpell[IDX(COMBAT_DEFENDER_SIDE)] = SPELL_NONE;
     giNextAction = ACTION_NONE;
@@ -893,7 +897,8 @@ void combatManager::LoadArmies(void) {
     CombatSide side;
     i32 hex;
 
-    m_armyCount[IDX(COMBAT_ATTACKER_SIDE)] = m_armyCount[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_armyCount[IDX(COMBAT_DEFENDER_SIDE)] = 0;
+    m_armyCount[IDX(COMBAT_ATTACKER_SIDE)] = 0;
 
     for (groupSlot = 0; groupSlot < COMBAT_ARMY_SLOT_COUNT; groupSlot++) {
         for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
@@ -1264,7 +1269,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     LogStr("CA1");
     if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
         || m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
-        m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
+        m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
+        m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = COMBAT_SIDE_NONE;
         DrawSmallView(IDX(COMBAT_ATTACKER_SIDE), true);
         DrawSmallView(IDX(COMBAT_DEFENDER_SIDE), true);
     }

@@ -1079,15 +1079,20 @@ VA(0x0042d1a5, 0x1c4)
 void combatManager::ResetRound(void) {
     i32 H2_UNUSED(unusedResetRoundWord);
 
-    m_heroLossReactionPlayed[0] = m_heroLossReactionPlayed[1] = 0;
-    m_heroOpponentLossReactionPlayed[0] = m_heroOpponentLossReactionPlayed[1] = 0;
-    m_heroLossReactionPending[0] = m_heroLossReactionPending[1] = 0;
-    m_heroOpponentLossReactionPending[0] = m_heroOpponentLossReactionPending[1] = 0;
+    m_heroLossReactionPlayed[1] = 0;
+    m_heroLossReactionPlayed[0] = 0;
+    m_heroOpponentLossReactionPlayed[1] = 0;
+    m_heroOpponentLossReactionPlayed[0] = 0;
+    m_heroLossReactionPending[1] = 0;
+    m_heroLossReactionPending[0] = 0;
+    m_heroOpponentLossReactionPending[1] = 0;
+    m_heroOpponentLossReactionPending[0] = 0;
     m_catapultAttacksRemaining[0] = m_catapultAttackCount[0];
     m_catapultAttacksRemaining[1] = m_catapultAttackCount[1];
     m_keepAttacksRemaining[0] = 1;
     m_keepAttacksRemaining[1] = 1;
-    m_heroCastSpell[0] = m_heroCastSpell[1] = false;
+    m_heroCastSpell[1] = false;
+    m_heroCastSpell[0] = false;
 
     memset(gpCombatManager->m_removedArmies, 0, sizeof(gpCombatManager->m_removedArmies));
     gpCombatManager->m_removedArmyPresent = 0;
@@ -2543,8 +2548,10 @@ void combatManager::ResetMouse(void) {
         ClearCombatMessages(0);
         gpMouseManager->MouseCoords(mouseX, mouseY);
         message.type = MESSAGE_MOUSE_MOVE;
-        message.payload.mouse.x = message.payload.mouse.screenX = mouseX;
-        message.payload.mouse.y = message.payload.mouse.screenY = mouseY;
+        message.payload.mouse.screenX = mouseX;
+        message.payload.mouse.x = message.payload.mouse.screenX;
+        message.payload.mouse.screenY = mouseY;
+        message.payload.mouse.y = message.payload.mouse.screenY;
         ProcessCombatMsg(message);
     } else {
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);

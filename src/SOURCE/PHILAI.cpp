@@ -1311,12 +1311,14 @@ void philAI::DoAI(i32 player) {
     CheckBuyStuff();
     IncrementHourGlass();
 
-    while ((currentHero = DetermineHeroToMove(player)) != NULL) {
+aiHeroLoop:
+    currentHero = DetermineHeroToMove(player);
+    if (currentHero != NULL) {
         ValidateHero(currentHero);
         gpCurAIHero = currentHero;
         if (gpCurAIHero->m_patrolX != HERO_PATROL_NONE && gpCurAIHero->m_patrolRadius == 0) {
             gpCurAIHero->m_remainingMobility = 0;
-            continue;
+            goto aiHeroLoop;
         }
 
         giCurAIHeroMorale = gpCurAIHero->m_army.GetMorale(gpCurAIHero, NULL, NULL);
@@ -1558,6 +1560,7 @@ void philAI::DoAI(i32 player) {
         if (gpCurAIHero->m_locationType == (MAP_ACTION_TRIGGER(MAP_OBJECT_CASTLE))) {
             CheckBuyStuff();
         }
+        goto aiHeroLoop;
     }
 
 aiCleanup:
@@ -5725,10 +5728,9 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, b32 evaluateOnly) {
     );
     if (evaluateOnly != false)
         return battleValue;
-    if (worthFighting != 0
-        && (combatResult =
-                QuickCombat(&heroPointer->m_army, heroPointer, gpMonGroup, NULL, 0, 0, attackerCasualtyFraction, defenderCasualtyFraction))
-               != false) {
+    if (worthFighting != 0) {
+        combatResult = QuickCombat(&heroPointer->m_army, heroPointer, gpMonGroup, NULL, 0, 0, attackerCasualtyFraction, defenderCasualtyFraction);
+        if (combatResult != false) {
         switch (eventType) {
             case MAP_OBJECT_SHIPWRECK:
                 switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5781,7 +5783,8 @@ i32 philAI::FightEvent(hero* heroPointer, mapCell* cell, b32 evaluateOnly) {
                 }
                 break;
         }
-        cell->m_objectMetadata = FIGHT_EVENT_EMPTY;
+            cell->m_objectMetadata = FIGHT_EVENT_EMPTY;
+        }
     }
     return 0;
 }

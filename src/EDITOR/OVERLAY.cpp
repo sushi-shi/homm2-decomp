@@ -1351,8 +1351,10 @@ b32 overlayManager::SelectOverlay(i32 index) {
                 gEditManager->m_cursorX = EDIT_NO_CELL;
                 message.type = MESSAGE_MOUSE_MOVE;
                 gpMouseManager->MouseCoords(x, y);
-                message.payload.mouse.screenX = message.payload.mouse.x = x;
-                message.payload.mouse.screenY = message.payload.mouse.y = y;
+                message.payload.mouse.x = x;
+                message.payload.mouse.screenX = message.payload.mouse.x;
+                message.payload.mouse.y = y;
+                message.payload.mouse.screenY = message.payload.mouse.y;
                 Main(message);
                 return true;
             }

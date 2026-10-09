@@ -216,8 +216,10 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 dsrFlo
         ShutdownComError("Configure communications device");
 
     portTimeouts.ReadIntervalTimeout = MAXDWORD;
-    portTimeouts.ReadTotalTimeoutMultiplier = portTimeouts.ReadTotalTimeoutConstant = 0;
-    portTimeouts.WriteTotalTimeoutMultiplier = portTimeouts.WriteTotalTimeoutConstant = 0;
+    portTimeouts.ReadTotalTimeoutConstant = 0;
+    portTimeouts.ReadTotalTimeoutMultiplier = portTimeouts.ReadTotalTimeoutConstant;
+    portTimeouts.WriteTotalTimeoutConstant = 0;
+    portTimeouts.WriteTotalTimeoutMultiplier = portTimeouts.WriteTotalTimeoutConstant;
     result = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
     if (result == 0)
         ShutdownComError("Set communications timeouts");

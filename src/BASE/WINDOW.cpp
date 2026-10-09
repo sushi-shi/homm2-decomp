@@ -42,14 +42,17 @@ H2_ENUM_END(WindowConstant)
 VA(0x004ba5c0, 0x99)
 heroWindow::heroWindow(void) {
     strcpy(m_name, "Default Construct");
-    m_nextWindow = m_prevWindow = NULL;
+    m_prevWindow = NULL;
+    m_nextWindow = NULL;
     m_zOrder = WINDOW_Z_ORDER_TOP;
-    m_posX = m_posY = 0;
+    m_posY = 0;
+    m_posX = 0;
     m_winWidth = LOGICAL_SCREEN_WIDTH;
     m_winHeight = LOGICAL_SCREEN_HEIGHT;
     m_winFlags = WINDOW_FLAG_FIXED_LAYER;
     m_winState = WINDOW_STATE_CLOSED;
-    m_widgetListTail = m_widgetListHead = NULL;
+    m_widgetListHead = NULL;
+    m_widgetListTail = NULL;
     m_savedBackground = NULL;
 }
 
@@ -62,7 +65,8 @@ heroWindow::heroWindow(
     i32 x, i32 y, i32 width, i32 height, H2_ENUM_PARAM(WindowFlag, i32) flags
 ) {
     strcpy(m_name, "Dynamic Construct");
-    m_nextWindow = m_prevWindow = NULL;
+    m_prevWindow = NULL;
+    m_nextWindow = NULL;
     m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
     m_posY = y;
@@ -70,7 +74,8 @@ heroWindow::heroWindow(
     m_winHeight = height;
     m_winFlags = flags;
     m_winState = WINDOW_STATE_CLOSED;
-    m_widgetListTail = m_widgetListHead = NULL;
+    m_widgetListHead = NULL;
+    m_widgetListTail = NULL;
     m_savedBackground = NULL;
 }
 #if H2_RETAIL_COMPILER
@@ -100,7 +105,8 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
     resourceId = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(resourceId);
     m_savedBackground = NULL;
-    m_nextWindow = m_prevWindow = NULL;
+    m_prevWindow = NULL;
+    m_nextWindow = NULL;
     m_winState = WINDOW_STATE_CLOSED;
     m_zOrder = WINDOW_Z_ORDER_TOP;
     m_posX = x;
@@ -109,7 +115,8 @@ heroWindow::heroWindow(i32 x, i32 y, H2_CONST char* resourceName) {
     m_winHeight = gpResourceManager->ReadWord();
     m_winFlags = static_cast<WindowFlag>(gpResourceManager->ReadWord());
     m_winFlags |= WINDOW_FLAG_OWNS_WIDGETS;
-    m_widgetListTail = m_widgetListHead = NULL;
+    m_widgetListHead = NULL;
+    m_widgetListTail = NULL;
     finishedReading = 0;
     while (finishedReading == 0) {
         PollSound();
@@ -308,7 +315,8 @@ void heroWindow::RemoveWidget(class widget* currentWidget) {
     }
     widget* nextWidget = currentWidget->m_next;
     if (nextWidget == NULL) {
-        m_widgetListTail = m_widgetListHead = NULL;
+        m_widgetListHead = NULL;
+        m_widgetListTail = NULL;
     } else {
         nextWidget->m_prev = currentWidget->m_prev;
         if (nextWidget->m_prev != NULL)
@@ -328,7 +336,8 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
     MessageDispatchResult dispatchResult = MESSAGE_DISPATCH_CONTINUE;
     widget* currentWidget = m_widgetListHead;
     while (currentWidget != NULL) {
-        switch (dispatchResult = currentWidget->Main(message)) {
+        dispatchResult = currentWidget->Main(message);
+        switch (dispatchResult) {
             case MESSAGE_DISPATCH_CONTINUE:
                 break;
             case MESSAGE_DISPATCH_CONSUME:
