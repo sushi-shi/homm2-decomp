@@ -126,7 +126,7 @@ BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	100.0000	1e045a210a1f
 BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	100.0000	2493c0e48787
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	100.0000	8064efa3be3f
-BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	3a6953eda77e
+BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	100.0000	9f29938dbb3f
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	0d6f2a691836
 BASE/Midi	?MIDIIsPlaying@@YI_NXZ	100.0000	1cef32d6c5b4
 BASE/Midi	?MIDIPlay@@YIXAAH0H@Z	100.0000	515370be1dfb
@@ -262,7 +262,7 @@ BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	100.0000	6dde390901c4
 BASE/WINDOW	??0heroWindow@@QAE@HHPAD@Z	100.0000	ab722fc9daf7
 BASE/WINDOW	??0heroWindow@@QAE@XZ	100.0000	e42bfcc2fb0f
 BASE/WINDOW	?AddWidget@heroWindow@@QAEXPAVwidget@@H@Z	100.0000	4fc7db5f0327
-BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	3ddeb9f0d8ce
+BASE/WINDOW	?BroadcastMessage@heroWindow@@QAEHAAUtag_message@@@Z	100.0000	67a6a1c4a35b
 BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	e5aafc82e4f1
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	0e54dd7b9f4c
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	100.0000	e39de57c4b23
@@ -285,7 +285,7 @@ BASE/WINMGR	?CycleColors@@YIXH@Z	100.0000	bdffa89e48f1
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	100.0000	759af4099c8a
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	2e2c6c0bc195.3e185ae21be4
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	100.0000	ac4adbbd6c49
-BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	a52ba7a90345
+BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	54c1e040d820
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	64912fae8a6c
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	ad9def206a5e
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	dcd7ce3959af
